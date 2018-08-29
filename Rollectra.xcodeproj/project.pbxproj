@@ -13,6 +13,13 @@
 		21C0FC7421369EB800849420 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7321369EB800849420 /* Assets.xcassets */; };
 		21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7521369EB800849420 /* LaunchScreen.storyboard */; };
 		21C0FC7A21369EB800849420 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC7921369EB800849420 /* main.m */; };
+		21C0FC8721369EE900849420 /* kmem.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8021369EE900849420 /* kmem.c */; };
+		21C0FC8821369EE900849420 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC8421369EE900849420 /* README */; };
+		21C0FC8921369EE900849420 /* sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* sploit.c */; };
+		21C0FC8A21369EE900849420 /* offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8621369EE900849420 /* offsets.m */; };
+		21C0FC8E2136A0D100849420 /* qilin.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC8C2136A0D100849420 /* qilin.o */; };
+		21C0FC912136A46500849420 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
+		21C0FC932136B97100849420 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC922136B97100849420 /* Icon.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +33,19 @@
 		21C0FC7621369EB800849420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		21C0FC7821369EB800849420 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		21C0FC7921369EB800849420 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		21C0FC8021369EE900849420 /* kmem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kmem.c; sourceTree = "<group>"; };
+		21C0FC8121369EE900849420 /* sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sploit.h; sourceTree = "<group>"; };
+		21C0FC8221369EE900849420 /* offsets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = offsets.h; sourceTree = "<group>"; };
+		21C0FC8321369EE900849420 /* kmem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kmem.h; sourceTree = "<group>"; };
+		21C0FC8421369EE900849420 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		21C0FC8521369EE900849420 /* sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sploit.c; sourceTree = "<group>"; };
+		21C0FC8621369EE900849420 /* offsets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = offsets.m; sourceTree = "<group>"; };
+		21C0FC8B21369FC500849420 /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		21C0FC8C2136A0D100849420 /* qilin.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = qilin.o; sourceTree = "<group>"; };
+		21C0FC8D2136A0D100849420 /* QiLin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QiLin.h; sourceTree = "<group>"; };
+		21C0FC8F2136A2C500849420 /* iokit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iokit.h; sourceTree = "<group>"; };
+		21C0FC902136A46500849420 /* SpringBoardServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpringBoardServices.framework; sourceTree = "<group>"; };
+		21C0FC922136B97100849420 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +53,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				21C0FC912136A46500849420 /* SpringBoardServices.framework in Frameworks */,
+				21C0FC8E2136A0D100849420 /* qilin.o in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -58,6 +80,19 @@
 		21C0FC6921369EB700849420 /* Rollectra */ = {
 			isa = PBXGroup;
 			children = (
+				21C0FC922136B97100849420 /* Icon.png */,
+				21C0FC902136A46500849420 /* SpringBoardServices.framework */,
+				21C0FC8F2136A2C500849420 /* iokit.h */,
+				21C0FC8D2136A0D100849420 /* QiLin.h */,
+				21C0FC8C2136A0D100849420 /* qilin.o */,
+				21C0FC8B21369FC500849420 /* common.h */,
+				21C0FC8021369EE900849420 /* kmem.c */,
+				21C0FC8321369EE900849420 /* kmem.h */,
+				21C0FC8221369EE900849420 /* offsets.h */,
+				21C0FC8621369EE900849420 /* offsets.m */,
+				21C0FC8421369EE900849420 /* README */,
+				21C0FC8521369EE900849420 /* sploit.c */,
+				21C0FC8121369EE900849420 /* sploit.h */,
 				21C0FC6A21369EB700849420 /* AppDelegate.h */,
 				21C0FC6B21369EB700849420 /* AppDelegate.m */,
 				21C0FC6D21369EB700849420 /* ViewController.h */,
@@ -128,7 +163,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				21C0FC8821369EE900849420 /* README in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
+				21C0FC932136B97100849420 /* Icon.png in Resources */,
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
 				21C0FC7221369EB700849420 /* Main.storyboard in Resources */,
 			);
@@ -142,7 +179,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				21C0FC6F21369EB700849420 /* ViewController.m in Sources */,
+				21C0FC8721369EE900849420 /* kmem.c in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
+				21C0FC8921369EE900849420 /* sploit.c in Sources */,
+				21C0FC8A21369EE900849420 /* offsets.m in Sources */,
 				21C0FC6C21369EB700849420 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -283,14 +323,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Rollectra",
+				);
 				INFOPLIST_FILE = Rollectra/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = fun.apfs.Rollectra;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					IOKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = fun.apfs.rollectra;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -299,14 +352,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Rollectra",
+				);
 				INFOPLIST_FILE = Rollectra/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = fun.apfs.Rollectra;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					IOKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = fun.apfs.rollectra;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

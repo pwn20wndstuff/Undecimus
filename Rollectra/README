@@ -1,0 +1,137 @@
+empty_list - exploit for p0 issue 1564 (CVE-2018-4243) iOS 11.0 - 11.3.1 kernel r/w
+@i41nbeer
+
+BUG:
+getvolattrlist takes a user controlled bufferSize argument via the fgetattrlist syscall.
+
+When allocating a kernel buffer to serialize the attr list to there's the following comment:
+
+/*
+* Allocate a target buffer for attribute results.
+* Note that since we won't ever copy out more than the caller requested,
+* we never need to allocate more than they offer.
+*/
+  ab.allocated = ulmin(bufferSize, fixedsize + varsize);
+  if (ab.allocated > ATTR_MAX_BUFFER) {
+    error = ENOMEM;
+   VFS_DEBUG(ctx, vp, "ATTRLIST - ERROR: buffer size too large (%d limit %d)", ab.allocated, ATTR_MAX_BUFFER);
+    goto out;
+  }
+  MALLOC(ab.base, char *, ab.allocated, M_TEMP, M_ZERO | M_WAITOK);
+
+The problem is that the code doesn't then correctly handle the case when the user supplied buffer size
+is smaller that the requested header size. If we pass ATTR_CMN_RETURNED_ATTRS we'll hit the following code:
+
+  /* Return attribute set output if requested. */
+  if (return_valid) {
+    ab.actual.commonattr |= ATTR_CMN_RETURNED_ATTRS;
+    if (pack_invalid) {
+      /* Only report the attributes that are valid */
+      ab.actual.commonattr &= ab.valid.commonattr;
+      ab.actual.volattr &= ab.valid.volattr;
+    }
+    bcopy(&ab.actual, ab.base + sizeof(uint32_t), sizeof (ab.actual));
+  }
+
+There's no check that the allocated buffer is big enough to hold at least that.
+
+Exploitation:
+I hope to publish a longer-form write up of this, these are some rough notes on how the exploit works:
+
+The bug gives you the ability to write 8 zero bytes off the end of a kalloc.16 allocation. Whilst it looks like you
+might be able to control a few bits in those bytes I'm not sure you actually can so I focused on exploiting
+as if it was writing a NULL pointer off the end.
+
+This is pretty limited primitive so the first step is to try to enumerate possible things you could do:
+  * target a reference count, trying to turn the overflow into a UaF bug
+  * target a lock, trying to turn the overflow into a race condition bug
+  * target a pointer, trying to leak a reference count
+  * target a validated datastructure where 0 is an interesting value to change something to
+
+In the end I chose the first option. There are then two further requirements:
+  * target needs a reference count in the first 8 bytes
+  * target has to be overflowable into from kalloc.16
+
+I chose to target struct ipc_port, which has a reference count field as its second dword thus fulfilling the
+first requirement. It is however not allocated in kalloc.16; instead it lives in its own zone (ipc_ports.)
+
+This means we have to aligned a kalloc.16 zone block just before an ipc_ports one, then overflow out of the
+last kalloc.16 allocation in the kalloc.16 block into the first on in ipc_ports.
+
+There are two tricks we can use to make this easier:
+  1) freelist reversal
+  2) safely-overflowable allocations
+
+Freelist Reversal:
+zone allocations will come first from intermediate (partially full) pages. This means that if we just start free'ing and
+allocating k.16 objects somewhere in the middle of the groom they won't be re-used until
+the current intermediate page is either full or empty.
+
+this provides a challenge because fresh page's freelist's are filled semi-randomly such that
+their allocations will go from the inside to the outside:
+
+  | 9 8 6 5 2 1 3 4 7 10 | <-- example "randomized" allocation order from a fresh all-free page
+
+this means that our final intermediate k.16 and ports pages will look a bit like this:
+
+  | - - - 5 2 1 3 4 - - | - - - 4 1 2 3 5 - - |
+          kalloc.16             ipc_ports
+
+if we use the overflow to corrupt a freelist entry we'll panic if it gets allocated, so we
+need to avoid that
+
+the trick is that by controlling the allocation and free order we can reverse the freelists such that
+the final intermediate pages will look more like this:
+  | 1 4 - - - - - 5 3 2 | 2 5 - - - - - 4 3 1 |
+        kalloc.16               ipc_ports
+
+at this point we're much more likely to be able to free a kalloc.16 and realloc it for the overflow
+such that we can hit the first qword of an ipc_port.
+
+Safely-Overflowable allocations:
+since there are likely to be many candidate allocations we're gonna have to overflow out of before we hit the
+target one (which is right at the end, just before the ipc_port) we need to make sure that the allocated objects
+on the kalloc.16 page are safe to corrupt with a NULL pointer.
+
+I use mach message ool_port descriptors for this, as NULL is a valid value.
+
+Exploit Flow:
+We do the groom to reverse the kalloc.16 freelists and start trying to overflow into an ipc_port.
+
+We know the approximate range of mach port names which contain the to-be-corrupted port; after each overflow attempt
+we check each of these ports to see if the port was corrupted. A side-effect of successful corruption is that the
+port's io_active flag will be set to zero. We can detect this without causing side-effects using the
+mach_port_kobject MIG method.
+
+Once we find the corrupted port we need to cause a reference to be taken and dropped on it; and more importantly we
+need the code path which does this to not check the io_active flag. mach_port_set_attributes will do this for us.
+
+Now we've turned our NULL pointer write off the end of a kalloc.16 into a dangling mach port :)
+
+We cause a zone gc, aiming to get the port's memory reused as a kalloc.4096 page. We first get it reused as a ool_ports
+descriptor where the ip_context field overlaps with a send right we send ourselves to a canary port. This lets us
+learn the approximate address of our objects in the kernel. We then replace the ool_desc with a pipe buffer,
+and with a bit of fiddling are able to work out where the dangling mach port is in memory.
+
+We craft a fake kernel task port in there then clean up.
+
+Reliability:
+The exploit does work, which was my goal :) Reliablilty is something like 30% maybe, it all hinges on how quickly you can do the initial overflow
+and test loop. If something else comes in and allocates or frees in kalloc.16 you increase the probability that you
+corrupt a freelist entry or something else and will panic.
+
+I'm sure the exploit can be made more reliable; I've only got it to the point where I've demonstrated that this
+bug is exploitable. If you want to take this as a starting point and demonstrate how to improve reliability I'd love
+to read a blog post! I imagine this would involve actually monitoring kalloc.16 allocations and understanding what
+the failure cases are and how they can be prevented.
+
+Success rates seem to be highest when the device has been rebooted and left idle for a bit.
+
+Cleanup:
+If the exploit does work it should clean up after itself and not panic the device. The fake kernel task port will stay alive.
+
+Use the functions in kmem.h to read and write kernel memory. Persist a send-right to tfp0 in there if you want to keep
+kernel memory access after this process exits.
+
+I've tested on: iPod Touch 6G, iPhone 6S, iPhone SE, iPhone 7, iPhone 8
+It should work on iOS 11 through iOS 11.3.1
