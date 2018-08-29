@@ -266,29 +266,83 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
         LOG("%@", NSLocalizedString(@"Successfully rebooted.", nil));
     }
 }
+    
+- (IBAction)tappedOnUnjailbreak:(id)sender {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Confirmation", nil) message:NSLocalizedString(@"Are you sure want to erase all data and unjailbreak the device?", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *OK = [UIAlertAction actionWithTitle:NSLocalizedString(@"Erase All", nil) style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.unjailbreakButton setEnabled:NO];
+            });
+#ifndef WANT_CYDIA
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.unjailbreakButton setTitle:NSLocalizedString(@"Exploiting...", nil) forState:UIControlStateDisabled];
+            });
+#endif    /* WANT_CYDIA */
+#ifndef WANT_CYDIA
+            // Initialize kernel exploit.
+            LOG("%@", NSLocalizedString(@"Initializing kernel exploit...", nil));
+            vfs_sploit();
+#endif    /* WANT_CYDIA */
+#ifndef WANT_CYDIA
+            // Validate TFP0.
+            LOG("%@", NSLocalizedString(@"Validating TFP0...", nil));
+            _assert(MACH_PORT_VALID(tfp0));
+            LOG("%@", NSLocalizedString(@"Successfully validated TFP0.", nil));
+#endif    /* WANT_CYDIA */
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.unjailbreakButton setTitle:NSLocalizedString(@"Unjailbreaking...", nil) forState:UIControlStateDisabled];
+            });
+#ifdef WANT_CYDIA
+            unjailbreak(false);
+#else    /* !WANT_CYDIA */
+            unjailbreak(tfp0, (uint64_t)get_kernel_base(tfp0), false);
+#endif    /* !WANT_CYDIA */
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.unjailbreakButton setTitle:NSLocalizedString(@"Failed, reboot.", nil) forState:UIControlStateDisabled];
+            });
+        });
+    }];
+    UIAlertAction *Cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleDefault handler:nil];
+    [alertController addAction:OK];
+    [alertController addAction:Cancel];
+    [alertController setPreferredAction:Cancel];
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+    
++ (NSURL *)getURLForUserName:(NSString *)userName {
+    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetbot://"]]) {
+        return [NSURL URLWithString:[NSString stringWithFormat:@"tweetbot:///user_profile/%@", userName]];
+    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitterrific://"]]) {
+        return [NSURL URLWithString:[NSString stringWithFormat:@"twitterrific:///profile?screen_name=%@", userName]];
+    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetings://"]]) {
+        return [NSURL URLWithString:[NSString stringWithFormat:@"tweetings:///user?screen_name=%@", userName]];
+    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitter://"]]) {
+        return [NSURL URLWithString:[NSString stringWithFormat:@"https://mobile.twitter.com/%@", userName]];
+    } else {
+        return [NSURL URLWithString:[NSString stringWithFormat:@"https://mobile.twitter.com/%@", userName]];
+    }
+}
+    
+- (IBAction)tappedOnMe:(id)sender {
+    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
+}
+    
+- (IBAction)tappedOnAesign_:(id)sender {
+    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"aesign_"] options:@{} completionHandler:nil];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
-#ifndef WANT_CYDIA
-    // Initialize kernel exploit.
-    LOG("%@", NSLocalizedString(@"Initializing kernel exploit...", nil));
-    vfs_sploit();
-#endif    /* WANT_CYDIA */
-    
-#ifndef WANT_CYDIA
-    // Validate TFP0.
-    LOG("%@", NSLocalizedString(@"Validating TFP0...", nil));
-    _assert(MACH_PORT_VALID(tfp0));
-    LOG("%@", NSLocalizedString(@"Successfully validated TFP0.", nil));
-#endif    /* WANT_CYDIA */
-    
-#ifdef WANT_CYDIA
-    unjailbreak(true);
-#else    /* !WANT_CYDIA */
-    unjailbreak(tfp0, (uint64_t)get_kernel_base(tfp0), true);
-#endif    /* !WANT_CYDIA */
+    NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:@"Revert all changes,\nfor a stock iOS."];
+    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:19 weight:UIFontWeightBold] range:[@"Revert all changes,\nfor a stock iOS." rangeOfString:@"Revert "]];
+    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:19 weight:UIFontWeightMedium] range:[@"Revert all changes,\nfor a stock iOS." rangeOfString:@"all changes,\nfor a stock i"]];
+    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:19 weight:UIFontWeightBold] range:[@"Revert all changes,\nfor a stock iOS." rangeOfString:@"OS."]];
+    [self.infoLabel setAttributedText:str];
+    [self.unjailbreakButton addTarget:self action:@selector(tappedOnUnjailbreak:) forControlEvents:UIControlEventTouchUpInside];
+    [self.myButton addTarget:self action:@selector(tappedOnMe:) forControlEvents:UIControlEventTouchUpInside];
+    [self.aesign_Button addTarget:self action:@selector(tappedOnAesign_:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -296,5 +350,8 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
     // Dispose of any resources that can be recreated.
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
 
 @end

@@ -41,5 +41,14 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tweetbot</string>
+		<string>twitterrific</string>
+		<string>tweetings</string>
+		<string>twitter</string>
+	</array>
 </dict>
 </plist>
