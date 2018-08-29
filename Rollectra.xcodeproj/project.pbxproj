@@ -1,0 +1,544 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		21675B312149576D00D20E2B /* jailbreakd.plist in Resources */ = {isa = PBXBuildFile; fileRef = 21675B292149576C00D20E2B /* jailbreakd.plist */; };
+		21675B3F21495F0000D20E2B /* Painting_With_Chocolate.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21675B3E21495F0000D20E2B /* Painting_With_Chocolate.ttf */; };
+		21675B4221495F1200D20E2B /* SF-Pro-Display-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 21675B4021495F1100D20E2B /* SF-Pro-Display-Semibold.otf */; };
+		21675B4321495F1200D20E2B /* SF-Pro-Display-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 21675B4121495F1100D20E2B /* SF-Pro-Display-Medium.otf */; };
+		21675B63214A68B700D20E2B /* qilin.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC8C2136A0D100849420 /* qilin.o */; };
+		21675B6D214A692400D20E2B /* libjb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 21A97FCF2148103C00DC0023 /* libjb.a */; };
+		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
+		21A97FD12148103C00DC0023 /* kexecute.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC82148103B00DC0023 /* kexecute.m */; };
+		21A97FD22148103C00DC0023 /* patchfinder64.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCA2148103B00DC0023 /* patchfinder64.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		21A97FD32148103C00DC0023 /* kutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCC2148103B00DC0023 /* kutils.c */; };
+		21A97FD42148103C00DC0023 /* remote_call.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCD2148103B00DC0023 /* remote_call.c */; };
+		21C0FC6C21369EB700849420 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6B21369EB700849420 /* AppDelegate.m */; };
+		21C0FC7221369EB700849420 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7021369EB700849420 /* Main.storyboard */; };
+		21C0FC7421369EB800849420 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7321369EB800849420 /* Assets.xcassets */; };
+		21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7521369EB800849420 /* LaunchScreen.storyboard */; };
+		21C0FC7A21369EB800849420 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC7921369EB800849420 /* main.m */; };
+		21C0FC8721369EE900849420 /* kmem.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8021369EE900849420 /* kmem.c */; };
+		21C0FC8921369EE900849420 /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		21C0FC8A21369EE900849420 /* offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8621369EE900849420 /* offsets.m */; };
+		21C0FC912136A46500849420 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
+		21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C130DE214BC2880021AA9D /* unlocknvram.c */; };
+		21C130E8214BEA730021AA9D /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; };
+		21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130EA214C03690021AA9D /* CreditsTableViewController.m */; };
+		21C130FB214C1EBA0021AA9D /* untar.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C130FA214C1EBA0021AA9D /* untar.c */; };
+		21C13102214C20950021AA9D /* libjailbreak.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C130FD214C20940021AA9D /* libjailbreak.tar */; };
+		21C13103214C20950021AA9D /* pspawn_hook.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C130FE214C20950021AA9D /* pspawn_hook.tar */; };
+		21C13104214C20950021AA9D /* amfid_payload.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C130FF214C20950021AA9D /* amfid_payload.tar */; };
+		21C13105214C20950021AA9D /* tar.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13100214C20950021AA9D /* tar.tar */; };
+		21C13106214C20950021AA9D /* jailbreakd.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13101214C20950021AA9D /* jailbreakd.tar */; };
+		21C13107214C26220021AA9D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* ViewController.m */; };
+		21C13109214C26AB0021AA9D /* launchctl.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13108214C26AB0021AA9D /* launchctl.tar */; };
+		21C13110214C2E570021AA9D /* strap.tgz in Resources */ = {isa = PBXBuildFile; fileRef = 21C1310F214C2E570021AA9D /* strap.tgz */; };
+		21C13116214C51100021AA9D /* gzip.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13115214C510F0021AA9D /* gzip.tar */; };
+		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		21C1311D214D2CC50021AA9D /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C1311A214D2CC40021AA9D /* Icon.png */; };
+		21C1311E214D2CC50021AA9D /* Icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C1311B214D2CC50021AA9D /* Icon@3x.png */; };
+		21C1311F214D2CC50021AA9D /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C1311C214D2CC50021AA9D /* Icon@2x.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		21675B292149576C00D20E2B /* jailbreakd.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = jailbreakd.plist; sourceTree = "<group>"; };
+		21675B3E21495F0000D20E2B /* Painting_With_Chocolate.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Painting_With_Chocolate.ttf; sourceTree = "<group>"; };
+		21675B4021495F1100D20E2B /* SF-Pro-Display-Semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-Pro-Display-Semibold.otf"; sourceTree = "<group>"; };
+		21675B4121495F1100D20E2B /* SF-Pro-Display-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-Pro-Display-Medium.otf"; sourceTree = "<group>"; };
+		21A97FC42148103A00DC0023 /* kexecute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kexecute.h; sourceTree = "<group>"; };
+		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
+		21A97FC62148103B00DC0023 /* remote_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_memory.c; sourceTree = "<group>"; };
+		21A97FC72148103B00DC0023 /* libjb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libjb.h; sourceTree = "<group>"; };
+		21A97FC82148103B00DC0023 /* kexecute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = kexecute.m; sourceTree = "<group>"; };
+		21A97FC92148103B00DC0023 /* kutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kutils.h; sourceTree = "<group>"; };
+		21A97FCA2148103B00DC0023 /* patchfinder64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = patchfinder64.c; sourceTree = "<group>"; };
+		21A97FCB2148103B00DC0023 /* patchfinder64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = patchfinder64.h; sourceTree = "<group>"; };
+		21A97FCC2148103B00DC0023 /* kutils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kutils.c; sourceTree = "<group>"; };
+		21A97FCD2148103B00DC0023 /* remote_call.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_call.c; sourceTree = "<group>"; };
+		21A97FCE2148103C00DC0023 /* remote_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_memory.h; sourceTree = "<group>"; };
+		21A97FCF2148103C00DC0023 /* libjb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjb.a; sourceTree = "<group>"; };
+		21C0FC6721369EB700849420 /* Rollectra.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rollectra.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		21C0FC6A21369EB700849420 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		21C0FC6B21369EB700849420 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		21C0FC6D21369EB700849420 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		21C0FC6E21369EB700849420 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; wrapsLines = 0; };
+		21C0FC7121369EB700849420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		21C0FC7321369EB800849420 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		21C0FC7621369EB800849420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		21C0FC7821369EB800849420 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		21C0FC7921369EB800849420 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		21C0FC8021369EE900849420 /* kmem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kmem.c; sourceTree = "<group>"; };
+		21C0FC8121369EE900849420 /* empty_list_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = empty_list_sploit.h; sourceTree = "<group>"; };
+		21C0FC8221369EE900849420 /* offsets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = offsets.h; sourceTree = "<group>"; };
+		21C0FC8321369EE900849420 /* kmem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kmem.h; sourceTree = "<group>"; };
+		21C0FC8521369EE900849420 /* empty_list_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = empty_list_sploit.c; sourceTree = "<group>"; };
+		21C0FC8621369EE900849420 /* offsets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = offsets.m; sourceTree = "<group>"; };
+		21C0FC8B21369FC500849420 /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		21C0FC8C2136A0D100849420 /* qilin.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = qilin.o; sourceTree = "<group>"; };
+		21C0FC8D2136A0D100849420 /* QiLin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QiLin.h; sourceTree = "<group>"; };
+		21C0FC8F2136A2C500849420 /* iokit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iokit.h; sourceTree = "<group>"; };
+		21C0FC902136A46500849420 /* SpringBoardServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpringBoardServices.framework; sourceTree = "<group>"; };
+		21C130DE214BC2880021AA9D /* unlocknvram.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unlocknvram.c; sourceTree = "<group>"; };
+		21C130DF214BC2880021AA9D /* unlocknvram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unlocknvram.h; sourceTree = "<group>"; };
+		21C130E4214BDDE20021AA9D /* SettingsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsTableViewController.h; sourceTree = "<group>"; };
+		21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsTableViewController.m; sourceTree = "<group>"; };
+		21C130E9214C03690021AA9D /* CreditsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CreditsTableViewController.h; sourceTree = "<group>"; };
+		21C130EA214C03690021AA9D /* CreditsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CreditsTableViewController.m; sourceTree = "<group>"; };
+		21C130FA214C1EBA0021AA9D /* untar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = untar.c; sourceTree = "<group>"; };
+		21C130FC214C1EC00021AA9D /* untar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = untar.h; sourceTree = "<group>"; };
+		21C130FD214C20940021AA9D /* libjailbreak.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = libjailbreak.tar; sourceTree = "<group>"; };
+		21C130FE214C20950021AA9D /* pspawn_hook.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = pspawn_hook.tar; sourceTree = "<group>"; };
+		21C130FF214C20950021AA9D /* amfid_payload.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = amfid_payload.tar; sourceTree = "<group>"; };
+		21C13100214C20950021AA9D /* tar.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = tar.tar; sourceTree = "<group>"; };
+		21C13101214C20950021AA9D /* jailbreakd.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = jailbreakd.tar; sourceTree = "<group>"; };
+		21C13108214C26AB0021AA9D /* launchctl.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = launchctl.tar; sourceTree = "<group>"; };
+		21C1310F214C2E570021AA9D /* strap.tgz */ = {isa = PBXFileReference; lastKnownFileType = file; path = strap.tgz; sourceTree = "<group>"; };
+		21C13115214C510F0021AA9D /* gzip.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = gzip.tar; sourceTree = "<group>"; };
+		21C13117214D268F0021AA9D /* multi_path_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = multi_path_sploit.c; sourceTree = "<group>"; };
+		21C13118214D268F0021AA9D /* multi_path_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multi_path_sploit.h; sourceTree = "<group>"; };
+		21C1311A214D2CC40021AA9D /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		21C1311B214D2CC50021AA9D /* Icon@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@3x.png"; sourceTree = "<group>"; };
+		21C1311C214D2CC50021AA9D /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
+		21C1312E214D5A710021AA9D /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		21C0FC6421369EB700849420 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				21675B6D214A692400D20E2B /* libjb.a in Frameworks */,
+				21675B63214A68B700D20E2B /* qilin.o in Frameworks */,
+				21C0FC912136A46500849420 /* SpringBoardServices.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		21675B62214A68B700D20E2B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		21C0FC5E21369EB700849420 = {
+			isa = PBXGroup;
+			children = (
+				21C0FC6921369EB700849420 /* Rollectra */,
+				21C0FC6821369EB700849420 /* Products */,
+				21675B62214A68B700D20E2B /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		21C0FC6821369EB700849420 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				21C0FC6721369EB700849420 /* Rollectra.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		21C0FC6921369EB700849420 /* Rollectra */ = {
+			isa = PBXGroup;
+			children = (
+				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
+				21C1311A214D2CC40021AA9D /* Icon.png */,
+				21C1311C214D2CC50021AA9D /* Icon@2x.png */,
+				21C1311B214D2CC50021AA9D /* Icon@3x.png */,
+				21C13115214C510F0021AA9D /* gzip.tar */,
+				21C1310F214C2E570021AA9D /* strap.tgz */,
+				21C13108214C26AB0021AA9D /* launchctl.tar */,
+				21C130FF214C20950021AA9D /* amfid_payload.tar */,
+				21C13101214C20950021AA9D /* jailbreakd.tar */,
+				21C130FD214C20940021AA9D /* libjailbreak.tar */,
+				21C130FE214C20950021AA9D /* pspawn_hook.tar */,
+				21C13100214C20950021AA9D /* tar.tar */,
+				21675B4121495F1100D20E2B /* SF-Pro-Display-Medium.otf */,
+				21675B4021495F1100D20E2B /* SF-Pro-Display-Semibold.otf */,
+				21675B3E21495F0000D20E2B /* Painting_With_Chocolate.ttf */,
+				21675B292149576C00D20E2B /* jailbreakd.plist */,
+				21C130FC214C1EC00021AA9D /* untar.h */,
+				21C130FA214C1EBA0021AA9D /* untar.c */,
+				21A97FC42148103A00DC0023 /* kexecute.h */,
+				21A97FC82148103B00DC0023 /* kexecute.m */,
+				21A97FCC2148103B00DC0023 /* kutils.c */,
+				21A97FC92148103B00DC0023 /* kutils.h */,
+				21A97FCF2148103C00DC0023 /* libjb.a */,
+				21A97FC72148103B00DC0023 /* libjb.h */,
+				21A97FCA2148103B00DC0023 /* patchfinder64.c */,
+				21A97FCB2148103B00DC0023 /* patchfinder64.h */,
+				21A97FCD2148103B00DC0023 /* remote_call.c */,
+				21A97FC52148103B00DC0023 /* remote_call.h */,
+				21A97FC62148103B00DC0023 /* remote_memory.c */,
+				21A97FCE2148103C00DC0023 /* remote_memory.h */,
+				21C0FC902136A46500849420 /* SpringBoardServices.framework */,
+				21C0FC8F2136A2C500849420 /* iokit.h */,
+				21C0FC8D2136A0D100849420 /* QiLin.h */,
+				21C0FC8C2136A0D100849420 /* qilin.o */,
+				21C0FC8B21369FC500849420 /* common.h */,
+				21C130DE214BC2880021AA9D /* unlocknvram.c */,
+				21C130DF214BC2880021AA9D /* unlocknvram.h */,
+				21C0FC8021369EE900849420 /* kmem.c */,
+				21C0FC8321369EE900849420 /* kmem.h */,
+				21C0FC8221369EE900849420 /* offsets.h */,
+				21C0FC8621369EE900849420 /* offsets.m */,
+				21C0FC8521369EE900849420 /* empty_list_sploit.c */,
+				21C0FC8121369EE900849420 /* empty_list_sploit.h */,
+				21C13117214D268F0021AA9D /* multi_path_sploit.c */,
+				21C13118214D268F0021AA9D /* multi_path_sploit.h */,
+				21C0FC6A21369EB700849420 /* AppDelegate.h */,
+				21C0FC6B21369EB700849420 /* AppDelegate.m */,
+				21C0FC6D21369EB700849420 /* ViewController.h */,
+				21C0FC6E21369EB700849420 /* ViewController.m */,
+				21C130E4214BDDE20021AA9D /* SettingsTableViewController.h */,
+				21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */,
+				21C0FC7021369EB700849420 /* Main.storyboard */,
+				21C0FC7321369EB800849420 /* Assets.xcassets */,
+				21C0FC7521369EB800849420 /* LaunchScreen.storyboard */,
+				21C0FC7821369EB800849420 /* Info.plist */,
+				21C0FC7921369EB800849420 /* main.m */,
+				21C130E9214C03690021AA9D /* CreditsTableViewController.h */,
+				21C130EA214C03690021AA9D /* CreditsTableViewController.m */,
+			);
+			path = Rollectra;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		21C0FC6621369EB700849420 /* Rollectra */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 21C0FC7D21369EB800849420 /* Build configuration list for PBXNativeTarget "Rollectra" */;
+			buildPhases = (
+				21C0FC6321369EB700849420 /* Sources */,
+				21C0FC6421369EB700849420 /* Frameworks */,
+				21C0FC6521369EB700849420 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Rollectra;
+			productName = Rollectra;
+			productReference = 21C0FC6721369EB700849420 /* Rollectra.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		21C0FC5F21369EB700849420 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = Pwn20wnd;
+				TargetAttributes = {
+					21C0FC6621369EB700849420 = {
+						CreatedOnToolsVersion = 9.4.1;
+					};
+				};
+			};
+			buildConfigurationList = 21C0FC6221369EB700849420 /* Build configuration list for PBXProject "Rollectra" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 21C0FC5E21369EB700849420;
+			productRefGroup = 21C0FC6821369EB700849420 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				21C0FC6621369EB700849420 /* Rollectra */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		21C0FC6521369EB700849420 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				21C1311D214D2CC50021AA9D /* Icon.png in Resources */,
+				21C13103214C20950021AA9D /* pspawn_hook.tar in Resources */,
+				21C13110214C2E570021AA9D /* strap.tgz in Resources */,
+				21C1311E214D2CC50021AA9D /* Icon@3x.png in Resources */,
+				21C13102214C20950021AA9D /* libjailbreak.tar in Resources */,
+				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
+				21675B4221495F1200D20E2B /* SF-Pro-Display-Semibold.otf in Resources */,
+				21C13104214C20950021AA9D /* amfid_payload.tar in Resources */,
+				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
+				21C13106214C20950021AA9D /* jailbreakd.tar in Resources */,
+				21C13116214C51100021AA9D /* gzip.tar in Resources */,
+				21C0FC7221369EB700849420 /* Main.storyboard in Resources */,
+				21C13109214C26AB0021AA9D /* launchctl.tar in Resources */,
+				21675B312149576D00D20E2B /* jailbreakd.plist in Resources */,
+				21C1311F214D2CC50021AA9D /* Icon@2x.png in Resources */,
+				21675B4321495F1200D20E2B /* SF-Pro-Display-Medium.otf in Resources */,
+				21675B3F21495F0000D20E2B /* Painting_With_Chocolate.ttf in Resources */,
+				21C13105214C20950021AA9D /* tar.tar in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		21C0FC6321369EB700849420 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				21A97FD12148103C00DC0023 /* kexecute.m in Sources */,
+				21A97FD42148103C00DC0023 /* remote_call.c in Sources */,
+				21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */,
+				21C130FB214C1EBA0021AA9D /* untar.c in Sources */,
+				21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */,
+				21C0FC8721369EE900849420 /* kmem.c in Sources */,
+				21C0FC7A21369EB800849420 /* main.m in Sources */,
+				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
+				21C0FC8921369EE900849420 /* empty_list_sploit.c in Sources */,
+				21C130E8214BEA730021AA9D /* SettingsTableViewController.m in Sources */,
+				21C13107214C26220021AA9D /* ViewController.m in Sources */,
+				21A97FD32148103C00DC0023 /* kutils.c in Sources */,
+				21C0FC8A21369EE900849420 /* offsets.m in Sources */,
+				21A97FD22148103C00DC0023 /* patchfinder64.c in Sources */,
+				21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */,
+				21C0FC6C21369EB700849420 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		21C0FC7021369EB700849420 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				21C0FC7121369EB700849420 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		21C0FC7521369EB800849420 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				21C0FC7621369EB800849420 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		21C0FC7B21369EB800849420 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		21C0FC7C21369EB800849420 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		21C0FC7E21369EB800849420 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Rollectra/multi_path.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Rollectra",
+				);
+				INFOPLIST_FILE = Rollectra/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Rollectra",
+				);
+				OTHER_CFLAGS = "-DPARTY_HARD";
+				OTHER_LDFLAGS = (
+					"-framework",
+					IOKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = science.xnu.unc0ver;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		21C0FC7F21369EB800849420 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Rollectra/multi_path.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Rollectra",
+				);
+				INFOPLIST_FILE = Rollectra/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Rollectra",
+				);
+				OTHER_CFLAGS = "-DPARTY_HARD";
+				OTHER_LDFLAGS = (
+					"-framework",
+					IOKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = science.xnu.unc0ver;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		21C0FC6221369EB700849420 /* Build configuration list for PBXProject "Rollectra" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				21C0FC7B21369EB800849420 /* Debug */,
+				21C0FC7C21369EB800849420 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		21C0FC7D21369EB800849420 /* Build configuration list for PBXNativeTarget "Rollectra" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				21C0FC7E21369EB800849420 /* Debug */,
+				21C0FC7F21369EB800849420 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 21C0FC5F21369EB700849420 /* Project object */;
+}
