@@ -22,7 +22,7 @@
                                 <rect key="frame" x="166.5" y="68" width="42" height="64"/>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KMr-3a-xtk">
-                                <rect key="frame" x="16" y="163" width="343" height="46"/>
+                                <rect key="frame" x="16" y="163" width="342" height="46"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="46" id="WbR-mS-Am6"/>
                                 </constraints>
@@ -33,7 +33,7 @@ for a stock iOS.</string>
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MAL-fK-xoB">
-                                <rect key="frame" x="129.5" y="221" width="117" height="30"/>
+                                <rect key="frame" x="128.5" y="221" width="117" height="30"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="by " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2SF-lC-N2J">
                                         <rect key="frame" x="0.0" y="0.0" width="21" height="30"/>
@@ -51,7 +51,7 @@ for a stock iOS.</string>
                                 </subviews>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rLl-li-fRW">
-                                <rect key="frame" x="108.5" y="612" width="158.5" height="30"/>
+                                <rect key="frame" x="108" y="612" width="158.5" height="30"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Designed by " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vLG-fA-g3g">
                                         <rect key="frame" x="0.0" y="0.0" width="91.5" height="30"/>
@@ -69,7 +69,7 @@ for a stock iOS.</string>
                                 </subviews>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="6oK-qh-y77">
-                                <rect key="frame" x="85" y="309.5" width="205" height="79"/>
+                                <rect key="frame" x="84.5" y="309.5" width="205" height="79"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2ck-a4-1FL">
                                         <rect key="frame" x="0.0" y="0.0" width="205" height="51"/>
@@ -96,6 +96,16 @@ for a stock iOS.</string>
                                     </label>
                                 </subviews>
                             </stackView>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GPL-Sm-qcs">
+                                <rect key="frame" x="162.5" y="573" width="51" height="31"/>
+                                <color key="onTintColor" red="0.25490196079999999" green="0.30980392159999998" blue="0.38431372549999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                            </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reset user data." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aMW-7a-h0F">
+                                <rect key="frame" x="130" y="547" width="114.5" height="18"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -104,12 +114,16 @@ for a stock iOS.</string>
                             <constraint firstItem="KMr-3a-xtk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="9E5-Yv-5ef"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="rLl-li-fRW" secondAttribute="bottom" constant="25" id="ET1-xH-87b"/>
                             <constraint firstItem="6oK-qh-y77" firstAttribute="centerX" secondItem="MAL-fK-xoB" secondAttribute="centerX" id="HEJ-yj-DBY"/>
+                            <constraint firstItem="rLl-li-fRW" firstAttribute="top" secondItem="GPL-Sm-qcs" secondAttribute="bottom" constant="8" symbolic="YES" id="MPP-Yi-3Ck"/>
+                            <constraint firstItem="GPL-Sm-qcs" firstAttribute="centerX" secondItem="6oK-qh-y77" secondAttribute="centerX" id="P2r-Qa-our"/>
                             <constraint firstItem="6oK-qh-y77" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="15.5" id="UBa-IP-PFf"/>
+                            <constraint firstItem="aMW-7a-h0F" firstAttribute="centerX" secondItem="GPL-Sm-qcs" secondAttribute="centerX" id="bXR-ct-rBp"/>
                             <constraint firstItem="KMr-3a-xtk" firstAttribute="centerX" secondItem="MAL-fK-xoB" secondAttribute="centerX" id="c3h-Df-EI7"/>
                             <constraint firstItem="J7C-0j-czS" firstAttribute="centerX" secondItem="KMr-3a-xtk" secondAttribute="centerX" id="ikA-Lt-9O0"/>
                             <constraint firstItem="J7C-0j-czS" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="mbH-cM-tFI"/>
                             <constraint firstItem="J7C-0j-czS" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="48" id="tWq-I7-etT"/>
                             <constraint firstItem="MAL-fK-xoB" firstAttribute="top" secondItem="KMr-3a-xtk" secondAttribute="bottom" constant="12" id="wUf-ZM-4qv"/>
+                            <constraint firstItem="GPL-Sm-qcs" firstAttribute="top" secondItem="aMW-7a-h0F" secondAttribute="bottom" constant="8" symbolic="YES" id="yxr-FX-DdN"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
@@ -117,6 +131,7 @@ for a stock iOS.</string>
                         <outlet property="aesign_Button" destination="AZu-X0-OvN" id="jDP-o6-y7N"/>
                         <outlet property="infoLabel" destination="KMr-3a-xtk" id="cdT-2Q-sat"/>
                         <outlet property="myButton" destination="RmR-Tr-eMC" id="cvm-6a-7Lc"/>
+                        <outlet property="resetUserDataSwitch" destination="GPL-Sm-qcs" id="5zS-GO-uT3"/>
                         <outlet property="unjailbreakButton" destination="2ck-a4-1FL" id="mqU-YU-OW6"/>
                     </connections>
                 </viewController>

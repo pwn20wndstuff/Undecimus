@@ -13,6 +13,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *infoLabel;
 @property (weak, nonatomic) IBOutlet UIButton *myButton;
 @property (weak, nonatomic) IBOutlet UIButton *aesign_Button;
+@property (weak, nonatomic) IBOutlet UISwitch *resetUserDataSwitch;
 
 @end
 
