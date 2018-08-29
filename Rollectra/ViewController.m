@@ -320,7 +320,7 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
 - (IBAction)tappedOnAesign_:(id)sender {
     [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"aesign_"] options:@{} completionHandler:nil];
 }
-
+    
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.

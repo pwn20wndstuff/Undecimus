@@ -18,12 +18,24 @@
 		21C0FC8A21369EE900849420 /* offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8621369EE900849420 /* offsets.m */; };
 		21C0FC8E2136A0D100849420 /* qilin.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC8C2136A0D100849420 /* qilin.o */; };
 		21C0FC912136A46500849420 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
-		21C0FC932136B97100849420 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC922136B97100849420 /* Icon.png */; };
 		21C0FC972136E25D00849420 /* Combined Shape@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC942136E25D00849420 /* Combined Shape@3x.png */; };
 		21C0FC982136E25D00849420 /* Combined Shape.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC952136E25D00849420 /* Combined Shape.png */; };
 		21C0FC992136E25D00849420 /* Combined Shape@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC962136E25D00849420 /* Combined Shape@2x.png */; };
 		21C0FC9C2136E29100849420 /* RollectraGradientView.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC9A2136E29100849420 /* RollectraGradientView.m */; };
 		21C0FC9F2136FC5300849420 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* ViewController.m */; };
+		21C0FCAD2137117B00849420 /* AppIcon20x20@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCA02137117900849420 /* AppIcon20x20@3x.png */; };
+		21C0FCAE2137117B00849420 /* AppIcon60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCA12137117900849420 /* AppIcon60x60@3x.png */; };
+		21C0FCAF2137117B00849420 /* AppIcon76x76.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCA22137117A00849420 /* AppIcon76x76.png */; };
+		21C0FCB02137117B00849420 /* AppIcon76x76@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCA32137117A00849420 /* AppIcon76x76@2x.png */; };
+		21C0FCB12137117B00849420 /* AppIcon60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCA42137117A00849420 /* AppIcon60x60@2x.png */; };
+		21C0FCB22137117B00849420 /* AppIcon40x40@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCA52137117A00849420 /* AppIcon40x40@3x.png */; };
+		21C0FCB32137117B00849420 /* AppIcon29x29.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCA62137117A00849420 /* AppIcon29x29.png */; };
+		21C0FCB42137117B00849420 /* AppIcon29x29@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCA72137117A00849420 /* AppIcon29x29@2x.png */; };
+		21C0FCB52137117B00849420 /* AppIcon29x29@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCA82137117A00849420 /* AppIcon29x29@3x.png */; };
+		21C0FCB62137117B00849420 /* AppIcon40x40.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCA92137117B00849420 /* AppIcon40x40.png */; };
+		21C0FCB72137117B00849420 /* AppIcon40x40@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCAA2137117B00849420 /* AppIcon40x40@2x.png */; };
+		21C0FCB82137117B00849420 /* AppIcon20x20@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCAB2137117B00849420 /* AppIcon20x20@2x.png */; };
+		21C0FCB92137117B00849420 /* AppIcon20x20.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FCAC2137117B00849420 /* AppIcon20x20.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,12 +61,24 @@
 		21C0FC8D2136A0D100849420 /* QiLin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QiLin.h; sourceTree = "<group>"; };
 		21C0FC8F2136A2C500849420 /* iokit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iokit.h; sourceTree = "<group>"; };
 		21C0FC902136A46500849420 /* SpringBoardServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpringBoardServices.framework; sourceTree = "<group>"; };
-		21C0FC922136B97100849420 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		21C0FC942136E25D00849420 /* Combined Shape@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Combined Shape@3x.png"; sourceTree = "<group>"; };
 		21C0FC952136E25D00849420 /* Combined Shape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Combined Shape.png"; sourceTree = "<group>"; };
 		21C0FC962136E25D00849420 /* Combined Shape@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Combined Shape@2x.png"; sourceTree = "<group>"; };
 		21C0FC9A2136E29100849420 /* RollectraGradientView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RollectraGradientView.m; sourceTree = "<group>"; };
 		21C0FC9B2136E29100849420 /* RollectraGradientView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RollectraGradientView.h; sourceTree = "<group>"; };
+		21C0FCA02137117900849420 /* AppIcon20x20@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon20x20@3x.png"; sourceTree = "<group>"; };
+		21C0FCA12137117900849420 /* AppIcon60x60@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon60x60@3x.png"; sourceTree = "<group>"; };
+		21C0FCA22137117A00849420 /* AppIcon76x76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AppIcon76x76.png; sourceTree = "<group>"; };
+		21C0FCA32137117A00849420 /* AppIcon76x76@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon76x76@2x.png"; sourceTree = "<group>"; };
+		21C0FCA42137117A00849420 /* AppIcon60x60@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon60x60@2x.png"; sourceTree = "<group>"; };
+		21C0FCA52137117A00849420 /* AppIcon40x40@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon40x40@3x.png"; sourceTree = "<group>"; };
+		21C0FCA62137117A00849420 /* AppIcon29x29.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AppIcon29x29.png; sourceTree = "<group>"; };
+		21C0FCA72137117A00849420 /* AppIcon29x29@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon29x29@2x.png"; sourceTree = "<group>"; };
+		21C0FCA82137117A00849420 /* AppIcon29x29@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon29x29@3x.png"; sourceTree = "<group>"; };
+		21C0FCA92137117B00849420 /* AppIcon40x40.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AppIcon40x40.png; sourceTree = "<group>"; };
+		21C0FCAA2137117B00849420 /* AppIcon40x40@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon40x40@2x.png"; sourceTree = "<group>"; };
+		21C0FCAB2137117B00849420 /* AppIcon20x20@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon20x20@2x.png"; sourceTree = "<group>"; };
+		21C0FCAC2137117B00849420 /* AppIcon20x20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AppIcon20x20.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,12 +113,24 @@
 		21C0FC6921369EB700849420 /* Rollectra */ = {
 			isa = PBXGroup;
 			children = (
+				21C0FCAC2137117B00849420 /* AppIcon20x20.png */,
+				21C0FCAB2137117B00849420 /* AppIcon20x20@2x.png */,
+				21C0FCA02137117900849420 /* AppIcon20x20@3x.png */,
+				21C0FCA62137117A00849420 /* AppIcon29x29.png */,
+				21C0FCA72137117A00849420 /* AppIcon29x29@2x.png */,
+				21C0FCA82137117A00849420 /* AppIcon29x29@3x.png */,
+				21C0FCA92137117B00849420 /* AppIcon40x40.png */,
+				21C0FCAA2137117B00849420 /* AppIcon40x40@2x.png */,
+				21C0FCA52137117A00849420 /* AppIcon40x40@3x.png */,
+				21C0FCA42137117A00849420 /* AppIcon60x60@2x.png */,
+				21C0FCA12137117900849420 /* AppIcon60x60@3x.png */,
+				21C0FCA22137117A00849420 /* AppIcon76x76.png */,
+				21C0FCA32137117A00849420 /* AppIcon76x76@2x.png */,
 				21C0FC9B2136E29100849420 /* RollectraGradientView.h */,
 				21C0FC9A2136E29100849420 /* RollectraGradientView.m */,
 				21C0FC952136E25D00849420 /* Combined Shape.png */,
 				21C0FC962136E25D00849420 /* Combined Shape@2x.png */,
 				21C0FC942136E25D00849420 /* Combined Shape@3x.png */,
-				21C0FC922136B97100849420 /* Icon.png */,
 				21C0FC902136A46500849420 /* SpringBoardServices.framework */,
 				21C0FC8F2136A2C500849420 /* iokit.h */,
 				21C0FC8D2136A0D100849420 /* QiLin.h */,
@@ -177,14 +213,26 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				21C0FCB72137117B00849420 /* AppIcon40x40@2x.png in Resources */,
 				21C0FC8821369EE900849420 /* README in Resources */,
+				21C0FCB42137117B00849420 /* AppIcon29x29@2x.png in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
 				21C0FC982136E25D00849420 /* Combined Shape.png in Resources */,
-				21C0FC932136B97100849420 /* Icon.png in Resources */,
+				21C0FCB62137117B00849420 /* AppIcon40x40.png in Resources */,
 				21C0FC992136E25D00849420 /* Combined Shape@2x.png in Resources */,
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
 				21C0FC7221369EB700849420 /* Main.storyboard in Resources */,
+				21C0FCB92137117B00849420 /* AppIcon20x20.png in Resources */,
 				21C0FC972136E25D00849420 /* Combined Shape@3x.png in Resources */,
+				21C0FCB02137117B00849420 /* AppIcon76x76@2x.png in Resources */,
+				21C0FCB52137117B00849420 /* AppIcon29x29@3x.png in Resources */,
+				21C0FCB82137117B00849420 /* AppIcon20x20@2x.png in Resources */,
+				21C0FCAE2137117B00849420 /* AppIcon60x60@3x.png in Resources */,
+				21C0FCAD2137117B00849420 /* AppIcon20x20@3x.png in Resources */,
+				21C0FCB12137117B00849420 /* AppIcon60x60@2x.png in Resources */,
+				21C0FCB32137117B00849420 /* AppIcon29x29.png in Resources */,
+				21C0FCAF2137117B00849420 /* AppIcon76x76.png in Resources */,
+				21C0FCB22137117B00849420 /* AppIcon40x40@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
