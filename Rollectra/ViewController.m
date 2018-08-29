@@ -6,6 +6,8 @@
 //  Copyright © 2018 Pwn20wnd. All rights reserved.
 //
 
+#include <sys/snapshot.h>
+#include <dlfcn.h>
 #import "ViewController.h"
 #include "common.h"
 #include "offsets.h"
@@ -13,8 +15,6 @@
 #include "kmem.h"
 #include "QiLin.h"
 #include "iokit.h"
-#include <sys/snapshot.h>
-#include <dlfcn.h>
 
 @interface ViewController ()
 
@@ -134,10 +134,11 @@ const char *systemSnapshot(char *bootHash) {
 }
 
 #ifdef WANT_CYDIA
-void unjailbreak(int shouldEraseUserData) {
+void unjailbreak(int shouldEraseUserData)
 #else    /* !WANT_CYDIA */
-void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData) {
+void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData)
 #endif    /* !WANT_CYDIA */
+{
     // Initialize variables.
     int rv = 0;
 #ifndef WANT_CYDIA
@@ -231,13 +232,13 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
         LOG("%@", NSLocalizedString(@"Successfully entitled myself.", nil));
 #endif    /* WANT_CYDIA */
         
-        // Get SBServerPort.
-        LOG("%@", NSLocalizedString(@"Getting SBServerPort...", nil));
+        // Get SpringBoardServerPort.
+        LOG("%@", NSLocalizedString(@"Getting SpringBoardServerPort...", nil));
         extern mach_port_t SBSSpringBoardServerPort(void);
         SBServerPort = SBSSpringBoardServerPort();
-        LOG("SBServerPort: " "%x" "\n", SBServerPort);
+        LOG("SpringBoardServerPort: " "%x" "\n", SBServerPort);
         _assert(SBServerPort);
-        LOG("%@", NSLocalizedString(@"Successfully got SBServerPort.", nil));
+        LOG("%@", NSLocalizedString(@"Successfully got SpringBoardServerPort.", nil));
         
         // Erase user data.
         LOG("%@", NSLocalizedString(@"Erasing user data...", nil));
@@ -255,7 +256,7 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
         LOG("%@", NSLocalizedString(@"Successfully rebooted.", nil));
     }
 }
-    
+
 - (IBAction)tappedOnUnjailbreak:(id)sender {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Confirmation", nil) message:NSLocalizedString(@"Are you sure want to erase all data and unjailbreak the device?", nil) preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *OK = [UIAlertAction actionWithTitle:NSLocalizedString(@"Erase All", nil) style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {

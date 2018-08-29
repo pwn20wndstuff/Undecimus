@@ -6,9 +6,9 @@
 //  Copyright © 2018 Pwn20wnd. All rights reserved.
 //
 
+#include <dlfcn.h>
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
-#include <dlfcn.h>
 
 /* Set platform binary flag */
 #define FLAG_PLATFORMIZE (1 << 1)
