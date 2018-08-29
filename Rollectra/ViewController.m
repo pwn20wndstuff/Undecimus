@@ -197,27 +197,13 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
 #endif    /* WANT_CYDIA */
     
 #ifndef WANT_CYDIA
-    // Borrow entitlements from sysdiagnose.
+    // Borrow entitlements from fsck_apfs.
     
-    LOG("%@", NSLocalizedString(@"Borrowing entitlements from sysdiagnose...", nil));
-    borrowEntitlementsFromDonor("/usr/bin/sysdiagnose", "-u");
-    LOG("%@", NSLocalizedString(@"Successfully borrowed entitlements from sysdiagnose.", nil));
+    LOG("%@", NSLocalizedString(@"Borrowing entitlements from fsck_apfs...", nil));
+    borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
+    LOG("%@", NSLocalizedString(@"Successfully borrowed entitlements from fsck_apfs.", nil));
     
-    // We now have Task_for_pid.
-#endif    /* WANT_CYDIA */
-    
-#ifndef WANT_CYDIA
-    // Entitle myself.
-    LOG("%@", NSLocalizedString(@"Entitling myself...", nil));
-    rv = entitleMe("\t<key>platform-application</key>\n"
-                   "\t<true/>\n"
-                   "\t<key>com.apple.private.vfs.snapshot</key>\n"
-                   "\t<true/>\n"
-                   "\t<key>com.apple.springboard.wipedevice</key>\n"
-                   "\t<true/>");
-    LOG("rv: " "%d" "\n", rv);
-    _assert(rv == 0);
-    LOG("%@", NSLocalizedString(@"Successfully entitled myself.", nil));
+    // We now have fs_snapshot_rename.
 #endif    /* WANT_CYDIA */
     
     // Revert to the system snapshot.
@@ -231,17 +217,20 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
     _assert(md);
     md[@"SBShowNonDefaultSystemApps"] = @(NO);
     [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
-#ifndef WANT_CYDIA
-    rv = kill(findPidOfProcess("cfprefsd"), SIGKILL);
-    LOG("rv: " "%d" "\n", rv);
-    _assert(rv == 0);
-#else     /* WANT_CYDIA */
-    rv = execCommandAndWait("/usr/bin/killall", "-9", "cfprefsd", NULL, NULL, NULL);
-    LOG("rv: " "%d" "\n", rv);
-    _assert(rv == 0);
-#endif    /* WANT_CYDIA */
     
     if (shouldEraseUserData) {
+#ifndef WANT_CYDIA
+        // Entitle myself.
+        LOG("%@", NSLocalizedString(@"Entitling myself...", nil));
+        rv = entitleMe("\t<key>platform-application</key>\n"
+                       "\t<true/>\n"
+                       "\t<key>com.apple.springboard.wipedevice</key>\n"
+                       "\t<true/>");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        LOG("%@", NSLocalizedString(@"Successfully entitled myself.", nil));
+#endif    /* WANT_CYDIA */
+        
         // Get SBServerPort.
         LOG("%@", NSLocalizedString(@"Getting SBServerPort...", nil));
         extern mach_port_t SBSSpringBoardServerPort(void);
@@ -294,9 +283,9 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
                 [self.unjailbreakButton setTitle:NSLocalizedString(@"Unjailbreaking...", nil) forState:UIControlStateDisabled];
             });
 #ifdef WANT_CYDIA
-            unjailbreak(false);
+            unjailbreak(1);
 #else    /* !WANT_CYDIA */
-            unjailbreak(tfp0, (uint64_t)get_kernel_base(tfp0), false);
+            unjailbreak(tfp0, (uint64_t)get_kernel_base(tfp0), 1);
 #endif    /* !WANT_CYDIA */
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.unjailbreakButton setTitle:NSLocalizedString(@"Failed, reboot.", nil) forState:UIControlStateDisabled];
@@ -337,8 +326,8 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
     // Do any additional setup after loading the view, typically from a nib.
     NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:@"Revert all changes,\nfor a stock iOS."];
     [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:19 weight:UIFontWeightBold] range:[@"Revert all changes,\nfor a stock iOS." rangeOfString:@"Revert "]];
-    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:19 weight:UIFontWeightMedium] range:[@"Revert all changes,\nfor a stock iOS." rangeOfString:@"all changes,\nfor a stock i"]];
-    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:19 weight:UIFontWeightBold] range:[@"Revert all changes,\nfor a stock iOS." rangeOfString:@"OS."]];
+    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:19 weight:UIFontWeightMedium] range:[@"Revert all changes,\nfor a stock iOS." rangeOfString:@"all changes,\nfor a stock "]];
+    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:19 weight:UIFontWeightBold] range:[@"Revert all changes,\nfor a stock iOS." rangeOfString:@"iOS."]];
     [self.infoLabel setAttributedText:str];
     [self.unjailbreakButton addTarget:self action:@selector(tappedOnUnjailbreak:) forControlEvents:UIControlEventTouchUpInside];
     [self.myButton addTarget:self action:@selector(tappedOnMe:) forControlEvents:UIControlEventTouchUpInside];

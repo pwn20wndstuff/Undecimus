@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		21C0FC6C21369EB700849420 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6B21369EB700849420 /* AppDelegate.m */; };
-		21C0FC6F21369EB700849420 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* ViewController.m */; };
 		21C0FC7221369EB700849420 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7021369EB700849420 /* Main.storyboard */; };
 		21C0FC7421369EB800849420 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7321369EB800849420 /* Assets.xcassets */; };
 		21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7521369EB800849420 /* LaunchScreen.storyboard */; };
@@ -24,6 +23,7 @@
 		21C0FC982136E25D00849420 /* Combined Shape.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC952136E25D00849420 /* Combined Shape.png */; };
 		21C0FC992136E25D00849420 /* Combined Shape@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC962136E25D00849420 /* Combined Shape@2x.png */; };
 		21C0FC9C2136E29100849420 /* RollectraGradientView.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC9A2136E29100849420 /* RollectraGradientView.m */; };
+		21C0FC9F2136FC5300849420 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* ViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -195,7 +195,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				21C0FC6F21369EB700849420 /* ViewController.m in Sources */,
+				21C0FC9F2136FC5300849420 /* ViewController.m in Sources */,
 				21C0FC9C2136E29100849420 /* RollectraGradientView.m in Sources */,
 				21C0FC8721369EE900849420 /* kmem.c in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
@@ -360,7 +360,7 @@
 					"-framework",
 					IOKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = fun.apfs.rollectra;
+				PRODUCT_BUNDLE_IDENTIFIER = "fun.apfs.rollectra-jailed";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -390,7 +390,7 @@
 					"-framework",
 					IOKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = fun.apfs.rollectra;
+				PRODUCT_BUNDLE_IDENTIFIER = "fun.apfs.rollectra-jailed";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
