@@ -407,7 +407,7 @@
 					IOKit,
 					"$(SRCROOT)/Rollectra/qilin.o",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "fun.apfs.rollectra-jailed";
+				PRODUCT_BUNDLE_IDENTIFIER = "science.xnu.rollectra-jailed";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -438,7 +438,7 @@
 					IOKit,
 					"$(SRCROOT)/Rollectra/qilin.o",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "fun.apfs.rollectra-jailed";
+				PRODUCT_BUNDLE_IDENTIFIER = "science.xnu.rollectra-jailed";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
