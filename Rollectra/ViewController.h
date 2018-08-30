@@ -14,6 +14,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *myButton;
 @property (weak, nonatomic) IBOutlet UIButton *aesign_Button;
 @property (weak, nonatomic) IBOutlet UISwitch *resetUserDataSwitch;
+@property (weak, nonatomic) IBOutlet UILabel *QiLinLabel;
 
 @end
 

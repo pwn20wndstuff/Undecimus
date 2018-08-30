@@ -29,6 +29,8 @@
 
 #define ptrSize sizeof(uintptr_t)
 
+#ifndef WANT_CYDIA
+// https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
 static vm_address_t get_kernel_base(mach_port_t tfp0) {
     uint64_t addr = 0;
     addr = KERNEL_SEARCH_ADDRESS_IOS10+MAX_KASLR_SLIDE;
@@ -67,6 +69,7 @@ static vm_address_t get_kernel_base(mach_port_t tfp0) {
         addr -= 0x200000;
     }
 }
+#endif    /* WANT_CYDIA */
 
 int sha1_to_str(const unsigned char *hash, int hashlen, char *buf, size_t buflen)
 {
@@ -265,6 +268,9 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
                 [self.unjailbreakButton setEnabled:NO];
             });
             dispatch_async(dispatch_get_main_queue(), ^{
+                [self.unjailbreakButton setAlpha:0.5];
+            });
+            dispatch_async(dispatch_get_main_queue(), ^{
                 [self.resetUserDataSwitch setEnabled:NO];
             });
 #ifndef WANT_CYDIA
@@ -328,7 +334,21 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
 - (IBAction)tappedOnAesign_:(id)sender {
     [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"aesign_"] options:@{} completionHandler:nil];
 }
-    
+
+#if 0
+
+Chariz Description:
+-------------------
+Using this tool will restore the RootFS to its stock state and reset the user data.
+So creating a backup using iTunes before using it is recommended.
+It supports all devices running iOS 11.3 to 11.4 Beta 3.
+The 11.2 to 11.2.6 support will be coming really soon.
+The 11.0 to 11.1.2 support will also be added in the future, so keep checking this package if you are interested in that.
+Although there's an option to not perform a full restore and keep the user data, I would really not recommend it, since it will leave a lot of left-overs from your jailbreak.
+Follow me at @Pwn20wnd for future updates about this tool or to troubleshoot any unexpected behavior that you may be having with this tool.
+
+#endif
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
@@ -340,6 +360,17 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
     [self.unjailbreakButton addTarget:self action:@selector(tappedOnUnjailbreak:) forControlEvents:UIControlEventTouchUpInside];
     [self.myButton addTarget:self action:@selector(tappedOnMe:) forControlEvents:UIControlEventTouchUpInside];
     [self.aesign_Button addTarget:self action:@selector(tappedOnAesign_:) forControlEvents:UIControlEventTouchUpInside];
+#ifndef WANT_CYDIA
+    [self.QiLinLabel setHidden:NO];
+#endif    /* WANT_CYDIA */
+    if (kCFCoreFoundationVersionNumber <= 1451.51) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.unjailbreakButton setEnabled:NO];
+            [self.unjailbreakButton setTitle:NSLocalizedString(@"Incompatible version", nil) forState:UIControlStateDisabled];
+            [self.unjailbreakButton setAlpha:0.5];
+            [self.resetUserDataSwitch setEnabled:NO];
+        });
+    }
 }
 
 - (void)didReceiveMemoryWarning {

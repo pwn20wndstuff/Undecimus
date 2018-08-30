@@ -1,12 +1,12 @@
-Package: fun.apfs.rollectra
+Package: com.pwn20wnd.semirestore11
 Version: 1.1
 Architecture: iphoneos-arm
 Description: 
 Maintainer: Pwn20wnd <pwn20wndstuff@gmail.com>
 Pre-Depends: dpkg (>= 1.14.25-8)
 Depends: cy+cpu.arm64, coreutils-bin, firmware (>= 11.3), firmware (<< 11.4.1)
-Conflicts: org.coolstar.semirestore11-lite, com.pwn20wnd.semirestore11
-Replaces: org.coolstar.semirestore11-lite, com.pwn20wnd.semirestore11
+Conflicts: org.coolstar.semirestore11-lite
+Replaces: org.coolstar.semirestore11-lite
 Section: System
 Author: Pwn20wnd <pwn20wndstuff@gmail.com>
 Name: SemiRestore11 / Rollectra

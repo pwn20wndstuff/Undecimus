@@ -16,7 +16,6 @@
 		21C0FC8821369EE900849420 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC8421369EE900849420 /* README */; };
 		21C0FC8921369EE900849420 /* sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* sploit.c */; };
 		21C0FC8A21369EE900849420 /* offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8621369EE900849420 /* offsets.m */; };
-		21C0FC8E2136A0D100849420 /* qilin.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC8C2136A0D100849420 /* qilin.o */; };
 		21C0FC912136A46500849420 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		21C0FC972136E25D00849420 /* Combined Shape@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC942136E25D00849420 /* Combined Shape@3x.png */; };
 		21C0FC982136E25D00849420 /* Combined Shape.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC952136E25D00849420 /* Combined Shape.png */; };
@@ -87,7 +86,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				21C0FC912136A46500849420 /* SpringBoardServices.framework in Frameworks */,
-				21C0FC8E2136A0D100849420 /* qilin.o in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,6 +405,7 @@
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,
+					"$(SRCROOT)/Rollectra/qilin.o",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "fun.apfs.rollectra-jailed";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -437,6 +436,7 @@
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,
+					"$(SRCROOT)/Rollectra/qilin.o",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "fun.apfs.rollectra-jailed";
 				PRODUCT_NAME = "$(TARGET_NAME)";

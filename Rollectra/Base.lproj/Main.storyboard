@@ -19,10 +19,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Combined Shape.png" translatesAutoresizingMaskIntoConstraints="NO" id="J7C-0j-czS">
-                                <rect key="frame" x="166.5" y="68" width="42" height="64"/>
+                                <rect key="frame" x="167" y="68" width="42" height="64"/>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KMr-3a-xtk">
-                                <rect key="frame" x="16.5" y="163" width="341.5" height="46"/>
+                                <rect key="frame" x="16" y="163" width="344" height="46"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="46" id="WbR-mS-Am6"/>
                                 </constraints>
@@ -33,7 +33,7 @@ for a stock iOS.</string>
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MAL-fK-xoB">
-                                <rect key="frame" x="128.5" y="221" width="117" height="30"/>
+                                <rect key="frame" x="129" y="221" width="117" height="30"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="by " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2SF-lC-N2J">
                                         <rect key="frame" x="0.0" y="0.0" width="21" height="30"/>
@@ -51,7 +51,7 @@ for a stock iOS.</string>
                                 </subviews>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rLl-li-fRW">
-                                <rect key="frame" x="107" y="612" width="158.5" height="30"/>
+                                <rect key="frame" x="108.5" y="612" width="158.5" height="30"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Designed by " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vLG-fA-g3g">
                                         <rect key="frame" x="0.0" y="0.0" width="91.5" height="30"/>
@@ -69,7 +69,7 @@ for a stock iOS.</string>
                                 </subviews>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="6oK-qh-y77">
-                                <rect key="frame" x="84.5" y="309.5" width="205" height="79"/>
+                                <rect key="frame" x="85" y="310" width="205" height="79"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2ck-a4-1FL">
                                         <rect key="frame" x="0.0" y="0.0" width="205" height="51"/>
@@ -97,11 +97,17 @@ for a stock iOS.</string>
                                 </subviews>
                             </stackView>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GPL-Sm-qcs">
-                                <rect key="frame" x="162" y="573" width="51" height="31"/>
+                                <rect key="frame" x="163" y="573" width="51" height="31"/>
                                 <color key="onTintColor" red="0.25490196079999999" green="0.30980392159999998" blue="0.38431372549999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                             </switch>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reset user data." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aMW-7a-h0F">
-                                <rect key="frame" x="130" y="547" width="114.5" height="18"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Perform full restore." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aMW-7a-h0F">
+                                <rect key="frame" x="117.5" y="547" width="141" height="18"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="powered by the QiLin Toolkit" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7vR-zn-5xq">
+                                <rect key="frame" x="88" y="259" width="199" height="18"/>
                                 <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -110,10 +116,12 @@ for a stock iOS.</string>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="rLl-li-fRW" firstAttribute="centerX" secondItem="MAL-fK-xoB" secondAttribute="centerX" id="0uj-Vr-aQ8"/>
+                            <constraint firstItem="7vR-zn-5xq" firstAttribute="centerX" secondItem="MAL-fK-xoB" secondAttribute="centerX" id="1Jh-Dq-Isx"/>
                             <constraint firstItem="KMr-3a-xtk" firstAttribute="top" secondItem="J7C-0j-czS" secondAttribute="bottom" constant="31" id="2Fj-z6-04a"/>
                             <constraint firstItem="KMr-3a-xtk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="9E5-Yv-5ef"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="rLl-li-fRW" secondAttribute="bottom" constant="25" id="ET1-xH-87b"/>
                             <constraint firstItem="6oK-qh-y77" firstAttribute="centerX" secondItem="MAL-fK-xoB" secondAttribute="centerX" id="HEJ-yj-DBY"/>
+                            <constraint firstItem="7vR-zn-5xq" firstAttribute="top" secondItem="MAL-fK-xoB" secondAttribute="bottom" constant="8" symbolic="YES" id="MEG-YQ-jif"/>
                             <constraint firstItem="rLl-li-fRW" firstAttribute="top" secondItem="GPL-Sm-qcs" secondAttribute="bottom" constant="8" symbolic="YES" id="MPP-Yi-3Ck"/>
                             <constraint firstItem="GPL-Sm-qcs" firstAttribute="centerX" secondItem="6oK-qh-y77" secondAttribute="centerX" id="P2r-Qa-our"/>
                             <constraint firstItem="6oK-qh-y77" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="15.5" id="UBa-IP-PFf"/>
@@ -128,6 +136,7 @@ for a stock iOS.</string>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="QiLinLabel" destination="7vR-zn-5xq" id="0Lr-YH-fMo"/>
                         <outlet property="aesign_Button" destination="AZu-X0-OvN" id="jDP-o6-y7N"/>
                         <outlet property="infoLabel" destination="KMr-3a-xtk" id="cdT-2Q-sat"/>
                         <outlet property="myButton" destination="RmR-Tr-eMC" id="cvm-6a-7Lc"/>
