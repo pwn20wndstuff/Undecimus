@@ -284,9 +284,9 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
                 [self.unjailbreakButton setTitle:NSLocalizedString(@"Unjailbreaking...", nil) forState:UIControlStateDisabled];
             });
 #ifdef WANT_CYDIA
-            unjailbreak(self.resetUserDataSwitch.enabled);
+            unjailbreak(self.resetUserDataSwitch.isOn);
 #else    /* !WANT_CYDIA */
-            unjailbreak(tfp0, (uint64_t)get_kernel_base(tfp0), self.resetUserDataSwitch.enabled);
+            unjailbreak(tfp0, (uint64_t)get_kernel_base(tfp0), self.resetUserDataSwitch.isOn);
 #endif    /* !WANT_CYDIA */
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.unjailbreakButton setTitle:NSLocalizedString(@"Failed, reboot.", nil) forState:UIControlStateDisabled];
