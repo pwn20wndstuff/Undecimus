@@ -242,7 +242,7 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
         
         // Erase user data.
         LOG("%@", NSLocalizedString(@"Erasing user data...", nil));
-        extern int SBDataReset(mach_port_t SpringBoardServerPort, int mode);
+        extern int SBDataReset(mach_port_t, int);
         rv = SBDataReset(SBServerPort, 5);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -264,6 +264,9 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.unjailbreakButton setEnabled:NO];
             });
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.resetUserDataSwitch setEnabled:NO];
+            });
 #ifndef WANT_CYDIA
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.unjailbreakButton setTitle:NSLocalizedString(@"Exploiting...", nil) forState:UIControlStateDisabled];
@@ -284,9 +287,13 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
                 [self.unjailbreakButton setTitle:NSLocalizedString(@"Unjailbreaking...", nil) forState:UIControlStateDisabled];
             });
 #ifdef WANT_CYDIA
-            unjailbreak(self.resetUserDataSwitch.isOn);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                unjailbreak(self.resetUserDataSwitch.isOn);
+            });
 #else    /* !WANT_CYDIA */
-            unjailbreak(tfp0, (uint64_t)get_kernel_base(tfp0), self.resetUserDataSwitch.isOn);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                unjailbreak(tfp0, (uint64_t)get_kernel_base(tfp0), self.resetUserDataSwitch.isOn);
+            });
 #endif    /* !WANT_CYDIA */
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.unjailbreakButton setTitle:NSLocalizedString(@"Failed, reboot.", nil) forState:UIControlStateDisabled];

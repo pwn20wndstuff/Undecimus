@@ -22,7 +22,7 @@
                                 <rect key="frame" x="166.5" y="68" width="42" height="64"/>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KMr-3a-xtk">
-                                <rect key="frame" x="16" y="163" width="342" height="46"/>
+                                <rect key="frame" x="16.5" y="163" width="341.5" height="46"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="46" id="WbR-mS-Am6"/>
                                 </constraints>
@@ -51,7 +51,7 @@ for a stock iOS.</string>
                                 </subviews>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rLl-li-fRW">
-                                <rect key="frame" x="108" y="612" width="158.5" height="30"/>
+                                <rect key="frame" x="107" y="612" width="158.5" height="30"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Designed by " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vLG-fA-g3g">
                                         <rect key="frame" x="0.0" y="0.0" width="91.5" height="30"/>
@@ -97,7 +97,7 @@ for a stock iOS.</string>
                                 </subviews>
                             </stackView>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GPL-Sm-qcs">
-                                <rect key="frame" x="162.5" y="573" width="51" height="31"/>
+                                <rect key="frame" x="162" y="573" width="51" height="31"/>
                                 <color key="onTintColor" red="0.25490196079999999" green="0.30980392159999998" blue="0.38431372549999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                             </switch>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reset user data." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aMW-7a-h0F">
