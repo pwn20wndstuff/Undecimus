@@ -1,3 +1,4 @@
+#ifndef WANT_CYDIA
 #ifndef kmem_h
 #define kmem_h
 
@@ -34,3 +35,5 @@ void wk64(uint64_t kaddr, uint64_t val);
 void prepare_for_rw_with_fake_tfp0(mach_port_t fake_tfp0);
 
 #endif
+#endif    /* WANT_CYDIA */
+

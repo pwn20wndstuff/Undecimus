@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
 
+#ifdef WANT_CYDIA
 /* Set platform binary flag */
 #define FLAG_PLATFORMIZE (1 << 1)
 
@@ -37,6 +38,7 @@ void patch_setuidandplatformize() {
     
     entitleptr(getpid(), FLAG_PLATFORMIZE);
 }
+#endif    /* !WANT_CYDIA */
 
 int main(int argc, char * argv[]) {
 #ifdef WANT_CYDIA

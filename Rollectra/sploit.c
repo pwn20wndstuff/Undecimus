@@ -1,3 +1,4 @@
+#ifndef WANT_CYDIA
 #include <sys/resource.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -1055,3 +1056,5 @@ void vfs_sploit() {
   printf("tfp0 in there will stay alive once this process exits\n");
   printf("keep hold of a send right to it; don't expect this exploit to work again without a reboot\n");
 }
+#endif    /* WANT_CYDIA */
+

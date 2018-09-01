@@ -10,9 +10,11 @@
 #include <dlfcn.h>
 #import "ViewController.h"
 #include "common.h"
+#ifndef WANT_CYDIA
 #include "offsets.h"
 #include "sploit.h"
 #include "kmem.h"
+#endif    /* WANT_CYDIA */
 #include "QiLin.h"
 #include "iokit.h"
 
@@ -22,6 +24,10 @@
 
 @implementation ViewController
 
+#ifndef WANT_CYDIA
+
+// https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
+
 #define IMAGE_OFFSET 0x2000
 #define MACHO_HEADER_MAGIC 0xfeedfacf
 #define MAX_KASLR_SLIDE 0x21000000
@@ -29,8 +35,6 @@
 
 #define ptrSize sizeof(uintptr_t)
 
-#ifndef WANT_CYDIA
-// https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
 static vm_address_t get_kernel_base(mach_port_t tfp0) {
     uint64_t addr = 0;
     addr = KERNEL_SEARCH_ADDRESS_IOS10+MAX_KASLR_SLIDE;
@@ -149,12 +153,6 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
 #endif    /* WANT_CYDIA */
     NSMutableDictionary *md = nil;
     mach_port_t SBServerPort = MACH_PORT_NULL;
-    
-#ifndef WANT_CYDIA
-    // Initialize offsets.
-    LOG("%@", NSLocalizedString(@"Initializing offsets...", nil));
-    offsets_init();
-#endif    /* WANT_CYDIA */
     
 #ifndef WANT_CYDIA
     // Initialize QiLin.

@@ -1,3 +1,4 @@
+#ifndef WANT_CYDIA
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -66,3 +67,5 @@ uint64_t rk64(uint64_t kaddr) {
   uint64_t full = ((higher<<32) | lower);
   return full;
 }
+#endif    /* WANT_CYDIA */
+
