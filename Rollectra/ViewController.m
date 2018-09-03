@@ -151,8 +151,6 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
 #ifndef WANT_CYDIA
     uint64_t myOriginalCredAddr = 0;
 #endif    /* WANT_CYDIA */
-    NSMutableDictionary *md = nil;
-    mach_port_t SBServerPort = MACH_PORT_NULL;
     
 #ifndef WANT_CYDIA
     // Initialize QiLin.
@@ -215,47 +213,26 @@ void unjailbreak(mach_port_t tfp0, uint64_t kernel_base, int shouldEraseUserData
     _assert(rv == 0);
     LOG("%@", NSLocalizedString(@"Successfully put the system snapshot in place, it should revert on the next mount.", nil));
     
-    md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
-    _assert(md);
-    md[@"SBShowNonDefaultSystemApps"] = @(NO);
-    [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
-    
-    if (shouldEraseUserData) {
 #ifndef WANT_CYDIA
-        // Entitle myself.
-        LOG("%@", NSLocalizedString(@"Entitling myself...", nil));
-        rv = entitleMe("\t<key>platform-application</key>\n"
-                       "\t<true/>\n"
-                       "\t<key>com.apple.springboard.wipedevice</key>\n"
-                       "\t<true/>");
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        LOG("%@", NSLocalizedString(@"Successfully entitled myself.", nil));
+    // Entitle myself.
+    LOG("%@", NSLocalizedString(@"Entitling myself...", nil));
+    rv = entitleMe("\t<key>platform-application</key>\n"
+                   "\t<true/>\n"
+                   "\t<key>com.apple.springboard.wipedevice</key>\n"
+                   "\t<true/>");
+    LOG("rv: " "%d" "\n", rv);
+    _assert(rv == 0);
+    LOG("%@", NSLocalizedString(@"Successfully entitled myself.", nil));
 #endif    /* WANT_CYDIA */
-        
-        // Get SpringBoardServerPort.
-        LOG("%@", NSLocalizedString(@"Getting SpringBoardServerPort...", nil));
-        extern mach_port_t SBSSpringBoardServerPort(void);
-        SBServerPort = SBSSpringBoardServerPort();
-        LOG("SpringBoardServerPort: " "%x" "\n", SBServerPort);
-        _assert(SBServerPort);
-        LOG("%@", NSLocalizedString(@"Successfully got SpringBoardServerPort.", nil));
-        
-        // Erase user data.
-        LOG("%@", NSLocalizedString(@"Erasing user data...", nil));
-        extern int SBDataReset(mach_port_t, int);
-        rv = SBDataReset(SBServerPort, 5);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        LOG("%@", NSLocalizedString(@"Successfully erased user data.", nil));
-    } else {
-        // Reboot.
-        LOG("%@", NSLocalizedString(@"Rebooting...", nil));
-        rv = reboot(0x400);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        LOG("%@", NSLocalizedString(@"Successfully rebooted.", nil));
-    }
+    
+    // Erase user data.
+    LOG("%@", NSLocalizedString(@"Erasing user data...", nil));
+    extern int SBDataReset(mach_port_t, int);
+    extern mach_port_t SBSSpringBoardServerPort(void);
+    rv = SBDataReset(SBSSpringBoardServerPort(), shouldEraseUserData ? 5 : 1);
+    LOG("rv: " "%d" "\n", rv);
+    _assert(rv == 0);
+    LOG("%@", NSLocalizedString(@"Successfully erased user data.", nil));
 }
 
 - (IBAction)tappedOnUnjailbreak:(id)sender {

@@ -1,9 +1,9 @@
 Package: com.pwn20wnd.semirestore11
-Version: 1.1
+Version: 1.1.2
 Architecture: iphoneos-arm
 Description: A full system unjailbreaker that supports all devices running iOS 11.3 to 11.4 Beta 3.
 Maintainer: Pwn20wnd <pwn20wndstuff@gmail.com>
-Depends: cy+cpu.arm64, coreutils-bin, firmware (>= 11.3), firmware (<< 11.4.1)
+Depends: cy+cpu.arm64, coreutils-bin, uikittools, firmware (>= 11.3), firmware (<< 11.4.1)
 Conflicts: org.coolstar.semirestore11-lite
 Replaces: org.coolstar.semirestore11-lite
 Section: System
