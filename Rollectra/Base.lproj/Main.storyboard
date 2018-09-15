@@ -56,10 +56,16 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2xi-sT-c6w">
                                         <rect key="frame" x="347.5" y="321" width="89" height="30"/>
                                         <state key="normal" title="@pwn20wnd"/>
+                                        <connections>
+                                            <action selector="tappedOnPwn:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="Nip-hk-wq5"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rrP-p5-z9h">
                                         <rect key="frame" x="279.5" y="338" width="118" height="30"/>
                                         <state key="normal" title="@DennisBednarz"/>
+                                        <connections>
+                                            <action selector="tappedOnDennis:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="0wz-Sx-Bxj"/>
+                                        </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&amp;" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pz5-qQ-pU1">
                                         <rect key="frame" x="400.5" y="345" width="10.5" height="18"/>
@@ -92,6 +98,9 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xNu-XJ-toL">
                                         <rect key="frame" x="415.5" y="338" width="74" height="30"/>
                                         <state key="normal" title="@sbingner"/>
+                                        <connections>
+                                            <action selector="tappedOnSam:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="hng-6s-YPC"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="0.83999999999999997" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
