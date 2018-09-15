@@ -1675,4 +1675,16 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     return UIStatusBarStyleDefault;
 }
 
+- (IBAction)tappedOnPwn:(id)sender{
+    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
+}
+
+- (IBAction)tappedOnDennis:(id)sender{
+    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
+}
+
+- (IBAction)tappedOnSam:(id)sender{
+    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
+}
+
 @end
