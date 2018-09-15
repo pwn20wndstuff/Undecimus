@@ -22,11 +22,4 @@
 #endif
 typedef struct load_command mach_lc_t;
 
-#define _assert(test) do \
-if (!(test)) { \
-    fprintf(stderr, "_assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILE__, __LINE__, __FUNCTION__); \
-    exit(-1); \
-} \
-while (false)
-
 #endif

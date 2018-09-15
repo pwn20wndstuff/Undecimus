@@ -1,4 +1,3 @@
-#ifndef WANT_CYDIA
 #ifndef offsets_h
 #define offsets_h
 
@@ -59,5 +58,3 @@ int koffset(enum kstruct_offset offset);
 void offsets_init(void);
 
 #endif
-#endif    /* WANT_CYDIA */
-

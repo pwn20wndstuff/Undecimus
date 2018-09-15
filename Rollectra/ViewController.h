@@ -9,12 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface ViewController : UIViewController
-@property (weak, nonatomic) IBOutlet UIButton *unjailbreakButton;
-@property (weak, nonatomic) IBOutlet UILabel *infoLabel;
-@property (weak, nonatomic) IBOutlet UIButton *myButton;
-@property (weak, nonatomic) IBOutlet UIButton *aesign_Button;
-@property (weak, nonatomic) IBOutlet UISwitch *resetUserDataSwitch;
-@property (weak, nonatomic) IBOutlet UILabel *QiLinLabel;
+@property (weak, nonatomic) IBOutlet UIButton *goButton;
 
 @end
 

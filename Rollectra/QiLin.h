@@ -183,8 +183,7 @@ int rootifyPid(pid_t Whom);
 int ShaiHuludPid (pid_t Whom, uint64_t CredAddr); // leave 0 for root creds.
 int unShaiHuludPid (pid_t Whom);
 
-
-
+int platformizeProcAtAddr(uint64_t thing);
 uint64_t borrowEntitlementsFromDonor(char *UnwittingDonor, char *Arg);
 // By request :-)
 uint64_t borrowEntitlementsFromPid(pid_t    Pid);

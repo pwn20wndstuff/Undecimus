@@ -9,43 +9,46 @@
 #include <dlfcn.h>
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
+#include "SettingsTableViewController.h"
 
-#ifdef WANT_CYDIA
-/* Set platform binary flag */
-#define FLAG_PLATFORMIZE (1 << 1)
+#define LOG_FILE [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
 
-void patch_setuidandplatformize() {
-    void* handle = dlopen("/usr/lib/libjailbreak.dylib", RTLD_LAZY);
-    if (!handle) return;
-    
-    // Reset errors
-    dlerror();
-    
-    typedef void (*fix_setuid_prt_t)(pid_t pid);
-    fix_setuid_prt_t setuidptr = (fix_setuid_prt_t)dlsym(handle, "jb_oneshot_fix_setuid_now");
-    
-    typedef void (*fix_entitle_prt_t)(pid_t pid, uint32_t what);
-    fix_entitle_prt_t entitleptr = (fix_entitle_prt_t)dlsym(handle, "jb_oneshot_entitle_now");
-    
-    setuidptr(getpid());
-    
-    setuid(0);
-    
-    const char *dlsym_error = dlerror();
-    if (dlsym_error) {
-        return;
-    }
-    
-    entitleptr(getpid(), FLAG_PLATFORMIZE);
-}
-#endif    /* !WANT_CYDIA */
+int (*dsystem)(const char *) = 0;
 
 int main(int argc, char * argv[]) {
-#ifdef WANT_CYDIA
-    patch_setuidandplatformize();
-    setuid(0);
-#endif    /* !WANT_CYDIA */
+    /*
+    freopen(LOG_FILE, "a+", stderr);
+    freopen(LOG_FILE, "a+", stdout);
+    setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
+    */
     @autoreleasepool {
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_TWEAK_INJECTION] == nil) {
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@K_TWEAK_INJECTION];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_LOAD_DAEMONS] == nil) {
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@K_LOAD_DAEMONS];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_DUMP_APTICKET] == nil) {
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@K_DUMP_APTICKET];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_REFRESH_ICON_CACHE] == nil) {
+            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_REFRESH_ICON_CACHE];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] == nil) {
+            [[NSUserDefaults standardUserDefaults] setObject:@"0x292dd10b56d87a3a" forKey:@K_BOOT_NONCE];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPLOIT] == nil) {
+            [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@K_EXPLOIT];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+        dsystem = dlsym(RTLD_DEFAULT,"system");
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
 }
+

@@ -1,4 +1,3 @@
-#ifndef WANT_CYDIA
 #import <Foundation/Foundation.h>
 
 #include <stdio.h>
@@ -84,5 +83,3 @@ void offsets_init() {
     exit(EXIT_FAILURE);
   }
 }
-#endif    /* WANT_CYDIA */
-

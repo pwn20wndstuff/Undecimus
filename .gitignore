@@ -92,3 +92,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# theos
+.theos/
+packages/
+obj/
+
