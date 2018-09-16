@@ -1,6 +1,6 @@
 //
 //  ViewController.m
-//  Rollectra
+//  Undecimus
 //
 //  Created by pwn20wnd on 8/29/18.
 //  Copyright © 2018 Pwn20wnd. All rights reserved.
@@ -17,6 +17,7 @@
 #include <libgen.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <dirent.h>
 #import "ViewController.h"
 #include "common.h"
 #include "offsets.h"
@@ -1492,10 +1493,11 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (access("/.installed_unc0ver", F_OK)) {
             rv = chdir("/");
             LOG("rv: " "%d" "\n", rv);
-            _assert( rv == 0);
+            _assert(rv == 0);
             rv = execCommandAndWait("/jb/tar", "-xvpkf", "/var/tmp/strap.tar", NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 512 || rv == 0);
+            dsystem("/usr/libexec/cydia/firmware.sh");
             rv = fclose(fopen("/.installed_unc0ver", "w"));
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1629,12 +1631,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
                 break;
             }
             case 2: {
-                exit(1);
                 break;
             }
                 
             default: {
-                exit(1);
                 break;
             }
         }
