@@ -24,7 +24,6 @@
 		21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7521369EB800849420 /* LaunchScreen.storyboard */; };
 		21C0FC7A21369EB800849420 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC7921369EB800849420 /* main.m */; };
 		21C0FC8721369EE900849420 /* kmem.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8021369EE900849420 /* kmem.c */; };
-		21C0FC8921369EE900849420 /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21C0FC8A21369EE900849420 /* offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8621369EE900849420 /* offsets.m */; };
 		21C0FC912136A46500849420 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C130DE214BC2880021AA9D /* unlocknvram.c */; };
@@ -44,6 +43,7 @@
 		21C1311D214D2CC50021AA9D /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C1311A214D2CC40021AA9D /* Icon.png */; };
 		21C1311E214D2CC50021AA9D /* Icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C1311B214D2CC50021AA9D /* Icon@3x.png */; };
 		21C1311F214D2CC50021AA9D /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C1311C214D2CC50021AA9D /* Icon@2x.png */; };
+		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -301,10 +301,10 @@
 				21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */,
 				21C130FB214C1EBA0021AA9D /* untar.c in Sources */,
 				21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */,
+				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* kmem.c in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
-				21C0FC8921369EE900849420 /* empty_list_sploit.c in Sources */,
 				21C130E8214BEA730021AA9D /* SettingsTableViewController.m in Sources */,
 				21C13107214C26220021AA9D /* ViewController.m in Sources */,
 				21A97FD32148103C00DC0023 /* kutils.c in Sources */,
