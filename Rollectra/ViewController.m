@@ -36,7 +36,11 @@ extern int (*dsystem)(const char *);
 #include "untar.h"
 #include "multi_path_sploit.h"
 
-@interface ViewController ()
+@interface ViewController (){
+    int upTime;
+    int waitTime;
+    NSTimer *waitingToJailbreak;
+}
 
 @end
 
@@ -45,22 +49,22 @@ extern int (*dsystem)(const char *);
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define _assert(test) do \
-    if (!(test)) { \
-        fprintf(stderr, "__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
-        dispatch_semaphore_t semaphore; \
-        semaphore = dispatch_semaphore_create(0); \
-        dispatch_async(dispatch_get_main_queue(), ^{ \
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__] preferredStyle:UIAlertControllerStyleAlert]; \
-            UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) { \
-                dispatch_semaphore_signal(semaphore); \
-            }]; \
-            [alertController addAction:OK]; \
-            [alertController setPreferredAction:OK]; \
-            [[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentViewController:alertController animated:YES completion:nil]; \
-        }); \
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER); \
-        exit(1); \
-    } \
+if (!(test)) { \
+fprintf(stderr, "__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
+dispatch_semaphore_t semaphore; \
+semaphore = dispatch_semaphore_create(0); \
+dispatch_async(dispatch_get_main_queue(), ^{ \
+UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__] preferredStyle:UIAlertControllerStyleAlert]; \
+UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) { \
+dispatch_semaphore_signal(semaphore); \
+}]; \
+[alertController addAction:OK]; \
+[alertController setPreferredAction:OK]; \
+[[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentViewController:alertController animated:YES completion:nil]; \
+}); \
+dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER); \
+exit(1); \
+} \
 while (false)
 
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
@@ -1594,11 +1598,16 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
 }
 
-- (IBAction)tappedOnJailbreak:(id)sender
-{
+- (IBAction)tappedOnJailbreak:(id)sender{
+    //Thanks Xerub/Siguza/Tihmstar for the idea to wait for kernel to chill before allowing the user to run the jailbreak.
+    waitingToJailbreak = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(checkUpTime) userInfo:nil repeats:YES];
+}
+
+- (void)startJailbreak{
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.goButton setEnabled:NO];
+            [self.goButton setAlpha:0.6];
             [self.goButton setTitle:NSLocalizedString(@"Exploiting...", nil) forState:UIControlStateDisabled];
             [self.tabBarController.tabBar setUserInteractionEnabled:NO];
         });
@@ -1609,7 +1618,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
                 vfs_sploit();
                 break;
             }
-            
+                
             case 1: {
                 mptcp_go();
                 break;
@@ -1685,6 +1694,21 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 
 - (IBAction)tappedOnSam:(id)sender{
     [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
+}
+
+- (void)checkUpTime{
+    upTime = (int)[[NSProcessInfo processInfo] systemUptime];
+    waitTime = 120 - upTime;
+    if (waitTime > 0){
+        [self.goButton setTitle:[NSString stringWithFormat:@"Jailbreaking in %d...", waitTime] forState:UIControlStateNormal];
+        [self.goButton setEnabled:false];
+        [self.goButton setAlpha:0.6];
+    } else {
+        [self.goButton setTitle:@"Jailbreak" forState:UIControlStateNormal];
+        [waitingToJailbreak invalidate];
+        [self startJailbreak];
+    }
+    
 }
 
 @end
