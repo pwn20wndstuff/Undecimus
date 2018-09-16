@@ -63,7 +63,7 @@
 		21A97FCD2148103B00DC0023 /* remote_call.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_call.c; sourceTree = "<group>"; };
 		21A97FCE2148103C00DC0023 /* remote_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_memory.h; sourceTree = "<group>"; };
 		21A97FCF2148103C00DC0023 /* libjb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjb.a; sourceTree = "<group>"; };
-		21C0FC6721369EB700849420 /* Rollectra.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rollectra.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		21C0FC6721369EB700849420 /* Undecimus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Undecimus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		21C0FC6A21369EB700849420 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		21C0FC6B21369EB700849420 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		21C0FC6D21369EB700849420 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
@@ -132,7 +132,7 @@
 		21C0FC5E21369EB700849420 = {
 			isa = PBXGroup;
 			children = (
-				21C0FC6921369EB700849420 /* Rollectra */,
+				21C0FC6921369EB700849420 /* Undecimus */,
 				21C0FC6821369EB700849420 /* Products */,
 				21675B62214A68B700D20E2B /* Frameworks */,
 			);
@@ -141,12 +141,12 @@
 		21C0FC6821369EB700849420 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				21C0FC6721369EB700849420 /* Rollectra.app */,
+				21C0FC6721369EB700849420 /* Undecimus.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		21C0FC6921369EB700849420 /* Rollectra */ = {
+		21C0FC6921369EB700849420 /* Undecimus */ = {
 			isa = PBXGroup;
 			children = (
 				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
@@ -208,15 +208,15 @@
 				21C130E9214C03690021AA9D /* CreditsTableViewController.h */,
 				21C130EA214C03690021AA9D /* CreditsTableViewController.m */,
 			);
-			path = Rollectra;
+			path = Undecimus;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		21C0FC6621369EB700849420 /* Rollectra */ = {
+		21C0FC6621369EB700849420 /* Undecimus */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 21C0FC7D21369EB800849420 /* Build configuration list for PBXNativeTarget "Rollectra" */;
+			buildConfigurationList = 21C0FC7D21369EB800849420 /* Build configuration list for PBXNativeTarget "Undecimus" */;
 			buildPhases = (
 				21C0FC6321369EB700849420 /* Sources */,
 				21C0FC6421369EB700849420 /* Frameworks */,
@@ -226,9 +226,9 @@
 			);
 			dependencies = (
 			);
-			name = Rollectra;
+			name = Undecimus;
 			productName = Rollectra;
-			productReference = 21C0FC6721369EB700849420 /* Rollectra.app */;
+			productReference = 21C0FC6721369EB700849420 /* Undecimus.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -246,7 +246,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 21C0FC6221369EB700849420 /* Build configuration list for PBXProject "Rollectra" */;
+			buildConfigurationList = 21C0FC6221369EB700849420 /* Build configuration list for PBXProject "Undecimus" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -259,7 +259,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				21C0FC6621369EB700849420 /* Rollectra */,
+				21C0FC6621369EB700849420 /* Undecimus */,
 			);
 		};
 /* End PBXProject section */
@@ -452,28 +452,28 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Rollectra/multi_path.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/multi_path.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Rollectra",
+					"$(PROJECT_DIR)/Undecimus",
 				);
-				INFOPLIST_FILE = Rollectra/Info.plist;
+				INFOPLIST_FILE = Undecimus/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Rollectra",
+					"$(PROJECT_DIR)/Undecimus",
 				);
 				OTHER_CFLAGS = "-DPARTY_HARD";
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = science.xnu.unc0ver;
+				PRODUCT_BUNDLE_IDENTIFIER = science.xnu.undecimus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -484,28 +484,28 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Rollectra/multi_path.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/multi_path.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Rollectra",
+					"$(PROJECT_DIR)/Undecimus",
 				);
-				INFOPLIST_FILE = Rollectra/Info.plist;
+				INFOPLIST_FILE = Undecimus/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Rollectra",
+					"$(PROJECT_DIR)/Undecimus",
 				);
 				OTHER_CFLAGS = "-DPARTY_HARD";
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = science.xnu.unc0ver;
+				PRODUCT_BUNDLE_IDENTIFIER = science.xnu.undecimus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -515,7 +515,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		21C0FC6221369EB700849420 /* Build configuration list for PBXProject "Rollectra" */ = {
+		21C0FC6221369EB700849420 /* Build configuration list for PBXProject "Undecimus" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				21C0FC7B21369EB800849420 /* Debug */,
@@ -524,7 +524,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		21C0FC7D21369EB800849420 /* Build configuration list for PBXNativeTarget "Rollectra" */ = {
+		21C0FC7D21369EB800849420 /* Build configuration list for PBXNativeTarget "Undecimus" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				21C0FC7E21369EB800849420 /* Debug */,
