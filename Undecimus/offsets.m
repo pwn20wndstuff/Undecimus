@@ -63,7 +63,6 @@ int koffset(enum kstruct_offset offset) {
   return offsets[offset];
 }
 
-
 void offsets_init() {
   if (@available(iOS 11.4, *)) {
     NSDictionary *systemVersionPlist = [[NSDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];

