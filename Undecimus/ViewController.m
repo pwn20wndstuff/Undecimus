@@ -789,7 +789,7 @@ int die() {
     return 0;
 }
 
-void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce)
+void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce)
 {
     // Initialize variables.
     int rv = 0;
@@ -1162,13 +1162,13 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         
         if (!access("/electra", F_OK)) {
-            rv = rmdir("/electra");
+            rv = unlink("/electra");
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
         rv = symlink("/jb", "/electra");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0); 
+        _assert(rv == 0);
         
         rv = chdir("/jb");
         LOG("rv: " "%d" "\n", rv);
@@ -1502,7 +1502,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = execCommandAndWait("/jb/tar", "-xvpkf", "/var/tmp/strap.tar", NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 512 || rv == 0);
-            dsystem("/usr/libexec/cydia/firmware.sh");
             rv = fclose(fopen("/.installed_unc0ver", "w"));
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1637,8 +1636,8 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("Validating TFP0...");
         _assert(MACH_PORT_VALID(tfp0));
         LOG("Successfully validated TFP0.");
-        extern void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce);
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]));
+        extern void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce);
+        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], [[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]);
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.goButton setTitle:NSLocalizedString(@"Done, exit.", nil) forState:UIControlStateDisabled];
         });
