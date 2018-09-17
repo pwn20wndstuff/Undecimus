@@ -78,6 +78,9 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="i2t-ek-Opx">
+                                        <rect key="frame" x="61.5" y="483" width="197" height="2"/>
+                                    </progressView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="9BH-Zb-878">
                                         <rect key="frame" x="413.5" y="388" width="197" height="56"/>
                                         <subviews>
@@ -119,6 +122,7 @@
                                 <constraints>
                                     <constraint firstItem="xNu-XJ-toL" firstAttribute="leading" secondItem="A1X-qf-Qzr" secondAttribute="trailing" constant="-43" id="1ej-T2-CkS"/>
                                     <constraint firstItem="xNu-XJ-toL" firstAttribute="leading" secondItem="9BH-Zb-878" secondAttribute="trailing" constant="-67" id="3TL-Mz-kHO"/>
+                                    <constraint firstItem="i2t-ek-Opx" firstAttribute="top" secondItem="ELb-9J-7YK" secondAttribute="bottom" constant="-29" id="5Pn-Go-IO5"/>
                                     <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="Pz5-qQ-pU1" secondAttribute="bottom" constant="90" id="9Df-5Y-dS7"/>
                                     <constraint firstItem="2xi-sT-c6w" firstAttribute="top" secondItem="A1X-qf-Qzr" secondAttribute="bottom" constant="11" id="A0v-Rb-YIh"/>
                                     <constraint firstItem="4KO-gY-f4A" firstAttribute="top" secondItem="82c-Je-J4x" secondAttribute="top" constant="244" id="Be6-pX-0eq"/>
@@ -146,6 +150,7 @@
                                     <constraint firstItem="rrP-p5-z9h" firstAttribute="top" secondItem="82c-Je-J4x" secondAttribute="top" constant="273" id="qSf-2t-7Ib"/>
                                     <constraint firstItem="A1X-qf-Qzr" firstAttribute="top" secondItem="82c-Je-J4x" secondAttribute="top" constant="104" id="sL7-Do-4dg"/>
                                     <constraint firstItem="9BH-Zb-878" firstAttribute="leading" secondItem="8P6-bw-obz" secondAttribute="trailing" constant="-59" id="tl4-aY-gOz"/>
+                                    <constraint firstItem="i2t-ek-Opx" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="ub9-9B-Acz"/>
                                     <constraint firstItem="4KO-gY-f4A" firstAttribute="centerX" secondItem="9BH-Zb-878" secondAttribute="centerX" id="vIu-Ob-mGN"/>
                                     <constraint firstItem="A1X-qf-Qzr" firstAttribute="leading" secondItem="8P6-bw-obz" secondAttribute="trailing" constant="-35" id="xfT-AX-d45"/>
                                     <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="rrP-p5-z9h" secondAttribute="bottom" constant="85" id="y2h-B0-xQk"/>
@@ -170,6 +175,7 @@
                     <tabBarItem key="tabBarItem" title="Jailbreak" image="maintenance" id="W8d-XC-the"/>
                     <connections>
                         <outlet property="goButton" destination="ELb-9J-7YK" id="NQQ-PZ-dgH"/>
+                        <outlet property="progressBar" destination="i2t-ek-Opx" id="hhc-yk-Jma"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DwP-nN-m9x" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -409,7 +415,7 @@
                                                     <segments>
                                                         <segment title="EL"/>
                                                         <segment title="MP"/>
-                                                        <segment title="AW"/>
+                                                        <segment title="AW" enabled="NO"/>
                                                     </segments>
                                                     <connections>
                                                         <action selector="KernelExploitSegmentedControl:" destination="ScN-Hx-Um8" eventType="valueChanged" id="Lgd-u2-qmM"/>

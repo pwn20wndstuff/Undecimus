@@ -38,7 +38,11 @@ extern int (*dsystem)(const char *);
 #include "untar.h"
 #include "multi_path_sploit.h"
 
-@interface ViewController ()
+@interface ViewController (){
+    int upTime;
+    int waitTime;
+    NSTimer *waitingToJailbreak;
+}
 
 @end
 
@@ -47,22 +51,22 @@ extern int (*dsystem)(const char *);
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define _assert(test) do \
-    if (!(test)) { \
-        fprintf(stderr, "__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
-        dispatch_semaphore_t semaphore; \
-        semaphore = dispatch_semaphore_create(0); \
-        dispatch_async(dispatch_get_main_queue(), ^{ \
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__] preferredStyle:UIAlertControllerStyleAlert]; \
-            UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) { \
-                dispatch_semaphore_signal(semaphore); \
-            }]; \
-            [alertController addAction:OK]; \
-            [alertController setPreferredAction:OK]; \
-            [[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentViewController:alertController animated:YES completion:nil]; \
-        }); \
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER); \
-        exit(1); \
-    } \
+if (!(test)) { \
+fprintf(stderr, "__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
+dispatch_semaphore_t semaphore; \
+semaphore = dispatch_semaphore_create(0); \
+dispatch_async(dispatch_get_main_queue(), ^{ \
+UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__] preferredStyle:UIAlertControllerStyleAlert]; \
+UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) { \
+dispatch_semaphore_signal(semaphore); \
+}]; \
+[alertController addAction:OK]; \
+[alertController setPreferredAction:OK]; \
+[[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentViewController:alertController animated:YES completion:nil]; \
+}); \
+dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER); \
+exit(1); \
+} \
 while (false)
 
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
@@ -1650,22 +1654,32 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
 }
 
-- (IBAction)tappedOnJailbreak:(id)sender
-{
+- (IBAction)tappedOnJailbreak:(id)sender{
+    //Thanks Xerub/Siguza/Tihmstar for the idea to wait for kernel to chill before allowing the user to run the jailbreak.
+    waitingToJailbreak = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(checkUpTime) userInfo:nil repeats:YES];
+}
+
+- (void)startJailbreak{
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.goButton setEnabled:NO];
-            [self.goButton setTitle:@"Exploiting..." forState:UIControlStateDisabled];
+            [self.goButton setAlpha:0.4];
+            [[self goButton] setTintColor:[UIColor greenColor]];
+            //[[self progressBar] setTintColor:[UIColor greenColor]];
+            [self.goButton setTitle:NSLocalizedString(@"Exploiting...", nil) forState:UIControlStateDisabled];
             [self.tabBarController.tabBar setUserInteractionEnabled:NO];
         });
         // Initialize kernel exploit.
         LOG("Initializing kernel exploit...");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            //[[self progressBar] setProgress:((float)1 / (float)3) animated:TRUE];
+        });
         switch ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]) {
             case 0: {
                 vfs_sploit();
                 break;
             }
-            
+                
             case 1: {
                 mptcp_go();
                 break;
@@ -1682,10 +1696,16 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("Validating TFP0...");
         _assert(MACH_PORT_VALID(tfp0));
         LOG("Successfully validated TFP0.");
-        extern void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce);
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], [[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]);
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.goButton setTitle:@"Done, exit." forState:UIControlStateDisabled];
+            //[[self progressBar] setProgress:((float)2 / (float)3) animated:TRUE];
+        });
+        extern void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce);
+        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]));
+        dispatch_async(dispatch_get_main_queue(), ^{
+            //[[self progressBar] setProgress:((float)3 / (float)3) animated:TRUE];
+        });
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.goButton setTitle:NSLocalizedString(@"Done, exit.", nil) forState:UIControlStateDisabled];
         });
     });
 }
@@ -1707,6 +1727,8 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    [[UITabBar appearance] setBarTintColor:[UIColor clearColor]];
+    [[UITabBar appearance] setBackgroundImage:[UIImage new]];
     [self.goButton addTarget:self action:@selector(tappedOnJailbreak:) forControlEvents:UIControlEventTouchUpInside];
     struct utsname u = { 0 };
     uname(&u);
@@ -1718,6 +1740,14 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             });
         });
     }
+    [[self progressBar] setHidden:TRUE];
+    /* CGAffineTransform transform = CGAffineTransformMakeScale(1.0f, 28.0f);
+    [[self progressBar] setTransform:transform];
+    self.progressBar.layer.cornerRadius = 10;
+    self.progressBar.clipsToBounds = true;
+    self.progressBar.layer.sublayers[1].cornerRadius = 10;
+    self.progressBar.subviews[1].clipsToBounds = true;
+    [[self progressBar] setAlpha:0.6];*/
 }
 
 - (void)didReceiveMemoryWarning {
@@ -1739,6 +1769,42 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 
 - (IBAction)tappedOnSam:(id)sender{
     [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
+}
+
+- (void)checkUpTime{
+    upTime = [self getUptime];
+    if (upTime < 0){
+        [waitingToJailbreak invalidate];
+        [self startJailbreak];
+    }
+    waitTime = 180 - upTime;
+    //[[self progressBar] setHidden:FALSE];
+    [[self goButton] setTintColor:[UIColor redColor]];
+    if (waitTime > 0){
+        [self.goButton setTitle:[NSString stringWithFormat:@"Jailbreaking in %d...", waitTime] forState:UIControlStateNormal];
+        [self.goButton setEnabled:false];
+        [self.goButton setAlpha:0.4];
+        //float progress = ((float)waitTime / (float)120);
+        //[[self progressBar] setTintColor:[UIColor redColor]];
+        //[[self progressBar] setProgress:progress animated:TRUE];
+    } else {
+        [waitingToJailbreak invalidate];
+        [self startJailbreak];
+    }
+    
+}
+
+- (double)getUptime{
+    struct timeval boottime;
+    size_t len = sizeof(boottime);
+    int mib[2] = { CTL_KERN, KERN_BOOTTIME };
+    if( sysctl(mib, 2, &boottime, &len, NULL, 0) < 0 )
+    {
+        return -1.0;
+    }
+    time_t bsec = boottime.tv_sec, csec = time(NULL);
+    
+    return difftime(csec, bsec);
 }
 
 @end
