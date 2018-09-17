@@ -18,6 +18,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <dirent.h>
+#include <sys/sysctl.h>
 #import "ViewController.h"
 #include "common.h"
 #include "offsets.h"
@@ -1716,13 +1717,15 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 }
 
 - (void)checkUpTime{
-    upTime = (int)[[NSProcessInfo processInfo] systemUptime];
-    waitTime = 120 - upTime;
+    upTime = [self getUptime];
+    if (upTime < 0){
+        [waitingToJailbreak invalidate];
+        [self startJailbreak];
+    }
+    waitTime = 180 - upTime;
     //[[self progressBar] setHidden:FALSE];
     [[self goButton] setTintColor:[UIColor redColor]];
     if (waitTime > 0){
-        upTime = (int)[[NSProcessInfo processInfo] systemUptime];
-        waitTime = 120 - upTime;
         [self.goButton setTitle:[NSString stringWithFormat:@"Jailbreaking in %d...", waitTime] forState:UIControlStateNormal];
         [self.goButton setEnabled:false];
         [self.goButton setAlpha:0.4];
@@ -1734,6 +1737,19 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         [self startJailbreak];
     }
     
+}
+
+- (double)getUptime{
+    struct timeval boottime;
+    size_t len = sizeof(boottime);
+    int mib[2] = { CTL_KERN, KERN_BOOTTIME };
+    if( sysctl(mib, 2, &boottime, &len, NULL, 0) < 0 )
+    {
+        return -1.0;
+    }
+    time_t bsec = boottime.tv_sec, csec = time(NULL);
+    
+    return difftime(csec, bsec);
 }
 
 @end
