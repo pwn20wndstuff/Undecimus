@@ -1161,6 +1161,15 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             _assert(rv == 0);
         }
         
+        if (!access("/electra", F_OK)) {
+            rv = rmdir("/electra");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
+        rv = symlink("/jb", "/electra");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0); 
+        
         rv = chdir("/jb");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1406,7 +1415,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
-        rv = rename("/jb/libjailbreak.dylib", "/usr/lib/libjailbreak.dylib");
+        rv = symlink("/jb/libjailbreak.dylib", "/usr/lib/libjailbreak.dylib");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         if (!access("/bin/launchctl", F_OK)) {
@@ -1448,7 +1457,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
-        rv = rename("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib");
+        rv = symlink("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Patching launchd...");
