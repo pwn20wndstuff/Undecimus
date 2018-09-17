@@ -1611,14 +1611,14 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             [self.goButton setEnabled:NO];
             [self.goButton setAlpha:0.4];
             [[self goButton] setTintColor:[UIColor greenColor]];
-            [[self progressBar] setTintColor:[UIColor greenColor]];
+            //[[self progressBar] setTintColor:[UIColor greenColor]];
             [self.goButton setTitle:NSLocalizedString(@"Exploiting...", nil) forState:UIControlStateDisabled];
             [self.tabBarController.tabBar setUserInteractionEnabled:NO];
         });
         // Initialize kernel exploit.
         LOG("Initializing kernel exploit...");
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[self progressBar] setProgress:((float)1 / (float)3) animated:TRUE];
+            //[[self progressBar] setProgress:((float)1 / (float)3) animated:TRUE];
         });
         switch ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]) {
             case 0: {
@@ -1643,12 +1643,12 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(MACH_PORT_VALID(tfp0));
         LOG("Successfully validated TFP0.");
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[self progressBar] setProgress:((float)2 / (float)3) animated:TRUE];
+            //[[self progressBar] setProgress:((float)2 / (float)3) animated:TRUE];
         });
         extern void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce);
         exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]));
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[self progressBar] setProgress:((float)3 / (float)3) animated:TRUE];
+            //[[self progressBar] setProgress:((float)3 / (float)3) animated:TRUE];
         });
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.goButton setTitle:NSLocalizedString(@"Done, exit.", nil) forState:UIControlStateDisabled];
@@ -1685,13 +1685,13 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         });
     }
     [[self progressBar] setHidden:TRUE];
-    CGAffineTransform transform = CGAffineTransformMakeScale(1.0f, 28.0f);
+    /* CGAffineTransform transform = CGAffineTransformMakeScale(1.0f, 28.0f);
     [[self progressBar] setTransform:transform];
     self.progressBar.layer.cornerRadius = 10;
     self.progressBar.clipsToBounds = true;
     self.progressBar.layer.sublayers[1].cornerRadius = 10;
     self.progressBar.subviews[1].clipsToBounds = true;
-    [[self progressBar] setAlpha:0.6];
+    [[self progressBar] setAlpha:0.6];*/
 }
 
 - (void)didReceiveMemoryWarning {
@@ -1718,7 +1718,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 - (void)checkUpTime{
     upTime = (int)[[NSProcessInfo processInfo] systemUptime];
     waitTime = 120 - upTime;
-     [[self progressBar] setHidden:FALSE];
+    //[[self progressBar] setHidden:FALSE];
     [[self goButton] setTintColor:[UIColor redColor]];
     if (waitTime > 0){
         upTime = (int)[[NSProcessInfo processInfo] systemUptime];
@@ -1726,9 +1726,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         [self.goButton setTitle:[NSString stringWithFormat:@"Jailbreaking in %d...", waitTime] forState:UIControlStateNormal];
         [self.goButton setEnabled:false];
         [self.goButton setAlpha:0.4];
-        float progress = ((float)waitTime / (float)120);
-        [[self progressBar] setTintColor:[UIColor redColor]];
-        [[self progressBar] setProgress:progress animated:TRUE];
+        //float progress = ((float)waitTime / (float)120);
+        //[[self progressBar] setTintColor:[UIColor redColor]];
+        //[[self progressBar] setProgress:progress animated:TRUE];
     } else {
         [waitingToJailbreak invalidate];
         [self startJailbreak];
