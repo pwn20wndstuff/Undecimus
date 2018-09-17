@@ -1699,7 +1699,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         dispatch_async(dispatch_get_main_queue(), ^{
             //[[self progressBar] setProgress:((float)2 / (float)3) animated:TRUE];
         });
-        extern void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce);
         exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]));
         dispatch_async(dispatch_get_main_queue(), ^{
             //[[self progressBar] setProgress:((float)3 / (float)3) animated:TRUE];
