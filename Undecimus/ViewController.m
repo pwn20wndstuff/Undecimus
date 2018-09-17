@@ -1674,6 +1674,8 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    [[UITabBar appearance] setBarTintColor:[UIColor clearColor]];
+    [[UITabBar appearance] setBackgroundImage:[UIImage new]];
     [self.goButton addTarget:self action:@selector(tappedOnJailbreak:) forControlEvents:UIControlEventTouchUpInside];
     struct utsname u = { 0 };
     uname(&u);
