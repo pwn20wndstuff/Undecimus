@@ -863,14 +863,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     char *dev_path = NULL;
     
     {
-        // Initialize structure offsets.
-        
-        LOG("Initializing structure offsets...");
-        offsets_init();
-        LOG("Successfully initialized structure offsets.");
-    }
-    
-    {
         // Initialize QiLin.
         
         LOG("Initializing QiLin...");
