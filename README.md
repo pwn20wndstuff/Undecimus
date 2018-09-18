@@ -60,7 +60,7 @@ Special thanks to:
 
 [@xerub](https://twitter.com/xerub) for libjb and the original patchfinder64.
 
-[@IBSparkes](https://twitter.com/ibsparkes) for the original amfid patch, jailbreakd, and posix_spawn.
+[PsychoTea / @IBSparkes](https://twitter.com/ibsparkes) for the original amfid patch, jailbreakd, and posix_spawn.
 
 [@stek29](https://twitter.com/stek29) for patchfinder64 additions, modifying nvram on iOS 11, and host_get_special_port(4).
 
