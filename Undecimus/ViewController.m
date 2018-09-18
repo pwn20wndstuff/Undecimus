@@ -1200,7 +1200,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         
         if (!access("/electra", F_OK)) {
-            rv = rmdir("/electra");
+            rv = unlink("/electra");
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
@@ -1222,6 +1222,12 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(a);
         untar(a, "amfid_payload");
         rv = fclose(a);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = rename("/jb/bin/amfid_payload.dylib", "/jb/amfid_payload.dylib");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = rmdir("/jb/bin");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         rv = chmod("/jb/amfid_payload.dylib", 0755);
@@ -1277,6 +1283,12 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
+        rv = rename("/jb/bin/jailbreakd", "/jb/jailbreakd");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = rmdir("/jb/bin");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
         rv = chmod("/jb/jailbreakd", 0755);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1313,6 +1325,12 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(a);
         untar(a, "pspawn_hook");
         rv = fclose(a);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = rename("/jb/bin/pspawn_hook.dylib", "/jb/pspawn_hook.dylib");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = rmdir("/jb/bin");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         rv = chmod("/jb/pspawn_hook.dylib", 0755);
