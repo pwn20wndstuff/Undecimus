@@ -44,42 +44,8 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="unc0ver jailbreak for iOS 11.0-11.4b3" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4KO-gY-f4A">
-                                        <rect key="frame" x="393" y="244" width="238" height="18"/>
-                                        <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="by" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8P6-bw-obz">
-                                        <rect key="frame" x="456.5" y="262" width="16" height="18"/>
-                                        <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2xi-sT-c6w">
-                                        <rect key="frame" x="475.5" y="256" width="87" height="30"/>
-                                        <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
-                                        <state key="normal" title="@pwn20wnd"/>
-                                        <connections>
-                                            <action selector="tappedOnPwn:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="Nip-hk-wq5"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rrP-p5-z9h">
-                                        <rect key="frame" x="412.5" y="273" width="113" height="30"/>
-                                        <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
-                                        <state key="normal" title="@DennisBednarz"/>
-                                        <connections>
-                                            <action selector="tappedOnDennis:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="0wz-Sx-Bxj"/>
-                                        </connections>
-                                    </button>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&amp;" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pz5-qQ-pU1">
-                                        <rect key="frame" x="528.5" y="280" width="10.5" height="18"/>
-                                        <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="9BH-Zb-878">
-                                        <rect key="frame" x="413.5" y="388" width="197" height="56"/>
+                                        <rect key="frame" x="413.5" y="393" width="197" height="56"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ELb-9J-7YK">
                                                 <rect key="frame" x="0.0" y="0.0" width="197" height="56"/>
@@ -100,57 +66,94 @@
                                             </button>
                                         </subviews>
                                     </stackView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xNu-XJ-toL">
-                                        <rect key="frame" x="543.5" y="273" width="70" height="30"/>
-                                        <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
-                                        <state key="normal" title="@sbingner"/>
-                                        <connections>
-                                            <action selector="tappedOnSam:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="hng-6s-YPC"/>
-                                        </connections>
-                                    </button>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="," textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HPS-9j-0Jl">
-                                        <rect key="frame" x="563" y="262" width="4" height="18"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="unc0ver jailbreak for iOS 11.0-11.4b3" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kgp-ib-vpD">
+                                        <rect key="frame" x="393" y="246" width="238" height="18"/>
                                         <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ABT-w0-L5M">
+                                        <rect key="frame" x="416" y="258" width="192.5" height="25"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="by " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xld-3S-HPJ">
+                                                <rect key="frame" x="0.0" y="0.0" width="19" height="25"/>
+                                                <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="a44-m6-jhi">
+                                                <rect key="frame" x="19" y="0.0" width="90" height="25"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="25" id="3wI-58-ZU6"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
+                                                <state key="normal" title="@pwn20wnd "/>
+                                                <connections>
+                                                    <action selector="tappedOnPwn:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="S1b-Y6-Hzx"/>
+                                                </connections>
+                                            </button>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&amp; " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5C0-i7-OBK">
+                                                <rect key="frame" x="109" y="0.0" width="13.5" height="25"/>
+                                                <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d4x-1B-oYY">
+                                                <rect key="frame" x="122.5" y="0.0" width="70" height="25"/>
+                                                <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
+                                                <state key="normal" title="@sbingner"/>
+                                                <connections>
+                                                    <action selector="tappedOnSamB:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="Lx9-Mj-pMH"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Lbx-lz-4J4">
+                                        <rect key="frame" x="384.5" y="271" width="255.5" height="29"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="UI by " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pgR-VP-G2p">
+                                                <rect key="frame" x="0.0" y="0.0" width="34" height="29"/>
+                                                <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="14"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nRv-6Z-uiN">
+                                                <rect key="frame" x="34" y="0.0" width="108" height="29"/>
+                                                <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="14"/>
+                                                <state key="normal" title="@DennisBednarz "/>
+                                                <connections>
+                                                    <action selector="tappedOnDennis:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="c0A-PP-Ffp"/>
+                                                </connections>
+                                            </button>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&amp; " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Euo-qR-USh">
+                                                <rect key="frame" x="142" y="0.0" width="12.5" height="29"/>
+                                                <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="14"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="a4n-BH-gsN">
+                                                <rect key="frame" x="154.5" y="0.0" width="101" height="29"/>
+                                                <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="14"/>
+                                                <state key="normal" title="Samg_is_a_Ninja"/>
+                                                <connections>
+                                                    <action selector="tappedOnSamG:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="ufo-Vn-7xu"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="0.83999999999999997" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstItem="xNu-XJ-toL" firstAttribute="leading" secondItem="A1X-qf-Qzr" secondAttribute="trailing" constant="-43" id="1ej-T2-CkS"/>
-                                    <constraint firstItem="xNu-XJ-toL" firstAttribute="leading" secondItem="9BH-Zb-878" secondAttribute="trailing" constant="-67" id="3TL-Mz-kHO"/>
-                                    <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="Pz5-qQ-pU1" secondAttribute="bottom" constant="90" id="9Df-5Y-dS7"/>
-                                    <constraint firstItem="2xi-sT-c6w" firstAttribute="top" secondItem="A1X-qf-Qzr" secondAttribute="bottom" constant="11" id="A0v-Rb-YIh"/>
-                                    <constraint firstItem="4KO-gY-f4A" firstAttribute="top" secondItem="82c-Je-J4x" secondAttribute="top" constant="244" id="Be6-pX-0eq"/>
-                                    <constraint firstItem="Pz5-qQ-pU1" firstAttribute="leading" secondItem="A1X-qf-Qzr" secondAttribute="trailing" constant="-58" id="Ckr-Uk-UfA"/>
-                                    <constraint firstItem="HPS-9j-0Jl" firstAttribute="top" secondItem="2xi-sT-c6w" secondAttribute="bottom" constant="-24" id="Da7-Xf-yJG"/>
-                                    <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="2xi-sT-c6w" secondAttribute="bottom" constant="102" id="Dah-ir-myk"/>
-                                    <constraint firstItem="HPS-9j-0Jl" firstAttribute="leading" secondItem="2xi-sT-c6w" secondAttribute="trailing" constant="0.5" id="Dfq-Gj-GRS"/>
-                                    <constraint firstItem="A1X-qf-Qzr" firstAttribute="leading" secondItem="rrP-p5-z9h" secondAttribute="trailing" constant="-88" id="E7B-Gk-j2g"/>
-                                    <constraint firstItem="rrP-p5-z9h" firstAttribute="top" secondItem="A1X-qf-Qzr" secondAttribute="bottom" constant="28" id="G3j-nf-Mab"/>
-                                    <constraint firstItem="2xi-sT-c6w" firstAttribute="top" secondItem="82c-Je-J4x" secondAttribute="top" constant="256" id="GwV-X6-NO5"/>
-                                    <constraint firstItem="xNu-XJ-toL" firstAttribute="top" secondItem="A1X-qf-Qzr" secondAttribute="bottom" constant="28" id="IDF-fg-36t"/>
-                                    <constraint firstItem="2xi-sT-c6w" firstAttribute="leading" secondItem="9BH-Zb-878" secondAttribute="trailing" constant="-135" id="NzO-L7-ShV"/>
-                                    <constraint firstItem="Pz5-qQ-pU1" firstAttribute="leading" secondItem="9BH-Zb-878" secondAttribute="trailing" constant="-82" id="O01-3U-KOw"/>
-                                    <constraint firstItem="8P6-bw-obz" firstAttribute="top" secondItem="82c-Je-J4x" secondAttribute="top" constant="262" id="P4Y-Lf-P9Q"/>
-                                    <constraint firstItem="4KO-gY-f4A" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="Sdm-fw-UPq"/>
-                                    <constraint firstItem="9BH-Zb-878" firstAttribute="leading" secondItem="rrP-p5-z9h" secondAttribute="trailing" constant="-112" id="VHA-PO-7De"/>
-                                    <constraint firstItem="Pz5-qQ-pU1" firstAttribute="top" secondItem="82c-Je-J4x" secondAttribute="top" constant="280" id="adZ-YV-FW6"/>
-                                    <constraint firstItem="8P6-bw-obz" firstAttribute="top" secondItem="A1X-qf-Qzr" secondAttribute="bottom" constant="17" id="b4y-Ey-pGK"/>
-                                    <constraint firstItem="4KO-gY-f4A" firstAttribute="centerX" secondItem="A1X-qf-Qzr" secondAttribute="centerX" id="bYa-do-USH"/>
-                                    <constraint firstItem="2xi-sT-c6w" firstAttribute="leading" secondItem="ELb-9J-7YK" secondAttribute="trailing" constant="-135" id="dlX-Ug-k33"/>
-                                    <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="4KO-gY-f4A" secondAttribute="bottom" constant="126" id="gXh-cg-xjm"/>
-                                    <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="xNu-XJ-toL" secondAttribute="bottom" constant="85" id="gt9-1a-N7b"/>
-                                    <constraint firstItem="xNu-XJ-toL" firstAttribute="top" secondItem="82c-Je-J4x" secondAttribute="top" constant="273" id="kua-j7-4wa"/>
-                                    <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="8P6-bw-obz" secondAttribute="bottom" constant="108" id="n5o-L3-Zu7"/>
-                                    <constraint firstItem="rrP-p5-z9h" firstAttribute="top" secondItem="82c-Je-J4x" secondAttribute="top" constant="273" id="qSf-2t-7Ib"/>
+                                    <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="Lbx-lz-4J4" secondAttribute="bottom" constant="93" id="AsG-6D-gAm"/>
+                                    <constraint firstItem="Kgp-ib-vpD" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="Ccd-dV-Dxh"/>
+                                    <constraint firstItem="ABT-w0-L5M" firstAttribute="top" secondItem="Kgp-ib-vpD" secondAttribute="bottom" constant="-6" id="KDr-Mj-86u"/>
+                                    <constraint firstItem="Lbx-lz-4J4" firstAttribute="top" secondItem="Kgp-ib-vpD" secondAttribute="bottom" constant="7" id="LGY-em-Xcn"/>
+                                    <constraint firstItem="9BH-Zb-878" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="LmD-Z2-XJF"/>
+                                    <constraint firstItem="A1X-qf-Qzr" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="beZ-bl-No1"/>
+                                    <constraint firstItem="Lbx-lz-4J4" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="dx7-kd-hLw"/>
+                                    <constraint firstItem="Kgp-ib-vpD" firstAttribute="top" secondItem="A1X-qf-Qzr" secondAttribute="bottom" constant="1" id="lpk-2f-HwR"/>
+                                    <constraint firstItem="ABT-w0-L5M" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="nqw-HT-9zC"/>
                                     <constraint firstItem="A1X-qf-Qzr" firstAttribute="top" secondItem="82c-Je-J4x" secondAttribute="top" constant="104" id="sL7-Do-4dg"/>
-                                    <constraint firstItem="9BH-Zb-878" firstAttribute="leading" secondItem="8P6-bw-obz" secondAttribute="trailing" constant="-59" id="tl4-aY-gOz"/>
-                                    <constraint firstItem="4KO-gY-f4A" firstAttribute="centerX" secondItem="9BH-Zb-878" secondAttribute="centerX" id="vIu-Ob-mGN"/>
-                                    <constraint firstItem="A1X-qf-Qzr" firstAttribute="leading" secondItem="8P6-bw-obz" secondAttribute="trailing" constant="-35" id="xfT-AX-d45"/>
-                                    <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="rrP-p5-z9h" secondAttribute="bottom" constant="85" id="y2h-B0-xQk"/>
-                                    <constraint firstItem="Pz5-qQ-pU1" firstAttribute="top" secondItem="A1X-qf-Qzr" secondAttribute="bottom" constant="35" id="yup-sU-9UC"/>
-                                    <constraint firstItem="2xi-sT-c6w" firstAttribute="leading" secondItem="A1X-qf-Qzr" secondAttribute="trailing" constant="-111" id="zHn-jL-lWm"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -174,7 +177,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DwP-nN-m9x" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1269.5999999999999" y="31.934032983508249"/>
+            <point key="canvasLocation" x="1269.5999999999999" y="31.03448275862069"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="JIj-uU-o6k">
@@ -409,7 +412,7 @@
                                                     <segments>
                                                         <segment title="EL"/>
                                                         <segment title="MP"/>
-                                                        <segment title="AW"/>
+                                                        <segment title="AW" enabled="NO"/>
                                                     </segments>
                                                     <connections>
                                                         <action selector="KernelExploitSegmentedControl:" destination="ScN-Hx-Um8" eventType="valueChanged" id="Lgd-u2-qmM"/>
