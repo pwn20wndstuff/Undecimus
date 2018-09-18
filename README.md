@@ -13,23 +13,41 @@ You can download the latest ipa from [the releases page](https://github.com/pwn2
 
 
 unc0ver supports all of the following iOS versions:
+
     Using the async_wake exploit: (credit to IanBeer)
+        
         11.0
+        
         11.0.1
+        
         11.0.2
+        
         11.0.3
+        
         11.1
+        
         11.1.1
+        
         11.1.2
+        
     Using the empty_list or multipath TCP exploit: (also credit to IanBeer, empty_list has a much lower success rate, but multipath TCP requires an Apple Developer Certificate with the multipath entitlement)
+        
         11.2
+        
         11.2.1
+        
         11.2.2
+        
         11.2.6
+        
         11.3.1
+    
     The following beta releases of iOS 11.4 are also compatible with the multipath TCP exploit:
+        
         15G5054c
+        
         15G5063b
+        
         15G5072a
         
         
