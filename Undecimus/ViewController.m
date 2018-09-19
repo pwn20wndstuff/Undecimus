@@ -1728,8 +1728,12 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
 }
 
-- (IBAction)tappedOnSam:(id)sender{
+- (IBAction)tappedOnSamB:(id)sender{
     [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
+}
+
+- (IBAction)tappedOnSamG:(id)sender{
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://reddit.com/u/Samg_is_a_Ninja"] options:@{} completionHandler:nil];
 }
 
 @end

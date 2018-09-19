@@ -103,7 +103,7 @@
                                                 <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="15"/>
                                                 <state key="normal" title="@sbingner"/>
                                                 <connections>
-                                                    <action selector="tappedOnSamB:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="Lx9-Mj-pMH"/>
+                                                    <action selector="tappedOnSamB:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="kxs-rT-IMv"/>
                                                 </connections>
                                             </button>
                                         </subviews>
@@ -136,7 +136,7 @@
                                                 <fontDescription key="fontDescription" name="SFProDisplay-Medium" family="SF Pro Display" pointSize="14"/>
                                                 <state key="normal" title="Samg_is_a_Ninja"/>
                                                 <connections>
-                                                    <action selector="tappedOnSamG:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="ufo-Vn-7xu"/>
+                                                    <action selector="tappedOnSamG:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="bk2-i1-wqn"/>
                                                 </connections>
                                             </button>
                                         </subviews>
