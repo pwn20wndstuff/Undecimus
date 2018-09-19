@@ -66,9 +66,20 @@
 
 - (IBAction)BootNonceTextFieldTriggered:(id)sender {
     uint64_t val = 0;
-    [[NSScanner scannerWithString:[self.BootNonceTextField text]] scanUnsignedLongLong:&val];
-    [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@ADDR, val] forKey:@K_BOOT_NONCE];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    if ([[NSScanner scannerWithString:[self.BootNonceTextField text]] scanHexLongLong:&val] && val != HUGE_VAL && val != -HUGE_VAL) {
+        [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@ADDR, val] forKey:@K_BOOT_NONCE];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    } else {
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Invalid Entry"
+                                                                       message:@"The boot nonce entered could not be parsed"
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * action) {}];
+        
+        [alert addAction:defaultAction];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
     [self reloadData];
 }
 
