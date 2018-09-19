@@ -1634,7 +1634,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         
         LOG("Loading Tweaks...");
         if (load_tweaks) {
-            rv = reSpring();
+            rv = kill(findPidOfProcess("backboardd"), SIGKILL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
