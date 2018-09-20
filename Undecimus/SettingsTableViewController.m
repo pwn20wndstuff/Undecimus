@@ -45,6 +45,7 @@
     [self.BootNonceTextField setText:nil];
     [self.RefreshIconCacheSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE]];
     [self.KernelExploitSegmentedControl setSelectedSegmentIndex:[[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]];
+    [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]];
     [self.tableView reloadData];
 }
 
@@ -90,6 +91,23 @@
 }
 - (IBAction)KernelExploitSegmentedControl:(id)sender {
     [[NSUserDefaults standardUserDefaults] setInteger:self.KernelExploitSegmentedControl.selectedSegmentIndex forKey:@K_EXPLOIT];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reloadData];
+}
+
+extern void iosurface_die(void);
+extern int vfs_die(void);
+extern int mptcp_die(void);
+
+- (IBAction)tappedOnRestart:(id)sender {
+    [self.restartButton setEnabled:NO];
+    [self.restartButton setTitle:@"Restarting..." forState:UIControlStateDisabled];
+    iosurface_die();
+    vfs_die();
+    mptcp_die();
+}
+- (IBAction)DisableAutoUpdatesSwitchTriggered:(id)sender {
+    [[NSUserDefaults standardUserDefaults] setBool:[self.DisableAutoUpdatesSwitch isOn] forKey:@K_DISABLE_AUTO_UPDATES];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }

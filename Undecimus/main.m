@@ -47,6 +47,10 @@ int main(int argc, char * argv[]) {
             [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@K_EXPLOIT];
             [[NSUserDefaults standardUserDefaults] synchronize];
         }
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_DISABLE_AUTO_UPDATES] == nil) {
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@K_DISABLE_AUTO_UPDATES];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
         dsystem = dlsym(RTLD_DEFAULT,"system");
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
