@@ -1613,6 +1613,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("Loading Daemons...");
         if (load_daemons) {
             dsystem("echo 'really jailbroken';ls /Library/LaunchDaemons | while read a; do launchctl load /Library/LaunchDaemons/$a; done; ls /etc/rc.d | while read a; do /etc/rc.d/$a; done;");
+            sleep(2);
         }
         LOG("Successfully loaded Daemons.");
     }
