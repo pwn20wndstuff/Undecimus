@@ -14,6 +14,7 @@
 #define K_REFRESH_ICON_CACHE "RefreshIconCache"
 #define K_BOOT_NONCE "BootNonce"
 #define K_EXPLOIT "Exploit"
+#define K_DISABLE_AUTO_UPDATES "DisableAutoUpdates"
 
 @interface SettingsTableViewController : UITableViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UISwitch *TweakInjectionSwitch;
@@ -22,6 +23,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *RefreshIconCacheSwitch;
 @property (weak, nonatomic) IBOutlet UITextField *BootNonceTextField;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *KernelExploitSegmentedControl;
+@property (weak, nonatomic) IBOutlet UIButton *restartButton;
+@property (weak, nonatomic) IBOutlet UISwitch *DisableAutoUpdatesSwitch;
 
 @end
 

