@@ -1469,6 +1469,126 @@ addr_t find_vnode_put(void) {
     
     return val;
 }
+
+addr_t find_vnode_getfromfd(void) {
+    addr_t call1, call2, call3, call4, call5, call6, call7;
+    addr_t func1;
+    
+    addr_t ent_str = find_strref("rootless_storage_class_entitlement", 1, 1);
+    ent_str -= kerndumpbase;
+    
+    call1 = step64(kernel, ent_str, 20*4, INSN_CALL);
+    call1 += 4;
+    call2 = step64(kernel, call1, 20*4, INSN_CALL);
+    call2 += 4;
+    call3 = step64(kernel, call2, 20*4, INSN_CALL);
+    call3 += 4;
+    call4 = step64(kernel, call3, 20*4, INSN_CALL);
+    call4 += 4;
+    call5 = step64(kernel, call4, 20*4, INSN_CALL);
+    call5 += 4;
+    call6 = step64(kernel, call5, 20*4, INSN_CALL);
+    call6 += 4;
+    
+    // this gets to the stub
+    call7 = step64(kernel, call6, 20*4, INSN_CALL);
+    func1 = follow_call64(kernel, call7);
+    
+    addr_t stub_offset = calc64(kernel, func1, func1+12, 16);
+    addr_t val = *(addr_t*)(kernel+stub_offset);
+    
+    return val;
+}
+
+addr_t find_vnode_getattr(void) {
+    addr_t call1;
+    addr_t func1;
+    
+    addr_t error_str = find_strref("\"add_fsevent: you can't pass me a NULL vnode ptr (type %d)!\\n\"", 1, 0);
+    error_str -= kerndumpbase;
+    
+    error_str += 12; // bypass the panic call
+    
+    call1 = step64(kernel, error_str, 30*4, INSN_CALL);
+    func1 = follow_call64(kernel, call1);
+    
+    return func1 + kerndumpbase;
+}
+
+addr_t find_SHA1Init(void) {
+    addr_t call1;
+    addr_t func1;
+    
+    addr_t error_str = find_strref("\"ah_keyed_sha1_init: what?\"", 1, 0);
+    error_str -= kerndumpbase;
+    
+    error_str += 12; // bypass the panic call
+    
+    call1 = step64(kernel, error_str, 30*4, INSN_CALL);
+    func1 = follow_call64(kernel, call1);
+    
+    return func1 + kerndumpbase;
+}
+
+addr_t find_SHA1Update(void) {
+    addr_t call1;
+    addr_t func1;
+    
+    addr_t error_str = find_strref("\"ah_keyed_sha1_init: what?\"", 1, 0);
+    error_str -= kerndumpbase;
+    
+    error_str += 12; // bypass the panic call
+    
+    call1 = step64(kernel, error_str, 30*4, INSN_CALL);
+    call1 += 4;
+    func1 = follow_call64(kernel, call1);
+    
+    return func1 + kerndumpbase;
+}
+
+
+addr_t find_SHA1Final(void) {
+    addr_t call1;
+    addr_t func1;
+    
+    addr_t error_str = find_strref("\"ah_keyed_sha1_result: what?\"", 1, 0);
+    error_str -= kerndumpbase;
+    
+    error_str += 12; // bypass the panic call
+    
+    call1 = step64(kernel, error_str, 30*4, INSN_CALL);
+    call1 += 4;
+    func1 = follow_call64(kernel, call1);
+    
+    return func1 + kerndumpbase;
+}
+
+addr_t find_csblob_entitlements_dictionary_set(void) {
+    addr_t call1, call2, call3, call4, call5, call6, call7;
+    addr_t func1;
+    
+    addr_t ent_str = find_strref("entitlements are not a dictionary", 1, 1);
+    ent_str -= kerndumpbase;
+    
+    call1 = step64(kernel, ent_str, 20*4, INSN_CALL);
+    call1 += 4;
+    call2 = step64(kernel, call1, 20*4, INSN_CALL);
+    call2 += 4;
+    call3 = step64(kernel, call2, 20*4, INSN_CALL);
+    /*call3 += 4;
+     call4 = step64(kernel, call3, 20*4, INSN_CALL);
+     call4 += 4;
+     call5 = step64(kernel, call4, 20*4, INSN_CALL);*/
+    
+    // this gets to the stub
+    call7 = step64(kernel, call3, 20*4, INSN_CALL); // IF DOESNT WORK, REPLACE THIS WITH call5, AND UNCOMMENT
+    func1 = follow_call64(kernel, call7);
+    
+    addr_t stub_offset = calc64(kernel, func1, func1+12, 16);
+    addr_t val = *(addr_t*)(kernel+stub_offset);
+    
+    return val;
+}
 #ifdef HAVE_MAIN
 #include <mach-o/nlist.h>
 

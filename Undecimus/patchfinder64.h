@@ -42,6 +42,12 @@ uint64_t find_smalloc(void);
 uint64_t find_vfs_context_current(void);
 uint64_t find_vnode_lookup(void);
 uint64_t find_vnode_put(void);
+uint64_t find_vnode_getfromfd(void);
+uint64_t find_vnode_getattr(void);
+uint64_t find_SHA1Init(void);
+uint64_t find_SHA1Update(void);
+uint64_t find_SHA1Final(void);
+uint64_t find_csblob_entitlements_dictionary_set(void);
 
 #endif
 

