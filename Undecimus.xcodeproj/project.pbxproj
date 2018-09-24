@@ -35,7 +35,6 @@
 		21C13104214C20950021AA9D /* amfid_payload.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C130FF214C20950021AA9D /* amfid_payload.tar */; };
 		21C13105214C20950021AA9D /* tar.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13100214C20950021AA9D /* tar.tar */; };
 		21C13106214C20950021AA9D /* jailbreakd.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13101214C20950021AA9D /* jailbreakd.tar */; };
-		21C13107214C26220021AA9D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* ViewController.m */; };
 		21C13109214C26AB0021AA9D /* launchctl.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13108214C26AB0021AA9D /* launchctl.tar */; };
 		21C13110214C2E570021AA9D /* strap.tgz in Resources */ = {isa = PBXBuildFile; fileRef = 21C1310F214C2E570021AA9D /* strap.tgz */; };
 		21C13116214C51100021AA9D /* gzip.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13115214C510F0021AA9D /* gzip.tar */; };
@@ -44,6 +43,7 @@
 		21C1311E214D2CC50021AA9D /* Icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C1311B214D2CC50021AA9D /* Icon@3x.png */; };
 		21C1311F214D2CC50021AA9D /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C1311C214D2CC50021AA9D /* Icon@2x.png */; };
 		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		21DFE7BE215962D900EBD6ED /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* ViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -307,7 +307,7 @@
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
 				21C130E8214BEA730021AA9D /* SettingsTableViewController.m in Sources */,
-				21C13107214C26220021AA9D /* ViewController.m in Sources */,
+				21DFE7BE215962D900EBD6ED /* ViewController.m in Sources */,
 				21A97FD32148103C00DC0023 /* kutils.c in Sources */,
 				21C0FC8A21369EE900849420 /* offsets.m in Sources */,
 				21A97FD22148103C00DC0023 /* patchfinder64.c in Sources */,
