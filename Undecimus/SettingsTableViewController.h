@@ -15,6 +15,7 @@
 #define K_BOOT_NONCE "BootNonce"
 #define K_EXPLOIT "Exploit"
 #define K_DISABLE_AUTO_UPDATES "DisableAutoUpdates"
+#define K_DISABLE_APP_REVOKES "DisableAppRevokes"
 
 @interface SettingsTableViewController : UITableViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UISwitch *TweakInjectionSwitch;
@@ -25,6 +26,7 @@
 @property (weak, nonatomic) IBOutlet UISegmentedControl *KernelExploitSegmentedControl;
 @property (weak, nonatomic) IBOutlet UIButton *restartButton;
 @property (weak, nonatomic) IBOutlet UISwitch *DisableAutoUpdatesSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *DisableAppRevokesSwitch;
 
 @end
 

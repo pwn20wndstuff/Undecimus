@@ -46,6 +46,7 @@
     [self.RefreshIconCacheSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE]];
     [self.KernelExploitSegmentedControl setSelectedSegmentIndex:[[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]];
     [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]];
+    [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]];
     [self.tableView reloadData];
 }
 
@@ -91,6 +92,12 @@
 }
 - (IBAction)KernelExploitSegmentedControl:(id)sender {
     [[NSUserDefaults standardUserDefaults] setInteger:self.KernelExploitSegmentedControl.selectedSegmentIndex forKey:@K_EXPLOIT];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reloadData];
+}
+
+- (IBAction)DisableAppRevokesSwitchTriggered:(id)sender {
+    [[NSUserDefaults standardUserDefaults] setBool:[self.RefreshIconCacheSwitch isOn] forKey:@K_DISABLE_APP_REVOKES];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
