@@ -51,6 +51,10 @@ int main(int argc, char * argv[]) {
             [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@K_DISABLE_AUTO_UPDATES];
             [[NSUserDefaults standardUserDefaults] synchronize];
         }
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_DISABLE_APP_REVOKES] == nil) {
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@K_DISABLE_APP_REVOKES];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
         dsystem = dlsym(RTLD_DEFAULT,"system");
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }

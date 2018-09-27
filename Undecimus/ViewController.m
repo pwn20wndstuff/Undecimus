@@ -951,7 +951,7 @@ typedef struct {
     kptr_t csblob_entitlements_dictionary_set;
 } offsets_t;
 
-void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce, int disable_auto_updates)
+void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce, int disable_auto_updates, int disable_app_revokes)
 {
     // Initialize variables.
     int rv = 0;
@@ -1802,9 +1802,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     
     {
         // Block ocsp.apple.com.
-        
         LOG("Blocking ocsp.apple.com...");
-        blockDomainWithName("ocsp.apple.com");
+        if (disable_app_revokes) {
+            blockDomainWithName("ocsp.apple.com");
+        }
         LOG("Successfully blocked ocsp.apple.com.");
     }
     
@@ -1946,7 +1947,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("Validating TFP0...");
         _assert(MACH_PORT_VALID(tfp0));
         LOG("Successfully validated TFP0.");
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], [[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]);
+        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], [[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]);
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.goButton setTitle:@"Done, exit." forState:UIControlStateDisabled];
         });
