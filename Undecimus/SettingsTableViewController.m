@@ -30,6 +30,14 @@
     [self.navigationController.navigationBar setShadowImage:[UIImage new]];
     [self.BootNonceTextField setDelegate:self];
     [self reloadData];
+    _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
+    _tap.cancelsTouchesInView = NO;
+    [self.view addGestureRecognizer:_tap];
+}
+
+- (void)userTappedAnyware:(UITapGestureRecognizer *) sender
+{
+    [self.view endEditing:YES];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {

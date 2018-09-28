@@ -27,6 +27,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *restartButton;
 @property (weak, nonatomic) IBOutlet UISwitch *DisableAutoUpdatesSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *DisableAppRevokesSwitch;
+@property (nonatomic) UITapGestureRecognizer *tap;
 
 @end
 
