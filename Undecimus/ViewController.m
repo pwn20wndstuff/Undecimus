@@ -52,7 +52,7 @@ extern int (*dsystem)(const char *);
         dispatch_semaphore_t semaphore; \
         semaphore = dispatch_semaphore_create(0); \
         dispatch_async(dispatch_get_main_queue(), ^{ \
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__] preferredStyle:UIAlertControllerStyleAlert]; \
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__] preferredStyle:UIAlertControllerStyleAlert]; \
             UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) { \
                 dispatch_semaphore_signal(semaphore); \
             }]; \
@@ -61,6 +61,7 @@ extern int (*dsystem)(const char *);
             [[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentViewController:alertController animated:YES completion:nil]; \
         }); \
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER); \
+ \
         exit(1); \
     } \
 while (false)
@@ -1213,6 +1214,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = close(fd);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
+        
         if (i == -1) {
             if (!access("/var/tmp/rootfsmnt", F_OK)) {
                 rv = rmdir("/var/tmp/rootfsmnt");
@@ -1241,10 +1243,8 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("fd: " "%d" "\n", fd);
             _assert(fd > 0);
             rv = fs_snapshot_rename(fd, systemSnapshot(copyBootHash()), "orig-fs", 0);
-            LOG("rv: " "%d" "\n", rv);
             _assert(errno == 2 || rv == 0);
             rv = fs_snapshot_create(fd, "orig-fs", 0);
-            LOG("rv: " "%d" "\n", rv);
             _assert(errno == 17 || rv == 0);
             rv = close(fd);
             LOG("rv: " "%d" "\n", rv);
