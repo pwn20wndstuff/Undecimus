@@ -532,7 +532,7 @@ void blockDomainWithName(char *name) {
 
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
 
-#define DEFAULT_VERSION_STRING "hacked"
+#define DEFAULT_VERSION_STRING "Hacked"
 int updateVersionString(char *newVersionString, mach_port_t tfp0, vm_address_t kernel_base) {
     uintptr_t versionPtr = 0;
     struct utsname u = {0};
