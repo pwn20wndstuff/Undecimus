@@ -1576,37 +1576,37 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         
-        if (!access("/jb/gzip", F_OK)) {
-            rv = unlink("/jb/gzip");
+        if (!access("/jb/lzma", F_OK)) {
+            rv = unlink("/jb/lzma");
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
-        a = fopen([[[NSBundle mainBundle] pathForResource:@"gzip" ofType:@"tar"] UTF8String], "rb");
+        a = fopen([[[NSBundle mainBundle] pathForResource:@"lzma" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL);
-        untar(a, "gzip");
+        untar(a, "lzma");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        rv = chmod("/jb/gzip", 0755);
+        rv = chmod("/jb/lzma", 0755);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        rv = chown("/jb/gzip", 0, 0);
+        rv = chown("/jb/lzma", 0, 0);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         
-        if (!access("/var/tmp/strap.tgz", F_OK)) {
-            rv = unlink("/var/tmp/strap.tgz");
+        if (!access("/var/tmp/strap.tar.lzma", F_OK)) {
+            rv = unlink("/var/tmp/strap.tar.lzma");
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
-        rv = copyfile([[[NSBundle mainBundle] pathForResource:@"strap" ofType:@"tgz"] UTF8String], "/var/tmp/strap.tgz", 0, COPYFILE_ALL);
+        rv = copyfile([[[NSBundle mainBundle] pathForResource:@"strap.tar" ofType:@"lzma"] UTF8String], "/var/tmp/strap.tar.lzma", 0, COPYFILE_ALL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        rv = chmod("/var/tmp/strap.tgz", 0644);
+        rv = chmod("/var/tmp/strap.tar.lzma", 0644);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        rv = chown("/var/tmp/strap.tgz", 0, 0);
+        rv = chown("/var/tmp/strap.tar.lzma", 0, 0);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully copied over our resources to RootFS.");
@@ -1791,17 +1791,11 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = chdir("/var/tmp");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        rv = execCommandAndWait("/jb/gzip", "-d", "/var/tmp/strap.tgz", NULL, NULL, NULL);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        rv = unlink("/jb/gzip");
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
         if (access("/.installed_unc0ver", F_OK)) {
             rv = chdir("/");
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
-            rv = execCommandAndWait("/jb/tar", "-xvpkf", "/var/tmp/strap.tar", NULL, NULL, NULL);
+            rv = execCommandAndWait("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", "/var/tmp/strap.tar.lzma", NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 512 || rv == 0);
             a = fopen("/var/lib/dpkg/available", "w");
@@ -1833,7 +1827,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = unlink("/jb/tar");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        rv = unlink("/var/tmp/strap.tar");
+        rv = unlink("/jb/lzma");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = unlink("/var/tmp/strap.tar.lzma");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully extracted bootstrap.");

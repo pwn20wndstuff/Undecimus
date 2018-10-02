@@ -36,8 +36,8 @@
 		21C13105214C20950021AA9D /* tar.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13100214C20950021AA9D /* tar.tar */; };
 		21C13106214C20950021AA9D /* jailbreakd.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13101214C20950021AA9D /* jailbreakd.tar */; };
 		21C13109214C26AB0021AA9D /* launchctl.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13108214C26AB0021AA9D /* launchctl.tar */; };
-		21C13110214C2E570021AA9D /* strap.tgz in Resources */ = {isa = PBXBuildFile; fileRef = 21C1310F214C2E570021AA9D /* strap.tgz */; };
-		21C13116214C51100021AA9D /* gzip.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13115214C510F0021AA9D /* gzip.tar */; };
+		21C13110214C2E570021AA9D /* strap.tar.lzma in Resources */ = {isa = PBXBuildFile; fileRef = 21C1310F214C2E570021AA9D /* strap.tar.lzma */; };
+		21C13116214C51100021AA9D /* lzma.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13115214C510F0021AA9D /* lzma.tar */; };
 		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21C1311D214D2CC50021AA9D /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C1311A214D2CC40021AA9D /* Icon.png */; };
 		21C1311E214D2CC50021AA9D /* Icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 21C1311B214D2CC50021AA9D /* Icon@3x.png */; };
@@ -98,8 +98,8 @@
 		21C13100214C20950021AA9D /* tar.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = tar.tar; sourceTree = "<group>"; };
 		21C13101214C20950021AA9D /* jailbreakd.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = jailbreakd.tar; sourceTree = "<group>"; };
 		21C13108214C26AB0021AA9D /* launchctl.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = launchctl.tar; sourceTree = "<group>"; };
-		21C1310F214C2E570021AA9D /* strap.tgz */ = {isa = PBXFileReference; lastKnownFileType = file; path = strap.tgz; sourceTree = "<group>"; };
-		21C13115214C510F0021AA9D /* gzip.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = gzip.tar; sourceTree = "<group>"; };
+		21C1310F214C2E570021AA9D /* strap.tar.lzma */ = {isa = PBXFileReference; lastKnownFileType = file; path = strap.tar.lzma; sourceTree = "<group>"; };
+		21C13115214C510F0021AA9D /* lzma.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = lzma.tar; sourceTree = "<group>"; };
 		21C13117214D268F0021AA9D /* multi_path_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = multi_path_sploit.c; sourceTree = "<group>"; };
 		21C13118214D268F0021AA9D /* multi_path_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multi_path_sploit.h; sourceTree = "<group>"; };
 		21C1311A214D2CC40021AA9D /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
@@ -153,8 +153,8 @@
 				21C1311A214D2CC40021AA9D /* Icon.png */,
 				21C1311C214D2CC50021AA9D /* Icon@2x.png */,
 				21C1311B214D2CC50021AA9D /* Icon@3x.png */,
-				21C13115214C510F0021AA9D /* gzip.tar */,
-				21C1310F214C2E570021AA9D /* strap.tgz */,
+				21C13115214C510F0021AA9D /* lzma.tar */,
+				21C1310F214C2E570021AA9D /* strap.tar.lzma */,
 				21C13108214C26AB0021AA9D /* launchctl.tar */,
 				21C130FF214C20950021AA9D /* amfid_payload.tar */,
 				21C13101214C20950021AA9D /* jailbreakd.tar */,
@@ -271,7 +271,7 @@
 			files = (
 				21C1311D214D2CC50021AA9D /* Icon.png in Resources */,
 				21C13103214C20950021AA9D /* pspawn_hook.tar in Resources */,
-				21C13110214C2E570021AA9D /* strap.tgz in Resources */,
+				21C13110214C2E570021AA9D /* strap.tar.lzma in Resources */,
 				21C1311E214D2CC50021AA9D /* Icon@3x.png in Resources */,
 				21C13102214C20950021AA9D /* libjailbreak.tar in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
@@ -279,7 +279,7 @@
 				21C13104214C20950021AA9D /* amfid_payload.tar in Resources */,
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
 				21C13106214C20950021AA9D /* jailbreakd.tar in Resources */,
-				21C13116214C51100021AA9D /* gzip.tar in Resources */,
+				21C13116214C51100021AA9D /* lzma.tar in Resources */,
 				21C0FC7221369EB700849420 /* Main.storyboard in Resources */,
 				21C13109214C26AB0021AA9D /* launchctl.tar in Resources */,
 				21675B312149576D00D20E2B /* jailbreakd.plist in Resources */,
