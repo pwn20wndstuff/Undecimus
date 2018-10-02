@@ -15,6 +15,26 @@
 
 @implementation SettingsTableViewController
 
+// https://github.com/Matchstic/ReProvision/blob/7b595c699335940f68702bb204c5aa55b8b1896f/Shared/Application%20Database/RPVApplication.m#L102
+
+- (NSDictionary *)_provisioningProfileAtPath:(NSString *)path {
+    NSError *err;
+    NSString *stringContent = [NSString stringWithContentsOfFile:path encoding:NSASCIIStringEncoding error:&err];
+    stringContent = [stringContent componentsSeparatedByString:@"<plist version=\"1.0\">"][1];
+    stringContent = [NSString stringWithFormat:@"%@%@", @"<plist version=\"1.0\">", stringContent];
+    stringContent = [stringContent componentsSeparatedByString:@"</plist>"][0];
+    stringContent = [NSString stringWithFormat:@"%@%@", stringContent, @"</plist>"];
+    
+    NSData *stringData = [stringContent dataUsingEncoding:NSASCIIStringEncoding];
+    
+    NSError *error;
+    NSPropertyListFormat format;
+    
+    id plist = [NSPropertyListSerialization propertyListWithData:stringData options:NSPropertyListImmutable format:&format error:&error];
+    
+    return plist;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     UIImageView *myImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Clouds"]];
@@ -30,9 +50,9 @@
     [self.navigationController.navigationBar setShadowImage:[UIImage new]];
     [self.BootNonceTextField setDelegate:self];
     [self reloadData];
-    _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
-    _tap.cancelsTouchesInView = NO;
-    [self.view addGestureRecognizer:_tap];
+    self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
+    self.tap.cancelsTouchesInView = NO;
+    [self.view addGestureRecognizer:self.tap];
 }
 
 - (void)userTappedAnyware:(UITapGestureRecognizer *) sender
@@ -55,6 +75,7 @@
     [self.KernelExploitSegmentedControl setSelectedSegmentIndex:[[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]];
     [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]];
     [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]];
+    [self.KernelExploitSegmentedControl setEnabled:[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"Entitlements"][@"com.apple.developer.networking.multipath"] boolValue] forSegmentAtIndex:1];
     [self.tableView reloadData];
 }
 
@@ -80,15 +101,10 @@
         [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@ADDR, val] forKey:@K_BOOT_NONCE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     } else {
-        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Invalid Entry"
-                                                                       message:@"The boot nonce entered could not be parsed"
-                                                                preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-                                                              handler:^(UIAlertAction * action) {}];
-        
-        [alert addAction:defaultAction];
-        [self presentViewController:alert animated:YES completion:nil];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Invalid Entry" message:@"The boot nonce entered could not be parsed" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+        [alertController addAction:OK];
+        [self presentViewController:alertController animated:YES completion:nil];
     }
     [self reloadData];
 }
@@ -121,6 +137,7 @@ extern int mptcp_die(void);
     vfs_die();
     mptcp_die();
 }
+
 - (IBAction)DisableAutoUpdatesSwitchTriggered:(id)sender {
     [[NSUserDefaults standardUserDefaults] setBool:[self.DisableAutoUpdatesSwitch isOn] forKey:@K_DISABLE_AUTO_UPDATES];
     [[NSUserDefaults standardUserDefaults] synchronize];

