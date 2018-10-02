@@ -48,6 +48,8 @@ uint64_t find_SHA1Init(void);
 uint64_t find_SHA1Update(void);
 uint64_t find_SHA1Final(void);
 uint64_t find_csblob_entitlements_dictionary_set(void);
+uint64_t find_kernel_task(void);
+uint64_t find_kernproc(void);
 
 #endif
 

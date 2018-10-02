@@ -1516,49 +1516,51 @@ addr_t find_vnode_getattr(void) {
 }
 
 addr_t find_SHA1Init(void) {
-    addr_t call1;
+    addr_t call1, call2;
     addr_t func1;
     
-    addr_t error_str = find_strref("\"ah_keyed_sha1_init: what?\"", 1, 0);
-    error_str -= kerndumpbase;
+    addr_t id_str = find_strref("chip-id", 1, 0);
+    id_str -= kerndumpbase;
     
-    error_str += 12; // bypass the panic call
-    
-    call1 = step64(kernel, error_str, 30*4, INSN_CALL);
+    call1 = step64(kernel, id_str, 30*4, INSN_CALL);
     func1 = follow_call64(kernel, call1);
     
     return func1 + kerndumpbase;
 }
 
 addr_t find_SHA1Update(void) {
-    addr_t call1;
+    addr_t call1, call2;
     addr_t func1;
     
-    addr_t error_str = find_strref("\"ah_keyed_sha1_init: what?\"", 1, 0);
-    error_str -= kerndumpbase;
+    addr_t id_str = find_strref("chip-id", 1, 0);
+    id_str -= kerndumpbase;
     
-    error_str += 12; // bypass the panic call
-    
-    call1 = step64(kernel, error_str, 30*4, INSN_CALL);
+    call1 = step64(kernel, id_str, 30*4, INSN_CALL);
     call1 += 4;
-    func1 = follow_call64(kernel, call1);
+    call2 = step64(kernel, call1, 30*4, INSN_CALL);
+    func1 = follow_call64(kernel, call2);
     
     return func1 + kerndumpbase;
 }
 
 
 addr_t find_SHA1Final(void) {
-    addr_t call1;
+    addr_t call1, call2, call3, call4, call5;
     addr_t func1;
     
-    addr_t error_str = find_strref("\"ah_keyed_sha1_result: what?\"", 1, 0);
-    error_str -= kerndumpbase;
+    addr_t id_str = find_strref("chip-id", 1, 0);
+    id_str -= kerndumpbase;
     
-    error_str += 12; // bypass the panic call
-    
-    call1 = step64(kernel, error_str, 30*4, INSN_CALL);
+    call1 = step64(kernel, id_str, 30*4, INSN_CALL);
     call1 += 4;
-    func1 = follow_call64(kernel, call1);
+    call2 = step64(kernel, call1, 30*4, INSN_CALL);
+    call2 += 4;
+    call3 = step64(kernel, call2, 30*4, INSN_CALL);
+    call3 += 4;
+    call4 = step64(kernel, call3, 30*4, INSN_CALL);
+    call4 += 4;
+    call5 = step64(kernel, call4, 30*4, INSN_CALL);
+    func1 = follow_call64(kernel, call5);
     
     return func1 + kerndumpbase;
 }
@@ -1588,6 +1590,46 @@ addr_t find_csblob_entitlements_dictionary_set(void) {
     addr_t val = *(addr_t*)(kernel+stub_offset);
     
     return val;
+}
+
+addr_t find_kernel_task(void) {
+    addr_t call1, call2, call3, call4, call5, call6, call7;
+    addr_t func1;
+    
+    addr_t str = find_strref("\"thread_terminate\"", 1, 0);
+    str -= kerndumpbase;
+    
+    func1 = bof64(kernel, xnucore_base, str); // find thread_terminate
+    
+    call1 = step64(kernel, func1, 20*4, INSN_CALL); // Find the first call
+    
+    addr_t kern_task = calc64(kernel, func1, call1, 9);
+    return kern_task;
+}
+
+addr_t find_kernproc(void) {
+    addr_t call1, call2, call3, call4, call5, call6, call7;
+    addr_t func1;
+    
+    addr_t err_str = find_strref("0 == error", 1, 0);
+    err_str -= kerndumpbase;
+    
+    call1 = step64_back(kernel, err_str, 20*4, INSN_CALL);
+    call1 -= 4;
+    call2 = step64_back(kernel, call1, 20*4, INSN_CALL);
+    call2 -= 4;
+    call3 = step64_back(kernel, call2, 20*4, INSN_CALL);
+    call3 -= 4;
+    call4 = step64_back(kernel, call3, 20*4, INSN_CALL);
+    call4 -= 4;
+    call5 = step64_back(kernel, call4, 20*4, INSN_CALL);
+    call5 -= 4;
+    call6 = step64_back(kernel, call5, 20*4, INSN_CALL);
+    
+    // this gets to the stub
+    addr_t kernproc = calc64(kernel, call6, call5, 1);
+    
+    return kernproc;
 }
 #ifdef HAVE_MAIN
 #include <mach-o/nlist.h>
