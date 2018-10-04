@@ -45,39 +45,12 @@ extern int (*dsystem)(const char *);
 @implementation ViewController
 static ViewController *sharedController = nil;
 
-#define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
-
-#define _assert(test) do \
-    if (!(test)) { \
-        fprintf(stderr, "__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
-        dispatch_semaphore_t semaphore; \
-        semaphore = dispatch_semaphore_create(0); \
+#define _puts(message) do { \
         dispatch_async(dispatch_get_main_queue(), ^{ \
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__] preferredStyle:UIAlertControllerStyleAlert]; \
-            UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) { \
-                dispatch_semaphore_signal(semaphore); \
-            }]; \
-            [alertController addAction:OK]; \
-            [alertController setPreferredAction:OK]; \
-            [sharedController presentViewController:alertController animated:YES completion:nil]; \
+            ViewController.sharedController.goButton.enabled = NO; \
+            [ViewController.sharedController.goButton setTitle:@(message) forState:UIControlStateDisabled]; \
         }); \
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER); \
-        exit(1); \
-    } \
-while (false)
-
-#define _puts(message) do \
-    if (1) { \
-        dispatch_semaphore_t semaphore; \
-        semaphore = dispatch_semaphore_create(0); \
-        dispatch_async(dispatch_get_main_queue(), ^{ \
-            [[sharedController goButton] setEnabled:NO]; \
-            [[sharedController goButton] setTitle:@(message) forState:UIControlStateDisabled]; \
-            dispatch_semaphore_signal(semaphore); \
-        }); \
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER); \
-    } \
-while (false)
+} while (false)
 
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
 
@@ -2108,6 +2081,42 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 
 - (IBAction)tappedOnSamG:(id)sender{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://reddit.com/u/Samg_is_a_Ninja"] options:@{} completionHandler:nil];
+}
+
+// This intentionally returns nil if called before it's been created by a proper init
++(ViewController*)sharedController {
+    return sharedController;
+}
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    NSLog(@"initWithCoder called");
+    @synchronized(sharedController) {
+        if (sharedController == nil) {
+            sharedController = [super initWithCoder:aDecoder];
+        }
+    }
+    self = sharedController;
+    return self;
+}
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    @synchronized(sharedController) {
+        if (sharedController == nil) {
+            sharedController = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+        }
+    }
+    self = sharedController;
+    return self;
+}
+
+- (id)init {
+    @synchronized(sharedController) {
+        if (sharedController == nil) {
+            sharedController = [super init];
+        }
+    }
+    self = sharedController;
+    return self;
 }
 
 @end
