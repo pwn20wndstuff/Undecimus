@@ -6,8 +6,10 @@
 //  Copyright © 2018 Pwn20wnd. All rights reserved.
 //
 
+#include <sys/utsname.h>
 #import "SettingsTableViewController.h"
 #include "common.h"
+#include "ViewController.h"
 
 @interface SettingsTableViewController ()
 
@@ -33,6 +35,158 @@
     id plist = [NSPropertyListSerialization propertyListWithData:stringData options:NSPropertyListImmutable format:&format error:&error];
     
     return plist;
+}
+
+#define STATUS_FILE          @"/var/lib/dpkg/status"
+#define CYDIA_LIST @"/etc/apt/sources.list.d/cydia.list"
+
+// https://github.com/lechium/nitoTV/blob/53cca06514e79279fa89639ad05b562f7d730079/Classes/packageManagement.m#L1138
+
++ (NSArray *)dependencyArrayFromString:(NSString *)depends
+{
+    NSMutableArray *cleanArray = [[NSMutableArray alloc] init];
+    NSArray *dependsArray = [depends componentsSeparatedByString:@","];
+    for (id depend in dependsArray)
+    {
+        NSArray *spaceDelimitedArray = [depend componentsSeparatedByString:@" "];
+        NSString *isolatedDependency = [[spaceDelimitedArray objectAtIndex:0] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if ([isolatedDependency length] == 0)
+            isolatedDependency = [[spaceDelimitedArray objectAtIndex:1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        
+        [cleanArray addObject:isolatedDependency];
+    }
+    
+    return cleanArray;
+}
+
+// https://github.com/lechium/nitoTV/blob/53cca06514e79279fa89639ad05b562f7d730079/Classes/packageManagement.m#L1163
+
++ (NSArray *)parsedPackageArray
+{
+    NSString *packageString = [NSString stringWithContentsOfFile:STATUS_FILE encoding:NSUTF8StringEncoding error:nil];
+    NSArray *lineArray = [packageString componentsSeparatedByString:@"\n\n"];
+    //NSLog(@"lineArray: %@", lineArray);
+    NSMutableArray *mutableList = [[NSMutableArray alloc] init];
+    //NSMutableDictionary *mutableDict = [[NSMutableDictionary alloc] init];
+    for (id currentItem in lineArray)
+    {
+        NSArray *packageArray = [currentItem componentsSeparatedByString:@"\n"];
+        //    NSLog(@"packageArray: %@", packageArray);
+        NSMutableDictionary *currentPackage = [[NSMutableDictionary alloc] init];
+        for (id currentLine in packageArray)
+        {
+            NSArray *itemArray = [currentLine componentsSeparatedByString:@": "];
+            if ([itemArray count] >= 2)
+            {
+                NSString *key = [itemArray objectAtIndex:0];
+                NSString *object = [itemArray objectAtIndex:1];
+                
+                if ([key isEqualToString:@"Depends"]) //process the array
+                {
+                    NSArray *dependsObject = [SettingsTableViewController dependencyArrayFromString:object];
+                    
+                    [currentPackage setObject:dependsObject forKey:key];
+                    
+                } else { //every other key, even if it has an array is treated as a string
+                    
+                    [currentPackage setObject:object forKey:key];
+                }
+                
+                
+            }
+        }
+        
+        //NSLog(@"currentPackage: %@\n\n", currentPackage);
+        if ([[currentPackage allKeys] count] > 4)
+        {
+            //[mutableDict setObject:currentPackage forKey:[currentPackage objectForKey:@"Package"]];
+            [mutableList addObject:currentPackage];
+        }
+        
+        currentPackage = nil;
+        
+    }
+    
+    NSSortDescriptor *nameDescriptor = [[NSSortDescriptor alloc] initWithKey:@"Name" ascending:YES
+                                                                    selector:@selector(localizedCaseInsensitiveCompare:)];
+    NSSortDescriptor *packageDescriptor = [[NSSortDescriptor alloc] initWithKey:@"Package" ascending:YES
+                                                                       selector:@selector(localizedCaseInsensitiveCompare:)];
+    NSArray *descriptors = [NSArray arrayWithObjects:nameDescriptor, packageDescriptor, nil];
+    NSArray *sortedArray = [mutableList sortedArrayUsingDescriptors:descriptors];
+    
+    mutableList = nil;
+    
+    return sortedArray;
+}
+
+// https://github.com/lechium/nitoTV/blob/53cca06514e79279fa89639ad05b562f7d730079/Classes/packageManagement.m#L854
+
++ (NSString *)domainFromRepoObject:(NSString *)repoObject
+{
+    //LogSelf;
+    if ([repoObject length] == 0)return nil;
+    NSArray *sourceObjectArray = [repoObject componentsSeparatedByString:@" "];
+    NSString *url = [sourceObjectArray objectAtIndex:1];
+    if ([url length] > 7)
+    {
+        NSString *urlClean = [url substringFromIndex:7];
+        NSArray *secondArray = [urlClean componentsSeparatedByString:@"/"];
+        return [secondArray objectAtIndex:0];
+    }
+    return nil;
+}
+
+// https://github.com/lechium/nitoTV/blob/53cca06514e79279fa89639ad05b562f7d730079/Classes/packageManagement.m#L869
+
++ (NSArray *)sourcesFromFile:(NSString *)theSourceFile
+{
+    NSMutableArray *finalArray = [[NSMutableArray alloc] init];
+    NSString *sourceString = [[NSString stringWithContentsOfFile:theSourceFile encoding:NSASCIIStringEncoding error:nil] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSArray *sourceFullArray =  [sourceString componentsSeparatedByString:@"\n"];
+    NSEnumerator *sourceEnum = [sourceFullArray objectEnumerator];
+    id currentSource = nil;
+    while (currentSource = [sourceEnum nextObject])
+    {
+        NSString *theObject = [SettingsTableViewController domainFromRepoObject:currentSource];
+        if (theObject != nil)
+        {
+            if (![finalArray containsObject:theObject])
+                [finalArray addObject:theObject];
+        }
+    }
+    
+    return finalArray;
+}
+
++ (NSDictionary *)getDiagnostics {
+    struct utsname u = { 0 };
+    NSMutableDictionary *md = nil;
+    uname(&u);
+    md = [[NSMutableDictionary alloc] init];
+    md[@"Sysname"] = [NSString stringWithUTF8String:u.sysname];
+    md[@"Nodename"] = [NSString stringWithUTF8String:u.nodename];
+    md[@"Release"] = [NSString stringWithUTF8String:u.release];
+    md[@"Version"] = [NSString stringWithUTF8String:u.version];
+    md[@"Machine"] = [NSString stringWithUTF8String:u.machine];
+    md[@"ProductVersion"] = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductVersion"];
+    md[@"ProductBuildVersion"] = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"];
+    md[@"Sources"] = [SettingsTableViewController sourcesFromFile:CYDIA_LIST];
+    md[@"Packages"] = [SettingsTableViewController parsedPackageArray];
+    md[@"Preferences"] = [[NSMutableDictionary alloc] init];
+    md[@"Preferences"][@"TweakInjection"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_TWEAK_INJECTION];
+    md[@"Preferences"][@"LoadDaemons"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_LOAD_DAEMONS];
+    md[@"Preferences"][@"DumpAPTicket"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_DUMP_APTICKET];
+    md[@"Preferences"][@"RefreshIconCache"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_REFRESH_ICON_CACHE];
+    md[@"Preferences"][@"BootNonce"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE];
+    md[@"Preferences"][@"Exploit"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPLOIT];
+    md[@"Preferences"][@"DisableAutoUpdates"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_DISABLE_AUTO_UPDATES];
+    md[@"Preferences"][@"DisableAppRevokes"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_DISABLE_APP_REVOKES];
+    md[@"AppVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    return md;
+}
+
++ (NSArray *) supportedBuilds {
+    return @[@"15A5278f", @"15A5304i", @"15A5304j", @"15A5318g", @"15A5327g", @"15A5341f", @"15A5354b", @"15A5362a", @"15A5368a", @"15A5370a", @"15A5372a", @"15A372", @"15B5066f", @"15B5078e", @"15B5086a", @"15B92", @"15B93", @"15C5092b", @"15C5097d", @"15C5107a", @"15C5110b", @"15C5111a", @"15C114", @"15D5037e", @"15D5046b", @"15D5049a", @"15D5054a", @"15D5057a", @"15D5059a", @"15D60", @"15E5167f", @"15E5178f", @"15E5189f", @"15E5201e", @"15E5211a", @"15E5216a", @"15F5037c", @"15F5049c", @"15F5061d", @"15A402", @"15A421", @"15A432", @"15B93", @"15B150", @"15B202", @"15C114", @"15C153", @"15C202", @"15D60", @"15D100", @"15E216", @"15E302"];
 }
 
 - (void)viewDidLoad {
@@ -76,6 +230,7 @@
     [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]];
     [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]];
     [self.KernelExploitSegmentedControl setEnabled:[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"Entitlements"][@"com.apple.developer.networking.multipath"] boolValue] forSegmentAtIndex:1];
+    [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
     [self.tableView reloadData];
 }
 
@@ -136,12 +291,28 @@ extern int mptcp_die(void);
     iosurface_die();
     vfs_die();
     mptcp_die();
+    sleep(2);
+    [self.restartButton setTitle:@"Failed to restart." forState:UIControlStateDisabled];
 }
 
 - (IBAction)DisableAutoUpdatesSwitchTriggered:(id)sender {
     [[NSUserDefaults standardUserDefaults] setBool:[self.DisableAutoUpdatesSwitch isOn] forKey:@K_DISABLE_AUTO_UPDATES];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
+}
+
+- (IBAction)tappedOnShareDiagnosticsData:(id)sender {
+    NSURL *URL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Documents/diagnostics.plist", NSHomeDirectory()]];
+    [[SettingsTableViewController getDiagnostics] writeToURL:URL error:nil];
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[URL] applicationActivities:nil];
+    if ([activityViewController respondsToSelector:@selector(popoverPresentationController)]) {
+        [[activityViewController popoverPresentationController] setSourceView:self.ShareDiagnosticsDataButton];
+    }
+    [self presentViewController:activityViewController animated:YES completion:nil];
+}
+
+- (IBAction)tappedOnOpenCydia:(id)sender {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"cydia://"] options:@{} completionHandler:nil];
 }
 
 - (void)didReceiveMemoryWarning {

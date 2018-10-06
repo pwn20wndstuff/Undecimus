@@ -28,6 +28,10 @@
 @property (weak, nonatomic) IBOutlet UISwitch *DisableAutoUpdatesSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *DisableAppRevokesSwitch;
 @property (nonatomic) UITapGestureRecognizer *tap;
+@property (weak, nonatomic) IBOutlet UIButton *ShareDiagnosticsDataButton;
+@property (weak, nonatomic) IBOutlet UIButton *OpenCydiaButton;
+
++ (NSArray *) supportedBuilds;
 
 @end
 

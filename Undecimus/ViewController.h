@@ -29,9 +29,26 @@
     } \
 while (false)
 
+#define _gets(msg) do { \
+        dispatch_semaphore_t semaphore; \
+        semaphore = dispatch_semaphore_create(0); \
+        dispatch_async(dispatch_get_main_queue(), ^{ \
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Notice" message:@(msg) preferredStyle:UIAlertControllerStyleAlert]; \
+            UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) { \
+            dispatch_semaphore_signal(semaphore); \
+        }]; \
+        [alertController addAction:OK]; \
+        [alertController setPreferredAction:OK]; \
+        [[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentViewController:alertController animated:YES completion:nil];; \
+    }); \
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER); \
+} while (false)
+
 @interface ViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UIButton *goButton;
 
+- (IBAction)tappedOnJailbreak:(id)sender;
 +(ViewController*)sharedController;
+
 @end
 

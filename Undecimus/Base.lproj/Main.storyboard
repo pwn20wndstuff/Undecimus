@@ -47,7 +47,7 @@
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="9BH-Zb-878">
                                         <rect key="frame" x="89" y="393" width="197" height="56"/>
                                         <subviews>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ELb-9J-7YK">
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ELb-9J-7YK">
                                                 <rect key="frame" x="0.0" y="0.0" width="197" height="56"/>
                                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
@@ -63,6 +63,9 @@
                                                         <integer key="value" value="28"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="tappedOnJailbreak:" destination="tXi-Ze-6Yw" eventType="touchUpInside" id="yND-fE-JMg"/>
+                                                </connections>
                                             </button>
                                         </subviews>
                                     </stackView>
@@ -223,7 +226,7 @@
             <objects>
                 <tableViewController id="ScN-Hx-Um8" customClass="SettingsTableViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="GAs-vX-6zY">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="729"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <sections>
@@ -236,8 +239,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="341" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Credits" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wrA-kI-QcM">
-                                                    <rect key="frame" x="16" y="0.0" width="55" height="44"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Special Thanks" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wrA-kI-QcM">
+                                                    <rect key="frame" x="16" y="0.0" width="116" height="44"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="44" id="l0Y-qs-SIE"/>
                                                     </constraints>
@@ -564,6 +567,60 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="DTa-Xu-fsT">
+                                        <rect key="frame" x="0.0" y="511" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="DTa-Xu-fsT" id="krI-4z-ctw">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j3u-pn-SGo">
+                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="44" id="BHO-YP-vhD"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <state key="normal" title="Share Diagnostics Data"/>
+                                                    <connections>
+                                                        <action selector="tappedOnShareDiagnosticsData:" destination="ScN-Hx-Um8" eventType="touchUpInside" id="3So-zT-lC7"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="j3u-pn-SGo" firstAttribute="leading" secondItem="krI-4z-ctw" secondAttribute="leading" id="5fo-4g-fgU"/>
+                                                <constraint firstAttribute="trailing" secondItem="j3u-pn-SGo" secondAttribute="trailing" id="Iiq-2a-KOm"/>
+                                                <constraint firstItem="j3u-pn-SGo" firstAttribute="centerY" secondItem="krI-4z-ctw" secondAttribute="centerY" id="VQo-o3-fuI"/>
+                                                <constraint firstItem="j3u-pn-SGo" firstAttribute="top" secondItem="krI-4z-ctw" secondAttribute="top" id="t85-y5-bTG"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="LaS-Im-6eS">
+                                        <rect key="frame" x="0.0" y="555" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="LaS-Im-6eS" id="dcQ-Ib-8Mg">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="m4Q-Ej-PFv">
+                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="44" id="hC6-Y8-rxg"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <state key="normal" title="Open Cydia"/>
+                                                    <connections>
+                                                        <action selector="tappedOnOpenCydia:" destination="ScN-Hx-Um8" eventType="touchUpInside" id="Mmd-ZB-hUN"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="m4Q-Ej-PFv" firstAttribute="centerY" secondItem="dcQ-Ib-8Mg" secondAttribute="centerY" id="51Q-9Y-bJX"/>
+                                                <constraint firstItem="m4Q-Ej-PFv" firstAttribute="top" secondItem="dcQ-Ib-8Mg" secondAttribute="top" id="Roa-wZ-yBG"/>
+                                                <constraint firstAttribute="trailing" secondItem="m4Q-Ej-PFv" secondAttribute="trailing" id="mjm-yg-YqW"/>
+                                                <constraint firstItem="m4Q-Ej-PFv" firstAttribute="leading" secondItem="dcQ-Ib-8Mg" secondAttribute="leading" id="oza-bj-hN8"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -572,6 +629,7 @@
                             <outlet property="delegate" destination="ScN-Hx-Um8" id="cNW-Ts-SRK"/>
                         </connections>
                     </tableView>
+                    <extendedEdge key="edgesForExtendedLayout" top="YES"/>
                     <navigationItem key="navigationItem" title="Settings" id="gmU-Kt-ooy"/>
                     <connections>
                         <outlet property="BootNonceTextField" destination="AmI-8O-WbP" id="Zdg-ET-M8T"/>
@@ -580,7 +638,9 @@
                         <outlet property="DumpAPTicketSwitch" destination="xWn-fd-7EJ" id="cJp-cM-DRn"/>
                         <outlet property="KernelExploitSegmentedControl" destination="6Xx-ol-UYF" id="O8d-hv-ElQ"/>
                         <outlet property="LoadDaemonsSwitch" destination="sUh-Nj-0hf" id="rbY-Ms-vpR"/>
+                        <outlet property="OpenCydiaButton" destination="m4Q-Ej-PFv" id="orL-xQ-3wJ"/>
                         <outlet property="RefreshIconCacheSwitch" destination="E0P-lH-E3m" id="UVF-BM-lu5"/>
+                        <outlet property="ShareDiagnosticsDataButton" destination="j3u-pn-SGo" id="0cM-Vu-e4I"/>
                         <outlet property="TweakInjectionSwitch" destination="fAs-8y-ldG" id="TY7-Ea-A2P"/>
                         <outlet property="restartButton" destination="cVO-Jp-zmf" id="VdH-bW-Drq"/>
                     </connections>
@@ -589,7 +649,7 @@
             </objects>
             <point key="canvasLocation" x="2524" y="31.773399014778327"/>
         </scene>
-        <!--Credits-->
+        <!--Special Thanks-->
         <scene sceneID="x6W-Dv-xaI">
             <objects>
                 <tableViewController id="uGG-wM-8Jf" customClass="CreditsTableViewController" sceneMemberID="viewController">
@@ -607,7 +667,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="@i41nbeer (el, mp &amp; aw)" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZJy-Jb-c0y">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="@i41nbeer (tf, el, mp &amp; aw)" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZJy-Jb-c0y">
                                                     <rect key="frame" x="16" y="0.0" width="343" height="44"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="44" id="dEf-SK-9u2"/>
@@ -758,7 +818,7 @@
                             <outlet property="delegate" destination="uGG-wM-8Jf" id="ELf-Bj-9yg"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Credits" id="chu-Ml-M9l"/>
+                    <navigationItem key="navigationItem" title="Special Thanks" id="chu-Ml-M9l"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sF3-i5-gWt" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
