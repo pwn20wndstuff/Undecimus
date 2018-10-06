@@ -17,7 +17,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     UIImageView *myImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Clouds"]];
-    [myImageView setContentMode:UIViewContentModeBottomLeft];
+    [myImageView setContentMode:UIViewContentModeScaleAspectFill];
     [myImageView setFrame:self.tableView.frame];
     UIView *myView = [[UIView alloc] initWithFrame:myImageView.frame];
     [myView setBackgroundColor:[UIColor whiteColor]];

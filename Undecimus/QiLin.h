@@ -115,6 +115,7 @@ int remountRootFS (void);
 int reSpring (void);        // @FCE365 - this is for you
 
 pid_t execCommand(char *Cmd, char *Arg1, char *Arg2, char *Arg3, char *Arg4, char *Arg5 , int Flags);
+int execCommandSuspended(char *Cmd, char *Arg1, char *Arg2, char *Arg3, char *Arg4, char *Arg5);
 int execCommandAndWait(char *Cmd, char *Arg1, char *Arg2, char *Arg3, char *Arg4, char *Arg5);
 
 int setTFP0AsHostSpecialPort4 (void);

@@ -45,7 +45,7 @@ extern int (*dsystem)(const char *);
 @implementation ViewController
 static ViewController *sharedController = nil;
 
-#define _puts(msg) do { \
+#define PROGRESS(msg) do { \
         dispatch_async(dispatch_get_main_queue(), ^{ \
             [UIView performWithoutAnimation:^{ \
                 [[[ViewController sharedController] goButton] setEnabled:NO]; \
@@ -509,8 +509,8 @@ char *readFile(char *filename) {
 void blockDomainWithName(char *name) {
     char *hostsFile = readFile("/etc/hosts");
     _assert(hostsFile);
-    char *newLine = malloc(sizeof(char *) + (15 + sizeof(name)));
-    bzero(newLine, sizeof(char *) + (15 + sizeof(name)));
+    char *newLine = malloc(sizeof(char *) + (14 + sizeof(name)));
+    bzero(newLine, sizeof(char *) + (14 + sizeof(name)));
     sprintf(newLine, "\n127.0.0.1 %s\n", name);
     if (strstr(hostsFile, newLine)) return;
     FILE *f = fopen("/etc/hosts", "a");
@@ -922,7 +922,7 @@ mach_port_t try_restore_port() {
 // https://github.com/tihmstar/doubleH3lix/blob/4428c660832e98271f5d82f7a9c67e842b814621/doubleH3lix/jailbreak.mm#L645
 
 extern char* const* environ;
-int easyPosixSpawn(NSURL *launchPath,NSArray *arguments){
+int easyPosixSpawn(NSURL *launchPath,NSArray *arguments) {
     NSMutableArray *posixSpawnArguments=[arguments mutableCopy];
     [posixSpawnArguments insertObject:[launchPath lastPathComponent] atIndex:0];
     
@@ -985,12 +985,15 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     int fd = 0;
     int i = 0;
     char *dev_path = NULL;
+    struct trust_mem mem;
+    size_t length = 0;
+    uint64_t kernel_trust = 0;
     
     {
         // Initialize patchfinder64.
         
         LOG("Initializing patchfinder64...");
-        _puts("Exploiting... (2/44)");
+        PROGRESS("Exploiting... (2/44)");
         rv = init_kernel(kernel_base, NULL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1001,7 +1004,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Find offsets.
         
         LOG("Finding offsets...");
-        _puts("Exploiting... (3/44)");
+        PROGRESS("Exploiting... (3/44)");
         offsets.trust_chain = find_trustcache();
         LOG("trust_chain: " ADDR "\n", offsets.trust_chain);
         _assert(offsets.trust_chain);
@@ -1048,7 +1051,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Deinitialize patchfinder64.
         
         LOG("Deinitializing patchfinder64...");
-        _puts("Exploiting... (4/44)");
+        PROGRESS("Exploiting... (4/44)");
         term_kernel();
         LOG("Successfully deinitialized patchfinder64.");
     }
@@ -1057,7 +1060,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Initialize QiLin.
         
         LOG("Initializing QiLin...");
-        _puts("Exploiting... (5/44)");
+        PROGRESS("Exploiting... (5/44)");
         rv = initQiLin(tfp0, kernel_base);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1068,7 +1071,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Rootify myself.
         
         LOG("Rootifying myself...");
-        _puts("Exploiting... (6/44)");
+        PROGRESS("Exploiting... (6/44)");
         rv = rootifyMe();
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1079,7 +1082,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Platformize myself.
         
         LOG("Platformizing myself...");
-        _puts("Exploiting... (7/44)");
+        PROGRESS("Exploiting... (7/44)");
         rv = platformizeMe();
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1090,7 +1093,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Escape Sandbox.
         
         LOG("Escaping Sandbox...");
-        _puts("Exploiting... (8/44)");
+        PROGRESS("Exploiting... (8/44)");
         ShaiHuludMe(0);
         LOG("Successfully escaped Sandbox.");
     }
@@ -1099,7 +1102,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Write a test file to UserFS.
         
         LOG("Writing a test file to UserFS...");
-        _puts("Exploiting... (9/44)");
+        PROGRESS("Exploiting... (9/44)");
         if (!access("/var/mobile/test.txt", F_OK)) {
             rv = unlink("/var/mobile/test.txt");
             LOG("rv: " "%d" "\n", rv);
@@ -1127,7 +1130,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Borrow entitlements from sysdiagnose.
         
         LOG("Borrowing entitlements from sysdiagnose...");
-        _puts("Exploiting... (10/44)");
+        PROGRESS("Exploiting... (10/44)");
         borrowEntitlementsFromDonor("/usr/bin/sysdiagnose", "--help");
         LOG("Successfully borrowed entitlements from sysdiagnose.");
         
@@ -1139,7 +1142,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Dump APTicket.
             
             LOG("Dumping APTicket...");
-            _puts("Exploiting... (11/44)");
+            PROGRESS("Exploiting... (11/44)");
             rv = [[NSData dataWithContentsOfFile:@"/System/Library/Caches/apticket.der"] writeToFile:[NSString stringWithFormat:@"%@/Documents/apticket.der", NSHomeDirectory()] atomically:YES];
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 1);
@@ -1151,7 +1154,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Unlock nvram.
         
         LOG("Unlocking nvram...");
-        _puts("Exploiting... (12/44)");
+        PROGRESS("Exploiting... (12/44)");
         rv = unlocknvram();
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1162,7 +1165,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Set boot-nonce.
         
         LOG("Setting boot-nonce...");
-        _puts("Exploiting... (13/44)");
+        PROGRESS("Exploiting... (13/44)");
         rv = execCommandAndWait("/usr/sbin/nvram", strdup([[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String]), NULL, NULL, NULL, NULL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1179,7 +1182,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Lock nvram.
         
         LOG("Locking nvram...");
-        _puts("Exploiting... (14/44)");
+        PROGRESS("Exploiting... (14/44)");
         rv = locknvram();
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1190,7 +1193,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Initialize kexecute.
         
         LOG("Initializing kexecute...");
-        _puts("Exploiting... (15/44)");
+        PROGRESS("Exploiting... (15/44)");
         init_kexecute(offsets.add_x0_x0_0x40_ret);
         LOG("Successfully initialized kexecute.");
     }
@@ -1199,7 +1202,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Get vfs_context.
         
         LOG("Getting vfs_context...");
-        _puts("Exploiting... (16/44)");
+        PROGRESS("Exploiting... (16/44)");
         vfs_context = _vfs_context(offsets.vfs_context_current, offsets.zone_map_ref);
         LOG("vfs_context: " ADDR "\n", vfs_context);
         _assert(vfs_context);
@@ -1210,7 +1213,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Get dev vnode.
         
         LOG("Getting dev vnode...");
-        _puts("Exploiting... (17/44)");
+        PROGRESS("Exploiting... (17/44)");
         devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", offsets.vnode_lookup);
         LOG("devVnode: " ADDR "\n", devVnode);
         _assert(devVnode);
@@ -1221,7 +1224,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Clear dev vnode's si_flags.
         
         LOG("Clearing dev vnode's si_flags...");
-        _puts("Exploiting... (18/44)");
+        PROGRESS("Exploiting... (18/44)");
         wk32(rk64(devVnode + 0x78) + 0x10, 0);
         LOG("Successfully cleared dev vnode's si_flags.");
     }
@@ -1230,7 +1233,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Clean up dev vnode.
         
         LOG("Cleaning up dev vnode...");
-        _puts("Exploiting... (19/44)");
+        PROGRESS("Exploiting... (19/44)");
         rv = _vnode_put(offsets.vnode_put, devVnode);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1241,7 +1244,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Deinitialize kexecute.
         
         LOG("Deinitializing kexecute...");
-        _puts("Exploiting... (20/44)");
+        PROGRESS("Exploiting... (20/44)");
         term_kexecute();
         LOG("Successfully deinitialized kexecute.");
     }
@@ -1250,7 +1253,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Remount RootFS.
         
         LOG("Remounting RootFS...");
-        _puts("Exploiting... (21/44)");
+        PROGRESS("Exploiting... (21/44)");
         fd = open("/", O_RDONLY, 0);
         LOG("fd: " "%d" "\n", fd);
         _assert(fd > 0);
@@ -1276,7 +1279,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Borrow entitlements from fsck_apfs.
             
             LOG("Borrowing entitlements from fsck_apfs...");
-            _puts("Exploiting... (22/44)");
+            PROGRESS("Exploiting... (22/44)");
             borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
             LOG("Successfully borrowed entitlements from fsck_apfs.");
             
@@ -1285,7 +1288,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Rename system snapshot.
             
             LOG("Renaming system snapshot...");
-            _puts("Exploiting... (23/44)");
+            PROGRESS("Exploiting... (23/44)");
             fd = open("/var/tmp/rootfsmnt", O_RDONLY, 0);
             LOG("fd: " "%d" "\n", fd);
             _assert(fd > 0);
@@ -1301,7 +1304,8 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Reboot.
             
             LOG("Rebooting...");
-            _puts("Exploiting... (24/44)");
+            PROGRESS("Exploiting... (24/44)");
+            NOTICE("The device will be restarted.");
             rv = reboot(0x400);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1326,7 +1330,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Write a test file to RootFS.
         
         LOG("Writing a test file to RootFS...");
-        _puts("Exploiting... (25/44)");
+        PROGRESS("Exploiting... (25/44)");
         if (!access("/test.txt", F_OK)) {
             rv = unlink("/test.txt");
             LOG("rv: " "%d" "\n", rv);
@@ -1355,7 +1359,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Borrow entitlements from fsck_apfs.
             
             LOG("Borrowing entitlements from fsck_apfs...");
-            _puts("Exploiting... (26/44)");
+            PROGRESS("Exploiting... (26/44)");
             borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
             LOG("Successfully borrowed entitlements from fsck_apfs.");
             
@@ -1364,7 +1368,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Rename system snapshot.
             
             LOG("Renaming system snapshot back...");
-            _puts("Exploiting... (27/44)");
+            PROGRESS("Exploiting... (27/44)");
             fd = open("/", O_RDONLY, 0);
             LOG("fd: " "%d" "\n", fd);
             _assert(fd > 0);
@@ -1396,7 +1400,8 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Reboot.
             
             LOG("Rebooting...");
-            _puts("Exploiting... (28/44)");
+            PROGRESS("Exploiting... (28/44)");
+            NOTICE("The device will be restarted.");
             rv = reboot(0x400);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1408,7 +1413,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Copy over our resources to RootFS.
         
         LOG("Copying over our resources to RootFS...");
-        _puts("Exploiting... (29/44)");
+        PROGRESS("Exploiting... (29/44)");
         if (access("/jb", F_OK)) {
             rv = mkdir("/jb", 0755);
             LOG("rv: " "%d" "\n", rv);
@@ -1603,10 +1608,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     {
         // Inject trust cache
         
-        _puts("Exploiting... (30/44)");
+        PROGRESS("Exploiting... (30/44)");
         printf("trust_chain = 0x%llx\n", offsets.trust_chain);
         
-        struct trust_mem mem;
         mem.next = rk64(offsets.trust_chain);
         *(uint64_t *)&mem.uuid[0] = 0xabadbabeabadbabe;
         *(uint64_t *)&mem.uuid[8] = 0xabadbabeabadbabe;
@@ -1614,8 +1618,8 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = grab_hashes("/jb", kread, offsets.amficache, mem.next);
         printf("rv = %d, numhash = %d\n", rv, numhash);
         
-        size_t length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
-        uint64_t kernel_trust = kmem_alloc(length);
+        length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
+        kernel_trust = kmem_alloc(length);
         printf("alloced: 0x%zx => 0x%llx\n", length, kernel_trust);
         
         mem.count = numhash;
@@ -1632,7 +1636,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Log slide.
         
         LOG("Logging slide...");
-        _puts("Exploiting... (31/44)");
+        PROGRESS("Exploiting... (31/44)");
         a = fopen("/tmp/slide.txt", "w+");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL);
@@ -1653,7 +1657,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Set HSP4.
         
         LOG("Setting HSP4...");
-        _puts("Exploiting... (32/44)");
+        PROGRESS("Exploiting... (32/44)");
         rv = remap_tfp0_set_hsp4(&tfp0, offsets.zone_map_ref);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1664,14 +1668,19 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Patch amfid.
         
         LOG("Patching amfid...");
-        _puts("Exploiting... (33/44)");
+        PROGRESS("Exploiting... (33/44)");
+        if (!access("/var/tmp/amfid_payload.alive", F_OK)) {
+            rv = unlink("/var/tmp/amfid_payload.alive");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
         rv = inject_library(findPidOfProcess("amfid"), "/jb/amfid_payload.dylib");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        sleep(2);
-        rv = access("/var/tmp/amfid_payload.alive", F_OK);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        while (access("/var/tmp/amfid_payload.alive", F_OK)) {
+            LOG("Waiting for amfid...");
+            usleep(100000);
+        }
         LOG("Successfully patched amfid.");
     }
     
@@ -1679,7 +1688,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Spawn jailbreakd.
         
         LOG("Spawning jailbreakd...");
-        _puts("Exploiting... (34/44)");
+        PROGRESS("Exploiting... (34/44)");
         if (!access("/usr/lib/libjailbreak.dylib", F_OK)) {
             rv = unlink("/usr/lib/libjailbreak.dylib");
             LOG("rv: " "%d" "\n", rv);
@@ -1729,13 +1738,18 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
         }
+        if (!access("/var/tmp/jailbreakd.pid", F_OK)) {
+            rv = unlink("/var/tmp/jailbreakd.pid");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
         rv = execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        sleep(2);
-        rv = access("/var/tmp/jailbreakd.pid", F_OK);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        while (access("/var/tmp/jailbreakd.pid", F_OK)) {
+            LOG("Waiting for jailbreakd...");
+            usleep(100000);
+        }
         LOG("Successfully spawned jailbreakd.");
     }
     
@@ -1752,7 +1766,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(rv == 0);
         if (load_tweaks) {
             LOG("Patching launchd...");
-            _puts("Exploiting... (35/44)");
+            PROGRESS("Exploiting... (35/44)");
             if (!access("/var/log/pspawn_hook_launchd.log", F_OK)) {
                 rv = unlink("/var/log/pspawn_hook_launchd.log");
                 LOG("rv: " "%d" "\n", rv);
@@ -1779,7 +1793,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Update version string.
         
         LOG("Updating version string...");
-        _puts("Exploiting... (36/44)");
+        PROGRESS("Exploiting... (36/44)");
         rv = updateVersionString(DEFAULT_VERSION_STRING, tfp0, kernel_base);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1793,7 +1807,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Extract bootstrap.
         
         LOG("Extracting bootstrap...");
-        _puts("Exploiting... (37/44)");
+        PROGRESS("Exploiting... (37/44)");
         if (access("/.installed_unc0ver", F_OK)) {
             rv = chdir("/");
             LOG("rv: " "%d" "\n", rv);
@@ -1844,7 +1858,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Disable stashing.
             
             LOG("Disabling stashing...");
-            _puts("Exploiting... (38/44)");
+            PROGRESS("Exploiting... (38/44)");
             a = fopen("/.cydia_no_stash", "w");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL);
@@ -1865,7 +1879,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (disable_app_revokes) {
             // Block ocsp.apple.com.
             LOG("Blocking ocsp.apple.com...");
-            _puts("Exploiting... (39/44)");
+            PROGRESS("Exploiting... (39/44)");
             blockDomainWithName("ocsp.apple.com");
             LOG("Successfully blocked ocsp.apple.com.");
         }
@@ -1875,7 +1889,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Allow SpringBoard to show non-default system apps.
         
         LOG("Allowing SpringBoard to show non-default system apps...");
-        _puts("Exploiting... (40/44)");
+        PROGRESS("Exploiting... (40/44)");
         rv = kill(findPidOfProcess("cfprefsd"), SIGSTOP);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
@@ -1896,7 +1910,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Disable Auto Updates.
             
             LOG("Disabling Auto Updates...");
-            _puts("Exploiting... (41/44)");
+            PROGRESS("Exploiting... (41/44)");
             if (!access("/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", F_OK)) {
                 rv = execCommandAndWait("/bin/launchctl", "unload", "/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", NULL, NULL, NULL);
                 LOG("rv: " "%d" "\n", rv);
@@ -1948,7 +1962,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Load Daemons.
             
             LOG("Loading Daemons...");
-            _puts("Exploiting... (42/44)");
+            PROGRESS("Exploiting... (42/44)");
             dsystem("echo 'really jailbroken';ls /Library/LaunchDaemons | while read a; do launchctl load /Library/LaunchDaemons/$a; done; ls /etc/rc.d | while read a; do /etc/rc.d/$a; done;");
             sleep(2);
             LOG("Successfully loaded Daemons.");
@@ -1960,7 +1974,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Run uicache.
             
             LOG("Running uicache...");
-            _puts("Exploiting... (43/44)");
+            PROGRESS("Exploiting... (43/44)");
             rv = execCommandAndWait("/usr/bin/uicache", NULL, NULL, NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1973,7 +1987,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Load Tweaks.
             
             LOG("Loading Tweaks...");
-            _puts("Exploiting... (44/44)");
+            PROGRESS("Exploiting... (44/44)");
             rv = execCommandAndWait("/usr/bin/ldrestart", NULL, NULL, NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1989,12 +2003,12 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         struct utsname u = { 0 };
         uname(&u);
         if (strstr(u.version, DEFAULT_VERSION_STRING)) {
-            _puts("Jailbroken");
+            PROGRESS("Jailbroken");
             return;
         }
         // Initialize kernel exploit.
         LOG("Initializing kernel exploit...");
-        _puts("Exploiting... (1/44)");
+        PROGRESS("Exploiting... (1/44)");
         switch ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]) {
             case 0: {
                 vfs_sploit();
@@ -2017,9 +2031,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("Validating TFP0...");
         _assert(MACH_PORT_VALID(tfp0));
         LOG("Successfully validated TFP0.");
-        _gets("Jailbreak succeeded, but still needs a few minutes to respring.");
+        NOTICE("Jailbreak succeeded, but still needs a few minutes to respring.");
         exploit(tfp0, (uint64_t)get_kernel_base(tfp0),[[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]);
-        _puts("Done, exit.");
+        PROGRESS("Done, exit.");
     });
 }
 
@@ -2045,7 +2059,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     struct utsname u = { 0 };
     uname(&u);
     if (strstr(u.version, DEFAULT_VERSION_STRING)) {
-        _puts("Jailbroken");
+        PROGRESS("Jailbroken");
     }
 }
 
