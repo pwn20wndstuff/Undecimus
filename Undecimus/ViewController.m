@@ -47,8 +47,11 @@ static ViewController *sharedController = nil;
 
 #define _puts(msg) do { \
         dispatch_async(dispatch_get_main_queue(), ^{ \
-            ViewController.sharedController.goButton.enabled = NO; \
-            [ViewController.sharedController.goButton setTitle:@(msg) forState:UIControlStateDisabled]; \
+            [UIView performWithoutAnimation:^{ \
+                [[[ViewController sharedController] goButton] setEnabled:NO]; \
+                [[[ViewController sharedController] goButton] setTitle:@(msg) forState:UIControlStateDisabled]; \
+                [[[ViewController sharedController] goButton] layoutIfNeeded]; \
+            }]; \
         }); \
 } while (false)
 
@@ -1558,6 +1561,25 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         rv = chown("/jb/lzma", 0, 0);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        
+        if (!access("/jb/spawn", F_OK)) {
+            rv = unlink("/jb/spawn");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
+        a = fopen([[[NSBundle mainBundle] pathForResource:@"spawn" ofType:@"tar"] UTF8String], "rb");
+        LOG("a: " "%p" "\n", a);
+        _assert(a != NULL);
+        untar(a, "spawn");
+        rv = fclose(a);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = chmod("/jb/spawn", 0755);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = chown("/jb/spawn", 0, 0);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         
