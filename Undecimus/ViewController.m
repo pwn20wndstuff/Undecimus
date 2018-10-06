@@ -45,10 +45,10 @@ extern int (*dsystem)(const char *);
 @implementation ViewController
 static ViewController *sharedController = nil;
 
-#define _puts(message) do { \
+#define _puts(msg) do { \
         dispatch_async(dispatch_get_main_queue(), ^{ \
             ViewController.sharedController.goButton.enabled = NO; \
-            [ViewController.sharedController.goButton setTitle:@(message) forState:UIControlStateDisabled]; \
+            [ViewController.sharedController.goButton setTitle:@(msg) forState:UIControlStateDisabled]; \
         }); \
 } while (false)
 
@@ -965,15 +965,6 @@ typedef struct {
     kptr_t vfs_context_current;
     kptr_t vnode_lookup;
     kptr_t vnode_put;
-    kptr_t vnode_getfromfd;
-    kptr_t vnode_getattr;
-    kptr_t SHA1Init;
-    kptr_t SHA1Update;
-    kptr_t SHA1Final;
-    kptr_t csblob_entitlements_dictionary_set;
-    kptr_t kernel_task;
-    kptr_t kernproc;
-    kptr_t cs_find_md;
 } offsets_t;
 
 void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce, int disable_auto_updates, int disable_app_revokes)
@@ -1047,30 +1038,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         offsets.vnode_put = find_vnode_put();
         LOG("vnode_put: " ADDR "\n", offsets.vnode_put);
         _assert(offsets.vnode_put);
-        offsets.vnode_getfromfd = find_vnode_getfromfd();
-        LOG("vnode_getfromfd: " ADDR "\n", offsets.vnode_getfromfd);
-        _assert(offsets.vnode_getfromfd);
-        offsets.vnode_getattr = find_vnode_getattr();
-        LOG("vnode_getattr: " ADDR "\n", offsets.vnode_getattr);
-        _assert(offsets.vnode_getattr);
-        offsets.SHA1Init = find_SHA1Init();
-        LOG("SHA1Init: " ADDR "\n", offsets.SHA1Init);
-        _assert(offsets.SHA1Init);
-        offsets.SHA1Update = find_SHA1Update();
-        LOG("SHA1Update: " ADDR "\n", offsets.SHA1Update);
-        _assert(offsets.SHA1Update);
-        offsets.SHA1Final = find_SHA1Final();
-        LOG("SHA1Final: " ADDR "\n", offsets.SHA1Final);
-        _assert(offsets.SHA1Final);
-        offsets.csblob_entitlements_dictionary_set = find_csblob_entitlements_dictionary_set();
-        LOG("csblob_entitlements_dictionary_set: " ADDR "\n", offsets.csblob_entitlements_dictionary_set);
-        _assert(offsets.csblob_entitlements_dictionary_set);
-        offsets.kernel_task = find_kernel_task();
-        LOG("kernel_task: " ADDR "\n", offsets.kernel_task);
-        _assert(offsets.kernel_task);
-        offsets.kernproc = find_kernproc();
-        LOG("kernproc: " ADDR "\n", offsets.kernproc);
-        _assert(offsets.kernproc);
         LOG("Successfully found offsets.");
     }
     
@@ -1091,8 +1058,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = initQiLin(tfp0, kernel_base);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        setKernelSymbol("_kernproc", offsets.kernproc);
-        setKernelSymbol("_rootvnode", offsets.rootvnode);
         LOG("Successfully initialized QiLin.");
     }
     
@@ -1199,6 +1164,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         rv = execCommandAndWait("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL, NULL, NULL, NULL);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = execCommandAndWait("/usr/sbin/nvram", "-p", NULL, NULL, NULL, NULL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully set boot-nonce.");
@@ -1498,21 +1466,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         
-        if (!access("/jb/jailbreakd.plist", F_OK)) {
-            rv = unlink("/jb/jailbreakd.plist");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
-        }
-        rv = copyfile([[[NSBundle mainBundle] pathForResource:@"jailbreakd" ofType:@"plist"] UTF8String], "/jb/jailbreakd.plist", 0, COPYFILE_ALL);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        rv = chmod("/jb/jailbreakd.plist", 0755);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        rv = chown("/jb/jailbreakd.plist", 0, 0);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        
         if (!access("/jb/jailbreakd", F_OK)) {
             rv = unlink("/jb/jailbreakd");
             LOG("rv: " "%d" "\n", rv);
@@ -1721,8 +1674,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = rename("/jb/launchctl", "/bin/launchctl");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
-        md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/jb/jailbreakd.plist"];
-        _assert(md != NULL);
+        md = [[NSMutableDictionary alloc] init];
+        md[@"Label"] = @"jailbreakd";
+        md[@"Program"] = @"/jb/jailbreakd";
+        md[@"EnvironmentVariables"] = [[NSMutableDictionary alloc] init];
         md[@"EnvironmentVariables"][@"KernelBase"] = [NSString stringWithFormat:@ADDR, kernel_base];
         md[@"EnvironmentVariables"][@"KernProcAddr"] = [NSString stringWithFormat:@ADDR, rk64(findKernelSymbol("_kernproc"))];
         md[@"EnvironmentVariables"][@"ZoneMapOffset"] = [NSString stringWithFormat:@ADDR, offsets.zone_map_ref - (kernel_base - KERNEL_SEARCH_ADDRESS)];
@@ -1731,6 +1686,14 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         md[@"EnvironmentVariables"][@"OSBooleanFalse"] = [NSString stringWithFormat:@ADDR, offsets.OSBoolean_False];
         md[@"EnvironmentVariables"][@"OSUnserializeXML"] = [NSString stringWithFormat:@ADDR, offsets.osunserializexml];
         md[@"EnvironmentVariables"][@"Smalloc"] = [NSString stringWithFormat:@ADDR, offsets.smalloc];
+        md[@"UserName"] = @"root";
+        md[@"MachServices"] = [[NSMutableDictionary alloc] init];
+        md[@"MachServices"][@"zone.sparkes.jailbreakd"] = [[NSMutableDictionary alloc] init];
+        md[@"MachServices"][@"zone.sparkes.jailbreakd"][@"HostSpecialPort"] = @(15);
+        md[@"RunAtLoad"] = @(YES);
+        md[@"KeepAlive"] = @(YES);
+        md[@"StandardErrorPath"] = @"/var/log/jailbreakd-stderr.log";
+        md[@"StandardOutPath"] = @"/var/log/jailbreakd-stdout.log";
         rv = [md writeToFile:@"/jb/jailbreakd.plist" atomically:YES];
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 1);
@@ -1895,7 +1858,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
-        _assert(md != NULL);
+        _assert(md != nil);
         md[@"SBShowNonDefaultSystemApps"] = @(YES);
         rv = [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
         LOG("rv: " "%d" "\n", rv);
@@ -2000,6 +1963,13 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 - (IBAction)tappedOnJailbreak:(id)sender
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+        _assert([[SettingsTableViewController supportedBuilds] containsObject:[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"]]);
+        struct utsname u = { 0 };
+        uname(&u);
+        if (strstr(u.version, DEFAULT_VERSION_STRING)) {
+            _puts("Jailbroken");
+            return;
+        }
         // Initialize kernel exploit.
         LOG("Initializing kernel exploit...");
         _puts("Exploiting... (1/44)");
@@ -2025,7 +1995,8 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("Validating TFP0...");
         _assert(MACH_PORT_VALID(tfp0));
         LOG("Successfully validated TFP0.");
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]);
+        _gets("Jailbreak succeeded, but still needs a few minutes to respring.");
+        exploit(tfp0, (uint64_t)get_kernel_base(tfp0),[[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]);
         _puts("Done, exit.");
     });
 }
@@ -2047,14 +2018,12 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    _assert([[SettingsTableViewController supportedBuilds] containsObject:[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"]]);
     sharedController = self;
-    [self.goButton addTarget:self action:@selector(tappedOnJailbreak:) forControlEvents:UIControlEventTouchUpInside];
     struct utsname u = { 0 };
     uname(&u);
     if (strstr(u.version, DEFAULT_VERSION_STRING)) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-            _puts("Jailbroken");
-        });
+        _puts("Jailbroken");
     }
 }
 

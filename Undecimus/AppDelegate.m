@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#include "ViewController.h"
 
 @interface AppDelegate ()
 
@@ -14,12 +15,38 @@
 
 @implementation AppDelegate
 
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [self SetUpShortcuts];
     return YES;
 }
 
+- (void)SetUpShortcuts {
+    NSMutableArray *ShortcutItems = [[NSMutableArray alloc] init];
+    UIApplicationShortcutIcon *JailbreakIcon = [UIApplicationShortcutIcon iconWithTemplateImageName:@"maintenance"];
+    UIApplicationShortcutItem *JailbreakShortcut = [[UIApplicationShortcutItem alloc] initWithType:@"1" localizedTitle:@"Jailbreak" localizedSubtitle:nil icon:JailbreakIcon userInfo:nil];
+    [ShortcutItems addObject:JailbreakShortcut];
+    [[UIApplication sharedApplication] setShortcutItems:ShortcutItems];
+}
+
+- (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
+    switch ([[shortcutItem type] integerValue]) {
+        case 1: {
+            [[ViewController sharedController] performSelectorOnMainThread:@selector(tappedOnJailbreak:) withObject:nil waitUntilDone:YES];
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary <UIApplicationOpenURLOptionsKey, id> *)options {
+    if ([[url scheme] isEqualToString:@"jailbreak"]) {
+        [[ViewController sharedController] performSelectorOnMainThread:@selector(tappedOnJailbreak:) withObject:nil waitUntilDone:YES];
+        return YES;
+    }
+    return NO;
+}
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
