@@ -29,7 +29,7 @@
     } \
 while (false)
 
-#define _gets(msg) do { \
+#define NOTICE(msg) do { \
         dispatch_semaphore_t semaphore; \
         semaphore = dispatch_semaphore_create(0); \
         dispatch_async(dispatch_get_main_queue(), ^{ \

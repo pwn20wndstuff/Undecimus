@@ -596,7 +596,7 @@ init_kernel(addr_t base, const char *filename)
 void
 term_kernel(void)
 {
-    free(kernel);
+    if (kernel != NULL) free(kernel);
 }
 
 /* these operate on VA ******************************************************/
