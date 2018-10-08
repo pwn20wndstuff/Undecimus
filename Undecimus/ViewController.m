@@ -1988,7 +1988,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             
             LOG("Loading Tweaks...");
             PROGRESS("Exploiting... (44/44)");
-            rv = execCommandAndWait("/usr/bin/ldrestart", NULL, NULL, NULL, NULL, NULL);
+            rv = kill(findPidOfProcess("backboardd"), SIGKILL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
             LOG("Successfully loaded Tweaks.");
