@@ -1705,6 +1705,11 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = rename("/jb/launchctl", "/bin/launchctl");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
+        if (!access("/jb/jailbreakd.plist", F_OK)) {
+            rv = unlink("/jb/jailbreakd.plist");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
         md = [[NSMutableDictionary alloc] init];
         md[@"Label"] = @"jailbreakd";
         md[@"Program"] = @"/jb/jailbreakd";
