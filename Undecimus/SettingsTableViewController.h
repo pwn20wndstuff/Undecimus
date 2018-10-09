@@ -30,6 +30,7 @@
 @property (nonatomic) UITapGestureRecognizer *tap;
 @property (weak, nonatomic) IBOutlet UIButton *ShareDiagnosticsDataButton;
 @property (weak, nonatomic) IBOutlet UIButton *OpenCydiaButton;
+@property (weak, nonatomic) IBOutlet UITextField *ExpiryLabel;
 
 + (NSArray *) supportedBuilds;
 
