@@ -231,6 +231,7 @@
     [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]];
     [self.KernelExploitSegmentedControl setEnabled:[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"Entitlements"][@"com.apple.developer.networking.multipath"] boolValue] forSegmentAtIndex:1];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
+    [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400]];
     [self.tableView reloadData];
 }
 
@@ -286,13 +287,20 @@ extern int vfs_die(void);
 extern int mptcp_die(void);
 
 - (IBAction)tappedOnRestart:(id)sender {
-    [self.restartButton setEnabled:NO];
-    [self.restartButton setTitle:@"Restarting..." forState:UIControlStateDisabled];
-    iosurface_die();
-    vfs_die();
-    mptcp_die();
-    sleep(2);
-    [self.restartButton setTitle:@"Failed to restart." forState:UIControlStateDisabled];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+        NOTICE("The device will be restarted.");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.restartButton setEnabled:NO];
+            [self.restartButton setTitle:@"Restarting..." forState:UIControlStateDisabled];
+        });
+        iosurface_die();
+        vfs_die();
+        mptcp_die();
+        sleep(2);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.restartButton setTitle:@"Failed to restart." forState:UIControlStateDisabled];
+        });
+    });
 }
 
 - (IBAction)DisableAutoUpdatesSwitchTriggered:(id)sender {

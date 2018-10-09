@@ -1992,7 +1992,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 - (IBAction)tappedOnJailbreak:(id)sender
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-        _assert([[SettingsTableViewController supportedBuilds] containsObject:[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"]]);
+        _assert([[SettingsTableViewController supportedBuilds] containsObject:[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"]] == 1);
         struct utsname u = { 0 };
         uname(&u);
         if (strstr(u.version, DEFAULT_VERSION_STRING)) {
@@ -2047,7 +2047,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    _assert([[SettingsTableViewController supportedBuilds] containsObject:[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"]]);
+    _assert([[SettingsTableViewController supportedBuilds] containsObject:[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"]] == 1);
     sharedController = self;
     struct utsname u = { 0 };
     uname(&u);
