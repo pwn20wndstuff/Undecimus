@@ -287,6 +287,7 @@
     [self.KernelExploitSegmentedControl setEnabled:([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] rangeOfString:@"15A"].location != NSNotFound || [[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] rangeOfString:@"15B"].location != NSNotFound) forSegmentAtIndex:2];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
     [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400]];
+    [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE]];
     [self.tableView reloadData];
 }
 
@@ -376,6 +377,11 @@ extern int mptcp_die(void);
 
 - (IBAction)tappedOnOpenCydia:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"cydia://"] options:@{} completionHandler:nil];
+}
+- (IBAction)OverwriteBootNonceSwitchTriggered:(id)sender {
+    [[NSUserDefaults standardUserDefaults] setBool:[self.OverwriteBootNonceSwitch isOn] forKey:@K_OVERWRITE_BOOT_NONCE];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reloadData];
 }
 
 - (void)didReceiveMemoryWarning {

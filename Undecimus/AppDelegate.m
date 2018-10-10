@@ -50,6 +50,10 @@
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@K_DISABLE_APP_REVOKES];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_OVERWRITE_BOOT_NONCE] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@K_OVERWRITE_BOOT_NONCE];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
     [self SetUpShortcuts];
     return YES;
 }
