@@ -30,11 +30,21 @@
 while (false)
 
 #define NOTICE(msg) do { \
-        dispatch_semaphore_t semaphore; \
-        semaphore = dispatch_semaphore_create(0); \
-        dispatch_async(dispatch_get_main_queue(), ^{ \
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Notice" message:@(msg) preferredStyle:UIAlertControllerStyleAlert]; \
-            UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) { \
+    dispatch_async(dispatch_get_main_queue(), ^{ \
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Notice" message:@(msg) preferredStyle:UIAlertControllerStyleAlert]; \
+        UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]; \
+        [alertController addAction:OK]; \
+        [alertController setPreferredAction:OK]; \
+        [[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentViewController:alertController animated:YES completion:nil];; \
+    }); \
+} while (false)
+
+#define WAIT_NOTICE(msg) do { \
+    dispatch_semaphore_t semaphore; \
+    semaphore = dispatch_semaphore_create(0); \
+    dispatch_async(dispatch_get_main_queue(), ^{ \
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Notice" message:@(msg) preferredStyle:UIAlertControllerStyleAlert]; \
+        UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) { \
             dispatch_semaphore_signal(semaphore); \
         }]; \
         [alertController addAction:OK]; \
