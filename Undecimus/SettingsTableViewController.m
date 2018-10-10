@@ -186,7 +186,61 @@
 }
 
 + (NSArray *) supportedBuilds {
-    return @[@"15A5278f", @"15A5304i", @"15A5304j", @"15A5318g", @"15A5327g", @"15A5341f", @"15A5354b", @"15A5362a", @"15A5368a", @"15A5370a", @"15A5372a", @"15A372", @"15B5066f", @"15B5078e", @"15B5086a", @"15B92", @"15B93", @"15C5092b", @"15C5097d", @"15C5107a", @"15C5110b", @"15C5111a", @"15C114", @"15D5037e", @"15D5046b", @"15D5049a", @"15D5054a", @"15D5057a", @"15D5059a", @"15D60", @"15E5167f", @"15E5178f", @"15E5189f", @"15E5201e", @"15E5211a", @"15E5216a", @"15F5037c", @"15F5049c", @"15F5061d", @"15A402", @"15A421", @"15A432", @"15B93", @"15B150", @"15B202", @"15C114", @"15C153", @"15C202", @"15D60", @"15D100", @"15E216", @"15E302"];
+    NSMutableArray *ma = [[NSMutableArray alloc] init];
+    [ma addObject:@"15A5278f"]; // 11.0 beta
+    [ma addObject:@"15A5304i"]; // 11.0 beta 2
+    [ma addObject:@"15A5304j"]; // 11.0 beta 2
+    [ma addObject:@"15A5318g"]; // 11.0 beta 3
+    [ma addObject:@"15A5327g"]; // 11.0 beta 4
+    [ma addObject:@"15A5341f"]; // 11.0 beta 5
+    [ma addObject:@"15A5354b"]; // 11.0 beta 6
+    [ma addObject:@"15A5362a"]; // 11.0 beta 7
+    [ma addObject:@"15A5368a"]; // 11.0 beta 8
+    [ma addObject:@"15A5370a"]; // 11.0 beta 9
+    [ma addObject:@"15A5372a"]; // 11.0 beta 10
+    [ma addObject:@"15A372"]; // 11.0 GM
+    [ma addObject:@"15B5066f"]; // 11.1 beta
+    [ma addObject:@"15B5078e"]; // 11.1 beta 2
+    [ma addObject:@"15B5086a"]; // 11.1 beta 3
+    [ma addObject:@"15B92"]; // 11.1 beta 4
+    [ma addObject:@"15B93"]; // 11.1 beta 5
+    [ma addObject:@"15C5092b"]; // 11.2 beta
+    [ma addObject:@"15C5097d"]; // 11.2 beta 2
+    [ma addObject:@"15C5107a"]; // 11.2 beta 3
+    [ma addObject:@"15C5110b"]; // 11.2 beta 4
+    [ma addObject:@"15C5111a"]; // 11.2 beta 5
+    [ma addObject:@"15C114"]; // 11.2 beta 6
+    [ma addObject:@"15D5037e"]; // 11.2.5 beta
+    [ma addObject:@"15D5046b"]; // 11.2.5 beta 2
+    [ma addObject:@"15D5049a"]; // 11.2.5 beta 3
+    [ma addObject:@"15D5054a"]; // 11.2.5 beta 4
+    [ma addObject:@"15D5057a"]; // 11.2.5 beta 5
+    [ma addObject:@"15D5059a"]; // 11.2.5 beta 6
+    [ma addObject:@"15D60"]; // 11.2.5 beta 7
+    [ma addObject:@"15E5167f"]; // 11.3 beta
+    [ma addObject:@"15E5178f"]; // 11.3 beta 2
+    [ma addObject:@"15E5189f"]; // 11.3 beta 3
+    [ma addObject:@"15E5201e"]; // 11.3 beta 4
+    [ma addObject:@"15E5211a"]; // 11.3 beta 5
+    [ma addObject:@"15E5216a"]; // 11.3 beta 6
+    [ma addObject:@"15F5037c"]; // 11.4 beta
+    [ma addObject:@"15F5049c"]; // 11.4 beta 2
+    [ma addObject:@"15F5061d"]; // 11.4 beta 3
+    [ma addObject:@"15A372"]; // 11.0
+    [ma addObject:@"15A402"]; // 11.0.1
+    [ma addObject:@"15A421"]; // 11.0.2
+    [ma addObject:@"15A432"]; // 11.0.3
+    [ma addObject:@"15B93"]; // 11.1
+    [ma addObject:@"15B150"]; // 11.1.1
+    [ma addObject:@"15B202"]; // 11.1.2
+    [ma addObject:@"15C114"]; // 11.2
+    [ma addObject:@"15C153"]; // 11.2.1
+    [ma addObject:@"15C202"]; // 11.2.2
+    [ma addObject:@"15D60"]; // 11.2.5
+    [ma addObject:@"15D100"]; // 11.2.6
+    [ma addObject:@"15E216"]; // 11.3
+    [ma addObject:@"15E302"]; // 11.3.1
+    return ma;
 }
 
 - (void)viewDidLoad {
@@ -203,10 +257,10 @@
     [self.navigationController.navigationBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
     [self.navigationController.navigationBar setShadowImage:[UIImage new]];
     [self.BootNonceTextField setDelegate:self];
-    [self reloadData];
     self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
     self.tap.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:self.tap];
+    [self reloadData];
 }
 
 - (void)userTappedAnyware:(UITapGestureRecognizer *) sender
@@ -230,6 +284,7 @@
     [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]];
     [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]];
     [self.KernelExploitSegmentedControl setEnabled:[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"Entitlements"][@"com.apple.developer.networking.multipath"] boolValue] forSegmentAtIndex:1];
+    [self.KernelExploitSegmentedControl setEnabled:([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] rangeOfString:@"15A"].location != NSNotFound || [[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] rangeOfString:@"15B"].location != NSNotFound) forSegmentAtIndex:2];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
     [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400]];
     [self.tableView reloadData];
