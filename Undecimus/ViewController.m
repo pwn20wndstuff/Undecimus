@@ -37,6 +37,7 @@ extern int (*dsystem)(const char *);
 #include "SettingsTableViewController.h"
 #include "untar.h"
 #include "multi_path_sploit.h"
+#include "async_wake.h"
 
 @interface ViewController ()
 
@@ -2013,6 +2014,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
                 break;
             }
             case 2: {
+                async_wake_go();
                 break;
             }
                 
