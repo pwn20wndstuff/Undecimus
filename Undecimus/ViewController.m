@@ -951,6 +951,7 @@ int easyPosixSpawn(NSURL *launchPath,NSArray *arguments) {
     }
     
     posix_spawn_file_actions_destroy(&action);
+    free(args);
     
     return status;
 }
@@ -971,7 +972,7 @@ typedef struct {
     kptr_t vnode_put;
 } offsets_t;
 
-void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce, int disable_auto_updates, int disable_app_revokes)
+void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce, int disable_auto_updates, int disable_app_revokes, int overwrite_boot_nonce)
 {
     // Initialize variables.
     int rv = 0;
@@ -1167,15 +1168,16 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         
         LOG("Setting boot-nonce...");
         PROGRESS("Exploiting... (13/44)");
-        rv = execCommandAndWait("/usr/sbin/nvram", strdup([[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String]), NULL, NULL, NULL, NULL);
+        rv = execCommandAndWait("/usr/sbin/nvram", "com.apple.System.boot-nonce", NULL, NULL, NULL, NULL);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        rv = execCommandAndWait("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL, NULL, NULL, NULL);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
-        rv = execCommandAndWait("/usr/sbin/nvram", "-p", NULL, NULL, NULL, NULL);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        if (overwrite_boot_nonce || rv == 512) {
+            rv = execCommandAndWait("/usr/sbin/nvram", strdup([[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String]), NULL, NULL, NULL, NULL);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+            rv = execCommandAndWait("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL, NULL, NULL, NULL);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
         LOG("Successfully set boot-nonce.");
     }
     
@@ -2027,7 +2029,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(MACH_PORT_VALID(tfp0));
         LOG("Successfully validated TFP0.");
         NOTICE("Jailbreak succeeded, but still needs a few minutes to respring.");
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0),[[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]);
+        exploit(tfp0, (uint64_t)get_kernel_base(tfp0),[[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE]);
         PROGRESS("Done, exit.");
     });
 }

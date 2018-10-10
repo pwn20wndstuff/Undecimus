@@ -16,6 +16,7 @@
 #define K_EXPLOIT "Exploit"
 #define K_DISABLE_AUTO_UPDATES "DisableAutoUpdates"
 #define K_DISABLE_APP_REVOKES "DisableAppRevokes"
+#define K_OVERWRITE_BOOT_NONCE "OverwriteBootNonce"
 
 @interface SettingsTableViewController : UITableViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UISwitch *TweakInjectionSwitch;
@@ -31,6 +32,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *ShareDiagnosticsDataButton;
 @property (weak, nonatomic) IBOutlet UIButton *OpenCydiaButton;
 @property (weak, nonatomic) IBOutlet UITextField *ExpiryLabel;
+@property (weak, nonatomic) IBOutlet UISwitch *OverwriteBootNonceSwitch;
 
 + (NSArray *) supportedBuilds;
 
