@@ -1823,8 +1823,12 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = execCommandAndWait("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", "/var/tmp/strap.tar.lzma", NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 512 || rv == 0);
-            dsystem("/usr/libexec/cydia/firmware.sh");
-            rv = execCommandAndWait("/usr/bin/dpkg", "--configure", "-a", NULL, NULL, NULL);
+            rv = dsystem("/usr/libexec/cydia/firmware.sh");
+            rv = WEXITSTATUS(rv);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+            rv = dsystem("/usr/bin/dpkg --configure -a");
+            rv = WEXITSTATUS(rv);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
             a = fopen("/.installed_unc0ver", "w");
@@ -1965,7 +1969,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             
             LOG("Loading Daemons...");
             PROGRESS("Exploiting... (42/44)");
-            dsystem("echo 'really jailbroken';ls /Library/LaunchDaemons | while read a; do launchctl load /Library/LaunchDaemons/$a; done; ls /etc/rc.d | while read a; do /etc/rc.d/$a; done;");
+            dsystem("echo 'really jailbroken'; shopt -s nullglob; for a in /Library/LaunchDaemons/*.plist; do echo loading $a; launchctl load \"$a\" ; done; for file in /etc/rc.d/*; do if [[ -x \"$file\" ]]; then \"$file\"; fi; done");
             sleep(2);
             LOG("Successfully loaded Daemons.");
         }
