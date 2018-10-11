@@ -1886,18 +1886,20 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         
         LOG("Allowing SpringBoard to show non-default system apps...");
         PROGRESS("Exploiting... (40/44)");
-        rv = kill(findPidOfProcess("cfprefsd"), SIGSTOP);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
         md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
         _assert(md != nil);
-        md[@"SBShowNonDefaultSystemApps"] = @(YES);
-        rv = [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 1);
-        rv = kill(findPidOfProcess("cfprefsd"), SIGKILL);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)]) {
+            rv = kill(findPidOfProcess("cfprefsd"), SIGSTOP);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+            md[@"SBShowNonDefaultSystemApps"] = @(YES);
+            rv = [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 1);
+            rv = kill(findPidOfProcess("cfprefsd"), SIGKILL);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
         LOG("Successfully allowed SpringBoard to show non-default system apps.");
     }
     
@@ -2051,7 +2053,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    _assert([[SettingsTableViewController supportedBuilds] containsObject:[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"]] == 1);
     sharedController = self;
     struct utsname u = { 0 };
     uname(&u);
