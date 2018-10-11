@@ -16,6 +16,7 @@
         dispatch_semaphore_t semaphore; \
         semaphore = dispatch_semaphore_create(0); \
         dispatch_async(dispatch_get_main_queue(), ^{ \
+            [[ViewController sharedController] dismissViewControllerAnimated:YES completion:nil]; \
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__] preferredStyle:UIAlertControllerStyleAlert]; \
             UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) { \
                 dispatch_semaphore_signal(semaphore); \
@@ -31,6 +32,7 @@ while (false)
 
 #define NOTICE(msg) do { \
     dispatch_async(dispatch_get_main_queue(), ^{ \
+        [[ViewController sharedController] dismissViewControllerAnimated:YES completion:nil]; \
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Notice" message:@(msg) preferredStyle:UIAlertControllerStyleAlert]; \
         UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]; \
         [alertController addAction:OK]; \
@@ -43,6 +45,7 @@ while (false)
     dispatch_semaphore_t semaphore; \
     semaphore = dispatch_semaphore_create(0); \
     dispatch_async(dispatch_get_main_queue(), ^{ \
+        [[ViewController sharedController] dismissViewControllerAnimated:YES completion:nil]; \
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Notice" message:@(msg) preferredStyle:UIAlertControllerStyleAlert]; \
         UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) { \
             dispatch_semaphore_signal(semaphore); \
