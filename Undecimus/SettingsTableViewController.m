@@ -384,6 +384,10 @@ extern int mptcp_die(void);
     [self reloadData];
 }
 
+- (IBAction)tappedOnGetTechnicalSupport:(id)sender {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://discord.gg/jb"] options:@{} completionHandler:nil];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

@@ -614,7 +614,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="768" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cVO-Jp-zmf">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cVO-Jp-zmf">
                                                     <rect key="frame" x="20" y="0.0" width="728" height="44"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="44" id="nTd-0K-Nfl"/>
@@ -641,7 +641,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="768" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j3u-pn-SGo">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j3u-pn-SGo">
                                                     <rect key="frame" x="20" y="0.0" width="728" height="44"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="44" id="Mx3-iv-mfg"/>
@@ -668,7 +668,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="768" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="m4Q-Ej-PFv">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="m4Q-Ej-PFv">
                                                     <rect key="frame" x="20" y="0.0" width="728" height="44"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="44" id="JzF-El-j8q"/>
@@ -685,6 +685,33 @@
                                                 <constraint firstItem="m4Q-Ej-PFv" firstAttribute="leading" secondItem="dcQ-Ib-8Mg" secondAttribute="leadingMargin" id="FMp-fC-Gf3"/>
                                                 <constraint firstItem="m4Q-Ej-PFv" firstAttribute="centerY" secondItem="dcQ-Ib-8Mg" secondAttribute="centerY" id="Xe5-Xu-w6Y"/>
                                                 <constraint firstItem="m4Q-Ej-PFv" firstAttribute="trailing" secondItem="dcQ-Ib-8Mg" secondAttribute="trailingMargin" id="bXF-LM-3b2"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="tfv-Vm-1FT">
+                                        <rect key="frame" x="0.0" y="727.5" width="768" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="tfv-Vm-1FT" id="eVL-nP-fxQ">
+                                            <rect key="frame" x="0.0" y="0.0" width="768" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZTH-kT-ApL">
+                                                    <rect key="frame" x="20" y="0.0" width="728" height="44"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="44" id="Hq0-NN-hyT"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <state key="normal" title="Get Technical Support"/>
+                                                    <connections>
+                                                        <action selector="tappedOnGetTechnicalSupport:" destination="ScN-Hx-Um8" eventType="touchUpInside" id="HCb-6q-Jvq"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="ZTH-kT-ApL" firstAttribute="trailing" secondItem="eVL-nP-fxQ" secondAttribute="trailingMargin" id="5Yg-64-mVb"/>
+                                                <constraint firstItem="ZTH-kT-ApL" firstAttribute="centerY" secondItem="eVL-nP-fxQ" secondAttribute="centerY" id="KtM-Nr-J0p"/>
+                                                <constraint firstItem="ZTH-kT-ApL" firstAttribute="top" secondItem="eVL-nP-fxQ" secondAttribute="top" id="awN-6Y-AeM"/>
+                                                <constraint firstItem="ZTH-kT-ApL" firstAttribute="leading" secondItem="eVL-nP-fxQ" secondAttribute="leadingMargin" id="usO-Qe-z7C"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
