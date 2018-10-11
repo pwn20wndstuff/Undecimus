@@ -333,7 +333,7 @@
 }
 
 - (IBAction)DisableAppRevokesSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.RefreshIconCacheSwitch isOn] forKey:@K_DISABLE_APP_REVOKES];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.DisableAppRevokesSwitch isOn] forKey:@K_DISABLE_APP_REVOKES];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
