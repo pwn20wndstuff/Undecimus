@@ -33,7 +33,7 @@ static inline void showAlert(NSString *title, NSString *message, Boolean wait) {
         }];
         [alertController addAction:OK];
         [alertController setPreferredAction:OK];
-        [[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentViewController:alertController animated:YES completion:nil];;
+        [[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentViewController:alertController animated:YES completion:nil];
     });
     if (wait)
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
