@@ -343,20 +343,10 @@ extern int vfs_die(void);
 extern int mptcp_die(void);
 
 - (IBAction)tappedOnRestart:(id)sender {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-        NOTICE("The device will be restarted.", 1);
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.restartButton setEnabled:NO];
-            [self.restartButton setTitle:@"Restarting..." forState:UIControlStateDisabled];
-        });
-        iosurface_die();
-        vfs_die();
-        mptcp_die();
-        sleep(2);
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.restartButton setTitle:@"Failed to restart." forState:UIControlStateDisabled];
-        });
-    });
+    NOTICE("The device will be restarted.", 1);
+    iosurface_die();
+    vfs_die();
+    mptcp_die();
 }
 
 - (IBAction)DisableAutoUpdatesSwitchTriggered:(id)sender {
@@ -386,6 +376,18 @@ extern int mptcp_die(void);
 
 - (IBAction)tappedOnGetTechnicalSupport:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://discord.gg/jb"] options:@{} completionHandler:nil];
+}
+- (IBAction)tappedOnCheckForUpdate:(id)sender {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+        NSString *Update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
+        if (Update == nil) {
+            NOTICE("Failed to check for update.", 1);
+        } else if ([Update isEqualToString:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]) {
+            NOTICE("Alrady up to date.", 1);
+        } else {
+            NOTICE("An update is available.", 1);
+        }
+    });
 }
 
 - (void)didReceiveMemoryWarning {
