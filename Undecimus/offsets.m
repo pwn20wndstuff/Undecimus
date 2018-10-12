@@ -98,17 +98,14 @@ int koffset(enum kstruct_offset offset) {
 
 
 void offsets_init() {
-  if (@available(iOS 11.4, *)) {
-    printf("this bug is patched in iOS 11.4 and above\n");
-    exit(EXIT_FAILURE);
-  } else if (@available(iOS 11.3, *)) {
-    printf("offsets selected for iOS 11.3 or above\n");
-    offsets = kstruct_offsets_11_3;
-  } else if (@available(iOS 11.0, *)) {
-    printf("offsets selected for iOS 11.0 to 11.2.6\n");
-    offsets = kstruct_offsets_11_0;
+  if (kCFCoreFoundationVersionNumber >= 1452.23) {
+        printf("offsets selected for iOS 11.3 or above\n");
+      offsets = kstruct_offsets_11_3;
+  } else if (kCFCoreFoundationVersionNumber >= 1443.00) {
+      printf("offsets selected for iOS 11.0 to 11.2.6\n");
+      offsets = kstruct_offsets_11_0;
   } else {
-    printf("iOS version too low, 11.0 required\n");
-    exit(EXIT_FAILURE);
+      printf("iOS version too low, 11.0 required\n");
+      exit(EXIT_FAILURE);
   }
 }
