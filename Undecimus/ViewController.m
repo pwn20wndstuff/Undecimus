@@ -1824,10 +1824,12 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 512 || rv == 0);
             rv = dsystem("/usr/libexec/cydia/firmware.sh");
+            LOG("rv: " "%d" "\n", rv);
             rv = WEXITSTATUS(rv);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
             rv = dsystem("/usr/bin/dpkg --configure -a");
+            LOG("rv: " "%d" "\n", rv);
             rv = WEXITSTATUS(rv);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
