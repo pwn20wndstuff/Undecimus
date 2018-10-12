@@ -475,7 +475,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus",
 				);
-				OTHER_CFLAGS = "-DPARTY_HARD";
+				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,
@@ -508,7 +508,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus",
 				);
-				OTHER_CFLAGS = "-DPARTY_HARD";
+				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,
