@@ -84,6 +84,11 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Turn on the AirPlane Mode before starting the jailbreak
 * Turn off Siri before starting the jailbreak
 
+## Source code
+* This project is completely open source and it will be kept like it in the future
+* Any kind of contribution is welcome
+* The source code can be found on [pwn20wndstuff](https://github.com/pwn20wndstuff)'s GitHub account
+
 ## Video tutorial
 * Coming soon
 
