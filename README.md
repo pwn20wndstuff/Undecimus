@@ -78,6 +78,9 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Use the built-in diagnostics tool
 * Get technical support on the r/Jailbreak Discord Server
 
+## Best practices
+* Perform a full restore with Rollectra before switching from the other jailbreaks
+
 ## Video tutorial
 * Coming soon
 
