@@ -1420,7 +1420,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             NOTICE("The device will be restarted.", 0);
             extern int SBDataReset(mach_port_t, int);
             extern mach_port_t SBSSpringBoardServerPort(void);
-            rv = SBDataReset(SBSSpringBoardServerPort(), 5);
+            rv = SBDataReset(SBSSpringBoardServerPort(), 1);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
             LOG("Successfully erased user data.");
