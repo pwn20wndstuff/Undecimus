@@ -345,9 +345,11 @@ extern int mptcp_die(void);
 - (IBAction)tappedOnRestart:(id)sender {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         NOTICE("The device will be restarted.", 1);
-        iosurface_die();
-        vfs_die();
-        mptcp_die();
+        while (1) {
+            iosurface_die();
+            vfs_die();
+            mptcp_die();
+        }
     });
 }
 
