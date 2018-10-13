@@ -210,7 +210,9 @@ int inject_library(pid_t pid, const char *path)
     mach_port_t task_port = MACH_PORT_NULL;
     kern_return_t ret = KERN_FAILURE;
     ret = task_for_pid(mach_task_self(), pid, &task_port);
-    _assert(MACH_PORT_VALID(task_port) && ret == KERN_SUCCESS);
+    if (!(MACH_PORT_VALID(task_port) && ret == KERN_SUCCESS))
+        task_port = task_for_pid_workaround(pid);
+    _assert(MACH_PORT_VALID(task_port));
     call_remote(task_port, dlopen, 2, REMOTE_CSTRING(path), REMOTE_LITERAL(RTLD_NOW));
     uint64_t error = call_remote(task_port, dlerror, 0);
     _assert(error == 0);
