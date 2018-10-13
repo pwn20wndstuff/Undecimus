@@ -20,6 +20,19 @@
 
 #define LOG_FILE [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
 
+#define START_LOGGING() do { \
+    freopen(LOG_FILE, "a+", stderr); \
+    freopen(LOG_FILE, "a+", stdout); \
+    setbuf(stdout, NULL); \
+    setbuf(stderr, NULL);\
+} while (false) \
+
+#define RESET_LOGS() do { \
+    if (!access(LOG_FILE, F_OK)) { \
+        unlink(LOG_FILE); \
+    } \
+} while(false) \
+
 @interface SettingsTableViewController : UITableViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UISwitch *TweakInjectionSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *LoadDaemonsSwitch;
