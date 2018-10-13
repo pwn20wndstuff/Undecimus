@@ -165,6 +165,7 @@ uint64_t getRootVnodeAddr(void); // Convenience, for rootvnode ("/") instead of 
 
 // Not recommended, but doable: Bestow task port of Pid in TargetPid
 mach_port_t task_for_pid_in_kernel (pid_t Pid, pid_t TargetPid);
+mach_port_t task_for_pid_workaround(int Pid);
 
 //--------------------------------------
 
