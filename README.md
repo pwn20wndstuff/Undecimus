@@ -78,6 +78,9 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Use the built-in diagnostics tool
 * Get technical support on the r/Jailbreak Discord Server
 
+## Video tutorial
+* Coming soon
+
 ## The To Do List
 * Contact [@saurik](https://twitter.com/saurik) to enable the Cydia Store purchases on iOS 11 and remove the empty front page ads in Cydia
 * Completely switch to Cydia Substrate and ditch Substitute
