@@ -9,18 +9,15 @@
 #include <dlfcn.h>
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
-
-#define LOG_FILE [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
+#include "SettingsTableViewController.h"
 
 int (*_system)(const char *) = 0;
 
 int main(int argc, char * argv[]) {
-    /*
     freopen(LOG_FILE, "a+", stderr);
     freopen(LOG_FILE, "a+", stdout);
     setbuf(stdout, NULL);
     setbuf(stderr, NULL);
-    */
     @autoreleasepool {
         _system = dlsym(RTLD_DEFAULT,"system");
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
