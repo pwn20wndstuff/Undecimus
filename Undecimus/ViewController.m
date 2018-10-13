@@ -1310,7 +1310,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             
             LOG("Rebooting...");
             PROGRESS("Exploiting... (24/47)", 0, 0);
-            NOTICE("The device will be restarted.", 0);
+            NOTICE("The device will be restarted.", 1);
             rv = reboot(0x400);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1442,7 +1442,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             
             LOG("Erasing user data...");
             PROGRESS("Exploiting... (31/47)", 0, 0);
-            NOTICE("The device will be restarted.", 0);
+            NOTICE("The device will be restarted.", 1);
             extern int SBDataReset(mach_port_t, int);
             extern mach_port_t SBSSpringBoardServerPort(void);
             rv = SBDataReset(SBSSpringBoardServerPort(), 1);
@@ -1903,6 +1903,11 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = WEXITSTATUS(rv);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
+            rv = _system("/usr/bin/dpkg --configure -a");
+            LOG("rv: " "%d" "\n", rv);
+            rv = WEXITSTATUS(rv);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 256 || rv == 0);
             rv = _system("/usr/bin/dpkg --configure -a");
             LOG("rv: " "%d" "\n", rv);
             rv = WEXITSTATUS(rv);
