@@ -18,6 +18,8 @@
 #define K_DISABLE_APP_REVOKES "DisableAppRevokes"
 #define K_OVERWRITE_BOOT_NONCE "OverwriteBootNonce"
 
+#define LOG_FILE [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
+
 @interface SettingsTableViewController : UITableViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UISwitch *TweakInjectionSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *LoadDaemonsSwitch;

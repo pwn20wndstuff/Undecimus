@@ -182,6 +182,7 @@
     md[@"Preferences"][@"DisableAutoUpdates"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_DISABLE_AUTO_UPDATES];
     md[@"Preferences"][@"DisableAppRevokes"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_DISABLE_APP_REVOKES];
     md[@"AppVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    md[@"LogFile"] = [NSString stringWithContentsOfFile:[NSString stringWithUTF8String:LOG_FILE] encoding:NSUTF8StringEncoding error:nil];
     return md;
 }
 
