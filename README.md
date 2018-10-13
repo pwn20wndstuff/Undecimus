@@ -72,7 +72,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Load Tweaks
 
 ## Switching from the other jailbreaks
-* The device will automatically be wiped
+* The RootFS will automatically be restored
 
 ## Getting support
 * Use the built-in diagnostics tool
