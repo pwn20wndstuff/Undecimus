@@ -346,8 +346,8 @@ extern int mptcp_die(void);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         NOTICE("The device will be restarted.", 1);
         while (1) {
-            iosurface_die();
             vfs_die();
+            iosurface_die();
             mptcp_die();
         }
     });
