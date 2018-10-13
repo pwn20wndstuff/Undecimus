@@ -121,3 +121,5 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@MidnightChip](https://twitter.com/MidnightChip) for testing
 * [@FCE365](https://twitter.com/FCE365) for testing
 * [@Swag_iOS](https://twitter.com/Swag_iOS) for testing
+* [@jailbreakbuster](https://twitter.com/jailbreakbuster) for testing
+* [@Jakeashacks](https://twitter.com/Jakeashacks) for testing
