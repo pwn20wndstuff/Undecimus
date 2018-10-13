@@ -80,6 +80,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 
 ## The To Do List
 * Contact [@saurik](https://twitter.com/saurik) to enable the Cydia Store purchases on iOS 11 and remove the empty front page ads in Cydia
+* Completely switch to Cydia Substrate and ditch Substitute
 * Make switching from other jailbreaks without wiping the device possible
 * Fix a kernel panic that's triggered by a kernel data abort which is caused by a UaF bug in jailbreakd
 * Chain [@_bazad](https://twitter.com/_bazad)'s [blanket](https://github.com/bazad/blanket) to bypass the developer certificate requirement for multi_path
