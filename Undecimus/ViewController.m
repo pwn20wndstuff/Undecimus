@@ -1621,6 +1621,25 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully copied over our resources to RootFS.");
+        
+        if (!access("/jb/debugserver", F_OK)) {
+            rv = unlink("/jb/debugserver");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
+        a = fopen([[[NSBundle mainBundle] pathForResource:@"debugserver" ofType:@"tar"] UTF8String], "rb");
+        LOG("a: " "%p" "\n", a);
+        _assert(a != NULL);
+        untar(a, "debugserver");
+        rv = fclose(a);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = chmod("/jb/debugserver", 0755);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        rv = chown("/jb/debugserver", 0, 0);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
     }
     
     {
@@ -1885,6 +1904,14 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         rv = unlink("/var/tmp/strap.tar.lzma");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        if (!access("/usr/bin/debugserver", F_OK)) {
+            rv = unlink("/usr/bin/debugserver");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
+        rv = symlink("/jb/debugserver", "/usr/bin/debugserver");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully extracted bootstrap.");

@@ -39,6 +39,7 @@
 		21C13116214C51100021AA9D /* lzma.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13115214C510F0021AA9D /* lzma.tar */; };
 		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		21E8CA7E2171CF7800936700 /* debugserver.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21E8CA7D2171CF7700936700 /* debugserver.tar */; };
 		21FED6A22168C2600024BC95 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* ViewController.m */; };
 		21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */; };
 		21FED6A82168DB460024BC95 /* SF-Pro-Display-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 21FED6A52168DB460024BC95 /* SF-Pro-Display-Semibold.otf */; };
@@ -106,6 +107,7 @@
 		21C13117214D268F0021AA9D /* multi_path_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = multi_path_sploit.c; sourceTree = "<group>"; };
 		21C13118214D268F0021AA9D /* multi_path_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multi_path_sploit.h; sourceTree = "<group>"; };
 		21C1312E214D5A710021AA9D /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
+		21E8CA7D2171CF7700936700 /* debugserver.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = debugserver.tar; sourceTree = "<group>"; };
 		21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Painting_With_Chocolate.ttf; sourceTree = "<group>"; };
 		21FED6A52168DB460024BC95 /* SF-Pro-Display-Semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-Pro-Display-Semibold.otf"; sourceTree = "<group>"; };
 		21FED6A62168DB460024BC95 /* SF-Pro-Display-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-Pro-Display-Medium.otf"; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 		21C0FC6921369EB700849420 /* Undecimus */ = {
 			isa = PBXGroup;
 			children = (
+				21E8CA7D2171CF7700936700 /* debugserver.tar */,
 				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
 				219A7C852169439B00A5DD60 /* spawn.tar */,
 				21C13115214C510F0021AA9D /* lzma.tar */,
@@ -277,6 +280,7 @@
 			files = (
 				21FED6A82168DB460024BC95 /* SF-Pro-Display-Semibold.otf in Resources */,
 				21C13103214C20950021AA9D /* pspawn_hook.tar in Resources */,
+				21E8CA7E2171CF7800936700 /* debugserver.tar in Resources */,
 				21C13110214C2E570021AA9D /* strap.tar.lzma in Resources */,
 				21C13102214C20950021AA9D /* libjailbreak.tar in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
