@@ -1907,12 +1907,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             rv = WEXITSTATUS(rv);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 256 || rv == 0);
-            rv = _system("/usr/bin/dpkg --configure -a");
-            LOG("rv: " "%d" "\n", rv);
-            rv = WEXITSTATUS(rv);
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
             a = fopen("/.installed_unc0ver", "w");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL);
