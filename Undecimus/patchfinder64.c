@@ -1432,6 +1432,7 @@ addr_t find_vfs_context_current(void) {
     return func1 + kerndumpbase;
 }
 
+
 addr_t find_vnode_lookup(void) {
     addr_t call1;
     addr_t func1;
@@ -1451,18 +1452,20 @@ addr_t find_vnode_lookup(void) {
 }
 
 addr_t find_vnode_put(void) {
-    addr_t call1, call2;
+    addr_t call1, call2, call3, call4, call5, call6, call7;
     addr_t func1;
     
-    addr_t error_str = find_strref("%s:%d: Couldn't get delta extentref tree, oid %llu, err %d\n", 1, 1);
-    error_str -= kerndumpbase;
+    addr_t ent_str = find_strref("KBY: getparent(%p) != parent_vp(%p)", 1, 1);
+    ent_str -= kerndumpbase;
     
-    call1 = step64(kernel, error_str, 8*4, INSN_CALL);
+    call1 = step64(kernel, ent_str, 20*4, INSN_CALL);
     call1 += 4;
+    call2 = step64(kernel, call1, 20*4, INSN_CALL);
+    call2 += 4;
+    call3 = step64(kernel, call2, 20*4, INSN_CALL);
     
     // this gets to the stub
-    call2 = step64(kernel, call1, 8*4, INSN_CALL);
-    func1 = follow_call64(kernel, call2);
+    func1 = follow_call64(kernel, call3);
     
     addr_t stub_offset = calc64(kernel, func1, func1+12, 16);
     addr_t val = *(addr_t*)(kernel+stub_offset);
@@ -1519,7 +1522,7 @@ addr_t find_SHA1Init(void) {
     addr_t call1, call2;
     addr_t func1;
     
-    addr_t id_str = find_strref("chip-id", 1, 0);
+    addr_t id_str = find_strref("chip-id", 1, 1);
     id_str -= kerndumpbase;
     
     call1 = step64(kernel, id_str, 30*4, INSN_CALL);
@@ -1532,7 +1535,7 @@ addr_t find_SHA1Update(void) {
     addr_t call1, call2;
     addr_t func1;
     
-    addr_t id_str = find_strref("chip-id", 1, 0);
+    addr_t id_str = find_strref("chip-id", 1, 1);
     id_str -= kerndumpbase;
     
     call1 = step64(kernel, id_str, 30*4, INSN_CALL);
@@ -1548,7 +1551,7 @@ addr_t find_SHA1Final(void) {
     addr_t call1, call2, call3, call4, call5;
     addr_t func1;
     
-    addr_t id_str = find_strref("chip-id", 1, 0);
+    addr_t id_str = find_strref("chip-id", 1, 1);
     id_str -= kerndumpbase;
     
     call1 = step64(kernel, id_str, 30*4, INSN_CALL);
@@ -1591,7 +1594,6 @@ addr_t find_csblob_entitlements_dictionary_set(void) {
     
     return val;
 }
-
 addr_t find_kernel_task(void) {
     addr_t call1, call2, call3, call4, call5, call6, call7;
     addr_t func1;
@@ -1606,6 +1608,7 @@ addr_t find_kernel_task(void) {
     addr_t kern_task = calc64(kernel, func1, call1, 9);
     return kern_task;
 }
+
 
 addr_t find_kernproc(void) {
     addr_t call1, call2, call3, call4, call5, call6, call7;
