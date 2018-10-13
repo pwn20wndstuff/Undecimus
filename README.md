@@ -85,7 +85,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 ## Video tutorial
 * Coming soon
 
-## The To Do List
+## To Do List
 * Contact [@saurik](https://twitter.com/saurik) to enable the Cydia Store purchases on iOS 11 and remove the empty front page ads in Cydia
 * Completely switch to Cydia Substrate and ditch Substitute
 * Make switching from other jailbreaks without wiping the device possible
