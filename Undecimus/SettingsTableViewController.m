@@ -229,6 +229,7 @@
     [ma addObject:@"15F5037c"]; // 11.4 beta
     [ma addObject:@"15F5049c"]; // 11.4 beta 2
     [ma addObject:@"15F5061d"]; // 11.4 beta 3
+    [ma addObject:@"15F5061e"]; // 11.4 beta 3
     [ma addObject:@"15A372"]; // 11.0
     [ma addObject:@"15A402"]; // 11.0.1
     [ma addObject:@"15A421"]; // 11.0.2
