@@ -1408,8 +1408,18 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             
             LOG("Cleaning up UserFS...");
             PROGRESS("Exploiting... (28/48)", 0, 0);
-            if (!access("/var/lib/", F_OK)) {
-                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/lib/" error:nil];
+            if (!access("/var/lib", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/lib" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1);
+            }
+            if (!access("/var/stash", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/stash" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1);
+            }
+            if (!access("/var/db/stash", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/db/stash" error:nil];
                 LOG("rv: " "%d" "\n", rv);
                 _assert(rv == 1);
             }
@@ -1919,6 +1929,12 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             rv = WEXITSTATUS(rv);
             LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 256 || rv == 0);
+            rv = _system("/usr/bin/dpkg --configure -a");
+            LOG("rv: " "%d" "\n", rv);
+            rv = WEXITSTATUS(rv);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
             a = fopen("/.installed_unc0ver", "w");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL);
