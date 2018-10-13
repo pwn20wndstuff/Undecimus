@@ -379,13 +379,14 @@ extern int mptcp_die(void);
 - (IBAction)tappedOnGetTechnicalSupport:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://discord.gg/jb"] options:@{} completionHandler:nil];
 }
+
 - (IBAction)tappedOnCheckForUpdate:(id)sender {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         NSString *Update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
         if (Update == nil) {
             NOTICE("Failed to check for update.", 1);
-        } else if ([Update isEqualToString:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]) {
-            NOTICE("Alrady up to date.", 1);
+        } else if ([Update isEqualToString:[NSString stringWithFormat:@"%@\n", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]]) {
+            NOTICE("Already up to date.", 1);
         } else {
             NOTICE("An update is available.", 1);
         }
