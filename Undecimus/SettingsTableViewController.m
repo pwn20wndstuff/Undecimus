@@ -398,6 +398,14 @@ extern int mptcp_die(void);
         }
     });
 }
+- (IBAction)exportKernelTaskPortSwitchTriggered:(id)sender {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+        NOTICE("This option is unsafe and only intented for advanced developers.", 1);
+        [[NSUserDefaults standardUserDefaults] setBool:[self.ExportKernelTaskPortSwitch isOn] forKey:@K_EXPORT_KERNEL_TASK_PORT];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self reloadData];
+    });
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

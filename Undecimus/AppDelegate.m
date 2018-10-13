@@ -54,6 +54,10 @@
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@K_OVERWRITE_BOOT_NONCE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPORT_KERNEL_TASK_PORT] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_EXPORT_KERNEL_TASK_PORT];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
     [self SetUpShortcuts];
     return YES;
 }
