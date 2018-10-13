@@ -81,6 +81,8 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 
 ## Best practices
 * Perform a full restore with Rollectra before switching from the other jailbreaks
+* Turn on the AirPlane Mode before starting the jailbreak
+* Turn off Siri before starting the jailbreak
 
 ## Video tutorial
 * Coming soon
