@@ -1986,7 +1986,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (43/47)", 0, 0);
         md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
         _assert(md != nil);
-        if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)]) {
+        for (int i = 0; !(i >= 5 || [md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)]); i++) {
             rv = kill(findPidOfProcess("cfprefsd"), SIGSTOP);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1997,7 +1997,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = kill(findPidOfProcess("cfprefsd"), SIGKILL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
+            md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
+            _assert(md != nil);
         }
+        _assert([md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)]);
         LOG("Successfully allowed SpringBoard to show non-default system apps.");
     }
     
