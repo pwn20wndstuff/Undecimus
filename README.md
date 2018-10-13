@@ -77,8 +77,17 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 ## Getting support
 * Use the built-in diagnostics tool
 * Get technical support on the r/Jailbreak Discord Server
+* Tweet [@pwn20wnd](https://twitter.com/Pwn20wnd)
 
-## The To Do List
+## Best practices
+* Perform a full restore with Rollectra before switching from the other jailbreaks
+* Turn on the AirPlane Mode before starting the jailbreak
+* Turn off Siri before starting the jailbreak
+
+## Video tutorial
+* Coming soon
+
+## To Do List
 * Contact [@saurik](https://twitter.com/saurik) to enable the Cydia Store purchases on iOS 11 and remove the empty front page ads in Cydia
 * Completely switch to Cydia Substrate and ditch Substitute
 * Make switching from other jailbreaks without wiping the device possible
