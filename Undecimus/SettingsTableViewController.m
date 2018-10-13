@@ -291,6 +291,7 @@
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
     [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400]];
     [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE]];
+    [self.ExportKernelTaskPortSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT]];
     [self.tableView reloadData];
 }
 
@@ -400,12 +401,9 @@ extern int mptcp_die(void);
     });
 }
 - (IBAction)exportKernelTaskPortSwitchTriggered:(id)sender {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-        NOTICE("This option is unsafe and only intented for advanced developers.", 1);
-        [[NSUserDefaults standardUserDefaults] setBool:[self.ExportKernelTaskPortSwitch isOn] forKey:@K_EXPORT_KERNEL_TASK_PORT];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        [self reloadData];
-    });
+    [[NSUserDefaults standardUserDefaults] setBool:[self.ExportKernelTaskPortSwitch isOn] forKey:@K_EXPORT_KERNEL_TASK_PORT];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reloadData];
 }
 
 - (void)didReceiveMemoryWarning {
