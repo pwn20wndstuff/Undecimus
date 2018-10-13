@@ -77,6 +77,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 ## Getting support
 * Use the built-in diagnostics tool
 * Get technical support on the r/Jailbreak Discord Server
+* Tweet [@pwn20wnd](https://twitter.com/Pwn20wnd)
 
 ## Best practices
 * Perform a full restore with Rollectra before switching from the other jailbreaks
