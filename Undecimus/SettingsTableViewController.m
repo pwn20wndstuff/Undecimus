@@ -363,6 +363,8 @@ extern int mptcp_die(void);
 - (IBAction)tappedOnShareDiagnosticsData:(id)sender {
     NSURL *URL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Documents/diagnostics.plist", NSHomeDirectory()]];
     [[SettingsTableViewController getDiagnostics] writeToURL:URL error:nil];
+    RESET_LOGS();
+    START_LOGGING();
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[URL] applicationActivities:nil];
     if ([activityViewController respondsToSelector:@selector(popoverPresentationController)]) {
         [[activityViewController popoverPresentationController] setSourceView:self.ShareDiagnosticsDataButton];
