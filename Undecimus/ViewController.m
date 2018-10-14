@@ -1306,7 +1306,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("fd: " "%d" "\n", fd);
             _assert(fd > 0, nil);
             rv = fs_snapshot_rename(fd, systemSnapshot(), "orig-fs", 0);
-            _assert(errno == 2 || rv == 0, nil);
+            _assert(errno == 2 || rv == 0, "Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
             rv = fs_snapshot_create(fd, "orig-fs", 0);
             _assert(errno == 17 || rv == 0, nil);
             rv = close(fd);
