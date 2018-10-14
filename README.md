@@ -107,7 +107,9 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 ## Changelog
 * RC1: Initial release: [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus-RC1.ipa)
 * RC2: Add the dynastic repo by default and fix the unsupported error on some devices running the iOS 11.4 Beta: [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus-RC2.ipa)
-* RC3: Add an option to restore the RootFS, don't reset the preferences when switching from other jailbreaks and fix several errors: [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus.ipa)
+* RC3: Add an option to restore the RootFS, don't reset the preferences when switching from other jailbreaks and fix several errors: [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus-RC3.ipa)
+* RC4: Add a label to display the uptime, remove the custom fonts as they are the same with the system fonts, enable logging again and include spawn in the PATH: [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus-RC4.ipa)
+* RC5: Attempt to fix the videosubscriptionsd crashes, fix the Unsupported error and fix the Update Checker: [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus.ipa)
 
 ## Special Thanks
 * [@i41nbeer](https://twitter.com/i41nbeer) for triple_fetch, async_wake, empty_list & multi_path

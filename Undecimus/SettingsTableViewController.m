@@ -204,60 +204,15 @@ double uptime(){
 
 + (NSArray *) supportedBuilds {
     NSMutableArray *ma = [[NSMutableArray alloc] init];
-    [ma addObject:@"15A5278f"]; // 11.0 beta
-    [ma addObject:@"15A5304i"]; // 11.0 beta 2
-    [ma addObject:@"15A5304j"]; // 11.0 beta 2
-    [ma addObject:@"15A5318g"]; // 11.0 beta 3
-    [ma addObject:@"15A5327g"]; // 11.0 beta 4
-    [ma addObject:@"15A5341f"]; // 11.0 beta 5
-    [ma addObject:@"15A5354b"]; // 11.0 beta 6
-    [ma addObject:@"15A5362a"]; // 11.0 beta 7
-    [ma addObject:@"15A5368a"]; // 11.0 beta 8
-    [ma addObject:@"15A5370a"]; // 11.0 beta 9
-    [ma addObject:@"15A5372a"]; // 11.0 beta 10
-    [ma addObject:@"15A372"]; // 11.0 GM
-    [ma addObject:@"15B5066f"]; // 11.1 beta
-    [ma addObject:@"15B5078e"]; // 11.1 beta 2
-    [ma addObject:@"15B5086a"]; // 11.1 beta 3
-    [ma addObject:@"15B92"]; // 11.1 beta 4
-    [ma addObject:@"15B93"]; // 11.1 beta 5
-    [ma addObject:@"15C5092b"]; // 11.2 beta
-    [ma addObject:@"15C5097d"]; // 11.2 beta 2
-    [ma addObject:@"15C5107a"]; // 11.2 beta 3
-    [ma addObject:@"15C5110b"]; // 11.2 beta 4
-    [ma addObject:@"15C5111a"]; // 11.2 beta 5
-    [ma addObject:@"15C114"]; // 11.2 beta 6
-    [ma addObject:@"15D5037e"]; // 11.2.5 beta
-    [ma addObject:@"15D5046b"]; // 11.2.5 beta 2
-    [ma addObject:@"15D5049a"]; // 11.2.5 beta 3
-    [ma addObject:@"15D5054a"]; // 11.2.5 beta 4
-    [ma addObject:@"15D5057a"]; // 11.2.5 beta 5
-    [ma addObject:@"15D5059a"]; // 11.2.5 beta 6
-    [ma addObject:@"15D60"]; // 11.2.5 beta 7
-    [ma addObject:@"15E5167f"]; // 11.3 beta
-    [ma addObject:@"15E5178f"]; // 11.3 beta 2
-    [ma addObject:@"15E5189f"]; // 11.3 beta 3
-    [ma addObject:@"15E5201e"]; // 11.3 beta 4
-    [ma addObject:@"15E5211a"]; // 11.3 beta 5
-    [ma addObject:@"15E5216a"]; // 11.3 beta 6
+    [ma addObject:@"15A"]; // 11.0
+    [ma addObject:@"15B"]; // 11.1
+    [ma addObject:@"15C"]; // 11.2
+    [ma addObject:@"15D"]; // 11.2.5
+    [ma addObject:@"15E"]; // 11.3
     [ma addObject:@"15F5037c"]; // 11.4 beta
     [ma addObject:@"15F5049c"]; // 11.4 beta 2
     [ma addObject:@"15F5061d"]; // 11.4 beta 3
     [ma addObject:@"15F5061e"]; // 11.4 beta 3
-    [ma addObject:@"15A372"]; // 11.0
-    [ma addObject:@"15A402"]; // 11.0.1
-    [ma addObject:@"15A421"]; // 11.0.2
-    [ma addObject:@"15A432"]; // 11.0.3
-    [ma addObject:@"15B93"]; // 11.1
-    [ma addObject:@"15B150"]; // 11.1.1
-    [ma addObject:@"15B202"]; // 11.1.2
-    [ma addObject:@"15C114"]; // 11.2
-    [ma addObject:@"15C153"]; // 11.2.1
-    [ma addObject:@"15C202"]; // 11.2.2
-    [ma addObject:@"15D60"]; // 11.2.5
-    [ma addObject:@"15D100"]; // 11.2.6
-    [ma addObject:@"15E216"]; // 11.3
-    [ma addObject:@"15E302"]; // 11.3.1
     return ma;
 }
 

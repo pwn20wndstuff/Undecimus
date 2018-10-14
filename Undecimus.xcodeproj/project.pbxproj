@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2116449A21737F9500250744 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* ViewController.m */; };
 		212D8841216B9FB400A36DA5 /* patchfinder64.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCA2148103B00DC0023 /* patchfinder64.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		212D8844216E4C4800A36DA5 /* find_port.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8842216E4C4700A36DA5 /* find_port.c */; };
 		212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8846216E4DF600A36DA5 /* early_kalloc.c */; };
@@ -40,7 +41,6 @@
 		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21E8CA7E2171CF7800936700 /* debugserver.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21E8CA7D2171CF7700936700 /* debugserver.tar */; };
-		21FED6A22168C2600024BC95 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* ViewController.m */; };
 		21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */; };
 		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; };
 /* End PBXBuildFile section */
@@ -304,12 +304,12 @@
 				21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */,
 				21C130FB214C1EBA0021AA9D /* untar.c in Sources */,
 				21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */,
+				2116449A21737F9500250744 /* ViewController.m in Sources */,
 				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* kmem.c in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
 				212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */,
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
-				21FED6A22168C2600024BC95 /* ViewController.m in Sources */,
 				21A97FD32148103C00DC0023 /* kutils.c in Sources */,
 				21C0FC8A21369EE900849420 /* offsets.m in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,
