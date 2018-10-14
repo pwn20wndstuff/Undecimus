@@ -511,16 +511,22 @@ char *readFile(char *filename) {
 }
 
 void blockDomainWithName(char *name) {
-    char *hostsFile = readFile("/etc/hosts");
-    _assert(hostsFile);
-    char *newLine = malloc(sizeof(char *) + (14 + sizeof(name)));
+    char *hostsFile = NULL;
+    char *newLine = NULL;
+    FILE *f = NULL;
+    hostsFile = readFile("/etc/hosts");
+    _assert(hostsFile != NULL);
+    newLine = malloc(sizeof(char *) + (14 + sizeof(name)));
     bzero(newLine, sizeof(char *) + (14 + sizeof(name)));
     sprintf(newLine, "\n127.0.0.1 %s\n", name);
-    if (strstr(hostsFile, newLine)) return;
-    FILE *f = fopen("/etc/hosts", "a");
-    _assert(f);
+    if (strstr(hostsFile, newLine)) goto out;
+    f = fopen("/etc/hosts", "a");
+    _assert(f != NULL);
     fprintf(f, "%s\n", newLine);
-    fclose(f);
+out:
+    if (hostsFile != NULL) free(hostsFile);
+    if (newLine != NULL) free(newLine);
+    if (f != NULL) fclose(f);
 }
 
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
@@ -1930,6 +1936,14 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             _assert(rv == 0);
         }
         rv = symlink("/jb/debugserver", "/usr/bin/debugserver");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0);
+        if (!access("/usr/bin/spawn", F_OK)) {
+            rv = unlink("/usr/bin/spawn");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0);
+        }
+        rv = symlink("/jb/spawn", "/usr/bin/spawn");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
         LOG("Successfully extracted bootstrap.");

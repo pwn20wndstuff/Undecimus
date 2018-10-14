@@ -7,6 +7,7 @@
 //
 
 #include <sys/utsname.h>
+#include <sys/sysctl.h>
 #import "SettingsTableViewController.h"
 #include "common.h"
 #include "ViewController.h"
@@ -16,6 +17,19 @@
 @end
 
 @implementation SettingsTableViewController
+
+double uptime(){
+    struct timeval boottime;
+    size_t len = sizeof(boottime);
+    int mib[2] = { CTL_KERN, KERN_BOOTTIME };
+    if( sysctl(mib, 2, &boottime, &len, NULL, 0) < 0 )
+    {
+        return -1.0;
+    }
+    time_t bsec = boottime.tv_sec, csec = time(NULL);
+    
+    return difftime(csec, bsec);
+}
 
 // https://github.com/Matchstic/ReProvision/blob/7b595c699335940f68702bb204c5aa55b8b1896f/Shared/Application%20Database/RPVApplication.m#L102
 
@@ -294,6 +308,7 @@
     [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE]];
     [self.ExportKernelTaskPortSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT]];
     [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]];
+    [self.UptimeLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)uptime() / 86400]];
     [self.tableView reloadData];
 }
 
@@ -411,6 +426,10 @@ extern int mptcp_die(void);
     [[NSUserDefaults standardUserDefaults] setBool:[self.RestoreRootFSSwitch isOn] forKey:@K_RESTORE_ROOTFS];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayFooterView:(UITableViewHeaderFooterView *)footerView forSection:(NSInteger)section {
+    footerView.textLabel.textAlignment = NSTextAlignmentCenter;
 }
 
 - (void)didReceiveMemoryWarning {
