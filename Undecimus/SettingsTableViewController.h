@@ -40,7 +40,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *LoadDaemonsSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *DumpAPTicketSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *RefreshIconCacheSwitch;
-@property (weak, nonatomic) IBOutlet UITextField *BootNonceTextField;
+@property (weak, nonatomic) IBOutlet UITextField *bootNonceTextField;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *KernelExploitSegmentedControl;
 @property (weak, nonatomic) IBOutlet UIButton *restartButton;
 @property (weak, nonatomic) IBOutlet UISwitch *DisableAutoUpdatesSwitch;
