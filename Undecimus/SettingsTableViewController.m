@@ -293,6 +293,7 @@
     [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400]];
     [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE]];
     [self.ExportKernelTaskPortSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT]];
+    [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]];
     [self.tableView reloadData];
 }
 
@@ -403,6 +404,11 @@ extern int mptcp_die(void);
 }
 - (IBAction)exportKernelTaskPortSwitchTriggered:(id)sender {
     [[NSUserDefaults standardUserDefaults] setBool:[self.ExportKernelTaskPortSwitch isOn] forKey:@K_EXPORT_KERNEL_TASK_PORT];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reloadData];
+}
+- (IBAction)RestoreRootFSSwitchTriggered:(id)sender {
+    [[NSUserDefaults standardUserDefaults] setBool:[self.RestoreRootFSSwitch isOn] forKey:@K_RESTORE_ROOTFS];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
