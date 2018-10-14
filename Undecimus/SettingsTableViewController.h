@@ -52,6 +52,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *OverwriteBootNonceSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *ExportKernelTaskPortSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *RestoreRootFSSwitch;
+@property (weak, nonatomic) IBOutlet UITextField *UptimeLabel;
 
 + (NSArray *) supportedBuilds;
 
