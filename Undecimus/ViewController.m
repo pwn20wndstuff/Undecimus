@@ -1437,7 +1437,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
                 LOG("rv: " "%d" "\n", rv);
                 _assert(rv == 1);
             }
-            LOG("Successfully allowed SpringBoard to show non-default system apps.");
+            LOG("Successfully disallowed SpringBoard to show non-default system apps.");
         }
     }
     
