@@ -216,6 +216,15 @@ double uptime(){
     return ma;
 }
 
++ (BOOL) isSupported {
+    for (NSString *buildPrefix in [SettingsTableViewController supportedBuilds]) {
+        if ([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] hasPrefix:buildPrefix]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     UIImageView *myImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Clouds"]];
