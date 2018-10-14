@@ -2165,7 +2165,15 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     uname(&u);
     if (strstr(u.version, DEFAULT_VERSION_STRING)) {
         PROGRESS("Jailbroken", 0, 1);
-    } else if (![[SettingsTableViewController supportedBuilds] containsObject:[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"]]) {
+    }
+    int hasPrefix = 0;
+    for (NSString *buildPrefix in [SettingsTableViewController supportedBuilds]) {
+        if ([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] hasPrefix:buildPrefix]) {
+            hasPrefix = 1;
+            break;
+        }
+    }
+    if (!hasPrefix) {
         PROGRESS("Unsupported", 0, 0);
     }
 }
