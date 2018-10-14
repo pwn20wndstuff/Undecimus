@@ -58,6 +58,10 @@
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_EXPORT_KERNEL_TASK_PORT];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_RESTORE_ROOTFS] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_RESTORE_ROOTFS];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
     [self SetUpShortcuts];
     return YES;
 }
