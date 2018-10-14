@@ -975,7 +975,7 @@ typedef struct {
     kptr_t vnode_put;
 } offsets_t;
 
-void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce, int disable_auto_updates, int disable_app_revokes, int overwrite_boot_nonce, int export_kernel_task_port)
+void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce, int disable_auto_updates, int disable_app_revokes, int overwrite_boot_nonce, int export_kernel_task_port, int restore_rootfs)
 {
     // Initialize variables.
     int rv = 0;
@@ -1362,7 +1362,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
     
     {
-        if (!access("/.bootstrapped_electra", F_OK)) {
+        if ((!access("/.bootstrapped_electra", F_OK) && !access("/electra", F_OK)) || restore_rootfs) {
             // Borrow entitlements from fsck_apfs.
             
             LOG("Borrowing entitlements from fsck_apfs...");
@@ -1379,26 +1379,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             fd = open("/", O_RDONLY, 0);
             LOG("fd: " "%d" "\n", fd);
             _assert(fd > 0);
-            if (kCFCoreFoundationVersionNumber <= 1451.51) {
-                rv = fs_snapshot_rename(fd, "electra-prejailbreak", systemSnapshot(), 0);
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
-                /*
-                rv = mkdir("/var/tmp/rootfsmnt", 0755);
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
-                rv = spawnAndShaiHulud("/sbin/mount_apfs", "-s", "electra-prejailbreak", "/", "/var/tmp/rootfsmnt", NULL);
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
-                rv = easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"--verbose", @"--recursive", @"--checksum", @"--hard-links", @"--perms", @"--executability", @"--owner", @"--group", @"--devices", @"--specials", @"--times", @"--delete", @"--delete-after", @"--force", @"/var/tmp/rootfsmnt", @"/"]);
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
-                */
-            } else {
-                rv = fs_snapshot_rename(fd, "orig-fs", systemSnapshot(), 0);
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0);
-            }
+            rv = fs_snapshot_rename(fd, "electra-prejailbreak", systemSnapshot(), 0);
+            _assert(errno == 2 || rv == 0);
+            rv = fs_snapshot_rename(fd, "orig-fs", systemSnapshot(), 0);
+            _assert(errno == 17 || rv == 0);
             rv = close(fd);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
@@ -1439,28 +1423,15 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             }
             LOG("Successfully disallowed SpringBoard to show non-default system apps.");
             
-            // Get entitlements.
-            LOG("Getting entitlements...");
-            PROGRESS("Exploiting... (30/48)", 0, 0);
-            rv = entitleMe("\t<key>platform-application</key>\n"
-                           "\t<true/>\n"
-                           "\t<key>com.apple.springboard.wipedevice</key>\n"
-                           "\t<true/>");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
-            LOG("Successfully got entitlements.");
+            // Reboot.
             
-            // Erase user data.
-            
-            LOG("Erasing user data...");
-            PROGRESS("Exploiting... (31/48)", 0, 0);
+            LOG("Rebooting...");
+            PROGRESS("Exploiting... (30/48)", 0 ,0);
             NOTICE("The device will be restarted.", 1);
-            extern int SBDataReset(mach_port_t, int);
-            extern mach_port_t SBSSpringBoardServerPort(void);
-            rv = SBDataReset(SBSSpringBoardServerPort(), 1);
+            rv = reboot(0x400);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0);
-            LOG("Successfully erased user data.");
+            LOG("Successfully rebooted.");
         }
     }
     
@@ -1479,9 +1450,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         
         if (!access("/electra", F_OK)) {
-            rv = unlink("/electra");
+            rv = [[NSFileManager defaultManager] removeItemAtPath:@"/electra" error:nil];
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0);
+            _assert(rv == 1);
         }
         rv = symlink("/jb", "/electra");
         LOG("rv: " "%d" "\n", rv);
@@ -2147,11 +2118,14 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         // Validate TFP0.
         LOG("Validating TFP0...");
-        _assert(MACH_PORT_VALID(tfp0));
+        if (!(MACH_PORT_VALID(tfp0))) {
+            PROGRESS("Failed, reboot", 0, 0);
+            return;
+        }
         LOG("Successfully validated TFP0.");
         // NOTICE("Jailbreak succeeded, but still needs a few minutes to respring.", 0);
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0),[[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE], [[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT]);
-        PROGRESS("Done, exit.", 0, 1);
+        exploit(tfp0, (uint64_t)get_kernel_base(tfp0),[[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE], [[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT], [[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]);
+        PROGRESS("Jailbroken", 0, 1);
     });
 }
 
