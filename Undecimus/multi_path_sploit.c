@@ -146,6 +146,8 @@ int alloc_and_fill_pipe() {
   if (amount_written != PIPE_SIZE) {
     printf("amount written was short: 0x%ld\n", amount_written);
   }
+  
+  write_fds[next_read_fd] = write_end;
   read_fds[next_read_fd++] = read_end;
   //printf("filled pipe %d\n", read_end);
   return read_end; // the buffer is actually hanging off the read end struct pipe
