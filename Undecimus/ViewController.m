@@ -2105,8 +2105,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (strstr(u.version, DEFAULT_VERSION_STRING)) {
             PROGRESS("Jailbroken", 0, 1);
             return;
-        } else if (![[SettingsTableViewController supportedBuilds] containsObject:[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"]]) {
-            PROGRESS("Unsupported", 0, 0);
+        }
+        if (![SettingsTableViewController isSupported]) {
+            PROGRESS("Unsupported", 0, 1);
         }
         // Initialize kernel exploit.
         LOG("Initializing kernel exploit...");
@@ -2166,15 +2167,8 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     if (strstr(u.version, DEFAULT_VERSION_STRING)) {
         PROGRESS("Jailbroken", 0, 1);
     }
-    int hasPrefix = 0;
-    for (NSString *buildPrefix in [SettingsTableViewController supportedBuilds]) {
-        if ([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] hasPrefix:buildPrefix]) {
-            hasPrefix = 1;
-            break;
-        }
-    }
-    if (!hasPrefix) {
-        PROGRESS("Unsupported", 0, 0);
+    if (![SettingsTableViewController isSupported]) {
+        PROGRESS("Unsupported", 0, 1);
     }
 }
 

@@ -55,6 +55,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *UptimeLabel;
 
 + (NSArray *) supportedBuilds;
++ (BOOL) isSupported;
 
 @end
 
