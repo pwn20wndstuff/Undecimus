@@ -1271,7 +1271,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("fd: " "%d" "\n", fd);
         _assert(fd > 0);
         i = snapshot_list(fd);
-        LOG("i: " "%d" "\n", rv);
+        LOG("i: " "%d" "\n", i);
         rv = close(fd);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0);
