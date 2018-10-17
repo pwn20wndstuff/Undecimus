@@ -760,6 +760,37 @@ int snapshot_list(int dirfd)
     return total;
 }
 
+int snapshot_check(int dirfd, const char *name)
+{
+    struct attrlist attr_list = { 0 };
+    
+    attr_list.commonattr = ATTR_BULK_REQUIRED;
+    
+    char *buf = (char*)calloc(2048, sizeof(char));
+    int retcount;
+    while ((retcount = fs_snapshot_list(dirfd, &attr_list, buf, 2048, 0))>0) {
+        char *bufref = buf;
+        
+        for (int i=0; i<retcount; i++) {
+            val_attrs_t *entry = (val_attrs_t *)bufref;
+            if (entry->returned.commonattr & ATTR_CMN_NAME) {
+                printf("%s\n", (char*)(&entry->name_info) + entry->name_info.attr_dataoffset);
+                if (strstr((char*)(&entry->name_info) + entry->name_info.attr_dataoffset, name))
+                    return 1;
+            }
+            bufref += entry->length;
+        }
+    }
+    free(buf);
+    
+    if (retcount < 0) {
+        perror("fs_snapshot_list");
+        return -1;
+    }
+    
+    return 0;
+}
+
 int message_size_for_kalloc_size(int kalloc_size) {
     return ((3*kalloc_size)/4) - 0x74;
 }
@@ -963,6 +994,14 @@ int easyPosixSpawn(NSURL *launchPath,NSArray *arguments) {
     free(args);
     
     return status;
+}
+
+int is_symlink(const char *filename) {
+    int rv = 0;
+    struct stat buf;
+    rv = lstat(filename, &buf);
+    rv = S_ISLNK(buf.st_mode);
+    return rv;
 }
 
 typedef struct {
@@ -1305,10 +1344,15 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             fd = open("/var/tmp/rootfsmnt", O_RDONLY, 0);
             LOG("fd: " "%d" "\n", fd);
             _assert(fd > 0, nil);
-            rv = fs_snapshot_rename(fd, systemSnapshot(), "orig-fs", 0);
-            _assert(errno == 2 || rv == 0, "Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
-            rv = fs_snapshot_create(fd, "orig-fs", 0);
-            _assert(errno == 17 || rv == 0, nil);
+            if (snapshot_check(fd, systemSnapshot()) == 1 && !(snapshot_check(fd, "orig-fs") == 1)) {
+                rv = fs_snapshot_rename(fd, systemSnapshot(), "orig-fs", 0);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0, "Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
+            } else if (!(snapshot_check(fd, "orig-fs") == 1)) {
+                rv = fs_snapshot_create(fd, "orig-fs", 0);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0, nil);
+            }
             rv = close(fd);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, nil);
@@ -1368,84 +1412,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
     
     {
-        if ((!access("/.bootstrapped_electra", F_OK) && !access("/electra", F_OK)) || restore_rootfs) {
-            // Borrow entitlements from fsck_apfs.
-            
-            LOG("Borrowing entitlements from fsck_apfs...");
-            PROGRESS("Exploiting... (26/48)", 0, 0);
-            borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
-            LOG("Successfully borrowed entitlements from fsck_apfs.");
-            
-            // We now have fs_snapshot_rename.
-            
-            // Rename system snapshot.
-            
-            LOG("Renaming system snapshot back...");
-            PROGRESS("Exploiting... (27/48)", 0, 0);
-            fd = open("/", O_RDONLY, 0);
-            LOG("fd: " "%d" "\n", fd);
-            _assert(fd > 0, nil);
-            rv = fs_snapshot_rename(fd, "electra-prejailbreak", systemSnapshot(), 0);
-            _assert(errno == 2 || rv == 0, nil);
-            rv = fs_snapshot_rename(fd, "orig-fs", systemSnapshot(), 0);
-            _assert(errno == 17 || rv == 0, nil);
-            rv = close(fd);
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, nil);
-            LOG("Successfully renamed system snapshot back.");
-            
-            // Clean up UserFS.
-            
-            LOG("Cleaning up UserFS...");
-            PROGRESS("Exploiting... (28/48)", 0, 0);
-            if (!access("/var/lib", F_OK)) {
-                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/lib" error:nil];
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1, nil);
-            }
-            if (!access("/var/stash", F_OK)) {
-                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/stash" error:nil];
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1, nil);
-            }
-            if (!access("/var/db/stash", F_OK)) {
-                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/db/stash" error:nil];
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1, nil);
-            }
-            LOG("Successfully cleaned up UserFS.");
-            
-            // Disallow SpringBoard to show non-default system apps.
-            
-            LOG("Disallowing SpringBoard to show non-default system apps...");
-            PROGRESS("Exploiting... (29/48)", 0, 0);
-            md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
-            _assert(md != nil, nil);
-            if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@(NO)]) {
-                md[@"SBShowNonDefaultSystemApps"] = @(NO);
-                rv = [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1, nil);
-            }
-            LOG("Successfully disallowed SpringBoard to show non-default system apps.");
-            
-            // Reboot.
-            
-            LOG("Rebooting...");
-            PROGRESS("Exploiting... (30/48)", 0 ,0);
-            NOTICE("The device will be restarted.", 1);
-            rv = reboot(0x400);
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, nil);
-            LOG("Successfully rebooted.");
-        }
-    }
-    
-    {
         // Copy over our resources to RootFS.
         
         LOG("Copying over our resources to RootFS...");
-        PROGRESS("Exploiting... (32/48)", 0, 0);
+        PROGRESS("Exploiting... (27/48)", 0, 0);
         if (access("/jb", F_OK)) {
             rv = mkdir("/jb", 0755);
             LOG("rv: " "%d" "\n", rv);
@@ -1654,12 +1624,31 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = chown("/jb/debugserver", 0, 0);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, nil);
+        
+        if (!access("/jb/rsync", F_OK)) {
+            rv = unlink("/jb/rsync");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, nil);
+        }
+        a = fopen([[[NSBundle mainBundle] pathForResource:@"rsync" ofType:@"tar"] UTF8String], "rb");
+        LOG("a: " "%p" "\n", a);
+        _assert(a != NULL, nil);
+        untar(a, "rsync");
+        rv = fclose(a);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0, nil);
+        rv = chmod("/jb/rsync", 0755);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0, nil);
+        rv = chown("/jb/rsync", 0, 0);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0, nil);
     }
     
     {
         // Inject trust cache
         
-        PROGRESS("Exploiting... (33/48)", 0, 0);
+        PROGRESS("Exploiting... (28/48)", 0, 0);
         printf("trust_chain = 0x%llx\n", offsets.trust_chain);
         
         mem.next = rk64(offsets.trust_chain);
@@ -1681,6 +1670,102 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         free(allhash);
         free(allkern);
         free(amfitab);
+    }
+    
+    {
+        if (!(is_symlink("/electra") == 1) || restore_rootfs) {
+            // Borrow entitlements from fsck_apfs.
+            
+            LOG("Borrowing entitlements from fsck_apfs...");
+            PROGRESS("Exploiting... (29/48)", 0, 0);
+            borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
+            LOG("Successfully borrowed entitlements from fsck_apfs.");
+            
+            // We now have fs_snapshot_rename.
+            
+            // Rename system snapshot.
+            
+            LOG("Renaming system snapshot back...");
+            PROGRESS("Exploiting... (30/48)", 0, 0);
+            fd = open("/", O_RDONLY, 0);
+            LOG("fd: " "%d" "\n", fd);
+            _assert(fd > 0, nil);
+            if (kCFCoreFoundationVersionNumber >= 1450.14) {
+                if (snapshot_check(fd, "electra-prejailbreak") == 1) {
+                    if (snapshot_check(fd, systemSnapshot()) == 1) {
+                        rv = fs_snapshot_delete(fd, systemSnapshot(), 0);
+                        LOG("rv: " "%d" "\n", rv);
+                        _assert(rv == 0, nil);
+                    }
+                    if (snapshot_check(fd, "orig-fs") == 1) {
+                        rv = fs_snapshot_delete(fd, "orig-fs", 0);
+                        LOG("rv: " "%d" "\n", rv);
+                        _assert(rv == 0, nil);
+                    }
+                    rv = fs_snapshot_rename(fd, "electra-prejailbreak", systemSnapshot(), 0);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, nil);
+                } else if (snapshot_check(fd, "orig-fs") == 1) {
+                    if (snapshot_check(fd, systemSnapshot()) == 1) {
+                        rv = fs_snapshot_delete(fd, systemSnapshot(), 0);
+                        LOG("rv: " "%d" "\n", rv);
+                        _assert(rv == 0, nil);
+                    }
+                    rv = fs_snapshot_rename(fd, "orig-fs", systemSnapshot(), 0);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, nil);
+                }
+            }
+            rv = close(fd);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, nil);
+            LOG("Successfully renamed system snapshot back.");
+            
+            // Clean up UserFS.
+            
+            LOG("Cleaning up UserFS...");
+            PROGRESS("Exploiting... (31/48)", 0, 0);
+            if (!access("/var/lib", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/lib" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, nil);
+            }
+            if (!access("/var/stash", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/stash" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, nil);
+            }
+            if (!access("/var/db/stash", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/db/stash" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, nil);
+            }
+            LOG("Successfully cleaned up UserFS.");
+            
+            // Disallow SpringBoard to show non-default system apps.
+            
+            LOG("Disallowing SpringBoard to show non-default system apps...");
+            PROGRESS("Exploiting... (32/48)", 0, 0);
+            md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
+            _assert(md != nil, nil);
+            if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@(NO)]) {
+                md[@"SBShowNonDefaultSystemApps"] = @(NO);
+                rv = [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, nil);
+            }
+            LOG("Successfully disallowed SpringBoard to show non-default system apps.");
+            
+            // Reboot.
+            
+            LOG("Rebooting...");
+            PROGRESS("Exploiting... (33/48)", 0 ,0);
+            NOTICE("The device will be restarted.", 1);
+            rv = reboot(0x400);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, nil);
+            LOG("Successfully rebooted.");
+        }
     }
     
     {
@@ -1946,6 +2031,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         rv = symlink("/jb/spawn", "/usr/bin/spawn");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, nil);
+        rv = unlink("/jb/rsync");
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0, nil);
         LOG("Successfully extracted bootstrap.");
     }
     
@@ -2133,10 +2221,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         }
         // Validate TFP0.
         LOG("Validating TFP0...");
-        if (!(MACH_PORT_VALID(tfp0))) {
-            PROGRESS("Failed, reboot", 0, 0);
-            return;
-        }
+        _assert(MACH_PORT_VALID(tfp0), "Exploit failed. Reboot and try again.");
         LOG("Successfully validated TFP0.");
         // NOTICE("Jailbreak succeeded, but still needs a few minutes to respring.", 0);
         exploit(tfp0, (uint64_t)get_kernel_base(tfp0),[[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE], [[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT], [[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]);

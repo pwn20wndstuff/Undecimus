@@ -12,6 +12,7 @@
 		212D8844216E4C4800A36DA5 /* find_port.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8842216E4C4700A36DA5 /* find_port.c */; };
 		212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8846216E4DF600A36DA5 /* early_kalloc.c */; };
 		212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8849216E4EBE00A36DA5 /* async_wake.c */; };
+		2139534C21763A0C00B17F8D /* rsync.tar in Resources */ = {isa = PBXBuildFile; fileRef = 2139534B21763A0B00B17F8D /* rsync.tar */; };
 		21675B63214A68B700D20E2B /* qilin.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC8C2136A0D100849420 /* qilin.o */; };
 		21675B6D214A692400D20E2B /* libjb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 21A97FCF2148103C00DC0023 /* libjb.a */; };
 		219A7C862169439C00A5DD60 /* spawn.tar in Resources */ = {isa = PBXBuildFile; fileRef = 219A7C852169439B00A5DD60 /* spawn.tar */; };
@@ -52,6 +53,7 @@
 		212D8846216E4DF600A36DA5 /* early_kalloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = early_kalloc.c; sourceTree = "<group>"; };
 		212D8848216E4EBE00A36DA5 /* async_wake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = async_wake.h; sourceTree = "<group>"; };
 		212D8849216E4EBE00A36DA5 /* async_wake.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = async_wake.c; sourceTree = "<group>"; };
+		2139534B21763A0B00B17F8D /* rsync.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = rsync.tar; sourceTree = "<group>"; };
 		219A7C852169439B00A5DD60 /* spawn.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = spawn.tar; sourceTree = "<group>"; };
 		21A97FC42148103A00DC0023 /* kexecute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kexecute.h; sourceTree = "<group>"; };
 		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 		21C0FC6921369EB700849420 /* Undecimus */ = {
 			isa = PBXGroup;
 			children = (
+				2139534B21763A0B00B17F8D /* rsync.tar */,
 				21E8CA7D2171CF7700936700 /* debugserver.tar */,
 				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
 				219A7C852169439B00A5DD60 /* spawn.tar */,
@@ -284,6 +287,7 @@
 				21C13106214C20950021AA9D /* jailbreakd.tar in Resources */,
 				21C13116214C51100021AA9D /* lzma.tar in Resources */,
 				21C0FC7221369EB700849420 /* Main.storyboard in Resources */,
+				2139534C21763A0C00B17F8D /* rsync.tar in Resources */,
 				21C13109214C26AB0021AA9D /* launchctl.tar in Resources */,
 				21C13105214C20950021AA9D /* tar.tar in Resources */,
 			);
