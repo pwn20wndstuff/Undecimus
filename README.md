@@ -90,7 +90,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * The source code can be found on [pwn20wndstuff](https://github.com/pwn20wndstuff)'s GitHub account
 
 ## Video tutorial
-* Coming soon
+<a href="https://youtu.be/TqHYjLHO0zs">https://youtu.be/TqHYjLHO0zs</a>
 
 ## To Do List
 * Contact [@saurik](https://twitter.com/saurik) to enable the Cydia Store purchases on iOS 11 and remove the empty front page ads in Cydia
