@@ -2004,9 +2004,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             rv = chown("/.installed_unc0ver", 0, 0);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, nil);
-            rv = symlink("/.installed_unc0ver", "/.bootstrapped_electra");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, nil);
             run_uicache = 1;
         }
         rv = unlink("/jb/tar");
