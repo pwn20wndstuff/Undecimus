@@ -1697,7 +1697,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
                         LOG("rv: " "%d" "\n", rv);
                         _assert(rv == 0, nil);
                     }
-                    if (snapshot_check(fd, "orig-fs")) {
+                    if (snapshot_check(fd, "orig-fs") == 1) {
                         rv = fs_snapshot_delete(fd, "orig-fs", 0);
                         LOG("rv: " "%d" "\n", rv);
                         _assert(rv == 0, nil);
