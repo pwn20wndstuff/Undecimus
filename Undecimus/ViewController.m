@@ -1344,7 +1344,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             fd = open("/var/tmp/rootfsmnt", O_RDONLY, 0);
             LOG("fd: " "%d" "\n", fd);
             _assert(fd > 0, nil);
-            if (!(snapshot_check(fd, "orig-fs") == 1)) {
+            if (!(snapshot_check(fd, systemSnapshot()) == 1)) {
                 rv = fs_snapshot_rename(fd, systemSnapshot(), "orig-fs", 0);
                 LOG("rv: " "%d" "\n", rv);
                 _assert(rv == 0, "Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
