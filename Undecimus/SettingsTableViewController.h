@@ -56,6 +56,7 @@
 
 + (NSArray *) supportedBuilds;
 + (BOOL) isSupported;
++ (BOOL) isWorkInProgress;
 
 @end
 
