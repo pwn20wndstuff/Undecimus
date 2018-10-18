@@ -216,8 +216,28 @@ double uptime(){
     return ma;
 }
 
++ (NSArray *) workInProgressBuilds {
+    NSMutableArray *ma = [[NSMutableArray alloc] init];
+    [ma addObject:@"15A"]; // 11.0
+    [ma addObject:@"15B"]; // 11.1
+    [ma addObject:@"15F5037c"]; // 11.4 beta
+    [ma addObject:@"15F5049c"]; // 11.4 beta 2
+    [ma addObject:@"15F5061d"]; // 11.4 beta 3
+    [ma addObject:@"15F5061e"]; // 11.4 beta 3
+    return ma;
+}
+
 + (BOOL) isSupported {
     for (NSString *buildPrefix in [SettingsTableViewController supportedBuilds]) {
+        if ([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] hasPrefix:buildPrefix]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
++ (BOOL) isWorkInProgress {
+    for (NSString *buildPrefix in [SettingsTableViewController workInProgressBuilds]) {
         if ([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] hasPrefix:buildPrefix]) {
             return YES;
         }
