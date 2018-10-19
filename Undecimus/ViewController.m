@@ -1018,11 +1018,12 @@ typedef struct {
     kptr_t vfs_context_current;
     kptr_t vnode_lookup;
     kptr_t vnode_put;
+    kptr_t kernproc;
 } offsets_t;
 
 // TODO: Add more detailed descriptions for the _assert calls.
 
-void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce, int disable_auto_updates, int disable_app_revokes, int overwrite_boot_nonce, int export_kernel_task_port, int restore_rootfs)
+void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce, int disable_auto_updates, int disable_app_revokes, int overwrite_boot_nonce, int export_kernel_task_port, int restore_rootfs, int increase_memory_limit)
 {
     // Initialize variables.
     int rv = 0;
@@ -1041,12 +1042,14 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     size_t length = 0;
     uint64_t kernel_trust = 0;
     struct utsname u = { 0 };
+    char buf_targettype[256];
+    size_t size = 0;
     
     {
         // Initialize patchfinder64.
         
         LOG("Initializing patchfinder64...");
-        PROGRESS("Exploiting... (2/49)", 0, 0);
+        PROGRESS("Exploiting... (2/50)", 0, 0);
         rv = init_kernel(kernel_base, NULL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to initialize patchfinder64.");
@@ -1057,46 +1060,46 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Find offsets.
         
         LOG("Finding offsets...");
-        PROGRESS("Exploiting... (3/49)", 0, 0);
+        PROGRESS("Exploiting... (3/50)", 0, 0);
         offsets.trust_chain = find_trustcache();
         LOG("trust_chain: " ADDR "\n", offsets.trust_chain);
-        _assert(offsets.trust_chain, "Failed to find offsets.");
+        _assert(offsets.trust_chain, "Failed to find trust_chain offset.");
         offsets.amficache = find_amficache();
         LOG("amficache: " ADDR "\n", offsets.amficache);
-        _assert(offsets.amficache, "Failed to find offsets.");
+        _assert(offsets.amficache, "Failed to find amficache offset.");
         offsets.OSBoolean_True = find_OSBoolean_True();
         LOG("OSBoolean_True: " ADDR "\n", offsets.OSBoolean_True);
-        _assert(offsets.OSBoolean_True, "Failed to find offsets.");
+        _assert(offsets.OSBoolean_True, "Failed to find OSBoolean_True offset.");
         offsets.OSBoolean_False = find_OSBoolean_False();
         LOG("OSBoolean_False: " ADDR "\n", offsets.OSBoolean_False);
-        _assert(offsets.OSBoolean_False, "Failed to find offsets.");
+        _assert(offsets.OSBoolean_False, "Failed to find OSBoolean_False offset.");
         offsets.osunserializexml = find_osunserializexml();
         LOG("osunserializexml: " ADDR "\n", offsets.osunserializexml);
-        _assert(offsets.osunserializexml, "Failed to find offsets.");
+        _assert(offsets.osunserializexml, "Failed to find osunserializexml offset.");
         offsets.smalloc = find_smalloc();
         LOG("smalloc: " ADDR "\n", offsets.smalloc);
-        _assert(offsets.smalloc, "Failed to find offsets.");
+        _assert(offsets.smalloc, "Failed to find smalloc offset.");
         offsets.allproc = find_allproc();
         LOG("allproc: " ADDR "\n", offsets.allproc);
-        _assert(offsets.allproc, "Failed to find offsets.");
+        _assert(offsets.allproc, "Failed to find allproc offset.");
         offsets.add_x0_x0_0x40_ret = find_add_x0_x0_0x40_ret();
         LOG("add_x0_x0_0x40_ret: " ADDR "\n", offsets.add_x0_x0_0x40_ret);
-        _assert(offsets.add_x0_x0_0x40_ret, "Failed to find offsets.");
+        _assert(offsets.add_x0_x0_0x40_ret, "Failed to find add_x0_x0_0x40_ret offset.");
         offsets.rootvnode = find_rootvnode();
         LOG("rootvnode: " ADDR "\n", offsets.rootvnode);
-        _assert(offsets.rootvnode, "Failed to find offsets.");
+        _assert(offsets.rootvnode, "Failed to find rootvnode offset.");
         offsets.zone_map_ref = find_zone_map_ref();
         LOG("zone_map_ref: " ADDR "\n", offsets.zone_map_ref);
-        _assert(offsets.zone_map_ref, "Failed to find offsets.");
+        _assert(offsets.zone_map_ref, "Failed to find zone_map_ref offset.");
         offsets.vfs_context_current = find_vfs_context_current();
         LOG("vfs_context_current: " ADDR "\n", offsets.vfs_context_current);
-        _assert(offsets.vfs_context_current, "Failed to find offsets.");
+        _assert(offsets.vfs_context_current, "Failed to find vfs_context_current offset.");
         offsets.vnode_lookup = find_vnode_lookup();
         LOG("vnode_lookup: " ADDR "\n", offsets.vnode_lookup);
-        _assert(offsets.vnode_lookup, "Failed to find offsets.");
+        _assert(offsets.vnode_lookup, "Failed to find vnode_lookup offset.");
         offsets.vnode_put = find_vnode_put();
         LOG("vnode_put: " ADDR "\n", offsets.vnode_put);
-        _assert(offsets.vnode_put, "Failed to find offsets.");
+        _assert(offsets.vnode_put, "Failed to find vnode_put offset.");
         LOG("Successfully found offsets.");
     }
     
@@ -1104,7 +1107,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Deinitialize patchfinder64.
         
         LOG("Deinitializing patchfinder64...");
-        PROGRESS("Exploiting... (4/49)", 0, 0);
+        PROGRESS("Exploiting... (4/50)", 0, 0);
         term_kernel();
         LOG("Successfully deinitialized patchfinder64.");
     }
@@ -1113,7 +1116,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Initialize QiLin.
         
         LOG("Initializing QiLin...");
-        PROGRESS("Exploiting... (5/49)", 0, 0);
+        PROGRESS("Exploiting... (5/50)", 0, 0);
         rv = initQiLin(tfp0, kernel_base);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to initialize QiLin.");
@@ -1121,32 +1124,32 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
     
     {
-        // Rootify myself.
+        // Rootify.
         
-        LOG("Rootifying myself...");
-        PROGRESS("Exploiting... (6/49)", 0, 0);
+        LOG("Rootifying...");
+        PROGRESS("Exploiting... (6/50)", 0, 0);
         rv = rootifyMe();
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0, "Failed to rootify myself.");
-        LOG("Successfully rootified myself.");
+        _assert(rv == 0, "Failed to rootify.");
+        LOG("Successfully rootified.");
     }
     
     {
-        // Platformize myself.
+        // Platformize.
         
-        LOG("Platformizing myself...");
-        PROGRESS("Exploiting... (7/49)", 0, 0);
+        LOG("Platformizing...");
+        PROGRESS("Exploiting... (7/50)", 0, 0);
         rv = platformizeMe();
         LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0, "Failed to platformize myself.");
-        LOG("Successfully platformized myself.");
+        _assert(rv == 0, "Failed to platformize.");
+        LOG("Successfully platformized.");
     }
     
     {
         // Escape Sandbox.
         
         LOG("Escaping Sandbox...");
-        PROGRESS("Exploiting... (8/49)", 0, 0);
+        PROGRESS("Exploiting... (8/50)", 0, 0);
         ShaiHuludMe(0);
         LOG("Successfully escaped Sandbox.");
     }
@@ -1155,7 +1158,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Write a test file to UserFS.
         
         LOG("Writing a test file to UserFS...");
-        PROGRESS("Exploiting... (9/49)", 0, 0);
+        PROGRESS("Exploiting... (9/50)", 0, 0);
         if (!access("/var/mobile/test.txt", F_OK)) {
             rv = unlink("/var/mobile/test.txt");
             LOG("rv: " "%d" "\n", rv);
@@ -1183,7 +1186,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Borrow entitlements from sysdiagnose.
         
         LOG("Borrowing entitlements from sysdiagnose...");
-        PROGRESS("Exploiting... (10/49)", 0, 0);
+        PROGRESS("Exploiting... (10/50)", 0, 0);
         borrowEntitlementsFromDonor("/usr/bin/sysdiagnose", "--help");
         LOG("Successfully borrowed entitlements from sysdiagnose.");
         
@@ -1195,7 +1198,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Dump APTicket.
             
             LOG("Dumping APTicket...");
-            PROGRESS("Exploiting... (11/49)", 0, 0);
+            PROGRESS("Exploiting... (11/50)", 0, 0);
             rv = [[NSData dataWithContentsOfFile:@"/System/Library/Caches/apticket.der"] writeToFile:[NSString stringWithFormat:@"%@/Documents/apticket.der", NSHomeDirectory()] atomically:YES];
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 1, "Failed to dump APTicket.");
@@ -1207,7 +1210,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Unlock nvram.
         
         LOG("Unlocking nvram...");
-        PROGRESS("Exploiting... (12/49)", 0, 0);
+        PROGRESS("Exploiting... (12/50)", 0, 0);
         rv = unlocknvram();
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to unlock nvram.");
@@ -1218,7 +1221,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Set boot-nonce.
         
         LOG("Setting boot-nonce...");
-        PROGRESS("Exploiting... (13/49)", 0, 0);
+        PROGRESS("Exploiting... (13/50)", 0, 0);
         rv = execCommandAndWait("/usr/sbin/nvram", "com.apple.System.boot-nonce", NULL, NULL, NULL, NULL);
         LOG("rv: " "%d" "\n", rv);
         if (overwrite_boot_nonce || rv == 512) {
@@ -1236,7 +1239,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Lock nvram.
         
         LOG("Locking nvram...");
-        PROGRESS("Exploiting... (14/49)", 0, 0);
+        PROGRESS("Exploiting... (14/50)", 0, 0);
         rv = locknvram();
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to lock nvram.");
@@ -1247,7 +1250,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Initialize kexecute.
         
         LOG("Initializing kexecute...");
-        PROGRESS("Exploiting... (15/49)", 0, 0);
+        PROGRESS("Exploiting... (15/50)", 0, 0);
         init_kexecute(offsets.add_x0_x0_0x40_ret);
         LOG("Successfully initialized kexecute.");
     }
@@ -1256,7 +1259,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Get vfs_context.
         
         LOG("Getting vfs_context...");
-        PROGRESS("Exploiting... (16/49)", 0, 0);
+        PROGRESS("Exploiting... (16/50)", 0, 0);
         vfs_context = _vfs_context(offsets.vfs_context_current, offsets.zone_map_ref);
         LOG("vfs_context: " ADDR "\n", vfs_context);
         _assert(vfs_context, "Failed to get vfs_context.");
@@ -1267,7 +1270,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Get dev vnode.
         
         LOG("Getting dev vnode...");
-        PROGRESS("Exploiting... (17/49)", 0, 0);
+        PROGRESS("Exploiting... (17/50)", 0, 0);
         devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", offsets.vnode_lookup);
         LOG("devVnode: " ADDR "\n", devVnode);
         _assert(devVnode, "Failed to get dev vnode.");
@@ -1278,7 +1281,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Clear dev vnode's si_flags.
         
         LOG("Clearing dev vnode's si_flags...");
-        PROGRESS("Exploiting... (18/49)", 0, 0);
+        PROGRESS("Exploiting... (18/50)", 0, 0);
         wk32(rk64(devVnode + 0x78) + 0x10, 0);
         LOG("Successfully cleared dev vnode's si_flags.");
     }
@@ -1287,7 +1290,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Clean up dev vnode.
         
         LOG("Cleaning up dev vnode...");
-        PROGRESS("Exploiting... (19/49)", 0, 0);
+        PROGRESS("Exploiting... (19/50)", 0, 0);
         rv = _vnode_put(offsets.vnode_put, devVnode);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to clean up dev vnode.");
@@ -1298,7 +1301,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Deinitialize kexecute.
         
         LOG("Deinitializing kexecute...");
-        PROGRESS("Exploiting... (20/49)", 0, 0);
+        PROGRESS("Exploiting... (20/50)", 0, 0);
         term_kexecute();
         LOG("Successfully deinitialized kexecute.");
     }
@@ -1307,7 +1310,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Remount RootFS.
         
         LOG("Remounting RootFS...");
-        PROGRESS("Exploiting... (21/49)", 0, 0);
+        PROGRESS("Exploiting... (21/50)", 0, 0);
         fd = open("/", O_RDONLY, 0);
         LOG("fd: " "%d" "\n", fd);
         _assert(fd > 0, "Failed to remount RootFS.");
@@ -1333,7 +1336,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Borrow entitlements from fsck_apfs.
             
             LOG("Borrowing entitlements from fsck_apfs...");
-            PROGRESS("Exploiting... (22/49)", 0, 0);
+            PROGRESS("Exploiting... (22/50)", 0, 0);
             borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
             LOG("Successfully borrowed entitlements from fsck_apfs.");
             
@@ -1342,21 +1345,18 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Rename system snapshot.
             
             LOG("Renaming system snapshot...");
-            PROGRESS("Exploiting... (23/49)", 0, 0);
+            PROGRESS("Exploiting... (23/50)", 0, 0);
             fd = open("/var/tmp/rootfsmnt", O_RDONLY, 0);
             LOG("fd: " "%d" "\n", fd);
             _assert(fd > 0, "Failed to remount RootFS.");
-            if (!(snapshot_check(fd, "orig-fs") == 1)) {
-                if (snapshot_check(fd, systemSnapshot()) == 1) {
-                    rv = fs_snapshot_rename(fd, systemSnapshot(), "orig-fs", 0);
-                    LOG("rv: " "%d" "\n", rv);
-                    _assert(rv == 0, "Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
-                } else {
-                    rv = fs_snapshot_create(fd, "orig-fs", 0);
-                    LOG("rv: " "%d" "\n", rv);
-                    _assert(rv == 0, "Failed to remount RootFS.");
-                }
-            }
+            rv = fs_snapshot_rename(fd, systemSnapshot(), "orig-fs", 0);
+            LOG("rv: " "%d" "\n", rv);
+            rv = fs_snapshot_rename(fd, systemSnapshot(), "electra-prejailbreak", 0);
+            LOG("rv: " "%d" "\n", rv);
+            rv = fs_snapshot_create(fd, "orig-fs", 0);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(!(snapshot_check(fd, systemSnapshot()) == 1), "Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
+            _assert(snapshot_check(fd, "orig-fs") == 1 || snapshot_check(fd, "electra-prejailbreak") == 1, "Failed to remount RootFS.");
             rv = close(fd);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, "Failed to remount RootFS.");
@@ -1365,7 +1365,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Reboot.
             
             LOG("Rebooting...");
-            PROGRESS("Exploiting... (24/49)", 0, 0);
+            PROGRESS("Exploiting... (24/50)", 0, 0);
             NOTICE("The device will be restarted.", 1);
             rv = reboot(0x400);
             LOG("rv: " "%d" "\n", rv);
@@ -1391,7 +1391,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Write a test file to RootFS.
         
         LOG("Writing a test file to RootFS...");
-        PROGRESS("Exploiting... (25/49)", 0, 0);
+        PROGRESS("Exploiting... (25/50)", 0, 0);
         if (!access("/test.txt", F_OK)) {
             rv = unlink("/test.txt");
             LOG("rv: " "%d" "\n", rv);
@@ -1419,7 +1419,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Copy over our resources to RootFS.
         
         LOG("Copying over our resources to RootFS...");
-        PROGRESS("Exploiting... (27/49)", 0, 0);
+        PROGRESS("Exploiting... (27/50)", 0, 0);
         if (access("/jb", F_OK)) {
             rv = mkdir("/jb", 0755);
             LOG("rv: " "%d" "\n", rv);
@@ -1652,7 +1652,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     {
         // Inject trust cache
         
-        PROGRESS("Exploiting... (28/49)", 0, 0);
+        PROGRESS("Exploiting... (28/50)", 0, 0);
         printf("trust_chain = 0x%llx\n", offsets.trust_chain);
         
         mem.next = rk64(offsets.trust_chain);
@@ -1677,104 +1677,10 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
     
     {
-        if ((((!access("/electra", F_OK) && !(is_symlink("/electra") == 1))) || ((!access("/.bootstrapped_electra", F_OK) && !(is_symlink("/.bootstrapped_electra") == 1)))) || restore_rootfs) {
-            // Borrow entitlements from fsck_apfs.
-            
-            LOG("Borrowing entitlements from fsck_apfs...");
-            PROGRESS("Exploiting... (29/49)", 0, 0);
-            borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
-            LOG("Successfully borrowed entitlements from fsck_apfs.");
-            
-            // We now have fs_snapshot_rename.
-            
-            // Rename system snapshot.
-            
-            LOG("Renaming system snapshot back...");
-            PROGRESS("Exploiting... (30/49)", 0, 0);
-            fd = open("/", O_RDONLY, 0);
-            LOG("fd: " "%d" "\n", fd);
-            _assert(fd > 0, "Failed to Restore RootFS.");
-            if (snapshot_check(fd, "electra-prejailbreak") == 1) {
-                if (snapshot_check(fd, systemSnapshot()) == 1) {
-                    rv = fs_snapshot_delete(fd, systemSnapshot(), 0);
-                    LOG("rv: " "%d" "\n", rv);
-                    _assert(rv == 0, "Failed to Restore RootFS.");
-                }
-                if (snapshot_check(fd, "orig-fs") == 1) {
-                    rv = fs_snapshot_delete(fd, "orig-fs", 0);
-                    LOG("rv: " "%d" "\n", rv);
-                    _assert(rv == 0, "Failed to Restore RootFS.");
-                }
-                rv = fs_snapshot_rename(fd, "electra-prejailbreak", systemSnapshot(), 0);
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0, "Failed to Restore RootFS.");
-            } else if (snapshot_check(fd, "orig-fs")) {
-                if (snapshot_check(fd, systemSnapshot()) == 1) {
-                    rv = fs_snapshot_delete(fd, systemSnapshot(), 0);
-                    LOG("rv: " "%d" "\n", rv);
-                    _assert(rv == 0, "Failed to Restore RootFS.");
-                }
-                rv = fs_snapshot_rename(fd, "orig-fs", systemSnapshot(), 0);
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0, "Failed to Restore RootFS.");
-            }
-            rv = close(fd);
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to Restore RootFS.");
-            LOG("Successfully renamed system snapshot back.");
-            
-            // Clean up UserFS.
-            
-            LOG("Cleaning up UserFS...");
-            PROGRESS("Exploiting... (31/49)", 0, 0);
-            if (!access("/var/lib", F_OK)) {
-                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/lib" error:nil];
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1, "Failed to Restore RootFS.");
-            }
-            if (!access("/var/stash", F_OK)) {
-                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/stash" error:nil];
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1, "Failed to Restore RootFS.");
-            }
-            if (!access("/var/db/stash", F_OK)) {
-                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/db/stash" error:nil];
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1, "Failed to Restore RootFS.");
-            }
-            LOG("Successfully cleaned up UserFS.");
-            
-            // Disallow SpringBoard to show non-default system apps.
-            
-            LOG("Disallowing SpringBoard to show non-default system apps...");
-            PROGRESS("Exploiting... (32/49)", 0, 0);
-            md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
-            _assert(md != nil, "Failed to Restore RootFS.");
-            if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@(NO)]) {
-                md[@"SBShowNonDefaultSystemApps"] = @(NO);
-                rv = [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 1, "Failed to Restore RootFS.");
-            }
-            LOG("Successfully disallowed SpringBoard to show non-default system apps.");
-            
-            // Reboot.
-            
-            LOG("Rebooting...");
-            PROGRESS("Exploiting... (33/49)", 0 ,0);
-            NOTICE("The device will be restarted.", 1);
-            rv = reboot(0x400);
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to Restore RootFS.");
-            LOG("Successfully rebooted.");
-        }
-    }
-    
-    {
         // Log slide.
         
         LOG("Logging slide...");
-        PROGRESS("Exploiting... (34/49)", 0, 0);
+        PROGRESS("Exploiting... (29/50)", 0, 0);
         a = fopen("/tmp/slide.txt", "w+");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, "Failed to log slide.");
@@ -1795,7 +1701,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Set HSP4.
         
         LOG("Setting HSP4...");
-        PROGRESS("Exploiting... (35/49)", 0, 0);
+        PROGRESS("Exploiting... (30/50)", 0, 0);
         rv = remap_tfp0_set_hsp4(&tfp0, offsets.zone_map_ref);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to set HSP4.");
@@ -1805,7 +1711,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     {
         if (export_kernel_task_port) {
             // Export Kernel Task Port.
-            PROGRESS("Exploiting... (36/49)", 0, 0);
+            PROGRESS("Exploiting... (31/50)", 0, 0);
             LOG("Exporting Kernel Task Port...");
             make_host_into_host_priv();
             LOG("Successfully Exported Kernel Task Port.");
@@ -1816,7 +1722,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Patch amfid.
         
         LOG("Patching amfid...");
-        PROGRESS("Exploiting... (37/49)", 0, 0);
+        PROGRESS("Exploiting... (32/50)", 0, 0);
         if (!access("/var/tmp/amfid_payload.alive", F_OK)) {
             rv = unlink("/var/tmp/amfid_payload.alive");
             LOG("rv: " "%d" "\n", rv);
@@ -1841,7 +1747,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Spawn jailbreakd.
         
         LOG("Spawning jailbreakd...");
-        PROGRESS("Exploiting... (38/49)", 0, 0);
+        PROGRESS("Exploiting... (33/50)", 0, 0);
         if (!access("/usr/lib/libjailbreak.dylib", F_OK)) {
             rv = unlink("/usr/lib/libjailbreak.dylib");
             LOG("rv: " "%d" "\n", rv);
@@ -1929,7 +1835,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(rv == 0, "Failed to patch launchd.");
         if (load_tweaks) {
             LOG("Patching launchd...");
-            PROGRESS("Exploiting... (39/49)", 0, 0);
+            PROGRESS("Exploiting... (34/50)", 0, 0);
             if (!access("/var/log/pspawn_hook_launchd.log", F_OK)) {
                 rv = unlink("/var/log/pspawn_hook_launchd.log");
                 LOG("rv: " "%d" "\n", rv);
@@ -1956,7 +1862,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Update version string.
         
         LOG("Updating version string...");
-        PROGRESS("Exploiting... (40/49)", 0, 0);
+        PROGRESS("Exploiting... (35/50)", 0, 0);
         rv = uname(&u);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to update version string.");
@@ -1973,10 +1879,109 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
     
     {
+        if ((((!access("/electra", F_OK) && !(is_symlink("/electra") == 1))) && ((!access("/.bootstrapped_electra", F_OK) && !(is_symlink("/.bootstrapped_electra") == 1)))) || restore_rootfs) {
+            // Borrow entitlements from fsck_apfs.
+            
+            LOG("Borrowing entitlements from fsck_apfs...");
+            PROGRESS("Exploiting... (36/50)", 0, 0);
+            borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
+            LOG("Successfully borrowed entitlements from fsck_apfs.");
+            
+            // We now have fs_snapshot_rename.
+            
+            // Rename system snapshot.
+            
+            LOG("Renaming system snapshot back...");
+            PROGRESS("Exploiting... (37/50)", 0, 0);
+            fd = open("/", O_RDONLY, 0);
+            LOG("fd: " "%d" "\n", fd);
+            _assert(fd > 0, "Failed to Restore RootFS.");
+            if (snapshot_check(fd, "electra-prejailbreak") == 1) {
+                if (snapshot_check(fd, systemSnapshot()) == 1) {
+                    rv = fs_snapshot_delete(fd, systemSnapshot(), 0);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, "Failed to Restore RootFS.");
+                }
+                if (snapshot_check(fd, "orig-fs") == 1) {
+                    rv = fs_snapshot_delete(fd, "orig-fs", 0);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, "Failed to Restore RootFS.");
+                }
+                rv = fs_snapshot_rename(fd, "electra-prejailbreak", systemSnapshot(), 0);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0, "Failed to Restore RootFS.");
+            } else if (snapshot_check(fd, "orig-fs")) {
+                if (snapshot_check(fd, systemSnapshot()) == 1) {
+                    rv = fs_snapshot_delete(fd, systemSnapshot(), 0);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, "Failed to Restore RootFS.");
+                }
+                rv = fs_snapshot_rename(fd, "orig-fs", systemSnapshot(), 0);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0, "Failed to Restore RootFS.");
+            }
+            rv = close(fd);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, "Failed to Restore RootFS.");
+            LOG("Successfully renamed system snapshot back.");
+            
+            // Clean up UserFS.
+            
+            LOG("Cleaning up UserFS...");
+            PROGRESS("Exploiting... (38/50)", 0, 0);
+            if (!access("/var/lib", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/lib" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
+            if (!access("/var/stash", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/stash" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
+            if (!access("/var/db/stash", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/db/stash" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
+            if (!access("/etc/apt", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/etc/apt" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
+            LOG("Successfully cleaned up UserFS.");
+            
+            // Disallow SpringBoard to show non-default system apps.
+            
+            LOG("Disallowing SpringBoard to show non-default system apps...");
+            PROGRESS("Exploiting... (39/50)", 0, 0);
+            md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
+            _assert(md != nil, "Failed to Restore RootFS.");
+            if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@(NO)]) {
+                md[@"SBShowNonDefaultSystemApps"] = @(NO);
+                rv = [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
+            LOG("Successfully disallowed SpringBoard to show non-default system apps.");
+            
+            // Reboot.
+            
+            LOG("Rebooting...");
+            PROGRESS("Exploiting... (40/50)", 0 ,0);
+            NOTICE("The device will be restarted.", 1);
+            rv = reboot(0x400);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, "Failed to Restore RootFS.");
+            LOG("Successfully rebooted.");
+        }
+    }
+    
+    {
         // Extract bootstrap.
         
         LOG("Extracting bootstrap...");
-        PROGRESS("Exploiting... (41/49)", 0, 0);
+        PROGRESS("Exploiting... (41/50)", 0, 0);
         if (access("/.installed_unc0ver", F_OK)) {
             rv = chdir("/");
             LOG("rv: " "%d" "\n", rv);
@@ -1993,7 +1998,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             LOG("rv: " "%d" "\n", rv);
             rv = WEXITSTATUS(rv);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 256 || rv == 0, "Failed to extract bootstrap.");
+            _assert(rv == 0, "Failed to extract bootstrap.");
             a = fopen("/.installed_unc0ver", "w");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, "Failed to extract bootstrap.");
@@ -2052,7 +2057,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Disable stashing.
             
             LOG("Disabling stashing...");
-            PROGRESS("Exploiting... (42/49)", 0, 0);
+            PROGRESS("Exploiting... (42/50)", 0, 0);
             a = fopen("/.cydia_no_stash", "w");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, "Failed to disable stashing.");
@@ -2073,7 +2078,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (disable_app_revokes) {
             // Block ocsp.apple.com.
             LOG("Blocking ocsp.apple.com...");
-            PROGRESS("Exploiting... (43/49)", 0, 0);
+            PROGRESS("Exploiting... (43/50)", 0, 0);
             blockDomainWithName("ocsp.apple.com");
             LOG("Successfully blocked ocsp.apple.com.");
         }
@@ -2083,7 +2088,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         // Allow SpringBoard to show non-default system apps.
         
         LOG("Allowing SpringBoard to show non-default system apps...");
-        PROGRESS("Exploiting... (44/49)", 0, 0);
+        PROGRESS("Exploiting... (44/50)", 0, 0);
         md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
         _assert(md != nil, "Failed to allow SpringBoard to show non-default system apps.");
         for (int i = 0; !(i >= 5 || [md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)]); i++) {
@@ -2109,7 +2114,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Disable Auto Updates.
             
             LOG("Disabling Auto Updates...");
-            PROGRESS("Exploiting... (45/49)", 0, 0);
+            PROGRESS("Exploiting... (45/50)", 0, 0);
             if (!access("/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", F_OK)) {
                 rv = execCommandAndWait("/bin/launchctl", "unload", "/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", NULL, NULL, NULL);
                 LOG("rv: " "%d" "\n", rv);
@@ -2151,7 +2156,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Enable Auto Updates.
             
             LOG("Enable Auto Updates...");
-            PROGRESS("Exploiting... (46/49)", 0, 0);
+            PROGRESS("Exploiting... (46/50)", 0, 0);
             if (!access("/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/softwareupdated", F_OK)) {
                 rv = rename("/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/softwareupdated", "/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/Support/softwareupdated");
                 LOG("rv: " "%d" "\n", rv);
@@ -2182,11 +2187,32 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
     }
     
     {
+        if (increase_memory_limit) {
+            // Increase memory limit.
+            
+            LOG("Increasing memory limit...");
+            PROGRESS("Exploiting... (47/50)", 0, 0);
+            bzero(buf_targettype, sizeof(buf_targettype));
+            size = sizeof(buf_targettype);
+            rv = sysctlbyname("hw.targettype", buf_targettype, &size, NULL, 0);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, "Failed to increase memory limit.");
+            md = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype]];
+            _assert(md != nil, "Failed to increase memory limit.");
+            md[@"Version4"][@"System"][@"Override"][@"Global"][@"UserHighWaterMark"] = md[@"Version4"][@"PListDevice"][@"MemoryCapacity"];
+            rv = [md writeToFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype] atomically:YES];
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 1, "Failed to increase memory limit.");
+            LOG("Successfully increased memory limit.");
+        }
+    }
+    
+    {
         if (load_daemons) {
             // Load Daemons.
             
             LOG("Loading Daemons...");
-            PROGRESS("Exploiting... (47/49)", 0, 0);
+            PROGRESS("Exploiting... (48/50)", 0, 0);
             _system("echo 'really jailbroken'; shopt -s nullglob; for a in /Library/LaunchDaemons/*.plist; do echo loading $a; launchctl load \"$a\" ; done; for file in /etc/rc.d/*; do if [[ -x \"$file\" ]]; then \"$file\"; fi; done");
             sleep(2);
             LOG("Successfully loaded Daemons.");
@@ -2198,7 +2224,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Run uicache.
             
             LOG("Running uicache...");
-            PROGRESS("Exploiting... (48/49)", 0, 0);
+            PROGRESS("Exploiting... (49/50)", 0, 0);
             rv = execCommandAndWait("/usr/bin/uicache", NULL, NULL, NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, "Failed to run uicache");
@@ -2211,7 +2237,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             // Load Tweaks.
             
             LOG("Loading Tweaks...");
-            PROGRESS("Exploiting... (49/49)", 0, 0);
+            PROGRESS("Exploiting... (50/50)", 0, 0);
             rv = execCommandAndWait("/usr/bin/ldrestart", NULL, NULL, NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, "Failed to run ldrestart");
@@ -2232,12 +2258,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         if (![SettingsTableViewController isSupported]) {
             PROGRESS("Unsupported", 0, 1);
         }
-        if ([SettingsTableViewController isWorkInProgress]) {
-            NOTICE("Your device is supported by this jailbreak version, however, it is still a work in progress. Are you sure want to continue with the jailbreak?", 1);
-        }
         // Initialize kernel exploit.
         LOG("Initializing kernel exploit...");
-        PROGRESS("Exploiting... (1/49)", 0, 0);
+        PROGRESS("Exploiting... (1/50)", 0, 0);
         switch ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]) {
             case 0: {
                 vfs_sploit();
@@ -2262,7 +2285,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(MACH_PORT_VALID(tfp0), "Exploit failed. Reboot and try again.");
         LOG("Successfully validated TFP0.");
         // NOTICE("Jailbreak succeeded, but still needs a few minutes to respring.", 0);
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0),[[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE], [[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT], [[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]);
+        exploit(tfp0, (uint64_t)get_kernel_base(tfp0),[[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE], [[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT], [[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_INCREASE_MEMORY_LIMIT]);
         PROGRESS("Jailbroken", 0, 1);
     });
 }
