@@ -19,6 +19,7 @@
 #define K_OVERWRITE_BOOT_NONCE "OverwriteBootNonce"
 #define K_EXPORT_KERNEL_TASK_PORT "ExportKernelTaskPort"
 #define K_RESTORE_ROOTFS "RestoreRootFS"
+#define K_INCREASE_MEMORY_LIMIT "IncreaseMemoryLimit"
 
 #define LOG_FILE [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
 
@@ -53,10 +54,10 @@
 @property (weak, nonatomic) IBOutlet UISwitch *ExportKernelTaskPortSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *RestoreRootFSSwitch;
 @property (weak, nonatomic) IBOutlet UITextField *UptimeLabel;
+@property (weak, nonatomic) IBOutlet UISwitch *IncreaseMemoryLimitSwitch;
 
 + (NSArray *) supportedBuilds;
 + (BOOL) isSupported;
-+ (BOOL) isWorkInProgress;
 
 @end
 

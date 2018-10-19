@@ -62,6 +62,10 @@
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_RESTORE_ROOTFS];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_INCREASE_MEMORY_LIMIT] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_INCREASE_MEMORY_LIMIT];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
     [self SetUpShortcuts];
     return YES;
 }

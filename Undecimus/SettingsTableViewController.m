@@ -197,12 +197,14 @@ double uptime(){
     md[@"Preferences"][@"DisableAppRevokes"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_DISABLE_APP_REVOKES];
     md[@"Preferences"][@"OverwriteBootNonce"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_OVERWRITE_BOOT_NONCE];
     md[@"Preferences"][@"ExportKernelTaskPort"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPORT_KERNEL_TASK_PORT];
+    md[@"Preferences"][@"RestoreRootFS"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_RESTORE_ROOTFS];
+    md[@"Preferences"][@"IncreaseMemoryLimit"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_INCREASE_MEMORY_LIMIT];
     md[@"AppVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     md[@"LogFile"] = [NSString stringWithContentsOfFile:[NSString stringWithUTF8String:LOG_FILE] encoding:NSUTF8StringEncoding error:nil];
     return md;
 }
 
-+ (NSArray *) supportedBuilds {
++ (NSArray *) supportedBuildPrefixes {
     NSMutableArray *ma = [[NSMutableArray alloc] init];
     [ma addObject:@"15A"]; // 11.0
     [ma addObject:@"15B"]; // 11.1
@@ -216,28 +218,8 @@ double uptime(){
     return ma;
 }
 
-+ (NSArray *) workInProgressBuilds {
-    NSMutableArray *ma = [[NSMutableArray alloc] init];
-    [ma addObject:@"15A"]; // 11.0
-    [ma addObject:@"15B"]; // 11.1
-    [ma addObject:@"15F5037c"]; // 11.4 beta
-    [ma addObject:@"15F5049c"]; // 11.4 beta 2
-    [ma addObject:@"15F5061d"]; // 11.4 beta 3
-    [ma addObject:@"15F5061e"]; // 11.4 beta 3
-    return ma;
-}
-
 + (BOOL) isSupported {
-    for (NSString *buildPrefix in [SettingsTableViewController supportedBuilds]) {
-        if ([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] hasPrefix:buildPrefix]) {
-            return YES;
-        }
-    }
-    return NO;
-}
-
-+ (BOOL) isWorkInProgress {
-    for (NSString *buildPrefix in [SettingsTableViewController workInProgressBuilds]) {
+    for (NSString *buildPrefix in [SettingsTableViewController supportedBuildPrefixes]) {
         if ([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] hasPrefix:buildPrefix]) {
             return YES;
         }
@@ -293,6 +275,7 @@ double uptime(){
     [self.ExportKernelTaskPortSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT]];
     [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]];
     [self.UptimeLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)uptime() / 86400]];
+    [self.IncreaseMemoryLimitSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INCREASE_MEMORY_LIMIT]];
     [self.tableView reloadData];
 }
 
@@ -414,6 +397,12 @@ extern int mptcp_die(void);
 
 - (void)tableView:(UITableView *)tableView willDisplayFooterView:(UITableViewHeaderFooterView *)footerView forSection:(NSInteger)section {
     footerView.textLabel.textAlignment = NSTextAlignmentCenter;
+}
+
+- (IBAction)IncreaseMemoryLimitSwitch:(id)sender {
+    [[NSUserDefaults standardUserDefaults] setBool:[self.IncreaseMemoryLimitSwitch isOn] forKey:@K_INCREASE_MEMORY_LIMIT];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reloadData];
 }
 
 - (void)didReceiveMemoryWarning {
