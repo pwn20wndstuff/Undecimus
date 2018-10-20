@@ -114,6 +114,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * RC7: Fix the RootFS Restore on iOS 11.2  - 11.2.6 and improve the reliability of the MP Exploit's clean up: [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus-RC7.ipa)
 * RC8: Fix the snapshot errors, add a warning for the iOS 11.0-11.1.2 and 11.4 Beta 1 - 3 devices and clean up the code:  [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus-RC8.ipa)
 * RC9: Fix the "Device will be restarted" loop, add even more detailed error messages and add an option to increase the memory limit to improve the stability and add compatibility layer to work correctly with some tweaks that were specifically made for the other jailbreaks:  [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus.ipa)
+* V1: Fix the RootFS Restore for all supported versions, fix the snapshot related issues, make the settings tab match with the rest of the UI, more minor fixes and get this out of beta (Known issues: Some Beta firmwares are still broken):  [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus.ipa)
 
 ## Special Thanks
 * [@i41nbeer](https://twitter.com/i41nbeer) for triple_fetch, async_wake, empty_list & multi_path
