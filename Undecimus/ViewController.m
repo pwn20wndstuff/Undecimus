@@ -1023,7 +1023,19 @@ typedef struct {
 
 // TODO: Add more detailed descriptions for the _assert calls.
 
-void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_daemons, int dump_apticket, int run_uicache, char *boot_nonce, int disable_auto_updates, int disable_app_revokes, int overwrite_boot_nonce, int export_kernel_task_port, int restore_rootfs, int increase_memory_limit)
+void exploit(mach_port_t tfp0,
+             uint64_t kernel_base,
+             int load_tweaks,
+             int load_daemons,
+             int dump_apticket,
+             int run_uicache,
+             char *boot_nonce,
+             int disable_auto_updates,
+             int disable_app_revokes,
+             int overwrite_boot_nonce,
+             int export_kernel_task_port,
+             int restore_rootfs,
+             int increase_memory_limit)
 {
     // Initialize variables.
     int rv = 0;
@@ -1129,6 +1141,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("Rootifying...");
         PROGRESS("Exploiting... (6/50)", 0, 0);
         rv = rootifyMe();
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0, "Failed to rootify.");
+        rv = getuid();
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to rootify.");
         LOG("Successfully rootified.");
@@ -1311,16 +1326,11 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         
         LOG("Remounting RootFS...");
         PROGRESS("Exploiting... (21/50)", 0, 0);
-        fd = open("/", O_RDONLY, 0);
-        LOG("fd: " "%d" "\n", fd);
-        _assert(fd > 0, "Failed to remount RootFS.");
-        i = snapshot_list(fd);
+        i = snapshot_list(open("/", O_RDONLY, 0));
         LOG("i: " "%d" "\n", i);
-        rv = close(fd);
-        LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to remount RootFS.");
         
-        if (i == -1) {
+        if (i <= 0) {
             if (!access("/var/tmp/rootfsmnt", F_OK)) {
                 rv = rmdir("/var/tmp/rootfsmnt");
                 LOG("rv: " "%d" "\n", rv);
@@ -1349,17 +1359,17 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             fd = open("/var/tmp/rootfsmnt", O_RDONLY, 0);
             LOG("fd: " "%d" "\n", fd);
             _assert(fd > 0, "Failed to remount RootFS.");
-            rv = fs_snapshot_rename(fd, systemSnapshot(), "orig-fs", 0);
-            LOG("rv: " "%d" "\n", rv);
-            rv = fs_snapshot_rename(fd, systemSnapshot(), "electra-prejailbreak", 0);
-            LOG("rv: " "%d" "\n", rv);
-            rv = fs_snapshot_create(fd, "orig-fs", 0);
-            LOG("rv: " "%d" "\n", rv);
-            _assert(!(snapshot_check(fd, systemSnapshot()) == 1), "Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
-            _assert(snapshot_check(fd, "orig-fs") == 1 || snapshot_check(fd, "electra-prejailbreak") == 1, "Failed to remount RootFS.");
-            rv = close(fd);
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to remount RootFS.");
+            i = snapshot_list(open("/var/tmp/rootfsmnt", O_RDONLY, 0));
+            LOG("i: " "%d" "\n", i);
+            if (i > 0) {
+                rv = fs_snapshot_rename(open("/var/tmp/rootfsmnt", O_RDONLY, 0), systemSnapshot(), (snapshot_check(open("/var/tmp/rootfsmnt", O_RDONLY, 0), "orig-fs") == 1) ? "electra-prejailbreak" : "orig-fs", 0);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0, "Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
+            } else {
+                rv = fs_snapshot_create(open("/var/tmp/rootfsmnt", O_RDONLY, 0), "orig-fs", 0);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0, "Unable to create system snapshot.  Delete OTA file from Settings - Storage if present");
+            }
             LOG("Successfully renamed system snapshot.");
             
             // Reboot.
@@ -1420,14 +1430,17 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         
         LOG("Copying over our resources to RootFS...");
         PROGRESS("Exploiting... (27/50)", 0, 0);
-        if (access("/jb", F_OK)) {
-            rv = mkdir("/jb", 0755);
+        if (!access("/jb", F_OK)) {
+            rv = [[NSFileManager defaultManager] removeItemAtPath:@"/jb" error:nil];
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-            rv = chown("/jb", 0, 0);
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
+            _assert(rv == 1, "Failed to copy over our resources to RootFS.");
         }
+        rv = mkdir("/jb", 0755);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0, "Failed to copy over our resources to RootFS.");
+        rv = chown("/jb", 0, 0);
+        LOG("rv: " "%d" "\n", rv);
+        _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         
         if (!access("/electra", F_OK)) {
             rv = [[NSFileManager defaultManager] removeItemAtPath:@"/electra" error:nil];
@@ -1442,11 +1455,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         
-        if (!access("/jb/amfid_payload.dylib", F_OK)) {
-            rv = unlink("/jb/amfid_payload.dylib");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"amfid_payload" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, "Failed to copy over our resources to RootFS.");
@@ -1461,11 +1469,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         
-        if (!access("/jb/launchctl", F_OK)) {
-            rv = unlink("/jb/launchctl");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"launchctl" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, "Failed to copy over our resources to RootFS.");
@@ -1480,11 +1483,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         
-        if (!access("/jb/jailbreakd", F_OK)) {
-            rv = unlink("/jb/jailbreakd");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"jailbreakd" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, "Failed to copy over our resources to RootFS.");
@@ -1499,11 +1497,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         
-        if (!access("/jb/libjailbreak.dylib", F_OK)) {
-            rv = unlink("/jb/libjailbreak.dylib");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"libjailbreak" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, "Failed to copy over our resources to RootFS.");
@@ -1518,11 +1511,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         
-        if (!access("/jb/pspawn_hook.dylib", F_OK)) {
-            rv = unlink("/jb/pspawn_hook.dylib");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"pspawn_hook" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, "Failed to copy over our resources to RootFS.");
@@ -1537,11 +1525,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         
-        if (!access("/jb/tar", F_OK)) {
-            rv = unlink("/jb/tar");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"tar" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, "Failed to copy over our resources to RootFS.");
@@ -1556,11 +1539,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         
-        if (!access("/jb/lzma", F_OK)) {
-            rv = unlink("/jb/lzma");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"lzma" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, "Failed to copy over our resources to RootFS.");
@@ -1575,11 +1553,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         
-        if (!access("/jb/spawn", F_OK)) {
-            rv = unlink("/jb/spawn");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"spawn" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, "Failed to copy over our resources to RootFS.");
@@ -1594,11 +1567,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         
-        if (!access("/var/tmp/strap.tar.lzma", F_OK)) {
-            rv = unlink("/var/tmp/strap.tar.lzma");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-        }
         rv = copyfile([[[NSBundle mainBundle] pathForResource:@"strap.tar" ofType:@"lzma"] UTF8String], "/var/tmp/strap.tar.lzma", 0, COPYFILE_ALL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
@@ -1610,11 +1578,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         LOG("Successfully copied over our resources to RootFS.");
         
-        if (!access("/jb/debugserver", F_OK)) {
-            rv = unlink("/jb/debugserver");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"debugserver" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, "Failed to copy over our resources to RootFS.");
@@ -1629,11 +1592,6 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to copy over our resources to RootFS.");
         
-        if (!access("/jb/rsync", F_OK)) {
-            rv = unlink("/jb/rsync");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to copy over our resources to RootFS.");
-        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"rsync" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, "Failed to copy over our resources to RootFS.");
@@ -1733,7 +1691,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(rv == 0, "Failed to patch amfid.");
         rv = access("/var/tmp/amfid_payload.alive", F_OK);
         LOG("rv: " "%d" "\n", rv);
-        for (i = 0; !(i >= 20 || rv == 0); i++) {
+        for (i = 0; !(i >= 100 || rv == 0); i++) {
             LOG("Waiting for amfid...");
             usleep(100000);
             rv = access("/var/tmp/amfid_payload.alive", F_OK);
@@ -1812,7 +1770,7 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(rv == 0, "Failed to spawn jailbreakd.");
         rv = access("/var/tmp/jailbreakd.pid", F_OK);
         LOG("rv: " "%d" "\n", rv);
-        for (i = 0; !(i >= 20 || rv == 0); i++) {
+        for (i = 0; !(i >= 100 || rv == 0); i++) {
             LOG("Waiting for jailbreakd...");
             usleep(100000);
             rv = access("/var/tmp/jailbreakd.pid", F_OK);
@@ -1893,42 +1851,90 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             
             LOG("Renaming system snapshot back...");
             PROGRESS("Exploiting... (37/50)", 0, 0);
-            fd = open("/", O_RDONLY, 0);
-            LOG("fd: " "%d" "\n", fd);
-            _assert(fd > 0, "Failed to Restore RootFS.");
-            if (snapshot_check(fd, "electra-prejailbreak") == 1) {
-                if (snapshot_check(fd, systemSnapshot()) == 1) {
+            if (snapshot_check(open("/", O_RDONLY, 0), "electra-prejailbreak") == 1) {
+                if (snapshot_check(open("/", O_RDONLY, 0), systemSnapshot()) == 1) {
+                    rv = fs_snapshot_delete(open("/", O_RDONLY, 0), systemSnapshot(), 0);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, "Failed to Restore RootFS.");
+                }
+                if (snapshot_check(open("/", O_RDONLY, 0), "orig-fs") == 1) {
+                    rv = fs_snapshot_delete(open("/", O_RDONLY, 0), "orig-fs", 0);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, "Failed to Restore RootFS.");
+                }
+                if (kCFCoreFoundationVersionNumber >= 1450.14) {
+                    rv = fs_snapshot_rename(open("/", O_RDONLY, 0), "electra-prejailbreak", systemSnapshot(), 0);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, "Failed to Restore RootFS.");
+                } else {
+                    if (!access("/var/tmp/rootfsmnt", F_OK)) {
+                        rv = rmdir("/var/tmp/rootfsmnt");
+                        LOG("rv: " "%d" "\n", rv);
+                        _assert(rv == 0, "Failed to remount RootFS.");
+                    }
+                    rv = mkdir("/var/tmp/rootfsmnt", 0755);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, "Failed to remount RootFS.");
+                    rv = spawnAndShaiHulud("/sbin/mount_apfs", "-s", "electra-prejailbreak", "/", "/var/tmp/rootfsmnt", NULL);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, "Failed to remount RootFS.");
+                    rv = easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/var/tmp/rootfsmnt/.", @"/"]);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, "Failed to remount RootFS.");
+                }
+            } else if (snapshot_check(open("/", O_RDONLY, 0), "orig-fs") == 1) {
+                if (snapshot_check(open("/", O_RDONLY, 0), systemSnapshot()) == 1) {
                     rv = fs_snapshot_delete(fd, systemSnapshot(), 0);
                     LOG("rv: " "%d" "\n", rv);
                     _assert(rv == 0, "Failed to Restore RootFS.");
                 }
-                if (snapshot_check(fd, "orig-fs") == 1) {
-                    rv = fs_snapshot_delete(fd, "orig-fs", 0);
+                if (kCFCoreFoundationVersionNumber >= 1450.14) {
+                     rv = fs_snapshot_rename(open("/", O_RDONLY, 0), "orig-fs", systemSnapshot(), 0);
+                     LOG("rv: " "%d" "\n", rv);
+                     _assert(rv == 0, "Failed to Restore RootFS.");
+                 } else {
+                    if (!access("/var/tmp/rootfsmnt", F_OK)) {
+                        rv = rmdir("/var/tmp/rootfsmnt");
+                        LOG("rv: " "%d" "\n", rv);
+                        _assert(rv == 0, "Failed to remount RootFS.");
+                    }
+                    rv = mkdir("/var/tmp/rootfsmnt", 0755);
                     LOG("rv: " "%d" "\n", rv);
-                    _assert(rv == 0, "Failed to Restore RootFS.");
-                }
-                rv = fs_snapshot_rename(fd, "electra-prejailbreak", systemSnapshot(), 0);
-                LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0, "Failed to Restore RootFS.");
-            } else if (snapshot_check(fd, "orig-fs")) {
-                if (snapshot_check(fd, systemSnapshot()) == 1) {
-                    rv = fs_snapshot_delete(fd, systemSnapshot(), 0);
+                    _assert(rv == 0, "Failed to remount RootFS.");
+                    rv = spawnAndShaiHulud("/sbin/mount_apfs", "-s", "orig-fs", "/", "/var/tmp/rootfsmnt", NULL);
                     LOG("rv: " "%d" "\n", rv);
-                    _assert(rv == 0, "Failed to Restore RootFS.");
+                    _assert(rv == 0, "Failed to remount RootFS.");
+                    rv = easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/var/tmp/rootfsmnt/.", @"/"]);
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, "Failed to remount RootFS.");
                 }
-                rv = fs_snapshot_rename(fd, "orig-fs", systemSnapshot(), 0);
+            } else {
+                if (!access("/var/tmp/rootfsmnt", F_OK)) {
+                    rv = rmdir("/var/tmp/rootfsmnt");
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, "Failed to remount RootFS.");
+                }
+                rv = mkdir("/var/tmp/rootfsmnt", 0755);
                 LOG("rv: " "%d" "\n", rv);
-                _assert(rv == 0, "Failed to Restore RootFS.");
+                _assert(rv == 0, "Failed to remount RootFS.");
+                rv = spawnAndShaiHulud("/sbin/mount_apfs", "-s", strdup(systemSnapshot()), "/", "/var/tmp/rootfsmnt", NULL);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0, "Failed to remount RootFS.");
+                rv = easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/var/tmp/rootfsmnt/.", @"/"]);
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 0, "Failed to remount RootFS.");
             }
-            rv = close(fd);
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, "Failed to Restore RootFS.");
             LOG("Successfully renamed system snapshot back.");
             
             // Clean up UserFS.
             
             LOG("Cleaning up UserFS...");
             PROGRESS("Exploiting... (38/50)", 0, 0);
+            if (!access("/var/cache", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/cache" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
             if (!access("/var/lib", F_OK)) {
                 rv = [[NSFileManager defaultManager] removeItemAtPath:@"/var/lib" error:nil];
                 LOG("rv: " "%d" "\n", rv);
@@ -1944,8 +1950,38 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
                 LOG("rv: " "%d" "\n", rv);
                 _assert(rv == 1, "Failed to Restore RootFS.");
             }
+            if (!access("/etc/alternatives", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/etc/alternatives" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
             if (!access("/etc/apt", F_OK)) {
                 rv = [[NSFileManager defaultManager] removeItemAtPath:@"/etc/apt" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
+            if (!access("/etc/default", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/etc/default" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
+            if (!access("/etc/dpkg", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/etc/dpkg" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
+            if (!access("/etc/profile.d", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/etc/profile.d" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
+            if (!access("/etc/ssh", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/etc/ssh" error:nil];
+                LOG("rv: " "%d" "\n", rv);
+                _assert(rv == 1, "Failed to Restore RootFS.");
+            }
+            if (!access("/etc/ssl", F_OK)) {
+                rv = [[NSFileManager defaultManager] removeItemAtPath:@"/etc/ssl" error:nil];
                 LOG("rv: " "%d" "\n", rv);
                 _assert(rv == 1, "Failed to Restore RootFS.");
             }
@@ -2238,7 +2274,9 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
             
             LOG("Loading Tweaks...");
             PROGRESS("Exploiting... (50/50)", 0, 0);
-            rv = execCommandAndWait("/usr/bin/ldrestart", NULL, NULL, NULL, NULL, NULL);
+            rv = _system("nohup /usr/bin/ldrestart");
+            LOG("rv: " "%d" "\n", rv);
+            rv = WEXITSTATUS(rv);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, "Failed to run ldrestart");
             LOG("Successfully loaded Tweaks.");
@@ -2285,7 +2323,19 @@ void exploit(mach_port_t tfp0, uint64_t kernel_base, int load_tweaks, int load_d
         _assert(MACH_PORT_VALID(tfp0), "Exploit failed. Reboot and try again.");
         LOG("Successfully validated TFP0.");
         // NOTICE("Jailbreak succeeded, but still needs a few minutes to respring.", 0);
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0),[[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION], [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET], [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE], strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]), [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES], [[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE], [[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT], [[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS], [[NSUserDefaults standardUserDefaults] boolForKey:@K_INCREASE_MEMORY_LIMIT]);
+        exploit(tfp0,
+                (uint64_t)get_kernel_base(tfp0),
+                [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION],
+                [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS],
+                [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET],
+                [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE],
+                strdup([[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String]),
+                [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES],
+                [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES],
+                [[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE],
+                [[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT],
+                [[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS],
+                [[NSUserDefaults standardUserDefaults] boolForKey:@K_INCREASE_MEMORY_LIMIT]);
         PROGRESS("Jailbroken", 0, 1);
     });
 }

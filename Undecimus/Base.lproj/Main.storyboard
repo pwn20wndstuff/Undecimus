@@ -402,7 +402,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Disable Auto Updates" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8sz-Zl-aTJ">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Disable Auto Updates (Beta)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8sz-Zl-aTJ">
                                                     <rect key="frame" x="20" y="0.0" width="728" height="44"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="44" id="Guy-KK-SUQ"/>
@@ -758,7 +758,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Utilities" footerTitle="unc0ver RC9" id="33o-xO-9yG">
+                            <tableViewSection headerTitle="Utilities" footerTitle="unc0ver V1" id="33o-xO-9yG">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="2Iu-w9-x4b">
                                         <rect key="frame" x="0.0" y="779" width="768" height="44"/>
