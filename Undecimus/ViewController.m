@@ -1132,8 +1132,6 @@ void exploit(mach_port_t tfp0,
         rv = initQiLin(tfp0, kernel_base);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, "Failed to initialize QiLin.");
-        setKernelSymbol("_kernproc", offsets.kernproc - (kernel_base - KERNEL_SEARCH_ADDRESS));
-        setKernelSymbol("_rootvnode", offsets.rootvnode - (kernel_base - KERNEL_SEARCH_ADDRESS));
         LOG("Successfully initialized QiLin.");
     }
     
