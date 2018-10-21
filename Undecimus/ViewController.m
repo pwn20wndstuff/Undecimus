@@ -2308,7 +2308,7 @@ void exploit(mach_port_t tfp0,
         if (![SettingsTableViewController isSupported]) {
             PROGRESS("Unsupported", 0, 1);
         }
-        if ((((!access("/electra", F_OK) && !(is_symlink("/electra") == 1)))) && kCFCoreFoundationVersionNumber < 1450.14) {
+        if ((((!access("/electra", F_OK) && !(is_symlink("/electra") == 1)))) && kCFCoreFoundationVersionNumber < 1452.23) {
             NOTICE("Other jailbreak detected. Please manually uninstall it and try this again.", 1, 1);
             exit(1);
         }
