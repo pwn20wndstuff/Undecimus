@@ -1376,7 +1376,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Rebooting...");
             PROGRESS("Exploiting... (24/50)", 0, 0);
-            NOTICE("The device will be restarted.", 1);
+            NOTICE("Electra detected! For your safety, your rootFS was restored automatically and your device will now reboot (NOT AN ERROR!) If this happens to you multiple times, Electra did not properly back up your rootfs, and you need to reinstall Electra and use a tool such as Delectra by KirovAir to remove electra, then use unc0ver.", 1);
             rv = reboot(0x400);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, "Failed to remount RootFS.");
@@ -2005,7 +2005,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Rebooting...");
             PROGRESS("Exploiting... (40/50)", 0 ,0);
-            NOTICE("The device will be restarted.", 1);
+            NOTICE("User requested APFS Restore complete! Device will be rebooted (NOT AN ERROR!)", 1);
             rv = reboot(0x400);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, "Failed to Restore RootFS.");
