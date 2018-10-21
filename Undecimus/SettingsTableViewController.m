@@ -276,6 +276,7 @@ double uptime(){
     [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]];
     [self.UptimeLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)uptime() / 86400]];
     [self.IncreaseMemoryLimitSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INCREASE_MEMORY_LIMIT]];
+    [self.RestoreRootFSSwitch setEnabled:(kCFCoreFoundationVersionNumber >= 1452.23)];
     [self.tableView reloadData];
 }
 
@@ -332,7 +333,7 @@ extern int mptcp_die(void);
 
 - (IBAction)tappedOnRestart:(id)sender {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-        NOTICE("The device will be restarted.", 1);
+        NOTICE("The device will be restarted.", 1, 0);
         while (1) {
             vfs_die();
             iosurface_die();
@@ -376,11 +377,11 @@ extern int mptcp_die(void);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         NSString *Update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
         if (Update == nil) {
-            NOTICE("Failed to check for update.", 1);
+            NOTICE("Failed to check for update.", 1, 0);
         } else if ([Update isEqualToString:[NSString stringWithFormat:@"%@\n", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]]) {
-            NOTICE("Already up to date.", 1);
+            NOTICE("Already up to date.", 1, 0);
         } else {
-            NOTICE("An update is available.", 1);
+            NOTICE("An update is available.", 1, 0);
         }
     });
 }

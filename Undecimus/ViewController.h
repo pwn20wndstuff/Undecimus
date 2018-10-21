@@ -14,23 +14,23 @@
     if (!(test)) { \
         fprintf(stderr, "__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
         if (message) \
-            showAlert(@"Error", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s\nDescription: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__, message], 1); \
+            showAlert(@"Error", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s\nDescription: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__, message], 1, 0); \
         else \
-            showAlert(@"Error", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__], 1); \
+            showAlert(@"Error", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__], 1, 0); \
         exit(1); \
     } \
 while (false)
 
-#define NOTICE(msg, wait) showAlert(@"Notice", @(msg), wait)
+#define NOTICE(msg, wait, destructive) showAlert(@"Notice", @(msg), wait, destructive)
 
-static inline void showAlert(NSString *title, NSString *message, Boolean wait) {
+static inline void showAlert(NSString *title, NSString *message, Boolean wait, Boolean destructive) {
     dispatch_semaphore_t semaphore;
     if (wait)
         semaphore = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
         [[[[[UIApplication sharedApplication] delegate] window] rootViewController] dismissViewControllerAnimated:YES completion:nil];
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:destructive ? UIAlertActionStyleDestructive : UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             if (wait)
                 dispatch_semaphore_signal(semaphore);
         }];
