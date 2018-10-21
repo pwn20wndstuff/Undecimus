@@ -56,7 +56,6 @@
 @property (weak, nonatomic) IBOutlet UITextField *UptimeLabel;
 @property (weak, nonatomic) IBOutlet UISwitch *IncreaseMemoryLimitSwitch;
 
-+ (NSArray *) supportedBuilds;
 + (BOOL) isSupported;
 
 @end
