@@ -1879,7 +1879,7 @@ void exploit(mach_port_t tfp0,
     
     {
         message = "Failed to Restore RootFS.";
-        if ((((!access("/electra", F_OK) && !(is_symlink("/electra") == 1)))) || restore_rootfs) {
+        if ((!access("/electra", F_OK) && !(is_symlink("/electra") == 1)) || restore_rootfs) {
             // Borrow entitlements from fsck_apfs.
             
             LOG("Borrowing entitlements from fsck_apfs...");
@@ -1893,13 +1893,43 @@ void exploit(mach_port_t tfp0,
             
             LOG("Renaming system snapshot back...");
             PROGRESS("Exploiting... (37/51)", 0, 0);
-            NOTICE("Will restore RootFS. This may take a while. Don't exit the app or let the device lock.", 1, 1);
-            if (snapshot_check(open("/", O_RDONLY, 0), "electra-prejailbreak") == 1) {
-                rv = fs_snapshot_rename(open("/", O_RDONLY, 0), "electra-prejailbreak", systemSnapshot(), 0);
+            NOTICE("Will restore RootFS. This may take a while. Don't exit the app and don't let the device lock.", 1, 1);
+            if (kCFCoreFoundationVersionNumber < 1452.23) {
+                if (!access("/var/tmp/rootfsmnt", F_OK)) {
+                    rv = rmdir("/var/tmp/rootfsmnt");
+                    LOG("rv: " "%d" "\n", rv);
+                    _assert(rv == 0, message);
+                }
+                rv = mkdir("/var/tmp/rootfsmnt", 0755);
                 LOG("rv: " "%d" "\n", rv);
                 _assert(rv == 0, message);
+            }
+            if (snapshot_check(open("/", O_RDONLY, 0), "electra-prejailbreak") == 1) {
+                if (kCFCoreFoundationVersionNumber < 1452.23) {
+                    rv = spawnAndShaiHulud("/sbin/mount_apfs", "-s", "electra-prejailbreak", "/", "/var/tmp/rootfsmnt", NULL);
+                    sleep(2);
+                    rv = access("/var/tmp/rootfsmnt/sbin/launchd", F_OK);
+                } else {
+                    rv = fs_snapshot_rename(open("/", O_RDONLY, 0), "electra-prejailbreak", systemSnapshot(), 0);
+                }
             } else if (snapshot_check(open("/", O_RDONLY, 0), "orig-fs") == 1) {
-                rv = fs_snapshot_rename(open("/", O_RDONLY, 0), "orig-fs", systemSnapshot(), 0);
+                if (kCFCoreFoundationVersionNumber < 1452.23) {
+                    rv = spawnAndShaiHulud("/sbin/mount_apfs", "-s", "orig-fs", "/", "/var/tmp/rootfsmnt", NULL);
+                    sleep(2);
+                    rv = access("/var/tmp/rootfsmnt/sbin/launchd", F_OK);
+                } else {
+                    rv = fs_snapshot_rename(open("/", O_RDONLY, 0), "orig-fs", systemSnapshot(), 0);
+                }
+            } else {
+                rv = spawnAndShaiHulud("/sbin/mount_apfs", "-s", strdup(systemSnapshot()), "/", "/var/tmp/rootfsmnt", NULL);
+                sleep(2);
+                rv = access("/var/tmp/rootfsmnt/sbin/launchd", F_OK);
+            }
+            LOG("rv: " "%d" "\n", rv);
+            message = "Unable to mount or rename system snapshot.  Delete OTA file from Settings - Storage if present";
+            _assert(rv == 0, message);
+            if (kCFCoreFoundationVersionNumber < 1452.23) {
+                rv = easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/var/tmp/rootfsmnt/.", @"/"]);
                 LOG("rv: " "%d" "\n", rv);
                 _assert(rv == 0, message);
             }
@@ -2071,11 +2101,6 @@ void exploit(mach_port_t tfp0,
         rv = unlink("/jb/rsync");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
-        if (!access("/jb/rsync.plist", F_OK)) {
-            rv = unlink("/jb/rsync.plist");
-            LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 0, message);
-        }
         if (!access("/.bootstrapped_electra", F_OK)) {
             rv = unlink("/.bootstrapped_electra");
             LOG("rv: " "%d" "\n", rv);
@@ -2307,10 +2332,6 @@ void exploit(mach_port_t tfp0,
         }
         if (![SettingsTableViewController isSupported]) {
             PROGRESS("Unsupported", 0, 1);
-        }
-        if ((((!access("/electra", F_OK) && !(is_symlink("/electra") == 1)))) && kCFCoreFoundationVersionNumber < 1452.23) {
-            NOTICE("Other jailbreak detected. Please manually uninstall it and try this again.", 1, 1);
-            exit(1);
         }
         // Initialize kernel exploit.
         LOG("Initializing kernel exploit...");

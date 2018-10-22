@@ -115,7 +115,8 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * RC8: Fix the snapshot errors, add a warning for the iOS 11.0-11.1.2 and 11.4 Beta 1 - 3 devices and clean up the code:  [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus-RC8.ipa)
 * RC9: Fix the "Device will be restarted" loop, add even more detailed error messages and add an option to increase the memory limit to improve the stability and add compatibility layer to work correctly with some tweaks that were specifically made for the other jailbreaks:  [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus.ipa)
 * V1: Fix the RootFS Restore for all supported versions, fix the snapshot related issues, make the settings tab match with the rest of the UI, more minor fixes and get this out of beta (Known issues: Some Beta firmwares are still broken):  [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus-V1.ipa)
-* V1.0.1: DISABLE THE ROOTFS RESTORE ON IOS 11.0 - 11.1.2 AND ATTEMPT TO FIX SOME OTHERS (Known issues: Some Beta firmwares are still broken):  [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus.ipa)
+* V1.0.1: DISABLE THE ROOTFS RESTORE ON IOS 11.0 - 11.1.2 AND ATTEMPT TO FIX SOME OTHERS (Known issues: Some Beta firmwares are still broken):  [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus-V1.0.1.ipa)
+* V1.0.2: Bulletproof the RootFS Restore for iOS 11.0 - 11.2.6 (Known issues: Some Beta firmwares are still broken):  [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus.ipa)
 
 ## Special Thanks
 * [@i41nbeer](https://twitter.com/i41nbeer) for triple_fetch, async_wake, empty_list & multi_path

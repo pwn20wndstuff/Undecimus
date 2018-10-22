@@ -1614,23 +1614,13 @@ addr_t find_kernproc(void) {
     addr_t call1, call2, call3, call4, call5, call6, call7;
     addr_t func1;
     
-    addr_t err_str = find_strref("0 == error", 1, 0);
-    err_str -= kerndumpbase;
+    addr_t ret_str = find_strref("\"returning child proc which is not cur_act\"", 1, 0);
+    ret_str -= kerndumpbase;
     
-    call1 = step64_back(kernel, err_str, 20*4, INSN_CALL);
-    call1 -= 4;
-    call2 = step64_back(kernel, call1, 20*4, INSN_CALL);
-    call2 -= 4;
-    call3 = step64_back(kernel, call2, 20*4, INSN_CALL);
-    call3 -= 4;
-    call4 = step64_back(kernel, call3, 20*4, INSN_CALL);
-    call4 -= 4;
-    call5 = step64_back(kernel, call4, 20*4, INSN_CALL);
-    call5 -= 4;
-    call6 = step64_back(kernel, call5, 20*4, INSN_CALL);
+    addr_t end_of_function = step64(kernel, ret_str, 20*4, INSN_RET);
     
     // this gets to the stub
-    addr_t kernproc = calc64(kernel, call6, call5, 1);
+    addr_t kernproc = calc64(kernel, ret_str, end_of_function, 19);
     
     return kernproc;
 }

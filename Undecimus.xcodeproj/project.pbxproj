@@ -141,6 +141,7 @@
 				21675B62214A68B700D20E2B /* Frameworks */,
 			);
 			sourceTree = "<group>";
+			wrapsLines = 0;
 		};
 		21C0FC6821369EB700849420 /* Products */ = {
 			isa = PBXGroup;
