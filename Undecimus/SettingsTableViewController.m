@@ -276,7 +276,6 @@ double uptime(){
     [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]];
     [self.UptimeLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)uptime() / 86400]];
     [self.IncreaseMemoryLimitSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INCREASE_MEMORY_LIMIT]];
-    [self.RestoreRootFSSwitch setEnabled:(kCFCoreFoundationVersionNumber >= 1452.23)];
     [self.tableView reloadData];
 }
 
