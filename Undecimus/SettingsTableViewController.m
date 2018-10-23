@@ -40,22 +40,22 @@ bool hasMPCTP() {
     int sock = socket(39, 1, 0);
     if (sock < 0) return hasMPTCP;
     
-    struct sockaddr *sa_dst = malloc(256);
-    memset(sa_dst, 'A', 256);
+    struct sockaddr *sa_dst = malloc(sizeof(struct sockaddr));
+    memset(sa_dst, 'A', sizeof(struct sockaddr));
     sa_dst->sa_family = AF_INET6;
-    sa_dst->sa_len = sizeof(struct sockaddr_in6);
+    sa_dst->sa_len = sizeof(struct sockaddr);
     
-    struct sockaddr *sa_src = malloc(256);
-    memset(sa_dst, 'A', 256);
-    sa_dst->sa_family = AF_INET6;
-    sa_dst->sa_len = 220;
+    struct sockaddr *sa_src = malloc(sizeof(struct sockaddr));
+    memset(sa_dst, 'A', sizeof(struct sockaddr));
+    sa_dst->sa_family = AF_INET;
+    sa_dst->sa_len = sizeof(struct sockaddr);
     
     sa_endpoints_t sae = {0};
     sae.sae_srcif = 0;
     sae.sae_srcaddr = sa_src;
     sae.sae_dstaddr = sa_dst;
-    sae.sae_dstaddrlen = sizeof(struct sockaddr_in6);
-    sae.sae_srcaddrlen = 220;
+    sae.sae_dstaddrlen = sizeof(struct sockaddr);
+    sae.sae_srcaddrlen = sizeof(struct sockaddr);
     
     errno = 0;
     connectx(sock, &sae, SAE_ASSOCID_ANY, 0, NULL, 0, NULL, NULL);
