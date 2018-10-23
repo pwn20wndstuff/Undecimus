@@ -1420,57 +1420,40 @@ addr_t find_smalloc(void) {
 }
 
 addr_t find_vfs_context_current(void) {
-    addr_t call1;
-    addr_t func1;
-    
     addr_t error_str = find_strref("\"vnode_put(%p): iocount < 1\"", 1, 0);
     error_str -= kerndumpbase;
     
-    call1 = step64_back(kernel, error_str, 10*4, INSN_CALL);
-    func1 = follow_call64(kernel, call1);
+    addr_t call_to_target = step64_back(kernel, error_str, 10*4, INSN_CALL);
+    addr_t offset_to_target = follow_call64(kernel, call_to_target);
     
-    return func1 + kerndumpbase;
+    return offset_to_target + kerndumpbase;
 }
 
-
 addr_t find_vnode_lookup(void) {
-    addr_t call1;
-    addr_t func1;
-    
     addr_t hfs_str = find_strref("hfs: journal open cb: error %d looking up device %s (dev uuid %s)\n", 1, 1);
     hfs_str -= kerndumpbase;
     
-    call1 = step64_back(kernel, hfs_str, 10*4, INSN_CALL);
+    addr_t call_to_stub = step64_back(kernel, hfs_str, 10*4, INSN_CALL);
+    addr_t stub_function = follow_call64(kernel, call_to_stub);
+    addr_t target_function_offset = calc64(kernel, stub_function, stub_function+12, 16);
+    addr_t target_function = *(addr_t*)(kernel+target_function_offset);
     
-    // this gets to the stub
-    func1 = follow_call64(kernel, call1);
-    
-    addr_t stub_offset = calc64(kernel, func1, func1+12, 16);
-    addr_t val = *(addr_t*)(kernel+stub_offset);
-    
-    return val;
+    return target_function;
 }
 
 addr_t find_vnode_put(void) {
-    addr_t call1, call2, call3, call4, call5, call6, call7;
-    addr_t func1;
+    addr_t err_str = find_strref("KBY: getparent(%p) != parent_vp(%p)", 1, 1);
+    err_str -= kerndumpbase;
     
-    addr_t ent_str = find_strref("KBY: getparent(%p) != parent_vp(%p)", 1, 1);
-    ent_str -= kerndumpbase;
+    addr_t call_to_os_log = step64(kernel, err_str, 20*4, INSN_CALL);
+    addr_t call_to_vn_getpath = step64(kernel, call_to_os_log + 4, 20*4, INSN_CALL);
+    addr_t call_to_stub = step64(kernel, call_to_vn_getpath + 4, 20*4, INSN_CALL);
     
-    call1 = step64(kernel, ent_str, 20*4, INSN_CALL);
-    call1 += 4;
-    call2 = step64(kernel, call1, 20*4, INSN_CALL);
-    call2 += 4;
-    call3 = step64(kernel, call2, 20*4, INSN_CALL);
+    addr_t stub_function = follow_call64(kernel, call_to_stub);
+    addr_t target_function_offset = calc64(kernel, stub_function, stub_function+12, 16);
+    addr_t target_function = *(addr_t*)(kernel+target_function_offset);
     
-    // this gets to the stub
-    func1 = follow_call64(kernel, call3);
-    
-    addr_t stub_offset = calc64(kernel, func1, func1+12, 16);
-    addr_t val = *(addr_t*)(kernel+stub_offset);
-    
-    return val;
+    return target_function;
 }
 
 addr_t find_vnode_getfromfd(void) {
@@ -1480,149 +1463,116 @@ addr_t find_vnode_getfromfd(void) {
     addr_t ent_str = find_strref("rootless_storage_class_entitlement", 1, 1);
     ent_str -= kerndumpbase;
     
-    call1 = step64(kernel, ent_str, 20*4, INSN_CALL);
-    call1 += 4;
-    call2 = step64(kernel, call1, 20*4, INSN_CALL);
-    call2 += 4;
-    call3 = step64(kernel, call2, 20*4, INSN_CALL);
-    call3 += 4;
-    call4 = step64(kernel, call3, 20*4, INSN_CALL);
-    call4 += 4;
-    call5 = step64(kernel, call4, 20*4, INSN_CALL);
-    call5 += 4;
-    call6 = step64(kernel, call5, 20*4, INSN_CALL);
-    call6 += 4;
+    addr_t call_to_unk1 = step64(kernel, ent_str, 20*4, INSN_CALL);
+    addr_t call_to_strlcpy = step64(kernel, call_to_unk1 + 4, 20*4, INSN_CALL);
+    addr_t call_to_strlcat = step64(kernel, call_to_strlcpy + 4, 20*4, INSN_CALL);
+    addr_t call_to_unk2 = step64(kernel, call_to_strlcat + 4, 20*4, INSN_CALL);
+    addr_t call_to_unk3 = step64(kernel, call_to_unk2 + 4, 20*4, INSN_CALL);
+    addr_t call_to_vfs_context_create = step64(kernel, call_to_unk3 + 4, 20*4, INSN_CALL);
+    addr_t call_to_stub = step64(kernel, call_to_vfs_context_create + 4, 20*4, INSN_CALL);
     
-    // this gets to the stub
-    call7 = step64(kernel, call6, 20*4, INSN_CALL);
-    func1 = follow_call64(kernel, call7);
+    addr_t stub_function = follow_call64(kernel, call_to_stub);
+    addr_t target_function_offset = calc64(kernel, stub_function, stub_function+12, 16);
+    addr_t target_function = *(addr_t*)(kernel+target_function_offset);
     
-    addr_t stub_offset = calc64(kernel, func1, func1+12, 16);
-    addr_t val = *(addr_t*)(kernel+stub_offset);
-    
-    return val;
+    return target_function;
 }
 
 addr_t find_vnode_getattr(void) {
-    addr_t call1;
-    addr_t func1;
-    
     addr_t error_str = find_strref("\"add_fsevent: you can't pass me a NULL vnode ptr (type %d)!\\n\"", 1, 0);
     error_str -= kerndumpbase;
+    error_str += 12; // Jump over the panic call
     
-    error_str += 12; // bypass the panic call
+    addr_t call_to_target = step64(kernel, error_str, 30*4, INSN_CALL);
+    addr_t offset_to_target = follow_call64(kernel, call_to_target);
     
-    call1 = step64(kernel, error_str, 30*4, INSN_CALL);
-    func1 = follow_call64(kernel, call1);
-    
-    return func1 + kerndumpbase;
+    return offset_to_target + kerndumpbase;
 }
 
 addr_t find_SHA1Init(void) {
-    addr_t call1, call2;
-    addr_t func1;
-    
-    addr_t id_str = find_strref("chip-id", 1, 1);
+    addr_t id_str = find_strref("CrashReporter-ID", 1, 1);
     id_str -= kerndumpbase;
     
-    call1 = step64(kernel, id_str, 30*4, INSN_CALL);
-    func1 = follow_call64(kernel, call1);
+    addr_t call_to_hash_function = step64(kernel, id_str, 10*4, INSN_CALL);
+    addr_t hash_function = follow_call64(kernel, call_to_hash_function);
+    addr_t call_to_stub = step64(kernel, hash_function, 20*4, INSN_CALL);
     
-    return func1 + kerndumpbase;
+    addr_t stub_function = follow_call64(kernel, call_to_stub);
+    addr_t target_function_offset = calc64(kernel, stub_function, stub_function+12, 16);
+    addr_t target_function = *(addr_t*)(kernel+target_function_offset);
+    
+    return target_function;
 }
 
 addr_t find_SHA1Update(void) {
-    addr_t call1, call2;
-    addr_t func1;
-    
-    addr_t id_str = find_strref("chip-id", 1, 1);
+    addr_t id_str = find_strref("CrashReporter-ID", 1, 1);
     id_str -= kerndumpbase;
     
-    call1 = step64(kernel, id_str, 30*4, INSN_CALL);
-    call1 += 4;
-    call2 = step64(kernel, call1, 30*4, INSN_CALL);
-    func1 = follow_call64(kernel, call2);
+    addr_t call_to_hash_function = step64(kernel, id_str, 10*4, INSN_CALL);
+    addr_t hash_function = follow_call64(kernel, call_to_hash_function);
+    addr_t call_to_sha1init = step64(kernel, hash_function, 20*4, INSN_CALL);
+    addr_t call_to_stub = step64(kernel, call_to_sha1init + 4, 20*4, INSN_CALL);
     
-    return func1 + kerndumpbase;
+    addr_t stub_function = follow_call64(kernel, call_to_stub);
+    addr_t target_function_offset = calc64(kernel, stub_function, stub_function+12, 16);
+    addr_t target_function = *(addr_t*)(kernel+target_function_offset);
+    
+    return target_function;
 }
 
 
 addr_t find_SHA1Final(void) {
-    addr_t call1, call2, call3, call4, call5;
-    addr_t func1;
-    
-    addr_t id_str = find_strref("chip-id", 1, 1);
+    addr_t id_str = find_strref("CrashReporter-ID", 1, 1);
     id_str -= kerndumpbase;
     
-    call1 = step64(kernel, id_str, 30*4, INSN_CALL);
-    call1 += 4;
-    call2 = step64(kernel, call1, 30*4, INSN_CALL);
-    call2 += 4;
-    call3 = step64(kernel, call2, 30*4, INSN_CALL);
-    call3 += 4;
-    call4 = step64(kernel, call3, 30*4, INSN_CALL);
-    call4 += 4;
-    call5 = step64(kernel, call4, 30*4, INSN_CALL);
-    func1 = follow_call64(kernel, call5);
+    addr_t call_to_hash_function = step64(kernel, id_str, 10*4, INSN_CALL);
+    addr_t hash_function = follow_call64(kernel, call_to_hash_function);
+    addr_t call_to_sha1init = step64(kernel, hash_function, 20*4, INSN_CALL);
+    addr_t call_to_sha1update = step64(kernel, call_to_sha1init + 4, 20*4, INSN_CALL);
+    addr_t call_to_stub = step64(kernel, call_to_sha1update + 4, 20*4, INSN_CALL);
     
-    return func1 + kerndumpbase;
+    addr_t stub_function = follow_call64(kernel, call_to_stub);
+    addr_t target_function_offset = calc64(kernel, stub_function, stub_function+12, 16);
+    addr_t target_function = *(addr_t*)(kernel+target_function_offset);
+    
+    return target_function;
 }
 
 addr_t find_csblob_entitlements_dictionary_set(void) {
-    addr_t call1, call2, call3, call4, call5, call6, call7;
-    addr_t func1;
-    
     addr_t ent_str = find_strref("entitlements are not a dictionary", 1, 1);
     ent_str -= kerndumpbase;
     
-    call1 = step64(kernel, ent_str, 20*4, INSN_CALL);
-    call1 += 4;
-    call2 = step64(kernel, call1, 20*4, INSN_CALL);
-    call2 += 4;
-    call3 = step64(kernel, call2, 20*4, INSN_CALL);
-    /*call3 += 4;
-     call4 = step64(kernel, call3, 20*4, INSN_CALL);
-     call4 += 4;
-     call5 = step64(kernel, call4, 20*4, INSN_CALL);*/
+    addr_t call_to_lck_mtx_lock = step64(kernel, ent_str, 20*4, INSN_CALL);
+    addr_t call_to_csblob_entitlements_dictionary_copy = step64(kernel, call_to_lck_mtx_lock + 4, 20*4, INSN_CALL);
+    addr_t call_to_stub = step64(kernel, call_to_csblob_entitlements_dictionary_copy + 4, 20*4, INSN_CALL);
     
-    // this gets to the stub
-    call7 = step64(kernel, call3, 20*4, INSN_CALL); // IF DOESNT WORK, REPLACE THIS WITH call5, AND UNCOMMENT
-    func1 = follow_call64(kernel, call7);
+    addr_t stub_function = follow_call64(kernel, call_to_stub);
+    addr_t target_function_offset = calc64(kernel, stub_function, stub_function+12, 16);
+    addr_t target_function = *(addr_t*)(kernel+target_function_offset);
     
-    addr_t stub_offset = calc64(kernel, func1, func1+12, 16);
-    addr_t val = *(addr_t*)(kernel+stub_offset);
-    
-    return val;
+    return target_function;
 }
+
 addr_t find_kernel_task(void) {
-    addr_t call1, call2, call3, call4, call5, call6, call7;
-    addr_t func1;
+    addr_t term_str = find_strref("\"thread_terminate\"", 1, 0);
+    term_str -= kerndumpbase;
     
-    addr_t str = find_strref("\"thread_terminate\"", 1, 0);
-    str -= kerndumpbase;
+    addr_t thread_terminate = bof64(kernel, xnucore_base, term_str);
+    addr_t call_to_unk1 = step64(kernel, thread_terminate, 20*4, INSN_CALL);
     
-    func1 = bof64(kernel, xnucore_base, str); // find thread_terminate
-    
-    call1 = step64(kernel, func1, 20*4, INSN_CALL); // Find the first call
-    
-    addr_t kern_task = calc64(kernel, func1, call1, 9);
-    return kern_task;
+    addr_t kern_task = calc64(kernel, thread_terminate, call_to_unk1, 9);
+    return kern_task + kerndumpbase;
 }
 
 
 addr_t find_kernproc(void) {
-    addr_t call1, call2, call3, call4, call5, call6, call7;
-    addr_t func1;
-    
     addr_t ret_str = find_strref("\"returning child proc which is not cur_act\"", 1, 0);
     ret_str -= kerndumpbase;
     
     addr_t end_of_function = step64(kernel, ret_str, 20*4, INSN_RET);
     
-    // this gets to the stub
     addr_t kernproc = calc64(kernel, ret_str, end_of_function, 19);
-    
-    return kernproc;
+    return kernproc + kerndumpbase;
 }
 #ifdef HAVE_MAIN
 #include <mach-o/nlist.h>

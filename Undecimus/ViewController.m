@@ -1058,13 +1058,19 @@ void exploit(mach_port_t tfp0,
     char buf_targettype[256];
     size_t size = 0;
     const char *message = NULL;
+#define SETMESSAGE(msg) \
+    message = msg;
+#define SETOFFSET(offset, addr) \
+    offsets.offset = addr;
+#define GETOFFSET(offset) offsets.offset
+#define kernel_slide (kernel_base - KERNEL_SEARCH_ADDRESS)
     
     {
         // Initialize patchfinder64.
         
         LOG("Initializing patchfinder64...");
         PROGRESS("Exploiting... (2/51)", 0, 0);
-        message = "Failed to initialize patchfinder64.";
+        SETMESSAGE("Failed to initialize patchfinder64.");
         rv = init_kernel(kernel_base, NULL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
@@ -1076,58 +1082,63 @@ void exploit(mach_port_t tfp0,
         
         LOG("Finding offsets...");
         PROGRESS("Exploiting... (3/51)", 0, 0);
-        message = "Failed to find trust_chain offset.";
-        offsets.trust_chain = find_trustcache();
-        LOG("trust_chain: " ADDR "\n", offsets.trust_chain);
-        _assert(offsets.trust_chain, message);
-        message = "Failed to find amficache offset.";
-        offsets.amficache = find_amficache();
-        LOG("amficache: " ADDR "\n", offsets.amficache);
-        _assert(offsets.amficache, message);
-        message = "Failed to find OSBoolean_True offset.";
-        offsets.OSBoolean_True = find_OSBoolean_True();
-        LOG("OSBoolean_True: " ADDR "\n", offsets.OSBoolean_True);
-        _assert(offsets.OSBoolean_True, message);
-        message = "Failed to find OSBoolean_False offset.";
-        offsets.OSBoolean_False = find_OSBoolean_False();
-        LOG("OSBoolean_False: " ADDR "\n", offsets.OSBoolean_False);
-        _assert(offsets.OSBoolean_False, message);
-        message = "Failed to find osunserializexml offset.";
-        offsets.osunserializexml = find_osunserializexml();
-        LOG("osunserializexml: " ADDR "\n", offsets.osunserializexml);
-        _assert(offsets.osunserializexml, message);
-        message = "Failed to find smalloc offset.";
-        offsets.smalloc = find_smalloc();
-        LOG("smalloc: " ADDR "\n", offsets.smalloc);
-        _assert(offsets.smalloc, message);
-        message = "Failed to find allproc offset.";
-        offsets.allproc = find_allproc();
-        LOG("allproc: " ADDR "\n", offsets.allproc);
-        _assert(offsets.allproc, message);
-        message = "Failed to find add_x0_x0_0x40_ret offset.";
-        offsets.add_x0_x0_0x40_ret = find_add_x0_x0_0x40_ret();
-        LOG("add_x0_x0_0x40_ret: " ADDR "\n", offsets.add_x0_x0_0x40_ret);
-        _assert(offsets.add_x0_x0_0x40_ret, message);
-        message = "Failed to find rootvnode offset.";
-        offsets.rootvnode = find_rootvnode();
-        LOG("rootvnode: " ADDR "\n", offsets.rootvnode);
-        _assert(offsets.rootvnode, message);
-        message = "Failed to find zone_map_ref offset.";
-        offsets.zone_map_ref = find_zone_map_ref();
-        LOG("zone_map_ref: " ADDR "\n", offsets.zone_map_ref);
-        _assert(offsets.zone_map_ref, message);
-        message = "Failed to find vfs_context_current offset.";
-        offsets.vfs_context_current = find_vfs_context_current();
-        LOG("vfs_context_current: " ADDR "\n", offsets.vfs_context_current);
-        _assert(offsets.vfs_context_current, message);
-        message = "Failed to find vnode_lookup offset.";
-        offsets.vnode_lookup = find_vnode_lookup();
-        LOG("vnode_lookup: " ADDR "\n", offsets.vnode_lookup);
-        _assert(offsets.vnode_lookup, message);
-        message = "Failed to find vnode_put offset.";
-        offsets.vnode_put = find_vnode_put();
-        LOG("vnode_put: " ADDR "\n", offsets.vnode_put);
-        _assert(offsets.vnode_put, message);
+        SETMESSAGE("Failed to find trust_chain offset.");
+        SETOFFSET(trust_chain, find_trustcache());
+        LOG("trust_chain: " ADDR "\n", GETOFFSET(trust_chain));
+        _assert(GETOFFSET(trust_chain), message);
+        SETMESSAGE("Failed to find amficache offset.");
+        SETOFFSET(amficache, find_amficache());
+        LOG("amficache: " ADDR "\n", GETOFFSET(amficache));
+        _assert(GETOFFSET(amficache), message);
+        SETMESSAGE("Failed to find OSBoolean_True offset.");
+        SETOFFSET(OSBoolean_True, find_OSBoolean_True());
+        LOG("OSBoolean_True: " ADDR "\n", GETOFFSET(OSBoolean_True));
+        _assert(GETOFFSET(OSBoolean_True), message);
+        SETMESSAGE("Failed to find OSBoolean_False offset.");
+        SETOFFSET(OSBoolean_False, find_OSBoolean_False());
+        LOG("OSBoolean_False: " ADDR "\n", GETOFFSET(OSBoolean_False));
+        _assert(GETOFFSET(OSBoolean_False), message);
+        SETMESSAGE("Failed to find osunserializexml offset.");
+        SETOFFSET(osunserializexml, find_osunserializexml());
+        LOG("osunserializexml: " ADDR "\n", GETOFFSET(osunserializexml));
+        _assert(GETOFFSET(osunserializexml), message);
+        SETMESSAGE("Failed to find smalloc offset.");
+        SETOFFSET(smalloc, find_smalloc());
+        LOG("smalloc: " ADDR "\n", GETOFFSET(smalloc));
+        _assert(GETOFFSET(smalloc), message);
+        SETMESSAGE("Failed to find allproc offset.");
+        SETOFFSET(allproc, find_allproc());
+        LOG("allproc: " ADDR "\n", GETOFFSET(allproc));
+        _assert(GETOFFSET(allproc), message);
+        SETMESSAGE("Failed to find add_x0_x0_0x40_ret offset.");
+        SETOFFSET(add_x0_x0_0x40_ret, find_add_x0_x0_0x40_ret());
+        LOG("add_x0_x0_0x40_ret: " ADDR "\n", GETOFFSET(add_x0_x0_0x40_ret));
+        _assert(GETOFFSET(add_x0_x0_0x40_ret), message);
+        SETMESSAGE("Failed to find rootvnode offset.");
+        SETOFFSET(rootvnode, find_rootvnode());
+        LOG("rootvnode: " ADDR "\n", GETOFFSET(rootvnode));
+        _assert(GETOFFSET(rootvnode), message);
+        SETMESSAGE("Failed to find zone_map_ref offset.");
+        SETOFFSET(zone_map_ref, find_zone_map_ref());
+        LOG("zone_map_ref: " ADDR "\n", GETOFFSET(zone_map_ref));
+        _assert(GETOFFSET(zone_map_ref), message);
+        SETMESSAGE("Failed to find vfs_context_current offset.");
+        SETOFFSET(vfs_context_current, find_vfs_context_current());
+        LOG("vfs_context_current: " ADDR "\n", GETOFFSET(vfs_context_current));
+        _assert(GETOFFSET(vfs_context_current), message);
+        SETMESSAGE("Failed to find vnode_lookup offset.");
+        SETOFFSET(vnode_lookup, find_vnode_lookup());
+        LOG("vnode_lookup: " ADDR "\n", GETOFFSET(vnode_lookup));
+        _assert(GETOFFSET(vnode_lookup), message);
+        SETMESSAGE("Failed to find vnode_put offset.");
+        SETOFFSET(vnode_put, find_vnode_put());
+        LOG("vnode_put: " ADDR "\n", GETOFFSET(vnode_put));
+        _assert(GETOFFSET(vnode_put), message);
+        if (kCFCoreFoundationVersionNumber >= 1452.23) {
+            SETOFFSET(kernproc, find_kernproc());
+            LOG("kernproc: " ADDR "\n", GETOFFSET(kernproc));
+            _assert(GETOFFSET(kernproc), message);
+        }
         LOG("Successfully found offsets.");
     }
     
@@ -1145,10 +1156,16 @@ void exploit(mach_port_t tfp0,
         
         LOG("Initializing QiLin...");
         PROGRESS("Exploiting... (5/51)", 0, 0);
-        message = "Failed to initialize QiLin.";
+        SETMESSAGE("Failed to initialize QiLin.");
         rv = initQiLin(tfp0, kernel_base);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
+        if (kCFCoreFoundationVersionNumber >= 1452.23) {
+            setKernelSymbol("_kernproc", GETOFFSET(kernproc) - kernel_slide);
+            setKernelSymbol("_rootvnode", GETOFFSET(rootvnode) - kernel_slide);
+        }
+        _assert(findKernelSymbol("_kernproc"), message);
+        _assert(findKernelSymbol("_rootvnode"), message);
         LOG("Successfully initialized QiLin.");
     }
     
@@ -1157,7 +1174,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Rootifying...");
         PROGRESS("Exploiting... (6/51)", 0, 0);
-        message = "Failed to rootify.";
+        SETMESSAGE("Failed to rootify.");
         rv = rootifyMe();
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
@@ -1172,7 +1189,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Platformizing...");
         PROGRESS("Exploiting... (7/51)", 0, 0);
-        message = "Failed to platformize.";
+        SETMESSAGE("Failed to platformize.");
         rv = platformizeMe();
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
@@ -1193,7 +1210,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Writing a test file to UserFS...");
         PROGRESS("Exploiting... (9/51)", 0, 0);
-        message = "Failed to write a test file to UserFS.";
+        SETMESSAGE("Failed to write a test file to UserFS.");
         if (!access("/var/mobile/test.txt", F_OK)) {
             rv = unlink("/var/mobile/test.txt");
             LOG("rv: " "%d" "\n", rv);
@@ -1234,7 +1251,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Dumping APTicket...");
             PROGRESS("Exploiting... (11/51)", 0, 0);
-            message = "Failed to dump APTicket.";
+            SETMESSAGE("Failed to dump APTicket.");
             rv = [[NSData dataWithContentsOfFile:@"/System/Library/Caches/apticket.der"] writeToFile:[NSString stringWithFormat:@"%@/Documents/apticket.der", NSHomeDirectory()] atomically:YES];
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 1, message);
@@ -1247,7 +1264,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Unlocking nvram...");
         PROGRESS("Exploiting... (12/51)", 0, 0);
-        message = "Failed to unlock nvram.";
+        SETMESSAGE("Failed to unlock nvram.");
         rv = unlocknvram();
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
@@ -1259,7 +1276,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Setting boot-nonce...");
         PROGRESS("Exploiting... (13/51)", 0, 0);
-        message = "Failed to set boot-nonce.";
+        SETMESSAGE("Failed to set boot-nonce.");
         rv = execCommandAndWait("/usr/sbin/nvram", "com.apple.System.boot-nonce", NULL, NULL, NULL, NULL);
         LOG("rv: " "%d" "\n", rv);
         if (overwrite_boot_nonce || rv == 512) {
@@ -1278,7 +1295,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Locking nvram...");
         PROGRESS("Exploiting... (14/51)", 0, 0);
-        message = "Failed to lock nvram.";
+        SETMESSAGE("Failed to lock nvram.");
         rv = locknvram();
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
@@ -1290,7 +1307,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Initializing kexecute...");
         PROGRESS("Exploiting... (15/51)", 0, 0);
-        init_kexecute(offsets.add_x0_x0_0x40_ret);
+        init_kexecute(GETOFFSET(add_x0_x0_0x40_ret));
         LOG("Successfully initialized kexecute.");
     }
     
@@ -1299,8 +1316,8 @@ void exploit(mach_port_t tfp0,
         
         LOG("Getting vfs_context...");
         PROGRESS("Exploiting... (16/51)", 0, 0);
-        message = "Failed to get vfs_context.";
-        vfs_context = _vfs_context(offsets.vfs_context_current, offsets.zone_map_ref);
+        SETMESSAGE("Failed to get vfs_context.");
+        vfs_context = _vfs_context(GETOFFSET(vfs_context_current), GETOFFSET(zone_map_ref));
         LOG("vfs_context: " ADDR "\n", vfs_context);
         _assert(vfs_context, message);
         LOG("Successfully got vfs_context.");
@@ -1311,8 +1328,8 @@ void exploit(mach_port_t tfp0,
         
         LOG("Getting dev vnode...");
         PROGRESS("Exploiting... (17/51)", 0, 0);
-        message = "Failed to get dev vnode.";
-        devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", offsets.vnode_lookup);
+        SETMESSAGE("Failed to get dev vnode.");
+        devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", GETOFFSET(vnode_lookup));
         LOG("devVnode: " ADDR "\n", devVnode);
         _assert(devVnode, message);
         LOG("Successfully got dev vnode.");
@@ -1332,8 +1349,8 @@ void exploit(mach_port_t tfp0,
         
         LOG("Cleaning up dev vnode...");
         PROGRESS("Exploiting... (19/51)", 0, 0);
-        message = "Failed to clean up dev vnode.";
-        rv = _vnode_put(offsets.vnode_put, devVnode);
+        SETMESSAGE("Failed to clean up dev vnode.");
+        rv = _vnode_put(GETOFFSET(vnode_put), devVnode);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         LOG("Successfully cleaned up dev vnode.");
@@ -1353,7 +1370,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Remounting RootFS...");
         PROGRESS("Exploiting... (21/51)", 0, 0);
-        message = "Failed to remount RootFS.";
+        SETMESSAGE("Failed to remount RootFS.");
         i = snapshot_list(open("/", O_RDONLY, 0));
         LOG("i: " "%d" "\n", i);
         _assert(rv == 0, message);
@@ -1367,7 +1384,7 @@ void exploit(mach_port_t tfp0,
             rv = mkdir("/var/tmp/rootfsmnt", 0755);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, message);
-            rv = spawnAndShaiHulud("/sbin/mount_apfs", "/dev/disk0s1s1", "/var/tmp/rootfsmnt", NULL, NULL, NULL);
+            rv = spawnAndShaihuludAndWait("/sbin/mount_apfs", "/dev/disk0s1s1", "/var/tmp/rootfsmnt", NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, message);
             
@@ -1392,12 +1409,12 @@ void exploit(mach_port_t tfp0,
             if (i > 0) {
                 rv = fs_snapshot_rename(open("/var/tmp/rootfsmnt", O_RDONLY, 0), systemSnapshot(), (snapshot_check(open("/var/tmp/rootfsmnt", O_RDONLY, 0), "orig-fs") == 1) ? "electra-prejailbreak" : "orig-fs", 0);
                 LOG("rv: " "%d" "\n", rv);
-                message = "Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present";
+                SETMESSAGE("Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
                 _assert(rv == 0, message);
             } else {
                 rv = fs_snapshot_create(open("/var/tmp/rootfsmnt", O_RDONLY, 0), "orig-fs", 0);
                 LOG("rv: " "%d" "\n", rv);
-                message = "Unable to create system snapshot.  Delete OTA file from Settings - Storage if present";
+                SETMESSAGE("Unable to create system snapshot.  Delete OTA file from Settings - Storage if present");
                 _assert(rv == 0, message);
             }
             LOG("Successfully renamed system snapshot.");
@@ -1412,7 +1429,7 @@ void exploit(mach_port_t tfp0,
             _assert(rv == 0, message);
             LOG("Successfully rebooted.");
         }
-        rootfs_vnode = rk64(offsets.rootvnode);
+        rootfs_vnode = rk64(GETOFFSET(rootvnode));
         v_mount = rk64(rootfs_vnode + 0xd8);
         v_flag = rk32(v_mount + 0x70);
         v_flag = v_flag & ~MNT_NOSUID;
@@ -1432,7 +1449,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Writing a test file to RootFS...");
         PROGRESS("Exploiting... (25/51)", 0, 0);
-        message = "Failed to write a test file to RootFS.";
+        SETMESSAGE("Failed to write a test file to RootFS.");
         if (!access("/test.txt", F_OK)) {
             rv = unlink("/test.txt");
             LOG("rv: " "%d" "\n", rv);
@@ -1461,32 +1478,31 @@ void exploit(mach_port_t tfp0,
         
         LOG("Copying over our resources to RootFS...");
         PROGRESS("Exploiting... (27/51)", 0, 0);
-        message = "Failed to copy over our resources to RootFS.";
-        if (!access("/jb", F_OK)) {
-            rv = [[NSFileManager defaultManager] removeItemAtPath:@"/jb" error:nil];
+        SETMESSAGE("Failed to copy over our resources to RootFS.");
+        if (access("/jb", F_OK)) {
+            rv = mkdir("/jb", 0755);
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 1, message);
+            _assert(rv == 0, message);
+            rv = chown("/jb", 0, 0);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
         }
-        rv = mkdir("/jb", 0755);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0, message);
-        rv = chown("/jb", 0, 0);
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0, message);
         
-        if (!access("/electra", F_OK)) {
-            rv = [[NSFileManager defaultManager] removeItemAtPath:@"/electra" error:nil];
+        if (access("/electra", F_OK)) {
+            rv = symlink("/jb", "/electra");
             LOG("rv: " "%d" "\n", rv);
-            _assert(rv == 1, message);
+            _assert(rv == 0, message);
         }
-        rv = symlink("/jb", "/electra");
-        LOG("rv: " "%d" "\n", rv);
-        _assert(rv == 0, message);
         
         rv = chdir("/jb");
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         
+        if (!access("/jb/amfid_payload.dylib", F_OK)) {
+            rv = unlink("/jb/amfid_payload.dylib");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
+        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"amfid_payload" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
@@ -1501,6 +1517,11 @@ void exploit(mach_port_t tfp0,
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         
+        if (!access("/jb/launchctl", F_OK)) {
+            rv = unlink("/jb/launchctl");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
+        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"launchctl" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
@@ -1515,6 +1536,11 @@ void exploit(mach_port_t tfp0,
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         
+        if (!access("/jb/jailbreakd", F_OK)) {
+            rv = unlink("/jb/jailbreakd");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
+        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"jailbreakd" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
@@ -1529,6 +1555,11 @@ void exploit(mach_port_t tfp0,
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         
+        if (!access("/jb/libjailbreak.dylib", F_OK)) {
+            rv = unlink("/jb/libjailbreak.dylib");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
+        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"libjailbreak" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
@@ -1543,6 +1574,11 @@ void exploit(mach_port_t tfp0,
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         
+        if (!access("/jb/pspawn_hook.dylib", F_OK)) {
+            rv = unlink("/jb/pspawn_hook.dylib");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
+        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"pspawn_hook" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
@@ -1557,6 +1593,11 @@ void exploit(mach_port_t tfp0,
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         
+        if (!access("/jb/tar", F_OK)) {
+            rv = unlink("/jb/tar");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
+        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"tar" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
@@ -1571,6 +1612,11 @@ void exploit(mach_port_t tfp0,
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         
+        if (!access("/jb/lzma", F_OK)) {
+            rv = unlink("/jb/lzma");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
+        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"lzma" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
@@ -1585,6 +1631,11 @@ void exploit(mach_port_t tfp0,
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         
+        if (!access("/jb/spawn", F_OK)) {
+            rv = unlink("/jb/spawn");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
+        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"spawn" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
@@ -1599,6 +1650,11 @@ void exploit(mach_port_t tfp0,
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         
+        if (!access("/jb/strap.tar.lzma", F_OK)) {
+            rv = unlink("/jb/strap.tar.lzma");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
+        }
         rv = copyfile([[[NSBundle mainBundle] pathForResource:@"strap.tar" ofType:@"lzma"] UTF8String], "/var/tmp/strap.tar.lzma", 0, COPYFILE_ALL);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
@@ -1609,6 +1665,11 @@ void exploit(mach_port_t tfp0,
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         
+        if (!access("/jb/debugserver", F_OK)) {
+            rv = unlink("/jb/debugserver");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
+        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"debugserver" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
@@ -1623,6 +1684,11 @@ void exploit(mach_port_t tfp0,
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         
+        if (!access("/jb/rsync", F_OK)) {
+            rv = unlink("/jb/rsync");
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, message);
+        }
         a = fopen([[[NSBundle mainBundle] pathForResource:@"rsync" ofType:@"tar"] UTF8String], "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
@@ -1644,14 +1710,14 @@ void exploit(mach_port_t tfp0,
         // Inject trust cache
         
         PROGRESS("Exploiting... (28/51)", 0, 0);
-        printf("trust_chain = 0x%llx\n", offsets.trust_chain);
-        message = "Failed to inject trust cache.";
+        printf("trust_chain = 0x%llx\n", GETOFFSET(trust_chain));
+        SETMESSAGE("Failed to inject trust cache.");
         
-        mem.next = rk64(offsets.trust_chain);
+        mem.next = rk64(GETOFFSET(trust_chain));
         *(uint64_t *)&mem.uuid[0] = 0xabadbabeabadbabe;
         *(uint64_t *)&mem.uuid[8] = 0xabadbabeabadbabe;
         
-        rv = grab_hashes("/jb", kread, offsets.amficache, mem.next);
+        rv = grab_hashes("/jb", kread, GETOFFSET(amficache), mem.next);
         printf("rv = %d, numhash = %d\n", rv, numhash);
         _assert(rv == 0, message);
         
@@ -1662,7 +1728,7 @@ void exploit(mach_port_t tfp0,
         mem.count = numhash;
         kwrite(kernel_trust, &mem, sizeof(mem));
         kwrite(kernel_trust + sizeof(mem), allhash, numhash * 20);
-        wk64(offsets.trust_chain, kernel_trust);
+        wk64(GETOFFSET(trust_chain), kernel_trust);
         
         free(allhash);
         free(allkern);
@@ -1674,11 +1740,11 @@ void exploit(mach_port_t tfp0,
         
         LOG("Logging slide...");
         PROGRESS("Exploiting... (29/51)", 0, 0);
-        message = "Failed to log slide.";
+        SETMESSAGE("Failed to log slide.");
         a = fopen("/tmp/slide.txt", "w+");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
-        fprintf(a, ADDR "\n", kernel_base - KERNEL_SEARCH_ADDRESS);
+        fprintf(a, ADDR "\n", kernel_slide);
         rv = chmod("/tmp/slide.txt", 0644);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
@@ -1696,8 +1762,8 @@ void exploit(mach_port_t tfp0,
         
         LOG("Setting HSP4...");
         PROGRESS("Exploiting... (30/51)", 0, 0);
-        message = "Failed to set HSP4.";
-        rv = remap_tfp0_set_hsp4(&tfp0, offsets.zone_map_ref);
+        SETMESSAGE("Failed to set HSP4.");
+        rv = remap_tfp0_set_hsp4(&tfp0, GETOFFSET(zone_map_ref));
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
         LOG("Successfully set HSP4.");
@@ -1718,7 +1784,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Patching amfid...");
         PROGRESS("Exploiting... (32/51)", 0, 0);
-        message = "Failed to patch amfid.";
+        SETMESSAGE("Failed to patch amfid.");
         if (!access("/var/tmp/amfid_payload.alive", F_OK)) {
             rv = unlink("/var/tmp/amfid_payload.alive");
             LOG("rv: " "%d" "\n", rv);
@@ -1744,7 +1810,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Spawning jailbreakd...");
         PROGRESS("Exploiting... (33/51)", 0, 0);
-        message = "Failed to spawn jailbreakd.";
+        SETMESSAGE("Failed to spawn jailbreakd.");
         if (!access("/usr/lib/libjailbreak.dylib", F_OK)) {
             rv = unlink("/usr/lib/libjailbreak.dylib");
             LOG("rv: " "%d" "\n", rv);
@@ -1772,12 +1838,12 @@ void exploit(mach_port_t tfp0,
         md[@"EnvironmentVariables"] = [[NSMutableDictionary alloc] init];
         md[@"EnvironmentVariables"][@"KernelBase"] = [NSString stringWithFormat:@ADDR, kernel_base];
         md[@"EnvironmentVariables"][@"KernProcAddr"] = [NSString stringWithFormat:@ADDR, rk64(findKernelSymbol("_kernproc"))];
-        md[@"EnvironmentVariables"][@"ZoneMapOffset"] = [NSString stringWithFormat:@ADDR, offsets.zone_map_ref - (kernel_base - KERNEL_SEARCH_ADDRESS)];
-        md[@"EnvironmentVariables"][@"AddRetGadget"] = [NSString stringWithFormat:@ADDR, offsets.add_x0_x0_0x40_ret];
-        md[@"EnvironmentVariables"][@"OSBooleanTrue"] = [NSString stringWithFormat:@ADDR, offsets.OSBoolean_True];
-        md[@"EnvironmentVariables"][@"OSBooleanFalse"] = [NSString stringWithFormat:@ADDR, offsets.OSBoolean_False];
-        md[@"EnvironmentVariables"][@"OSUnserializeXML"] = [NSString stringWithFormat:@ADDR, offsets.osunserializexml];
-        md[@"EnvironmentVariables"][@"Smalloc"] = [NSString stringWithFormat:@ADDR, offsets.smalloc];
+        md[@"EnvironmentVariables"][@"ZoneMapOffset"] = [NSString stringWithFormat:@ADDR, GETOFFSET(zone_map_ref) - kernel_slide];
+        md[@"EnvironmentVariables"][@"AddRetGadget"] = [NSString stringWithFormat:@ADDR, GETOFFSET(add_x0_x0_0x40_ret)];
+        md[@"EnvironmentVariables"][@"OSBooleanTrue"] = [NSString stringWithFormat:@ADDR, GETOFFSET(OSBoolean_True)];
+        md[@"EnvironmentVariables"][@"OSBooleanFalse"] = [NSString stringWithFormat:@ADDR, GETOFFSET(OSBoolean_False)];
+        md[@"EnvironmentVariables"][@"OSUnserializeXML"] = [NSString stringWithFormat:@ADDR, GETOFFSET(osunserializexml)];
+        md[@"EnvironmentVariables"][@"Smalloc"] = [NSString stringWithFormat:@ADDR, GETOFFSET(smalloc)];
         md[@"UserName"] = @"root";
         md[@"MachServices"] = [[NSMutableDictionary alloc] init];
         md[@"MachServices"][@"zone.sparkes.jailbreakd"] = [[NSMutableDictionary alloc] init];
@@ -1822,7 +1888,7 @@ void exploit(mach_port_t tfp0,
     {
         // Patch launchd.
         
-        message = "Failed to patch launchd.";
+        SETMESSAGE("Failed to patch launchd.");
         if (!access("/usr/lib/pspawn_hook.dylib", F_OK)) {
             rv = unlink("/usr/lib/pspawn_hook.dylib");
             LOG("rv: " "%d" "\n", rv);
@@ -1861,7 +1927,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Updating version string...");
         PROGRESS("Exploiting... (35/51)", 0, 0);
-        message = "Failed to update version string.";
+        SETMESSAGE("Failed to update version string.");
         rv = uname(&u);
         LOG("rv: " "%d" "\n", rv);
         _assert(rv == 0, message);
@@ -1878,7 +1944,7 @@ void exploit(mach_port_t tfp0,
     }
     
     {
-        message = "Failed to Restore RootFS.";
+        SETMESSAGE("Failed to Restore RootFS.");
         if ((!access("/electra", F_OK) && !(is_symlink("/electra") == 1)) || restore_rootfs) {
             // Borrow entitlements from fsck_apfs.
             
@@ -1906,27 +1972,24 @@ void exploit(mach_port_t tfp0,
             }
             if (snapshot_check(open("/", O_RDONLY, 0), "electra-prejailbreak") == 1) {
                 if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    rv = spawnAndShaiHulud("/sbin/mount_apfs", "-s", "electra-prejailbreak", "/", "/var/tmp/rootfsmnt", NULL);
-                    sleep(2);
+                    rv = spawnAndShaihuludAndWait("/sbin/mount_apfs", "-s", "electra-prejailbreak", "/", "/var/tmp/rootfsmnt", NULL);
                     rv = access("/var/tmp/rootfsmnt/sbin/launchd", F_OK);
                 } else {
                     rv = fs_snapshot_rename(open("/", O_RDONLY, 0), "electra-prejailbreak", systemSnapshot(), 0);
                 }
             } else if (snapshot_check(open("/", O_RDONLY, 0), "orig-fs") == 1) {
                 if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    rv = spawnAndShaiHulud("/sbin/mount_apfs", "-s", "orig-fs", "/", "/var/tmp/rootfsmnt", NULL);
-                    sleep(2);
+                    rv = spawnAndShaihuludAndWait("/sbin/mount_apfs", "-s", "orig-fs", "/", "/var/tmp/rootfsmnt", NULL);
                     rv = access("/var/tmp/rootfsmnt/sbin/launchd", F_OK);
                 } else {
                     rv = fs_snapshot_rename(open("/", O_RDONLY, 0), "orig-fs", systemSnapshot(), 0);
                 }
             } else {
-                rv = spawnAndShaiHulud("/sbin/mount_apfs", "-s", strdup(systemSnapshot()), "/", "/var/tmp/rootfsmnt", NULL);
-                sleep(2);
+                rv = spawnAndShaihuludAndWait("/sbin/mount_apfs", "-s", strdup(systemSnapshot()), "/", "/var/tmp/rootfsmnt", NULL);
                 rv = access("/var/tmp/rootfsmnt/sbin/launchd", F_OK);
             }
             LOG("rv: " "%d" "\n", rv);
-            message = "Unable to mount or rename system snapshot.  Delete OTA file from Settings - Storage if present";
+            SETMESSAGE("Unable to mount or rename system snapshot.  Delete OTA file from Settings - Storage if present");
             _assert(rv == 0, message);
             if (kCFCoreFoundationVersionNumber < 1452.23) {
                 rv = easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/var/tmp/rootfsmnt/.", @"/"]);
@@ -2041,7 +2104,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Extracting bootstrap...");
         PROGRESS("Exploiting... (42/51)", 0, 0);
-        message = "Failed to extract bootstrap.";
+        SETMESSAGE("Failed to extract bootstrap.");
         if (access("/.installed_unc0ver", F_OK)) {
             rv = chdir("/");
             LOG("rv: " "%d" "\n", rv);
@@ -2118,7 +2181,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Disabling stashing...");
             PROGRESS("Exploiting... (43/51)", 0, 0);
-            message = "Failed to disable stashing.";
+            SETMESSAGE("Failed to disable stashing.");
             a = fopen("/.cydia_no_stash", "w");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message);
@@ -2150,7 +2213,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Allowing SpringBoard to show non-default system apps...");
         PROGRESS("Exploiting... (45/51)", 0, 0);
-        message = "Failed to allow SpringBoard to show non-default system apps.";
+        SETMESSAGE("Failed to allow SpringBoard to show non-default system apps.");
         md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
         _assert(md != nil, "Failed to allow SpringBoard to show non-default system apps.");
         for (int i = 0; !(i >= 5 || [md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)]); i++) {
@@ -2177,7 +2240,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Disabling Auto Updates...");
             PROGRESS("Exploiting... (46/51)", 0, 0);
-            message = "Failed to disable auto updates.";
+            SETMESSAGE("Failed to disable auto updates.");
             if (!access("/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", F_OK)) {
                 rv = execCommandAndWait("/bin/launchctl", "unload", "/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", NULL, NULL, NULL);
                 LOG("rv: " "%d" "\n", rv);
@@ -2220,7 +2283,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Enable Auto Updates...");
             PROGRESS("Exploiting... (47/51)", 0, 0);
-            message = "Failed to enable auto updates.";
+            SETMESSAGE("Failed to enable auto updates.");
             if (!access("/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/softwareupdated", F_OK)) {
                 rv = rename("/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/softwareupdated", "/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/Support/softwareupdated");
                 LOG("rv: " "%d" "\n", rv);
@@ -2256,7 +2319,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Increasing memory limit...");
             PROGRESS("Exploiting... (48/51)", 0, 0);
-            message = "Failed to increase memory limit.";
+            SETMESSAGE("Failed to increase memory limit.");
             bzero(buf_targettype, sizeof(buf_targettype));
             size = sizeof(buf_targettype);
             rv = sysctlbyname("hw.targettype", buf_targettype, &size, NULL, 0);
@@ -2290,7 +2353,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Running uicache...");
             PROGRESS("Exploiting... (50/51)", 0, 0);
-            message = "Failed to run uicache";
+            SETMESSAGE("Failed to run uicache");
             rv = execCommandAndWait("/usr/bin/uicache", NULL, NULL, NULL, NULL, NULL);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, message);
@@ -2304,7 +2367,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Loading Tweaks...");
             PROGRESS("Exploiting... (51/51)", 0, 0);
-            message = "Failed to run ldrestart";
+            SETMESSAGE("Failed to run ldrestart");
             rv = chmod("/usr/bin/ldrestart", 755);
             LOG("rv: " "%d" "\n", rv);
             _assert(rv == 0, message);

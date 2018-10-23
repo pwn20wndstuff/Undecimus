@@ -91,6 +91,7 @@ talented researcher he can be.
 #include <mach/mach.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <signal.h>
 
 
 char *getMachine (void);
@@ -115,7 +116,7 @@ int remountRootFS (void);
 int reSpring (void);        // @FCE365 - this is for you
 
 pid_t execCommand(char *Cmd, char *Arg1, char *Arg2, char *Arg3, char *Arg4, char *Arg5 , int Flags);
-int execCommandSuspended(char *Cmd, char *Arg1, char *Arg2, char *Arg3, char *Arg4, char *Arg5);
+pid_t execCommandSuspended(char *Cmd, char *Arg1, char *Arg2, char *Arg3, char *Arg4, char *Arg5);
 int execCommandAndWait(char *Cmd, char *Arg1, char *Arg2, char *Arg3, char *Arg4, char *Arg5);
 
 int setTFP0AsHostSpecialPort4 (void);
@@ -123,7 +124,6 @@ int setTFP0AsHostSpecialPort4 (void);
 // 1/17/18 - This is super useful
 int spawnAndPlatformize (char *AmfidebPath, char *Arg1, char *Arg2, char *Arg3 , char *Arg4, char *Arg5);
 int spawnAndShaiHulud (char *AmfidebPath, char *Arg1, char *Arg2, char *Arg3 , char *Arg4, char *Arg5);
-
 
 int moveFileFromAppDir (char *File, char *Dest);
 int disableAutoUpdates(void);
@@ -183,6 +183,7 @@ int setCSFlagsForPid (pid_t Whom, uint32_t Flags);
 int platformizePid(pid_t Whom);
 int rootifyPid(pid_t Whom);
 int ShaiHuludPid (pid_t Whom, uint64_t CredAddr); // leave 0 for root creds.
+int ShaiHuludProcessAtAddr(uint64_t thing, uint64_t CredAddr);
 int unShaiHuludPid (pid_t Whom);
 
 int platformizeProcAtAddr(uint64_t thing);
@@ -244,5 +245,32 @@ void dumpARMThreadState64(_STRUCT_ARM_THREAD_STATE64 *old_state);
 uint64_t findKernelTask (void);
 uint64_t findMyProcStructInKernelMemory(void);  // For other advanced uses I haven't provided already
 
+static inline int spawnAndShaihuludAndWait(char *AmfidebPath, char *Arg1, char *Arg2, char *Arg3 , char *Arg4, char *Arg5) {
+    pid_t Pid = execCommandSuspended(AmfidebPath, Arg1, Arg2, Arg3, Arg4, Arg5);
+    if (!Pid)
+        return 1;
+    uint64_t procStruct = getProcStructForPid(Pid);
+    if (!procStruct)
+        return 1;
+    ShaiHuludProcessAtAddr(procStruct, 0);
+    kill(Pid, SIGCONT);
+    int status = 0;
+    waitpid(Pid, &status, 0);
+    return WEXITSTATUS(status);
+}
+
+static inline int spawnAndPlatformizeAndWait(char *AmfidebPath, char *Arg1, char *Arg2, char *Arg3 , char *Arg4, char *Arg5) {
+    pid_t Pid = execCommandSuspended(AmfidebPath, Arg1, Arg2, Arg3, Arg4, Arg5);
+    if (!Pid)
+        return 1;
+    uint64_t procStruct = getProcStructForPid(Pid);
+    if (!procStruct)
+        return 1;
+    platformizeProcAtAddr(procStruct);
+    kill(Pid, SIGCONT);
+    int status = 0;
+    waitpid(Pid, &status, 0);
+    return WEXITSTATUS(status);
+}
 
 #endif /* qilin_h */
