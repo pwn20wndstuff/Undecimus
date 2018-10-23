@@ -33,7 +33,7 @@ double uptime(){
     return difftime(csec, bsec);
 }
 
-bool hasMPCTP() {
+bool hasMPTCP() {
    
     bool hasMPTCP = false;
     
