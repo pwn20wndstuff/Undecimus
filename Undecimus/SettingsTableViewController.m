@@ -9,6 +9,7 @@
 #include <sys/utsname.h>
 #include <sys/sysctl.h>
 #include <sys/socket.h>
+#import <netinet/in.h>
 #import "SettingsTableViewController.h"
 #include "common.h"
 #include "ViewController.h"
@@ -30,6 +31,41 @@ double uptime(){
     time_t bsec = boottime.tv_sec, csec = time(NULL);
     
     return difftime(csec, bsec);
+}
+
+bool hasMPCTP() {
+   
+    bool hasMPTCP = false;
+    
+    int sock = socket(39, 1, 0);
+    if (sock < 0) return hasMPTCP;
+    
+    struct sockaddr *sa_dst = malloc(256);
+    memset(sa_dst, 'A', 256);
+    sa_dst->sa_family = AF_INET6;
+    sa_dst->sa_len = sizeof(struct sockaddr_in6);
+    
+    struct sockaddr *sa_src = malloc(256);
+    memset(sa_dst, 'A', 256);
+    sa_dst->sa_family = AF_INET6;
+    sa_dst->sa_len = 220;
+    
+    sa_endpoints_t sae = {0};
+    sae.sae_srcif = 0;
+    sae.sae_srcaddr = sa_src;
+    sae.sae_dstaddr = sa_dst;
+    sae.sae_dstaddrlen = sizeof(struct sockaddr_in6);
+    sae.sae_srcaddrlen = 220;
+    
+    errno = 0;
+    connectx(sock, &sae, SAE_ASSOCID_ANY, 0, NULL, 0, NULL, NULL);
+    hasMPTCP = !(errno == 1);
+    
+    free(sa_src);
+    free(sa_dst);
+    close(sock);
+    
+    return hasMPTCP;
 }
 
 // https://github.com/Matchstic/ReProvision/blob/7b595c699335940f68702bb204c5aa55b8b1896f/Shared/Application%20Database/RPVApplication.m#L102
@@ -268,7 +304,7 @@ double uptime(){
     [self.KernelExploitSegmentedControl setSelectedSegmentIndex:[[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]];
     [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]];
     [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]];
-    [self.KernelExploitSegmentedControl setEnabled:(socket(39, 1, 0) >= 0) forSegmentAtIndex:1];
+    [self.KernelExploitSegmentedControl setEnabled:hasMPTCP() forSegmentAtIndex:1];
     [self.KernelExploitSegmentedControl setEnabled:([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] rangeOfString:@"15A"].location != NSNotFound || [[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] rangeOfString:@"15B"].location != NSNotFound) forSegmentAtIndex:2];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
     [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400]];
