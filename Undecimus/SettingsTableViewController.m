@@ -18,22 +18,9 @@
 
 @implementation SettingsTableViewController
 
-double uptime(){
-    struct timeval boottime;
-    size_t len = sizeof(boottime);
-    int mib[2] = { CTL_KERN, KERN_BOOTTIME };
-    if( sysctl(mib, 2, &boottime, &len, NULL, 0) < 0 )
-    {
-        return -1.0;
-    }
-    time_t bsec = boottime.tv_sec, csec = time(NULL);
-    
-    return difftime(csec, bsec);
-}
-
 // https://github.com/Matchstic/ReProvision/blob/7b595c699335940f68702bb204c5aa55b8b1896f/Shared/Application%20Database/RPVApplication.m#L102
 
-- (NSDictionary *)_provisioningProfileAtPath:(NSString *)path {
++ (NSDictionary *)_provisioningProfileAtPath:(NSString *)path {
     NSError *err;
     NSString *stringContent = [NSString stringWithContentsOfFile:path encoding:NSASCIIStringEncoding error:&err];
     stringContent = [stringContent componentsSeparatedByString:@"<plist version=\"1.0\">"][1];
@@ -204,29 +191,6 @@ double uptime(){
     return md;
 }
 
-+ (NSArray *) supportedBuildPrefixes {
-    NSMutableArray *ma = [[NSMutableArray alloc] init];
-    [ma addObject:@"15A"]; // 11.0
-    [ma addObject:@"15B"]; // 11.1
-    [ma addObject:@"15C"]; // 11.2
-    [ma addObject:@"15D"]; // 11.2.5
-    [ma addObject:@"15E"]; // 11.3
-    [ma addObject:@"15F5037c"]; // 11.4 beta
-    [ma addObject:@"15F5049c"]; // 11.4 beta 2
-    [ma addObject:@"15F5061d"]; // 11.4 beta 3
-    [ma addObject:@"15F5061e"]; // 11.4 beta 3
-    return ma;
-}
-
-+ (BOOL) isSupported {
-    for (NSString *buildPrefix in [SettingsTableViewController supportedBuildPrefixes]) {
-        if ([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] hasPrefix:buildPrefix]) {
-            return YES;
-        }
-    }
-    return NO;
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     UIImageView *myImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Clouds"]];
@@ -267,10 +231,12 @@ double uptime(){
     [self.KernelExploitSegmentedControl setSelectedSegmentIndex:[[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]];
     [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]];
     [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]];
-    [self.KernelExploitSegmentedControl setEnabled:[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"Entitlements"][@"com.apple.developer.networking.multipath"] boolValue] forSegmentAtIndex:1];
-    [self.KernelExploitSegmentedControl setEnabled:([[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] rangeOfString:@"15A"].location != NSNotFound || [[[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"] rangeOfString:@"15B"].location != NSNotFound) forSegmentAtIndex:2];
+    [self.KernelExploitSegmentedControl setEnabled:!(isJailbroken() == 1)];
+    [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(EMPTY_LIST) forSegmentAtIndex:0];
+    [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(MULTI_PATH) forSegmentAtIndex:1];
+    [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(ASYNC_WAKE) forSegmentAtIndex:2];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
-    [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)[[self _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400]];
+    [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)[[SettingsTableViewController _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400]];
     [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE]];
     [self.ExportKernelTaskPortSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT]];
     [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]];

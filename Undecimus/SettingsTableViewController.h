@@ -22,6 +22,7 @@
 #define K_INCREASE_MEMORY_LIMIT "IncreaseMemoryLimit"
 
 #define LOG_FILE [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
+#define PREFERENCES_FILE [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", NSHomeDirectory(), [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]]
 
 #define START_LOGGING() do { \
     freopen(LOG_FILE, "a+", stderr); \
@@ -56,7 +57,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *UptimeLabel;
 @property (weak, nonatomic) IBOutlet UISwitch *IncreaseMemoryLimitSwitch;
 
-+ (BOOL) isSupported;
++ (NSDictionary *)_provisioningProfileAtPath:(NSString *)path;
 
 @end
 

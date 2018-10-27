@@ -45,6 +45,17 @@ static inline void showAlert(NSString *title, NSString *message, Boolean wait, B
 @interface ViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UIButton *goButton;
 
+enum {
+    EMPTY_LIST = 0,
+    MULTI_PATH = 1,
+    ASYNC_WAKE = 2,
+};
+
+double uptime(void);
+int isJailbroken(void);
+int isSupportedByExploit(int exploit);
+int selectExploit(void);
+
 - (IBAction)tappedOnJailbreak:(id)sender;
 +(ViewController*)sharedController;
 
