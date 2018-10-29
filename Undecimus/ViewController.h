@@ -10,6 +10,9 @@
 
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
+static const char *message = NULL;
+#define SETMESSAGE(msg) (message = msg)
+
 #define _assert(test, message) do \
     if (!(test)) { \
         fprintf(stderr, "__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
