@@ -339,6 +339,17 @@ extern int mptcp_die(void);
     [self reloadData];
 }
 
+- (IBAction)tappedOnCopyNonce:(id)sender{
+    UIAlertController *copyBootNonceAlert = [UIAlertController alertControllerWithTitle:@"Copy boot nonce?" message:@"Would you like to copy nonce generator to clipboard?" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UIPasteboard generalPasteboard] setString:[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE]];
+    }];
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"No" style:UIAlertActionStyleCancel handler:nil];
+    [copyBootNonceAlert addAction:copyAction];
+    [copyBootNonceAlert addAction:noAction];
+    [self presentViewController:copyBootNonceAlert animated:TRUE completion:nil];
+}
+
 - (IBAction)tappedOnGetTechnicalSupport:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://discord.gg/jb"] options:@{} completionHandler:nil];
 }
