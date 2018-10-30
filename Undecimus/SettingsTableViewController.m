@@ -328,6 +328,11 @@ extern int mptcp_die(void);
 - (IBAction)tappedOnOpenCydia:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"cydia://"] options:@{} completionHandler:nil];
 }
+
+- (IBAction)tappedOnOpenGithub:(id)sender {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus"] options:@{} completionHandler:nil];
+}
+
 - (IBAction)OverwriteBootNonceSwitchTriggered:(id)sender {
     [[NSUserDefaults standardUserDefaults] setBool:[self.OverwriteBootNonceSwitch isOn] forKey:@K_OVERWRITE_BOOT_NONCE];
     [[NSUserDefaults standardUserDefaults] synchronize];
