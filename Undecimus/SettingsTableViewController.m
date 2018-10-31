@@ -231,7 +231,6 @@
     [self.KernelExploitSegmentedControl setSelectedSegmentIndex:[[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]];
     [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]];
     [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]];
-    [self.KernelExploitSegmentedControl setEnabled:!(isJailbroken() == 1)];
     [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(EMPTY_LIST) forSegmentAtIndex:0];
     [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(MULTI_PATH) forSegmentAtIndex:1];
     [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(ASYNC_WAKE) forSegmentAtIndex:2];
