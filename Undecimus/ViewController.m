@@ -1255,7 +1255,7 @@ const char *pathForResource(const char *filename) {
 int _system(const char *cmd) {
     pid_t Pid = 0;
     int Status = 0;
-    Pid = execCommand("/bin/sh", "-c", (char *)cmd, NULL, NULL, NULL, 0);
+    Pid = execCommand("/bin/sh", "-c", (char *)[[NSString stringWithFormat:@"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/X11:/usr/games %s", cmd] UTF8String], NULL, NULL, NULL, 0);
     waitpid(Pid, &Status, 0);
     return Status;
 }
