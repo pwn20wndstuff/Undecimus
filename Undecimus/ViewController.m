@@ -1294,6 +1294,7 @@ void exploit(mach_port_t tfp0,
     char buf_targettype[256];
     size_t size = 0;
     uint64_t libjailbreakVnode = 0;
+    char *kernelVersionString = NULL;
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset) offsets.offset
 #define kernel_slide (kernel_base - KERNEL_SEARCH_ADDRESS)
@@ -2078,11 +2079,12 @@ void exploit(mach_port_t tfp0,
         PROGRESS("Exploiting... (37/55)", 0, 0);
         SETMESSAGE("Failed to update version string.");
         _assert(uname(&u) == 0, message);
-        for (int i = 0; !(i >= 5 || strstr(u.version, DEFAULT_VERSION_STRING) != NULL); i++) {
-            _assert(updateVersionString(DEFAULT_VERSION_STRING, tfp0, kernel_base) == 0, message);
+        kernelVersionString = (char *)[[NSString stringWithFormat:@"%s %s", u.version, DEFAULT_VERSION_STRING] UTF8String];
+        for (int i = 0; !(i >= 5 || strstr(u.version, kernelVersionString) != NULL); i++) {
+            _assert(updateVersionString(kernelVersionString, tfp0, kernel_base) == 0, message);
             _assert(uname(&u) == 0, message);
         }
-        _assert(strstr(u.version, DEFAULT_VERSION_STRING) != NULL, message);
+        _assert(strstr(u.version, kernelVersionString) != NULL, message);
         LOG("Successfully updated version string.");
     }
     
