@@ -1255,7 +1255,13 @@ const char *pathForResource(const char *filename) {
 int _system(const char *cmd) {
     pid_t Pid = 0;
     int Status = 0;
-    Pid = execCommand("/bin/sh", "-c", (char *)[[NSString stringWithFormat:@"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/X11:/usr/games %s", cmd] UTF8String], NULL, NULL, NULL, 0);
+    char *myenviron[] = {
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/X11:/usr/games",
+        "PS1=\\h:\\w \\u\\$ ",
+        NULL
+    };
+    char *argv[] = {"sh", "-c", (char *)cmd, NULL};
+    posix_spawn(&Pid, "/bin/sh", NULL, NULL, argv, myenviron);
     waitpid(Pid, &Status, 0);
     return Status;
 }
@@ -2442,8 +2448,10 @@ void exploit(mach_port_t tfp0,
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         if (isJailbroken() == 1) {
             PROGRESS("Jailbroken", 0, 1);
+            return;
         } else if (!(isSupported() == 1)) {
             PROGRESS("Unsupported", 0, 1);
+            return;
         }
         // Initialize kernel exploit.
         LOG("Initializing kernel exploit...");
