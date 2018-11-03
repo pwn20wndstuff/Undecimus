@@ -22,7 +22,7 @@ extern "C" {
     Boolean MGGetBoolAnswer(CFStringRef property);
 
     /*
-     * Arguments are still a mistery.
+     * Arguments are still af mistery.
      * CFPropertyListRef MGCopyAnswerWithError(CFStringRef question, int *error, ...);
      */
 

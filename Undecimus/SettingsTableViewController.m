@@ -241,6 +241,7 @@
     [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]];
     [self.UptimeLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)uptime() / 86400]];
     [self.IncreaseMemoryLimitSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INCREASE_MEMORY_LIMIT]];
+    [self.ECIDLabel setPlaceholder:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
     [self.tableView reloadData];
 }
 
@@ -349,6 +350,17 @@ extern int mptcp_die(void);
     [self presentViewController:copyBootNonceAlert animated:TRUE completion:nil];
 }
 
+- (IBAction)tappedOnCopyECID:(id)sender {
+    UIAlertController *copyBootNonceAlert = [UIAlertController alertControllerWithTitle:@"Copy ECID?" message:@"Would you like to ECID to clipboard?" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UIPasteboard generalPasteboard] setString:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
+    }];
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"No" style:UIAlertActionStyleCancel handler:nil];
+    [copyBootNonceAlert addAction:copyAction];
+    [copyBootNonceAlert addAction:noAction];
+    [self presentViewController:copyBootNonceAlert animated:TRUE completion:nil];
+}
+
 - (IBAction)tappedOnGetTechnicalSupport:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://discord.gg/jb"] options:@{} completionHandler:nil];
 }
@@ -365,6 +377,7 @@ extern int mptcp_die(void);
         }
     });
 }
+
 - (IBAction)exportKernelTaskPortSwitchTriggered:(id)sender {
     [[NSUserDefaults standardUserDefaults] setBool:[self.ExportKernelTaskPortSwitch isOn] forKey:@K_EXPORT_KERNEL_TASK_PORT];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -382,6 +395,12 @@ extern int mptcp_die(void);
 
 - (IBAction)IncreaseMemoryLimitSwitch:(id)sender {
     [[NSUserDefaults standardUserDefaults] setBool:[self.IncreaseMemoryLimitSwitch isOn] forKey:@K_INCREASE_MEMORY_LIMIT];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reloadData];
+}
+
+- (IBAction)tappedOnAutomaticallySelectExploit:(id)sender {
+    [[NSUserDefaults standardUserDefaults] setInteger:selectExploit() forKey:@K_EXPLOIT];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }

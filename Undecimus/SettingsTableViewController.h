@@ -8,23 +8,24 @@
 
 #import <UIKit/UIKit.h>
 
-#define K_TWEAK_INJECTION "TweakInjection"
-#define K_LOAD_DAEMONS "LoadDaemons"
-#define K_DUMP_APTICKET "DumpAPTicket"
-#define K_REFRESH_ICON_CACHE "RefreshIconCache"
-#define K_BOOT_NONCE "BootNonce"
-#define K_EXPLOIT "Exploit"
-#define K_DISABLE_AUTO_UPDATES "DisableAutoUpdates"
-#define K_DISABLE_APP_REVOKES "DisableAppRevokes"
-#define K_OVERWRITE_BOOT_NONCE "OverwriteBootNonce"
-#define K_EXPORT_KERNEL_TASK_PORT "ExportKernelTaskPort"
-#define K_RESTORE_ROOTFS "RestoreRootFS"
-#define K_INCREASE_MEMORY_LIMIT "IncreaseMemoryLimit"
+#define K_TWEAK_INJECTION           "TweakInjection"
+#define K_LOAD_DAEMONS              "LoadDaemons"
+#define K_DUMP_APTICKET             "DumpAPTicket"
+#define K_REFRESH_ICON_CACHE        "RefreshIconCache"
+#define K_BOOT_NONCE                "BootNonce"
+#define K_EXPLOIT                   "Exploit"
+#define K_DISABLE_AUTO_UPDATES      "DisableAutoUpdates"
+#define K_DISABLE_APP_REVOKES       "DisableAppRevokes"
+#define K_OVERWRITE_BOOT_NONCE      "OverwriteBootNonce"
+#define K_EXPORT_KERNEL_TASK_PORT   "ExportKernelTaskPort"
+#define K_RESTORE_ROOTFS            "RestoreRootFS"
+#define K_INCREASE_MEMORY_LIMIT     "IncreaseMemoryLimit"
+#define K_ECID                      "Ecid"
 
-#define LOG_FILE [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
-#define PREFERENCES_FILE [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", NSHomeDirectory(), [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]]
+#define LOG_FILE                    [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
+#define PREFERENCES_FILE            [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", NSHomeDirectory(), [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]]
 
-#define ISDEBUGGERATTACHED() (getppid() == 1)
+#define ISDEBUGGERATTACHED()        (getppid() == 1)
 
 #define START_LOGGING() do { \
     if (ISDEBUGGERATTACHED()) { \
@@ -62,6 +63,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *RestoreRootFSSwitch;
 @property (weak, nonatomic) IBOutlet UITextField *UptimeLabel;
 @property (weak, nonatomic) IBOutlet UISwitch *IncreaseMemoryLimitSwitch;
+@property (weak, nonatomic) IBOutlet UITextField *ECIDLabel;
 
 + (NSDictionary *)_provisioningProfileAtPath:(NSString *)path;
 
