@@ -58,6 +58,8 @@ double uptime(void);
 int isJailbroken(void);
 int isSupportedByExploit(int exploit);
 int selectExploit(void);
+void setPreference(NSString *key, id object);
+NSString *hexFromInt(NSInteger val);
 
 - (IBAction)tappedOnJailbreak:(id)sender;
 +(ViewController*)sharedController;

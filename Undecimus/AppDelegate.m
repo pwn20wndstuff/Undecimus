@@ -38,7 +38,7 @@
         [[NSUserDefaults standardUserDefaults] setObject:@"0xbd34a880be0b53f3" forKey:@K_BOOT_NONCE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPLOIT] == nil || [[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT] != selectExploit()) {
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPLOIT] == nil) {
         [[NSUserDefaults standardUserDefaults] setInteger:selectExploit() forKey:@K_EXPLOIT];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
@@ -64,6 +64,10 @@
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_INCREASE_MEMORY_LIMIT] == nil) {
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_INCREASE_MEMORY_LIMIT];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] == nil) {
+        [[NSUserDefaults standardUserDefaults] setObject:@"..." forKey:@K_ECID];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     [self SetUpShortcuts];
