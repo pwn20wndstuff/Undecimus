@@ -67,7 +67,7 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] == nil) {
-        [[NSUserDefaults standardUserDefaults] setObject:@"..." forKey:@K_ECID];
+        [[NSUserDefaults standardUserDefaults] setObject:@"0x0" forKey:@K_ECID];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     [self SetUpShortcuts];
