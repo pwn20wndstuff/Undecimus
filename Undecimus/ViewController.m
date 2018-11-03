@@ -1396,7 +1396,6 @@ void exploit(mach_port_t tfp0,
     struct utsname u = { 0 };
     char buf_targettype[256];
     size_t size = 0;
-    uint64_t libjailbreakVnode = 0;
     char *kernelVersionString = NULL;
     CFStringRef value = nil;
     uint64_t v_specinfo = 0;
