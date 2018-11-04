@@ -39,8 +39,8 @@
 		21C13109214C26AB0021AA9D /* launchctl.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13108214C26AB0021AA9D /* launchctl.tar */; };
 		21C13110214C2E570021AA9D /* strap.tar.lzma in Resources */ = {isa = PBXBuildFile; fileRef = 21C1310F214C2E570021AA9D /* strap.tar.lzma */; };
 		21C13116214C51100021AA9D /* lzma.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13115214C510F0021AA9D /* lzma.tar */; };
-		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
-		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		21E8CA7E2171CF7800936700 /* debugserver.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21E8CA7D2171CF7700936700 /* debugserver.tar */; };
 		21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */; };
 		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; };
