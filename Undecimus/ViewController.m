@@ -1519,6 +1519,10 @@ void exploit(mach_port_t tfp0,
         if (kCFCoreFoundationVersionNumber >= 1452.23) {
             setKernelSymbol("_kernproc", GETOFFSET(kernproc) - kernel_slide);
             setKernelSymbol("_rootvnode", GETOFFSET(rootvnode) - kernel_slide);
+        } else {
+            SETOFFSET(kernproc, findKernelSymbol("_kernproc"));
+            LOG("kernproc: " ADDR "\n", GETOFFSET(kernproc));
+            _assert(ISADDR(GETOFFSET(kernproc)), message);
         }
         _assert(ISADDR(findKernelSymbol("_kernproc")), message);
         _assert(ISADDR(findKernelSymbol("_rootvnode")), message);
