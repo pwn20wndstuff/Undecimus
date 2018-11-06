@@ -1704,13 +1704,13 @@ void exploit(mach_port_t tfp0,
         rv = snapshot_list("/");
         switch (rv) {
             case -1: {
-                if (!access("/var/tmp/rootfsmnt", F_OK)) {
-                    _assert(rmdir("/var/tmp/rootfsmnt") == 0, message);
+                if (!access("/private/var/tmp/rootfsmnt", F_OK)) {
+                    _assert(rmdir("/private/var/tmp/rootfsmnt") == 0, message);
                 }
-                _assert(mkdir("/var/tmp/rootfsmnt", 0755) == 0, message);
-                _assert(access("/var/tmp/rootfsmnt", F_OK) == 0, message);
-                _assert(chown("/var/tmp/rootfsmnt", 0, 0) == 0, message);
-                _assert(spawnAndShaiHulud("/sbin/mount_apfs", "/dev/disk0s1s1", "/var/tmp/rootfsmnt", NULL, NULL, NULL) == 0, message);
+                _assert(mkdir("/private/var/tmp/rootfsmnt", 0755) == 0, message);
+                _assert(access("/private/var/tmp/rootfsmnt", F_OK) == 0, message);
+                _assert(chown("/private/var/tmp/rootfsmnt", 0, 0) == 0, message);
+                _assert(spawnAndShaiHulud("/sbin/mount_apfs", "/dev/disk0s1s1", "/private/var/tmp/rootfsmnt", NULL, NULL, NULL) == 0, message);
                 
                 // Borrow entitlements from fsck_apfs.
                 
@@ -1726,12 +1726,12 @@ void exploit(mach_port_t tfp0,
                 LOG("Renaming system snapshot...");
                 PROGRESS("Exploiting... (22/56)", 0, 0);
                 SETMESSAGE("Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
-                rv = snapshot_list("/var/tmp/rootfsmnt");
+                rv = snapshot_list("/private/var/tmp/rootfsmnt");
                 _assert(!(rv == -1), message);
-                if (snapshot_check("/var/tmp/rootfsmnt", "orig-fs") == 1) {
-                    _assert(snapshot_rename("/var/tmp/rootfsmnt", systemSnapshot(), "electra-prejailbreak") == 0, message);
+                if (snapshot_check("/private/var/tmp/rootfsmnt", "orig-fs") == 1) {
+                    _assert(snapshot_rename("/private/var/tmp/rootfsmnt", systemSnapshot(), "electra-prejailbreak") == 0, message);
                 } else {
-                    _assert(snapshot_rename("/var/tmp/rootfsmnt", systemSnapshot(), "orig-fs") == 0, message);
+                    _assert(snapshot_rename("/private/var/tmp/rootfsmnt", systemSnapshot(), "orig-fs") == 0, message);
                 }
                 
                 LOG("Successfully renamed system snapshot.");
@@ -2035,16 +2035,16 @@ void exploit(mach_port_t tfp0,
         LOG("Logging slide...");
         PROGRESS("Exploiting... (31/56)", 0, 0);
         SETMESSAGE("Failed to log slide.");
-        if (!access("/var/tmp/slide.txt", F_OK)) {
-            _assert(unlink("/var/tmp/slide.txt") == 0, message);
+        if (!access("/private/var/tmp/slide.txt", F_OK)) {
+            _assert(unlink("/private/var/tmp/slide.txt") == 0, message);
         }
-        a = fopen("/var/tmp/slide.txt", "w+");
+        a = fopen("/private/var/tmp/slide.txt", "w+");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         fprintf(a, ADDR "\n", kernel_slide);
         _assert(fclose(a) == 0, message);
-        _assert(chmod("/var/tmp/slide.txt", 0644) == 0, message);
-        _assert(chown("/var/tmp/slide.txt", 0, 0) == 0, message);
+        _assert(chmod("/private/var/tmp/slide.txt", 0644) == 0, message);
+        _assert(chown("/private/var/tmp/slide.txt", 0, 0) == 0, message);
         LOG("Successfully logged slide.");
     }
     
@@ -2124,11 +2124,11 @@ void exploit(mach_port_t tfp0,
         LOG("Patching amfid...");
         PROGRESS("Exploiting... (36/56)", 0, 0);
         SETMESSAGE("Failed to patch amfid.");
-        if (!access("/var/tmp/amfid_payload.alive", F_OK)) {
-            _assert(unlink("/var/tmp/amfid_payload.alive") == 0, message);
+        if (!access("/private/var/tmp/amfid_payload.alive", F_OK)) {
+            _assert(unlink("/private/var/tmp/amfid_payload.alive") == 0, message);
         }
         _assert(inject_library(findPidOfProcess("amfid"), "/jb/amfid_payload.dylib") == 0, message);
-        _assert(waitForFile("/var/tmp/amfid_payload.alive") == 0, message);
+        _assert(waitForFile("/private/var/tmp/amfid_payload.alive") == 0, message);
         LOG("Successfully patched amfid.");
     }
     
@@ -2178,11 +2178,11 @@ void exploit(mach_port_t tfp0,
         if (!access("/var/log/jailbreakd-stdout.log", F_OK)) {
             _assert(unlink("/var/log/jailbreakd-stdout.log") == 0, message);
         }
-        if (!access("/var/tmp/jailbreakd.pid", F_OK)) {
-            _assert(unlink("/var/tmp/jailbreakd.pid") == 0, message);
+        if (!access("/private/var/tmp/jailbreakd.pid", F_OK)) {
+            _assert(unlink("/private/var/tmp/jailbreakd.pid") == 0, message);
         }
         _assert(execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL) == 0, message);
-        _assert(waitForFile("/var/tmp/jailbreakd.pid") == 0, message);
+        _assert(waitForFile("/private/var/tmp/jailbreakd.pid") == 0, message);
         LOG("Successfully spawned jailbreakd.");
     }
     
@@ -2246,31 +2246,31 @@ void exploit(mach_port_t tfp0,
             NOTICE("Will restore RootFS. This may take a while. Don't exit the app and don't let the device lock.", 1, 1);
             SETMESSAGE("Unable to mount or rename system snapshot.  Delete OTA file from Settings - Storage if present");
             if (kCFCoreFoundationVersionNumber < 1452.23) {
-                if (!access("/var/tmp/rootfsmnt", F_OK)) {
-                    _assert(rmdir("/var/tmp/rootfsmnt") == 0, message);
+                if (!access("/private/var/tmp/rootfsmnt", F_OK)) {
+                    _assert(rmdir("/private/var/tmp/rootfsmnt") == 0, message);
                 }
-                _assert(mkdir("/var/tmp/rootfsmnt", 0755) == 0, message);
+                _assert(mkdir("/private/var/tmp/rootfsmnt", 0755) == 0, message);
             }
             if (snapshot_check("/", "electra-prejailbreak") == 1) {
                 if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    _assert(snapshot_mount("/", "electra-prejailbreak", "/var/tmp/rootfsmnt") == 0, message);
-                    _assert(waitForFile("/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
+                    _assert(snapshot_mount("/", "electra-prejailbreak", "/private/var/tmp/rootfsmnt") == 0, message);
+                    _assert(waitForFile("/private/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
                 } else {
                     _assert(snapshot_rename("/", "electra-prejailbreak", systemSnapshot()) == 0, message);
                 }
             } else if (snapshot_check("/", "orig-fs") == 1) {
                 if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    _assert(snapshot_mount("/", "orig-fs", "/var/tmp/rootfsmnt") == 0, message);
-                    _assert(waitForFile("/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
+                    _assert(snapshot_mount("/", "orig-fs", "/private/var/tmp/rootfsmnt") == 0, message);
+                    _assert(waitForFile("/private/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
                 } else {
                     _assert(snapshot_rename("/", "orig-fs", systemSnapshot()) == 0, message);
                 }
             } else {
-                _assert(snapshot_mount("/", systemSnapshot(), "/var/tmp/rootfsmnt") == 0, message);
-                _assert(waitForFile("/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
+                _assert(snapshot_mount("/", systemSnapshot(), "/private/var/tmp/rootfsmnt") == 0, message);
+                _assert(waitForFile("/private/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
             }
             if (kCFCoreFoundationVersionNumber < 1452.23) {
-                _assert(easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/var/tmp/rootfsmnt/.", @"/"]) == 0, message);
+                _assert(easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/private/var/tmp/rootfsmnt/.", @"/"]) == 0, message);
             }
             LOG("Successfully renamed system snapshot back.");
             
