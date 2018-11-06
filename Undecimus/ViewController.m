@@ -1471,11 +1471,9 @@ void exploit(mach_port_t tfp0,
         SETOFFSET(vnode_put, find_vnode_put());
         LOG("vnode_put: " ADDR "\n", GETOFFSET(vnode_put));
         _assert(ISADDR(GETOFFSET(vnode_put)), message);
-        if (kCFCoreFoundationVersionNumber >= 1452.23) {
-            SETOFFSET(kernproc, find_kernproc());
-            LOG("kernproc: " ADDR "\n", GETOFFSET(kernproc));
-            _assert(ISADDR(GETOFFSET(kernproc)), message);
-        }
+        SETOFFSET(kernproc, find_kernproc());
+        LOG("kernproc: " ADDR "\n", GETOFFSET(kernproc));
+        _assert(ISADDR(GETOFFSET(kernproc)), message);
         SETMESSAGE("Failed to find v_mount offset.");
         SETOFFSET(v_mount, 0xd8);
         LOG("v_mount: " ADDR "\n", GETOFFSET(v_mount));
@@ -1516,14 +1514,8 @@ void exploit(mach_port_t tfp0,
         PROGRESS("Exploiting... (5/56)", 0, 0);
         SETMESSAGE("Failed to initialize QiLin.");
         _assert(initQiLin(tfp0, kernel_base) == 0, message);
-        if (kCFCoreFoundationVersionNumber >= 1452.23) {
-            setKernelSymbol("_kernproc", GETOFFSET(kernproc) - kernel_slide);
-            setKernelSymbol("_rootvnode", GETOFFSET(rootvnode) - kernel_slide);
-        } else {
-            SETOFFSET(kernproc, findKernelSymbol("_kernproc"));
-            LOG("kernproc: " ADDR "\n", GETOFFSET(kernproc));
-            _assert(ISADDR(GETOFFSET(kernproc)), message);
-        }
+        setKernelSymbol("_kernproc", GETOFFSET(kernproc) - kernel_slide);
+        setKernelSymbol("_rootvnode", GETOFFSET(rootvnode) - kernel_slide);
         _assert(ISADDR(findKernelSymbol("_kernproc")), message);
         _assert(ISADDR(findKernelSymbol("_rootvnode")), message);
         LOG("Successfully initialized QiLin.");
