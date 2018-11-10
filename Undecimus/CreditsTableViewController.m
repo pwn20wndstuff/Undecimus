@@ -76,8 +76,8 @@
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Cryptiiiic"] options:@{} completionHandler:nil];
 }
 
--(IBAction)tappedOnXanDesign:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"xanDesign_"] options:@{} completionHandler:nil];
+-(IBAction)tappedOnXerusDesign:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"xerusdesign"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnAppleDry:(id)sender{
