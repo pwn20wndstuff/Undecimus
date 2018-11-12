@@ -63,6 +63,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *OverwriteBootNonceSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *ExportKernelTaskPortSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *RestoreRootFSSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *installCydiaSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *installSSHSwitch;
 @property (weak, nonatomic) IBOutlet UITextField *UptimeLabel;
 @property (weak, nonatomic) IBOutlet UISwitch *IncreaseMemoryLimitSwitch;
 @property (weak, nonatomic) IBOutlet UITextField *ECIDLabel;

@@ -186,6 +186,8 @@
     md[@"Preferences"][@"ExportKernelTaskPort"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPORT_KERNEL_TASK_PORT];
     md[@"Preferences"][@"RestoreRootFS"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_RESTORE_ROOTFS];
     md[@"Preferences"][@"IncreaseMemoryLimit"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_INCREASE_MEMORY_LIMIT];
+    md[@"Preferences"][@"InstallCydia"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_INSTALL_CYDIA];
+    md[@"Preferences"][@"InstallOpenSSH"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_INSTALL_OPENSSH];
     md[@"AppVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     md[@"LogFile"] = [NSString stringWithContentsOfFile:[NSString stringWithUTF8String:LOG_FILE] encoding:NSUTF8StringEncoding error:nil];
     return md;
@@ -385,6 +387,18 @@ extern int mptcp_die(void);
 }
 - (IBAction)RestoreRootFSSwitchTriggered:(id)sender {
     [[NSUserDefaults standardUserDefaults] setBool:[self.RestoreRootFSSwitch isOn] forKey:@K_RESTORE_ROOTFS];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reloadData];
+}
+
+- (IBAction)installCydiaSwitchTriggered:(id)sender {
+    [[NSUserDefaults standardUserDefaults] setBool:[self.installCydiaSwitch isOn] forKey:@K_INSTALL_CYDIA];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reloadData];
+}
+
+- (IBAction)installSSHSwitchTriggered:(id)sender {
+    [[NSUserDefaults standardUserDefaults] setBool:[self.installSSHSwitch isOn] forKey:@K_INSTALL_OPENSSH];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }

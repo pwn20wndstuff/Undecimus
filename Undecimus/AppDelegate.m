@@ -70,6 +70,14 @@
         [[NSUserDefaults standardUserDefaults] setObject:@"0x0" forKey:@K_ECID];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_INSTALL_CYDIA] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_INSTALL_CYDIA];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_INSTALL_OPENSSH] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_INSTALL_OPENSSH];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
     [self SetUpShortcuts];
     return YES;
 }
