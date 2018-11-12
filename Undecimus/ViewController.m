@@ -2968,6 +2968,44 @@ void exploit(mach_port_t tfp0,
             LOG("Successfully loaded Daemons.");
         }
     }
+    {
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_OPENSSH]) {
+            // Install OpenSSH
+            a = fopen([[[NSBundle mainBundle] pathForResource:@"openssh" ofType:@"tar"] UTF8String], "rb");
+            LOG("a: " "%p" "\n", a);
+            _assert(a != NULL, nil);
+            untar(a, "openssh");
+            rv = fclose(a);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, nil);
+            rv = _system("dpkg -i /jb/openssh.deb /jb/openssl.deb");
+            if (WEXITSTATUS(rv) != 0) {
+                NOTICE("Failed to install OpenSSH", 0, 0);
+            } else {
+                [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_INSTALL_OPENSSH];
+            }
+
+        }
+    }
+    
+    {
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_CYDIA]) {
+            // Install Cydia
+            a = fopen([[[NSBundle mainBundle] pathForResource:@"cydia" ofType:@"tar"] UTF8String], "rb");
+            LOG("a: " "%p" "\n", a);
+            _assert(a != NULL, nil);
+            untar(a, "cydia");
+            rv = fclose(a);
+            LOG("rv: " "%d" "\n", rv);
+            _assert(rv == 0, nil);
+            rv = _system("dpkg -i /jb/cydia.deb");
+            if (WEXITSTATUS(rv) != 0) {
+                NOTICE("Failed to install Cydia", 0, 0);
+            } else {
+                [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_INSTALL_CYDIA];
+            }
+        }
+    }
     
     {
         if (run_uicache) {
