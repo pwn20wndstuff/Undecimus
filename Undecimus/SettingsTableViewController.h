@@ -21,6 +21,8 @@
 #define K_RESTORE_ROOTFS            "RestoreRootFS"
 #define K_INCREASE_MEMORY_LIMIT     "IncreaseMemoryLimit"
 #define K_ECID                      "Ecid"
+#define K_INSTALL_OPENSSH           "InstallOpenSSH"
+#define K_INSTALL_CYDIA             "InstallCydia"
 
 #define LOG_FILE                    [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
 #define PREFERENCES_FILE            [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", NSHomeDirectory(), [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]]
