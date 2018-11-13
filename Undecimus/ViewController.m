@@ -2981,10 +2981,8 @@ void exploit(mach_port_t tfp0,
                     "done; ");
             if (load_tweaks) {
                 _system("for file in /etc/rc.d/*; do "
-                            "if [[ \"$file\" != \"/etc/rc.d/substrate\" ]]; then "
-                                "if [[ -x \"$file\" ]]; then "
-                                    "\"$file\";"
-                                "fi;"
+                            "if [[ -x \"$file\" ]]; then "
+                                "\"$file\";"
                             "fi;"
                         "done");
             } else {
