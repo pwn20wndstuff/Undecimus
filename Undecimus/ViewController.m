@@ -2250,6 +2250,7 @@ void exploit(mach_port_t tfp0,
                 PROGRESS("Exploiting... (26/63)", 0, 0);
                 SETMESSAGE("Unable to create system snapshot.  Delete OTA file from Settings - Storage if present");
                 _assert(snapshot_create("/", "orig-fs") == 0, message);
+                _assert(snapshot_check("/", "orig-fs") == 1, message);
                 
                 // Borrow entitlements from sysdiagnose.
                 
