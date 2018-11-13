@@ -181,6 +181,16 @@ const char *async_wake_supported_versions[] = {
 
 #define ptrSize sizeof(uintptr_t)
 
+static void writeTestFile(const char *file) {
+    CLEAN_FILE(file);
+    FILE *a = fopen(file, "w");
+    LOG("a: " "%p" "\n", a);
+    _assert(a != NULL, message);
+    _assert(fclose(a) == 0, message);
+    INIT_FILE(file, 0, 0644);
+    _assert(unlink(file) == 0, message);
+}
+
 static vm_address_t get_kernel_base(mach_port_t tfp0)
 {
     uint64_t addr = 0;
@@ -2052,13 +2062,7 @@ void exploit(mach_port_t tfp0,
         LOG("Writing a test file to UserFS...");
         PROGRESS("Exploiting... (10/63)", 0, 0);
         SETMESSAGE("Failed to write a test file to UserFS.");
-        CLEAN_FILE("/var/mobile/test.txt");
-        a = fopen("/var/mobile/test.txt", "w");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/var/mobile/test.txt", 0, 0644);
-        _assert(unlink("/var/mobile/test.txt") == 0, message);
+        writeTestFile("/var/mobile/test.txt");
         LOG("Successfully wrote a test file to UserFS.");
     }
     
@@ -2278,13 +2282,7 @@ void exploit(mach_port_t tfp0,
         LOG("Writing a test file to RootFS...");
         PROGRESS("Exploiting... (28/63)", 0, 0);
         SETMESSAGE("Failed to write a test file to RootFS.");
-        CLEAN_FILE("/test.txt");
-        a = fopen("/test.txt", "w");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/test.txt", 0, 0644);
-        _assert(unlink("/test.txt") == 0, message);
+        writeTestFile("/test.txt");
         LOG("Successfully wrote a test file to RootFS.");
     }
     
