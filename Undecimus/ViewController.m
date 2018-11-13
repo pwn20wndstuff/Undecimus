@@ -1827,19 +1827,23 @@ NSArray *getCleanUpFileList() {
 
 void exploit(mach_port_t tfp0,
              uint64_t kernel_base,
-             int load_tweaks,
-             int load_daemons,
-             int dump_apticket,
-             int run_uicache,
-             char *boot_nonce,
-             int disable_auto_updates,
-             int disable_app_revokes,
-             int overwrite_boot_nonce,
-             int export_kernel_task_port,
-             int restore_rootfs,
-             int increase_memory_limit)
+             NSDictionary *defaults)
 {
     // Initialize variables.
+    int load_tweaks = [defaults[@K_TWEAK_INJECTION] boolValue];
+    int load_daemons = [defaults[@K_LOAD_DAEMONS] boolValue];
+    int dump_apticket = [defaults[@K_DUMP_APTICKET] boolValue];
+    int run_uicache = [defaults[@K_REFRESH_ICON_CACHE] boolValue];
+    char *boot_nonce = (char *)[defaults[@K_BOOT_NONCE] UTF8String];
+    int disable_auto_updates = [defaults[@K_DISABLE_AUTO_UPDATES] boolValue];
+    int disable_app_revokes = [defaults[@K_DISABLE_APP_REVOKES] boolValue];
+    int overwrite_boot_nonce = [defaults[@K_OVERWRITE_BOOT_NONCE] boolValue];
+    int export_kernel_task_port = [defaults[@K_EXPORT_KERNEL_TASK_PORT] boolValue];
+    int restore_rootfs = [defaults[@K_RESTORE_ROOTFS] boolValue];
+    int increase_memory_limit = [defaults[@K_INCREASE_MEMORY_LIMIT] boolValue];
+    int install_cydia = [defaults[@K_INSTALL_CYDIA] boolValue];
+    int install_openssh = [defaults[@K_INSTALL_OPENSSH] boolValue];
+
     int rv = 0;
     offsets_t offsets = { 0 };
     NSMutableDictionary *md = nil;
@@ -2341,8 +2345,24 @@ void exploit(mach_port_t tfp0,
         untar(a, "libjailbreak");
         _assert(fclose(a) == 0, message);
         _assert(access("/jb/libjailbreak.dylib", F_OK) == 0, message);
-        _assert(chmod("/jb/libjailbreak.dylib", 0755) == 0, message);
+        _assert(chmod("/jb/libjailbreak.dylib", 0644) == 0, message);
         _assert(chown("/jb/libjailbreak.dylib", 501, 501) == 0, message);
+        
+        if (!access("/jb/libjailbreacy.tar", F_OK)) {
+            _assert(unlink("/jb/libjailbreacy.tar") == 0, message);
+        }
+        if (!access("/jb/libjailbreacy.dylib", F_OK)) {
+            _assert(unlink("/jb/libjailbreacy.dylib") == 0, message);
+        }
+        _assert(moveFileFromAppDir("libjailbreacy.tar", "/jb/libjailbreacy.tar") == 0, message);
+        a = fopen("/jb/libjailbreacy.tar", "rb");
+        LOG("a: " "%p" "\n", a);
+        _assert(a != NULL, message);
+        untar(a, "libjailbreacy");
+        _assert(fclose(a) == 0, message);
+        _assert(access("/jb/libjailbreacy.dylib", F_OK) == 0, message);
+        _assert(chmod("/jb/libjailbreacy.dylib", 0644) == 0, message);
+        _assert(chown("/jb/libjailbreacy.dylib", 0, 0) == 0, message);
         
         if (!access("/jb/pspawn_hook.tar", F_OK)) {
             _assert(unlink("/jb/pspawn_hook.tar") == 0, message);
@@ -2601,6 +2621,11 @@ void exploit(mach_port_t tfp0,
             _assert(unlink("/usr/lib/libjailbreak.dylib") == 0, message);
         }
         _assert(symlink("/jb/libjailbreak.dylib", "/usr/lib/libjailbreak.dylib") == 0, message);
+        if (!access("/usr/lib/libjailbreacy.dylib", F_OK)) {
+            _assert(unlink("/usr/lib/libjailbreacy.dylib") == 0, message);
+        }
+        _assert(link("/jb/libjailbreacy.dylib", "/usr/lib/libjailbreacy.dylib") == 0, message);
+        _assert(unlink("/jb/libjailbreacy.dylib") == 0, message);
         if (!access("/bin/launchctl", F_OK)) {
             _assert(unlink("/bin/launchctl") == 0, message);
         }
@@ -2653,7 +2678,7 @@ void exploit(mach_port_t tfp0,
             _assert(unlink("/usr/lib/pspawn_hook.dylib") == 0, message);
         }
         _assert(symlink("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib") == 0, message);
-        if (load_tweaks) {
+        if ((access("/etc/rc.d/substrate", F_OK) != 0) && load_tweaks) {
             LOG("Patching launchd...");
             PROGRESS("Exploiting... (38/56)", 0, 0);
             if (!access("/var/log/pspawn_hook_launchd.log", F_OK)) {
@@ -2666,8 +2691,8 @@ void exploit(mach_port_t tfp0,
                 _assert(unlink("/var/log/pspawn_hook_other.log") == 0, message);
             }
             _assert(inject_library(1, "/usr/lib/pspawn_hook.dylib") == 0, message);
+            LOG("Successfully patched launchd.");
         }
-        LOG("Successfully patched launchd.");
     }
     
     {
@@ -2806,6 +2831,7 @@ void exploit(mach_port_t tfp0,
         _assert(unlink("/jb/launchctl.tar") == 0, message);
         _assert(unlink("/jb/jailbreakd.tar") == 0, message);
         _assert(unlink("/jb/libjailbreak.tar") == 0, message);
+        _assert(unlink("/jb/libjailbreacy.tar") == 0, message);
         _assert(unlink("/jb/pspawn_hook.tar") == 0, message);
         _assert(unlink("/jb/tar.tar") == 0, message);
         _assert(unlink("/jb/tar") == 0, message);
@@ -2955,21 +2981,9 @@ void exploit(mach_port_t tfp0,
             LOG("Successfully increased memory limit.");
         }
     }
-    
+
     {
-        if (load_daemons) {
-            // Load Daemons.
-            
-            LOG("Loading Daemons...");
-            PROGRESS("Exploiting... (54/56)", 0, 0);
-            SETMESSAGE("Failed to load Daemons.");
-            _system("echo 'really jailbroken'; shopt -s nullglob; for a in /Library/LaunchDaemons/*.plist; do echo loading $a; launchctl load \"$a\" ; done; for file in /etc/rc.d/*; do if [[ -x \"$file\" ]]; then \"$file\"; fi; done");
-            sleep(2);
-            LOG("Successfully loaded Daemons.");
-        }
-    }
-    {
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_OPENSSH]) {
+        if (install_openssh) {
             // Install OpenSSH
             a = fopen([[[NSBundle mainBundle] pathForResource:@"openssh" ofType:@"tar"] UTF8String], "rb");
             LOG("a: " "%p" "\n", a);
@@ -2982,14 +2996,14 @@ void exploit(mach_port_t tfp0,
             if (WEXITSTATUS(rv) != 0) {
                 NOTICE("Failed to install OpenSSH", 0, 0);
             } else {
-                [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_INSTALL_OPENSSH];
+                setPreference(@K_INSTALL_OPENSSH, @NO);
             }
-
+            
         }
     }
-    
+
     {
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_CYDIA]) {
+        if (install_cydia) {
             // Install Cydia
             a = fopen([[[NSBundle mainBundle] pathForResource:@"cydia" ofType:@"tar"] UTF8String], "rb");
             LOG("a: " "%p" "\n", a);
@@ -3002,11 +3016,46 @@ void exploit(mach_port_t tfp0,
             if (WEXITSTATUS(rv) != 0) {
                 NOTICE("Failed to install Cydia", 0, 0);
             } else {
-                [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_INSTALL_CYDIA];
+                setPreference(@K_INSTALL_CYDIA, @NO);
             }
         }
     }
-    
+
+    {
+        if (load_daemons) {
+            // Load Daemons.
+            
+            LOG("Loading Daemons...");
+            PROGRESS("Exploiting... (54/56)", 0, 0);
+            SETMESSAGE("Failed to load Daemons.");
+            _system("echo 'really jailbroken';"
+                    "shopt -s nullglob;"
+                    "for a in /Library/LaunchDaemons/*.plist;"
+                        "do echo loading $a;"
+                        "launchctl load \"$a\" ;"
+                    "done; ");
+            if (load_tweaks) {
+                _system("for file in /etc/rc.d/*; do "
+                            "if [[ \"$file\" != \"/etc/rc.d/substrate\" ]]; then "
+                                "if [[ -x \"$file\" ]]; then "
+                                    "\"$file\";"
+                                "fi;"
+                            "fi;"
+                        "done");
+            } else {
+                _system("for file in /etc/rc.d/*; do "
+                            "if [[ \"$file\" != \"/etc/rc.d/substrate\" ]]; then "
+                                "if [[ -x \"$file\" ]]; then "
+                                    "\"$file\";"
+                                "fi;"
+                            "fi;"
+                        "done");
+            }
+            sleep(2);
+            LOG("Successfully loaded Daemons.");
+        }
+    }
+
     {
         if (run_uicache) {
             // Run uicache.
@@ -3027,7 +3076,11 @@ void exploit(mach_port_t tfp0,
             LOG("Loading Tweaks...");
             PROGRESS("Exploiting... (56/56)", 0, 0);
             SETMESSAGE("Failed to run ldrestart");
-            rv = _system("nohup /usr/bin/ldrestart 2>&1 >/dev/null &");
+            rv = _system("nohup bash -c \""
+                         "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
+                         "ldrestart ;"
+                         "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
+                         "\" 2>&1 >/dev/null &");
             _assert(WEXITSTATUS(rv) == 0, message);
             LOG("Successfully loaded Tweaks.");
         }
@@ -3071,19 +3124,7 @@ void exploit(mach_port_t tfp0,
         _assert(MACH_PORT_VALID(tfp0), "Exploit failed. Reboot and try again.");
         LOG("Successfully validated TFP0.");
         // NOTICE("Jailbreak succeeded, but still needs a few minutes to respring.", 0, 0);
-        exploit(tfp0,
-                (uint64_t)get_kernel_base(tfp0),
-                [[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION],
-                [[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS],
-                [[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET],
-                [[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE],
-                (char *)[[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE] UTF8String],
-                [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES],
-                [[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES],
-                [[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE],
-                [[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT],
-                [[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS],
-                [[NSUserDefaults standardUserDefaults] boolForKey:@K_INCREASE_MEMORY_LIMIT]);
+        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
         PROGRESS("Jailbroken", 0, 1);
     });
 }
