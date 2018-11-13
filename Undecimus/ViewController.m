@@ -60,6 +60,18 @@ static ViewController *sharedController = nil;
         }); \
 } while (false)
 
+#define CLEAN_FILE(file) do { \
+    if (!access(file, F_OK)) { \
+        _assert(unlink(file) == 0, message); \
+    } \
+} while (false)
+
+#define INIT_FILE(file, owner, mode) do { \
+        _assert(access(file, F_OK) == 0, message); \
+        _assert(chmod(file, mode) == 0, message); \
+        _assert(chown(file, owner, owner) == 0, message); \
+} while (false)
+
 typedef struct {
     kptr_t trust_chain;
     kptr_t amficache;
@@ -2040,16 +2052,12 @@ void exploit(mach_port_t tfp0,
         LOG("Writing a test file to UserFS...");
         PROGRESS("Exploiting... (10/63)", 0, 0);
         SETMESSAGE("Failed to write a test file to UserFS.");
-        if (!access("/var/mobile/test.txt", F_OK)) {
-            _assert(unlink("/var/mobile/test.txt") == 0, message);
-        }
+        CLEAN_FILE("/var/mobile/test.txt");
         a = fopen("/var/mobile/test.txt", "w");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         _assert(fclose(a) == 0, message);
-        _assert(access("/var/mobile/test.txt", F_OK) == 0, message);
-        _assert(chmod("/var/mobile/test.txt", 0644) == 0, message);
-        _assert(chown("/var/mobile/test.txt", 0, 0) == 0, message);
+        INIT_FILE("/var/mobile/test.txt", 0, 0644);
         _assert(unlink("/var/mobile/test.txt") == 0, message);
         LOG("Successfully wrote a test file to UserFS.");
     }
@@ -2270,16 +2278,12 @@ void exploit(mach_port_t tfp0,
         LOG("Writing a test file to RootFS...");
         PROGRESS("Exploiting... (28/63)", 0, 0);
         SETMESSAGE("Failed to write a test file to RootFS.");
-        if (!access("/test.txt", F_OK)) {
-            _assert(unlink("/test.txt") == 0, message);
-        }
+        CLEAN_FILE("/test.txt");
         a = fopen("/test.txt", "w");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         _assert(fclose(a) == 0, message);
-        _assert(access("/test.txt", F_OK) == 0, message);
-        _assert(chmod("/test.txt", 0644) == 0, message);
-        _assert(chown("/test.txt", 0, 0) == 0, message);
+        INIT_FILE("/test.txt", 0, 0644);
         _assert(unlink("/test.txt") == 0, message);
         LOG("Successfully wrote a test file to RootFS.");
     }
@@ -2298,189 +2302,119 @@ void exploit(mach_port_t tfp0,
         
         _assert(chdir("/jb") == 0, message);
         
-        if (!access("/jb/amfid_payload.tar", F_OK)) {
-            _assert(unlink("/jb/amfid_payload.tar") == 0, message);
-        }
-        if (!access("/jb/amfid_payload.dylib", F_OK)) {
-            _assert(unlink("/jb/amfid_payload.dylib") == 0, message);
-        }
+        CLEAN_FILE("/jb/amfid_payload.tar");
+        CLEAN_FILE("/jb/amfid_payload.dylib");
         _assert(moveFileFromAppDir("amfid_payload.tar", "/jb/amfid_payload.tar") == 0, message);
         a = fopen("/jb/amfid_payload.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         untar(a, "amfid_payload");
         _assert(fclose(a) == 0, message);
-        _assert(access("/jb/amfid_payload.dylib", F_OK) == 0, message);
-        _assert(chmod("/jb/amfid_payload.dylib", 0755) == 0, message);
-        _assert(chown("/jb/amfid_payload.dylib", 0, 0) == 0, message);
+        INIT_FILE("/jb/amfid_payload.dylib", 0, 0644);
         
-        if (!access("/jb/launchctl.tar", F_OK)) {
-            _assert(unlink("/jb/launchctl.tar") == 0, message);
-        }
-        if (!access("/jb/launchctl", F_OK)) {
-            _assert(unlink("/jb/launchctl") == 0, message);
-        }
+        CLEAN_FILE("/jb/launchctl.tar");
+        CLEAN_FILE("/jb/launchctl");
         _assert(moveFileFromAppDir("launchctl.tar", "/jb/launchctl.tar") == 0, message);
         a = fopen("/jb/launchctl.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         untar(a, "launchctl");
         _assert(fclose(a) == 0, message);
-        _assert(access("/jb/launchctl", F_OK) == 0, message);
-        _assert(chmod("/jb/launchctl", 0755) == 0, message);
-        _assert(chown("/jb/launchctl", 0, 0) == 0, message);
+        INIT_FILE("/jb/launchctl", 0, 0755);
         
-        if (!access("/jb/jailbreakd.tar", F_OK)) {
-            _assert(unlink("/jb/jailbreakd.tar") == 0, message);
-        }
-        if (!access("/jb/jailbreakd", F_OK)) {
-            _assert(unlink("/jb/jailbreakd") == 0, message);
-        }
+        CLEAN_FILE("/jb/jailbreakd.tar");
+        CLEAN_FILE("/jb/jailbreakd");
         _assert(moveFileFromAppDir("jailbreakd.tar", "/jb/jailbreakd.tar") == 0, message);
         a = fopen("/jb/jailbreakd.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         untar(a, "jailbreakd");
         _assert(fclose(a) == 0, message);
-        _assert(access("/jb/jailbreakd", F_OK) == 0, message);
-        _assert(chmod("/jb/jailbreakd", 0755) == 0, message);
-        _assert(chown("/jb/jailbreakd", 0, 0) == 0, message);
+        INIT_FILE("/jb/jailbreakd", 0, 0755);
         
-        if (!access("/jb/libjailbreak.tar", F_OK)) {
-            _assert(unlink("/jb/libjailbreak.tar") == 0, message);
-        }
-        if (!access("/jb/libjailbreak.dylib", F_OK)) {
-            _assert(unlink("/jb/libjailbreak.dylib") == 0, message);
-        }
+        CLEAN_FILE("/jb/libjailbreak.tar");
+        CLEAN_FILE("/jb/libjailbreak.dylib");
         _assert(moveFileFromAppDir("libjailbreak.tar", "/jb/libjailbreak.tar") == 0, message);
         a = fopen("/jb/libjailbreak.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         untar(a, "libjailbreak");
         _assert(fclose(a) == 0, message);
-        _assert(access("/jb/libjailbreak.dylib", F_OK) == 0, message);
-        _assert(chmod("/jb/libjailbreak.dylib", 0644) == 0, message);
-        _assert(chown("/jb/libjailbreak.dylib", 501, 501) == 0, message);
+        INIT_FILE("/jb/libjailbreak.dylib", 501, 0644);
         
-        if (!access("/jb/libjailbreacy.tar", F_OK)) {
-            _assert(unlink("/jb/libjailbreacy.tar") == 0, message);
-        }
-        if (!access("/jb/libjailbreacy.dylib", F_OK)) {
-            _assert(unlink("/jb/libjailbreacy.dylib") == 0, message);
-        }
+        CLEAN_FILE("/jb/libjailbreacy.tar");
+        CLEAN_FILE("/jb/libjailbreacy.dylib");
         _assert(moveFileFromAppDir("libjailbreacy.tar", "/jb/libjailbreacy.tar") == 0, message);
         a = fopen("/jb/libjailbreacy.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         untar(a, "libjailbreacy");
         _assert(fclose(a) == 0, message);
-        _assert(access("/jb/libjailbreacy.dylib", F_OK) == 0, message);
-        _assert(chmod("/jb/libjailbreacy.dylib", 0644) == 0, message);
-        _assert(chown("/jb/libjailbreacy.dylib", 0, 0) == 0, message);
+        INIT_FILE("/jb/libjailbreacy.dylib", 0, 0644);
         
-        if (!access("/jb/pspawn_hook.tar", F_OK)) {
-            _assert(unlink("/jb/pspawn_hook.tar") == 0, message);
-        }
-        if (!access("/jb/pspawn_hook.dylib", F_OK)) {
-            _assert(unlink("/jb/pspawn_hook.dylib") == 0, message);
-        }
+        CLEAN_FILE("/jb/pspawn_hook.tar");
+        CLEAN_FILE("/jb/pspawn_hook.dylib");
         _assert(moveFileFromAppDir("pspawn_hook.tar", "/jb/pspawn_hook.tar") == 0, message);
         a = fopen("/jb/pspawn_hook.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         untar(a, "pspawn_hook");
         _assert(fclose(a) == 0, message);
-        _assert(access("/jb/pspawn_hook.dylib", F_OK) == 0, message);
-        _assert(chmod("/jb/pspawn_hook.dylib", 0755) == 0, message);
-        _assert(chown("/jb/pspawn_hook.dylib", 0, 0) == 0, message);
+        INIT_FILE("/jb/pspawn_hook.dylib", 0, 0644);
         
-        if (!access("/jb/tar.tar", F_OK)) {
-            _assert(unlink("/jb/tar.tar") == 0, message);
-        }
-        if (!access("/jb/tar", F_OK)) {
-            _assert(unlink("/jb/tar") == 0, message);
-        }
+        CLEAN_FILE("/jb/tar.tar");
+        CLEAN_FILE("/jb/tar");
         _assert(moveFileFromAppDir("tar.tar", "/jb/tar.tar") == 0, message);
         a = fopen("/jb/tar.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         untar(a, "tar");
         _assert(fclose(a) == 0, message);
-        _assert(access("/jb/tar", F_OK) == 0, message);
-        _assert(chmod("/jb/tar", 0755) == 0, message);
-        _assert(chown("/jb/tar", 0, 0) == 0, message);
+        INIT_FILE("/jb/tar", 0, 0755);
         
-        if (!access("/jb/lzma.tar", F_OK)) {
-            _assert(unlink("/jb/lzma.tar") == 0, message);
-        }
-        if (!access("/jb/lzma", F_OK)) {
-            _assert(unlink("/jb/lzma") == 0, message);
-        }
+        CLEAN_FILE("/jb/lzma.tar");
+        CLEAN_FILE("/jb/lzma");
         _assert(moveFileFromAppDir("lzma.tar", "/jb/lzma.tar") == 0, message);
         a = fopen("/jb/lzma.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         untar(a, "lzma");
         _assert(fclose(a) == 0, message);
-        _assert(access("/jb/lzma", F_OK) == 0, message);
-        _assert(chmod("/jb/lzma", 0755) == 0, message);
-        _assert(chown("/jb/lzma", 0, 0) == 0, message);
+        INIT_FILE("/jb/lzma", 0, 0755);
         
-        if (!access("/jb/spawn.tar", F_OK)) {
-            _assert(unlink("/jb/spawn.tar") == 0, message);
-        }
-        if (!access("/jb/spawn", F_OK)) {
-            _assert(unlink("/jb/spawn") == 0, message);
-        }
+        CLEAN_FILE("/jb/spawn.tar");
+        CLEAN_FILE("/jb/spawn");
         _assert(moveFileFromAppDir("spawn.tar", "/jb/spawn.tar") == 0, message);
         a = fopen("/jb/spawn.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         untar(a, "spawn");
         _assert(fclose(a) == 0, message);
-        _assert(access("/jb/spawn", F_OK) == 0, message);
-        _assert(chmod("/jb/spawn", 0755) == 0, message);
-        _assert(chown("/jb/spawn", 0, 0) == 0, message);
+        INIT_FILE("/jb/spawn", 0, 0755);
         
-        if (!access("/jb/strap.tar.lzma", F_OK)) {
-            _assert(unlink("/jb/strap.tar.lzma") == 0, message);
-        }
+        CLEAN_FILE("/jb/strap.tar.lzma");
         _assert(moveFileFromAppDir("strap.tar.lzma", "/jb/strap.tar.lzma") == 0, message);
-        _assert(access("/jb/strap.tar.lzma", F_OK) == 0, message);
-        _assert(chmod("/jb/strap.tar.lzma", 0644) == 0, message);
-        _assert(chown("/jb/strap.tar.lzma", 0, 0) == 0, message);
+        INIT_FILE("/jb/strap.tar.lzma", 0, 0644);
         
-        if (!access("/jb/debugserver.tar", F_OK)) {
-            _assert(unlink("/jb/debugserver.tar") == 0, message);
-        }
-        if (!access("/jb/debugserver", F_OK)) {
-            _assert(unlink("/jb/debugserver") == 0, message);
-        }
+        CLEAN_FILE("/jb/debugserver.tar");
+        CLEAN_FILE("/jb/debugserver");
         _assert(moveFileFromAppDir("debugserver.tar", "/jb/debugserver.tar") == 0, message);
         a = fopen("/jb/debugserver.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         untar(a, "debugserver");
         _assert(fclose(a) == 0, message);
-        _assert(access("/jb/debugserver", F_OK) == 0, message);
-        _assert(chmod("/jb/debugserver", 0755) == 0, message);
-        _assert(chown("/jb/debugserver", 0, 0) == 0, message);
+        INIT_FILE("/jb/debugserver", 0, 0755);
         
-        if (!access("/jb/rsync.tar", F_OK)) {
-            _assert(unlink("/jb/rsync.tar") == 0, message);
-        }
-        if (!access("/jb/rsync", F_OK)) {
-            _assert(unlink("/jb/rsync") == 0, message);
-        }
+        CLEAN_FILE("/jb/rsync.tar");
+        CLEAN_FILE("/jb/rsync");
         _assert(moveFileFromAppDir("rsync.tar", "/jb/rsync.tar") == 0, message);
         a = fopen("/jb/rsync.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         untar(a, "rsync");
         _assert(fclose(a) == 0, message);
-        _assert(access("/jb/rsync", F_OK) == 0, message);
-        _assert(chmod("/jb/rsync", 0755) == 0, message);
-        _assert(chown("/jb/rsync", 0, 0) == 0, message);
+        INIT_FILE("/jb/rsync", 0, 0755);
         
         LOG("Successfully copied over our resources to RootFS.");
     }
@@ -2528,16 +2462,13 @@ void exploit(mach_port_t tfp0,
         LOG("Logging slide...");
         PROGRESS("Exploiting... (32/63)", 0, 0);
         SETMESSAGE("Failed to log slide.");
-        if (!access("/private/var/tmp/slide.txt", F_OK)) {
-            _assert(unlink("/private/var/tmp/slide.txt") == 0, message);
-        }
+        CLEAN_FILE("/private/var/tmp/slide.txt");
         a = fopen("/private/var/tmp/slide.txt", "w+");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         fprintf(a, ADDR "\n", kernel_slide);
         _assert(fclose(a) == 0, message);
-        _assert(chmod("/private/var/tmp/slide.txt", 0644) == 0, message);
-        _assert(chown("/private/var/tmp/slide.txt", 0, 0) == 0, message);
+        INIT_FILE("/private/var/tmp/slide.txt", 0, 0644);
         LOG("Successfully logged slide.");
     }
     
@@ -2559,9 +2490,7 @@ void exploit(mach_port_t tfp0,
         LOG("Logging offsets...");
         PROGRESS("Exploiting... (34/63)", 0, 0);
         SETMESSAGE("Failed to log offsets.");
-        if (!access("/jb/offsets.plist", F_OK)) {
-            _assert(unlink("/jb/offsets.plist") == 0, message);
-        }
+        CLEAN_FILE("/jb/offsets.plist");
         md = [[NSMutableDictionary alloc] init];
         md[@"KernelBase"] = ADDRSTRING(kernel_base);
         md[@"KernelSlide"] = ADDRSTRING(kernel_slide);
@@ -2585,8 +2514,7 @@ void exploit(mach_port_t tfp0,
         md[@"SiFlags"] = ADDRSTRING(GETOFFSET(si_flags));
         md[@"VFlags"] = ADDRSTRING(GETOFFSET(v_flags));
         _assert(([md writeToFile:@"/jb/offsets.plist" atomically:YES]) == 1, message);
-        _assert(chmod("/jb/offsets.plist", 0644) == 0, message);
-        _assert(chown("/jb/offsets.plist", 0, 0) == 0, message);
+        INIT_FILE("/jb/offsets.plist", 0, 0644);
         LOG("Successfully logged offsets.");
     }
     
@@ -2617,9 +2545,7 @@ void exploit(mach_port_t tfp0,
         LOG("Patching amfid...");
         PROGRESS("Exploiting... (37/63)", 0, 0);
         SETMESSAGE("Failed to patch amfid.");
-        if (!access("/private/var/tmp/amfid_payload.alive", F_OK)) {
-            _assert(unlink("/private/var/tmp/amfid_payload.alive") == 0, message);
-        }
+        CLEAN_FILE("/private/var/tmp/amfid_payload.alive");
         _assert(inject_library(findPidOfProcess("amfid"), "/jb/amfid_payload.dylib") == 0, message);
         _assert(waitForFile("/private/var/tmp/amfid_payload.alive") == 0, message);
         LOG("Successfully patched amfid.");
@@ -2631,22 +2557,13 @@ void exploit(mach_port_t tfp0,
         LOG("Spawning jailbreakd...");
         PROGRESS("Exploiting... (38/63)", 0, 0);
         SETMESSAGE("Failed to spawn jailbreakd.");
-        if (!access("/usr/lib/libjailbreak.dylib", F_OK)) {
-            _assert(unlink("/usr/lib/libjailbreak.dylib") == 0, message);
-        }
+        CLEAN_FILE("/usr/lib/libjailbreak.dylib");
         _assert(symlink("/jb/libjailbreak.dylib", "/usr/lib/libjailbreak.dylib") == 0, message);
-        if (!access("/usr/lib/libjailbreacy.dylib", F_OK)) {
-            _assert(unlink("/usr/lib/libjailbreacy.dylib") == 0, message);
-        }
-        _assert(link("/jb/libjailbreacy.dylib", "/usr/lib/libjailbreacy.dylib") == 0, message);
-        _assert(unlink("/jb/libjailbreacy.dylib") == 0, message);
-        if (!access("/bin/launchctl", F_OK)) {
-            _assert(unlink("/bin/launchctl") == 0, message);
-        }
+        CLEAN_FILE("/usr/lib/libjailbreacy.dylib");
+        _assert(rename("/jb/libjailbreacy.dylib", "/usr/lib/libjailbreacy.dylib") == 0, message);
+        CLEAN_FILE("/bin/launchctl");
         _assert(rename("/jb/launchctl", "/bin/launchctl") == 0, message);
-        if (!access("/jb/jailbreakd.plist", F_OK)) {
-            _assert(unlink("/jb/jailbreakd.plist") == 0, message);
-        }
+        CLEAN_FILE("/jb/jailbreakd.plist");
         md = [[NSMutableDictionary alloc] init];
         md[@"Label"] = @"jailbreakd";
         md[@"Program"] = @"/jb/jailbreakd";
@@ -2668,17 +2585,10 @@ void exploit(mach_port_t tfp0,
         md[@"StandardErrorPath"] = @"/var/log/jailbreakd-stderr.log";
         md[@"StandardOutPath"] = @"/var/log/jailbreakd-stdout.log";
         _assert(([md writeToFile:@"/jb/jailbreakd.plist" atomically:YES]) == 1, message);
-        _assert(chmod("/jb/jailbreakd.plist", 0644) == 0, message);
-        _assert(chown("/jb/jailbreakd.plist", 0, 0) == 0, message);
-        if (!access("/var/log/jailbreakd-stderr.log", F_OK)) {
-            _assert(unlink("/var/log/jailbreakd-stderr.log") == 0, message);
-        }
-        if (!access("/var/log/jailbreakd-stdout.log", F_OK)) {
-            _assert(unlink("/var/log/jailbreakd-stdout.log") == 0, message);
-        }
-        if (!access("/private/var/tmp/jailbreakd.pid", F_OK)) {
-            _assert(unlink("/private/var/tmp/jailbreakd.pid") == 0, message);
-        }
+        INIT_FILE("/jb/jailbreakd.plist", 0, 0644);
+        CLEAN_FILE("/var/log/jailbreakd-stderr.log");
+        CLEAN_FILE("/var/log/jailbreakd-stdout.log");
+        CLEAN_FILE("/private/var/tmp/jailbreakd.pid");
         _assert(execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL) == 0, message);
         _assert(waitForFile("/private/var/tmp/jailbreakd.pid") == 0, message);
         LOG("Successfully spawned jailbreakd.");
@@ -2688,22 +2598,14 @@ void exploit(mach_port_t tfp0,
         // Patch launchd.
         
         SETMESSAGE("Failed to patch launchd.");
-        if (!access("/usr/lib/pspawn_hook.dylib", F_OK)) {
-            _assert(unlink("/usr/lib/pspawn_hook.dylib") == 0, message);
-        }
+        CLEAN_FILE("/usr/lib/pspawn_hook.dylib");
         _assert(symlink("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib") == 0, message);
         if ((access("/etc/rc.d/substrate", F_OK) != 0) && load_tweaks) {
             LOG("Patching launchd...");
             PROGRESS("Exploiting... (39/63)", 0, 0);
-            if (!access("/var/log/pspawn_hook_launchd.log", F_OK)) {
-                _assert(unlink("/var/log/pspawn_hook_launchd.log") == 0, message);
-            }
-            if (!access("/var/log/pspawn_hook_xpcproxy.log", F_OK)) {
-                _assert(unlink("/var/log/pspawn_hook_xpcproxy.log") == 0, message);
-            }
-            if (!access("/var/log/pspawn_hook_other.log", F_OK)) {
-                _assert(unlink("/var/log/pspawn_hook_other.log") == 0, message);
-            }
+            CLEAN_FILE("/var/log/pspawn_hook_launchd.log");
+            CLEAN_FILE("/var/log/pspawn_hook_xpcproxy.log");
+            CLEAN_FILE("/var/log/pspawn_hook_other.log");
             _assert(inject_library(1, "/usr/lib/pspawn_hook.dylib") == 0, message);
             LOG("Successfully patched launchd.");
         }
@@ -2835,8 +2737,7 @@ void exploit(mach_port_t tfp0,
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message);
             _assert(fclose(a) == 0, message);
-            _assert(chmod("/.installed_unc0ver", 0644) == 0, message);
-            _assert(chown("/.installed_unc0ver", 0, 0) == 0, message);
+            INIT_FILE("/.installed_unc0ver", 0, 0644);
             run_uicache = 1;
         }
         _assert(chdir("/jb") == 0, message);
@@ -2877,8 +2778,7 @@ void exploit(mach_port_t tfp0,
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message);
             _assert(fclose(a) == 0, message);
-            _assert(chmod("/.cydia_no_stash", 0644) == 0, message);
-            _assert(chown("/.cydia_no_stash", 0, 0) == 0, message);
+            INIT_FILE("/.cydia_no_stash", 0, 0644);
             LOG("Successfully disabled stashing.");
         }
     }
@@ -3001,28 +2901,25 @@ void exploit(mach_port_t tfp0,
             LOG("Extracting OpenSSH...");
             PROGRESS("Exploiting... (55/63)", 0, 0);
             SETMESSAGE("Failed to extract OpenSSH.");
-            if (!access("/jb/openssh.tar", F_OK)) {
-                _assert(unlink("/jb/openssh.tar") == 0, message);
-            }
-            if (!access("/jb/openssh.deb", F_OK)) {
-                _assert(unlink("/jb/openssh.deb") == 0, message);
-            }
+            CLEAN_FILE("/jb/openssh.tar");
+            CLEAN_FILE("/jb/openssh.deb");
+            CLEAN_FILE("/jb/ca-certificates.deb");
             _assert(moveFileFromAppDir("openssh.tar", "/jb/openssh.tar") == 0, message);
             a = fopen("/jb/openssh.tar", "rb");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message);
             untar(a, "openssh.deb");
             _assert(fclose(a) == 0, message);
-            _assert(access("/jb/openssh.deb", F_OK) == 0, message);
-            _assert(chmod("/jb/openssh.deb", 0755) == 0, message);
-            _assert(chown("/jb/openssh.deb", 0, 0) == 0, message);
+            INIT_FILE("/jb/openssh.deb", 0, 0644);
+            INIT_FILE("/jb/openssl.deb", 0, 0644);
+            INIT_FILE("/jb/ca-certificates.deb", 0, 0644);
             LOG("Successfully extracted OpenSSH.");
             
             // Install OpenSSH.
             LOG("Installing OpenSSH...");
             PROGRESS("Exploiting... (56/63)", 0, 0);
             SETMESSAGE("Failed to install OpenSSH.");
-            rv = _system("/usr/bin/dpkg -i /jb/openssh.deb /jb/openssl.deb");
+            rv = _system("/usr/bin/dpkg -i /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
             _assert(WEXITSTATUS(rv) == 0, message);
             LOG("Successfully installed OpenSSH.");
             
@@ -3041,28 +2938,24 @@ void exploit(mach_port_t tfp0,
             LOG("Extracting Cydia...");
             PROGRESS("Exploiting... (58/63)", 0, 0);
             SETMESSAGE("Failed to extract Cydia.");
-            if (!access("/jb/cydia.tar", F_OK)) {
-                _assert(unlink("/jb/cydia.tar") == 0, message);
-            }
-            if (!access("/jb/cydia.deb", F_OK)) {
-                _assert(unlink("/jb/cydia.deb") == 0, message);
-            }
+            CLEAN_FILE("/jb/cydia.tar");
+            CLEAN_FILE("/jb/cydia.deb");
+            CLEAN_FILE("/jb/cydia-lproj.deb");
             _assert(moveFileFromAppDir("cydia.tar", "/jb/cydia.tar") == 0, message);
             a = fopen("/jb/cydia.tar", "rb");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message);
             untar(a, "cydia.deb");
             _assert(fclose(a) == 0, message);
-            _assert(access("/jb/cydia.deb", F_OK) == 0, message);
-            _assert(chmod("/jb/cydia.deb", 0755) == 0, message);
-            _assert(chown("/jb/cydia.deb", 0, 0) == 0, message);
+            INIT_FILE("/jb/cydia.deb", 0, 0644);
+            INIT_FILE("/jb/cydia-lproj.deb", 0, 0644);
             LOG("Successfully extracted Cydia.");
             
             // Install Cydia.
             LOG("Installing Cydia...");
             PROGRESS("Exploiting... (59/63)", 0, 0);
             SETMESSAGE("Failed to install Cydia.");
-            rv = _system("/usr/bin/dpkg -i /jb/cydia.deb");
+            rv = _system("/usr/bin/dpkg -i /jb/cydia.deb /jb/cydia-lproj.deb");
             _assert(WEXITSTATUS(rv) == 0, message);
             LOG("Successfully installed Cydia.");
             
