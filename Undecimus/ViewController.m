@@ -1857,7 +1857,6 @@ void exploit(mach_port_t tfp0,
     uint64_t v_mount = 0;
     uint32_t v_flag = 0;
     FILE *a = NULL;
-    char *dev_path = NULL;
     struct trust_mem mem;
     size_t length = 0;
     uint64_t kernel_trust = 0;
@@ -2103,14 +2102,14 @@ void exploit(mach_port_t tfp0,
     {
         // Set boot-nonce.
         
-        LOG("Setting boot-nonce...");
-        PROGRESS("Exploiting... (14/63)", 0, 0);
-        SETMESSAGE("Failed to set boot-nonce.");
         if (overwrite_boot_nonce) {
+            LOG("Setting boot-nonce...");
+            PROGRESS("Exploiting... (14/63)", 0, 0);
+            SETMESSAGE("Failed to set boot-nonce.");
             _assert(execCommandAndWait("/usr/sbin/nvram", (char *)[[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String], NULL, NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL, NULL, NULL, NULL) == 0, message);
+            LOG("Successfully set boot-nonce.");
         }
-        LOG("Successfully set boot-nonce.");
     }
     
     {
@@ -2270,8 +2269,7 @@ void exploit(mach_port_t tfp0,
         v_flag = v_flag & ~MNT_NOSUID;
         v_flag = v_flag & ~MNT_RDONLY;
         wk32(v_mount + GETOFFSET(mnt_flag), v_flag & ~MNT_ROOTFS);
-        dev_path = "/dev/disk0s1s1";
-        _assert(mount("apfs", "/", MNT_UPDATE, (void *)&dev_path) == 0, message);
+        _assert(execCommandAndWait("/sbin/mount", "-u", "/", NULL, NULL, NULL) == 0, message);
         v_mount = rk64(rootfs_vnode + GETOFFSET(v_mount));
         wk32(v_mount + GETOFFSET(mnt_flag), v_flag);
         LOG("Successfully remounted RootFS.");
@@ -2740,21 +2738,21 @@ void exploit(mach_port_t tfp0,
             run_uicache = 1;
         }
         _assert(chdir("/jb") == 0, message);
-        _assert(unlink("/jb/amfid_payload.tar") == 0, message);
-        _assert(unlink("/jb/launchctl.tar") == 0, message);
-        _assert(unlink("/jb/jailbreakd.tar") == 0, message);
-        _assert(unlink("/jb/libjailbreak.tar") == 0, message);
-        _assert(unlink("/jb/libjailbreacy.tar") == 0, message);
-        _assert(unlink("/jb/pspawn_hook.tar") == 0, message);
-        _assert(unlink("/jb/tar.tar") == 0, message);
-        _assert(unlink("/jb/tar") == 0, message);
-        _assert(unlink("/jb/lzma.tar") == 0, message);
-        _assert(unlink("/jb/spawn.tar") == 0, message);
-        _assert(unlink("/jb/strap.tar.lzma") == 0, message);
-        _assert(unlink("/jb/debugserver.tar") == 0, message);
-        _assert(unlink("/jb/rsync") == 0, message);
-        _assert(unlink("/jb/rsync.tar") == 0, message);
-        _assert(unlink("/jb/lzma") == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/amfid_payload.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/launchctl.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/jailbreakd.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/libjailbreak.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/libjailbreacy.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/pspawn_hook.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/spawn.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/debugserver.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/rsync", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/rsync.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma", NULL, NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/rm", "-rf", "/usr/bin/debugserver", NULL, NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/ln", "-s", "/jb/debugserver", "/usr/bin/debugserver", NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/rm", "-rf", "/usr/bin/spawn", NULL, NULL, NULL) == 0, message);
@@ -2926,7 +2924,7 @@ void exploit(mach_port_t tfp0,
             LOG("Disabling Install OpenSSH...");
             PROGRESS("Exploiting... (57/63)", 0, 0);
             SETMESSAGE("Failed to disable Install OpenSSH.");
-            setPreference(@K_INSTALL_OPENSSH, @NO);
+            setPreference(@K_INSTALL_OPENSSH, @(NO));
             LOG("Successfully disabled Install OpenSSH.");
         }
     }
@@ -2962,7 +2960,7 @@ void exploit(mach_port_t tfp0,
             LOG("Disabling Install Cydia...");
             PROGRESS("Exploiting... (60/63)", 0, 0);
             SETMESSAGE("Failed to disable Install Cydia.");
-            setPreference(@K_INSTALL_CYDIA, @NO);
+            setPreference(@K_INSTALL_CYDIA, @(NO));
             LOG("Successfully disabled Install Cydia.");
         }
     }
