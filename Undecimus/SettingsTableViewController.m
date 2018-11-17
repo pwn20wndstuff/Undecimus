@@ -10,6 +10,8 @@
 #include <sys/sysctl.h>
 #import "SettingsTableViewController.h"
 #include "common.h"
+#include "hideventsystem.h"
+#include "remote_call.h"
 #include "ViewController.h"
 
 @interface SettingsTableViewController ()
@@ -426,6 +428,16 @@ extern int mptcp_die(void);
     [[NSUserDefaults standardUserDefaults] setBool:[self.ReloadSystemDaemonsSwitch isOn] forKey:@K_RELOAD_SYSTEM_DAEMONS];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
+}
+
+- (IBAction)tappedRestartSpringBoard:(id)sender {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+        SETMESSAGE("Failed to restart SpringBoard.");
+        NOTICE("SpringBoard will be restarted.", 1, 0);
+        mach_port_t bb_tp = hid_event_queue_exploit();
+        _assert(MACH_PORT_VALID(bb_tp), message);
+        thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0));
+    });
 }
 
 - (void)didReceiveMemoryWarning {

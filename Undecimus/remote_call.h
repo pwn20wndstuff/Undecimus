@@ -37,6 +37,7 @@ typedef struct _arg_desc {
 #define REMOTE_OUT_BUFFER(ptr, size) &(arg_desc){ARG_OUT_BUFFER, (uint64_t)ptr, (uint64_t)size}
 
 uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...);
+uint64_t thread_call_remote(mach_port_t thread_port, void* fptr, int n_params, ...);
 
 #endif
 
