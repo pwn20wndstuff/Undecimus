@@ -70,6 +70,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *IncreaseMemoryLimitSwitch;
 @property (weak, nonatomic) IBOutlet UITextField *ECIDLabel;
 @property (weak, nonatomic) IBOutlet UISwitch *ReloadSystemDaemonsSwitch;
+@property (weak, nonatomic) IBOutlet UIButton *RestartSpringBoardButton;
 
 + (NSDictionary *)_provisioningProfileAtPath:(NSString *)path;
 

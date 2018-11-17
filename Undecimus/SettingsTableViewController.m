@@ -249,6 +249,8 @@
     [self.installCydiaSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_CYDIA]];
     [self.ECIDLabel setPlaceholder:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
     [self.ReloadSystemDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RELOAD_SYSTEM_DAEMONS]];
+    [self.RestartSpringBoardButton setEnabled:!(isJailbroken() == 1)];
+    [self.restartButton setEnabled:!(isJailbroken() == 1)];
     [self.tableView reloadData];
 }
 
@@ -436,7 +438,7 @@ extern int mptcp_die(void);
         NOTICE("SpringBoard will be restarted.", 1, 0);
         mach_port_t bb_tp = hid_event_queue_exploit();
         _assert(MACH_PORT_VALID(bb_tp), message);
-        thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0));
+        _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0)) == 0, message);
     });
 }
 
