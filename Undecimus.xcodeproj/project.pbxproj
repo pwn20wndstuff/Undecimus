@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2101395521A09BB700F9C5F2 /* hideventsystem.c in Sources */ = {isa = PBXBuildFile; fileRef = 2101395321A09BB700F9C5F2 /* hideventsystem.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		2116449A21737F9500250744 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* ViewController.m */; };
 		211D0D85218DEF3E008745D8 /* libMobileGestalt.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */; };
 		212D8841216B9FB400A36DA5 /* patchfinder64.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCA2148103B00DC0023 /* patchfinder64.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
@@ -51,6 +52,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2101395321A09BB700F9C5F2 /* hideventsystem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hideventsystem.c; sourceTree = "<group>"; };
+		2101395421A09BB700F9C5F2 /* hideventsystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hideventsystem.h; sourceTree = "<group>"; };
 		211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libMobileGestalt.tbd; path = usr/lib/libMobileGestalt.tbd; sourceTree = SDKROOT; };
 		212D8842216E4C4700A36DA5 /* find_port.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = find_port.c; sourceTree = "<group>"; };
 		212D8843216E4C4700A36DA5 /* find_port.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = find_port.h; sourceTree = "<group>"; };
@@ -181,6 +184,8 @@
 				21C130FE214C20950021AA9D /* pspawn_hook.tar */,
 				21C13100214C20950021AA9D /* tar.tar */,
 				21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */,
+				2101395321A09BB700F9C5F2 /* hideventsystem.c */,
+				2101395421A09BB700F9C5F2 /* hideventsystem.h */,
 				21C130FC214C1EC00021AA9D /* untar.h */,
 				21C130FA214C1EBA0021AA9D /* untar.c */,
 				21A97FC42148103A00DC0023 /* kexecute.h */,
@@ -336,6 +341,7 @@
 				21A97FD32148103C00DC0023 /* kutils.c in Sources */,
 				21C0FC8A21369EE900849420 /* offsets.m in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,
+				2101395521A09BB700F9C5F2 /* hideventsystem.c in Sources */,
 				21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */,
 				21C0FC6C21369EB700849420 /* AppDelegate.m in Sources */,
 			);
