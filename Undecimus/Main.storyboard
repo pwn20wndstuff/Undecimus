@@ -1093,6 +1093,7 @@
                         <outlet property="OverwriteBootNonceSwitch" destination="5W0-39-WKV" id="baD-it-yNn"/>
                         <outlet property="RefreshIconCacheSwitch" destination="E0P-lH-E3m" id="UVF-BM-lu5"/>
                         <outlet property="ReloadSystemDaemonsSwitch" destination="dZz-WS-G1u" id="zAs-NI-nkc"/>
+                        <outlet property="RestartSpringBoardButton" destination="sBD-7B-tON" id="T9J-Es-GVJ"/>
                         <outlet property="RestoreRootFSSwitch" destination="Vce-QD-qkd" id="Psh-NM-sAb"/>
                         <outlet property="ShareDiagnosticsDataButton" destination="j3u-pn-SGo" id="0cM-Vu-e4I"/>
                         <outlet property="TweakInjectionSwitch" destination="fAs-8y-ldG" id="TY7-Ea-A2P"/>
