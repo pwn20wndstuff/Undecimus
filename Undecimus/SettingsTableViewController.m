@@ -246,6 +246,7 @@
     [self.installSSHSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_OPENSSH]];
     [self.installCydiaSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_CYDIA]];
     [self.ECIDLabel setPlaceholder:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
+    [self.ReloadSystemDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RELOAD_SYSTEM_DAEMONS]];
     [self.tableView reloadData];
 }
 
@@ -417,6 +418,12 @@ extern int mptcp_die(void);
 
 - (IBAction)tappedOnAutomaticallySelectExploit:(id)sender {
     [[NSUserDefaults standardUserDefaults] setInteger:selectExploit() forKey:@K_EXPLOIT];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reloadData];
+}
+
+- (IBAction)reloadSystemDaemonsSwitchTriggered:(id)sender {
+    [[NSUserDefaults standardUserDefaults] setBool:[self.ReloadSystemDaemonsSwitch isOn] forKey:@K_RELOAD_SYSTEM_DAEMONS];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }

@@ -1881,6 +1881,7 @@ void exploit(mach_port_t tfp0,
     int increase_memory_limit = 0;
     int install_cydia = 0;
     int install_openssh = 0;
+    int reload_system_daemons = 0;
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
 #define kernel_slide           (kernel_base - KERNEL_SEARCH_ADDRESS)
@@ -1903,6 +1904,7 @@ void exploit(mach_port_t tfp0,
         increase_memory_limit = [defaults[@K_INCREASE_MEMORY_LIMIT] boolValue];
         install_cydia = [defaults[@K_INSTALL_CYDIA] boolValue];
         install_openssh = [defaults[@K_INSTALL_OPENSSH] boolValue];
+        reload_system_daemons = [defaults[@K_RELOAD_SYSTEM_DAEMONS] boolValue];
         LOG("Successfully loaded preferences.");
     }
     
@@ -2651,22 +2653,20 @@ void exploit(mach_port_t tfp0,
             if (snapshot_check("/", "electra-prejailbreak") == 1) {
                 if (kCFCoreFoundationVersionNumber < 1452.23) {
                     _assert(snapshot_mount("/", "electra-prejailbreak", "/private/var/tmp/rootfsmnt") == 0, message);
-                    _assert(waitForFile("/private/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
                 } else {
                     _assert(snapshot_rename("/", "electra-prejailbreak", systemSnapshot()) == 0, message);
                 }
             } else if (snapshot_check("/", "orig-fs") == 1) {
                 if (kCFCoreFoundationVersionNumber < 1452.23) {
                     _assert(snapshot_mount("/", "orig-fs", "/private/var/tmp/rootfsmnt") == 0, message);
-                    _assert(waitForFile("/private/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
                 } else {
                     _assert(snapshot_rename("/", "orig-fs", systemSnapshot()) == 0, message);
                 }
             } else {
                 _assert(snapshot_mount("/", systemSnapshot(), "/private/var/tmp/rootfsmnt") == 0, message);
-                _assert(waitForFile("/private/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
             }
             if (kCFCoreFoundationVersionNumber < 1452.23) {
+                _assert(waitForFile("/private/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
                 _assert(easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/private/var/tmp/rootfsmnt/.", @"/"]) == 0, message);
             }
             LOG("Successfully renamed system snapshot back.");
@@ -3018,11 +3018,18 @@ void exploit(mach_port_t tfp0,
             LOG("Loading Tweaks...");
             PROGRESS("Exploiting... (63/63)", 0, 0);
             SETMESSAGE("Failed to run ldrestart");
-            rv = _system("nohup bash -c \""
-                         "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
-                         "ldrestart ;"
-                         "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
-                         "\" 2>&1 >/dev/null &");
+            if (reload_system_daemons) {
+                rv = _system("nohup bash -c \""
+                             "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
+                             "ldrestart ;"
+                             "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
+                             "\" 2>&1 >/dev/null &");
+            } else {
+                rv = _system("nohup bash -c \""
+                             "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist ;"
+                             "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
+                             "\" 2>&1 >/dev/null &");
+            }
             _assert(WEXITSTATUS(rv) == 0, message);
             LOG("Successfully loaded Tweaks.");
         }
