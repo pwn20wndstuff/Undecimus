@@ -23,6 +23,7 @@
 #define K_ECID                      "Ecid"
 #define K_INSTALL_OPENSSH           "InstallOpenSSH"
 #define K_INSTALL_CYDIA             "InstallCydia"
+#define K_RELOAD_SYSTEM_DAEMONS     "ReloadSystemDaemons"
 
 #define LOG_FILE                    [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
 #define PREFERENCES_FILE            [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", NSHomeDirectory(), [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]]
@@ -68,6 +69,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *UptimeLabel;
 @property (weak, nonatomic) IBOutlet UISwitch *IncreaseMemoryLimitSwitch;
 @property (weak, nonatomic) IBOutlet UITextField *ECIDLabel;
+@property (weak, nonatomic) IBOutlet UISwitch *ReloadSystemDaemonsSwitch;
 
 + (NSDictionary *)_provisioningProfileAtPath:(NSString *)path;
 

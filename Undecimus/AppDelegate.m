@@ -78,6 +78,10 @@
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@K_INSTALL_OPENSSH];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_RELOAD_SYSTEM_DAEMONS] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@K_RELOAD_SYSTEM_DAEMONS];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
     [self SetUpShortcuts];
     return YES;
 }
