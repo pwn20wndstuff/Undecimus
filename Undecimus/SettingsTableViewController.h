@@ -28,10 +28,10 @@
 #define LOG_FILE                    [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
 #define PREFERENCES_FILE            [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", NSHomeDirectory(), [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]]
 
-#define ISDEBUGGERATTACHED()        (getppid() == 1)
+#define ISDEBUGGERATTACHED()        (!(getppid() == 1))
 
 #define START_LOGGING() do { \
-    if (ISDEBUGGERATTACHED()) { \
+    if (!ISDEBUGGERATTACHED()) { \
         freopen(LOG_FILE, "a+", stderr); \
         freopen(LOG_FILE, "a+", stdout); \
         setbuf(stdout, NULL); \
@@ -40,7 +40,7 @@
 } while (false) \
 
 #define RESET_LOGS() do { \
-    if (ISDEBUGGERATTACHED()) { \
+    if (!ISDEBUGGERATTACHED()) { \
         if (!access(LOG_FILE, F_OK)) { \
         unlink(LOG_FILE); \
         } \
