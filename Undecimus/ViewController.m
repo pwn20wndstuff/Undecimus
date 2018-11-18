@@ -2905,7 +2905,7 @@ void exploit(mach_port_t tfp0,
             _assert(sysctlbyname("hw.targettype", buf_targettype, &size, NULL, 0) == 0, message);
             md = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype]];
             _assert(md != nil, message);
-            md[@"Version4"][@"System"][@"Override"][@"Global"][@"UserHighWaterMark"] = md[@"Version4"][@"PListDevice"][@"MemoryCapacity"];
+            md[@"Version4"][@"System"][@"Override"][@"Global"][@"UserHighWaterMark"] = [NSNumber numberWithInteger:[md[@"Version4"][@"PListDevice"][@"MemoryCapacity"] integerValue]];
             _assert(([md writeToFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype] atomically:YES]) == 1, message);
             LOG("Successfully increased memory limit.");
         }
