@@ -20,11 +20,6 @@
 
 @implementation SettingsTableViewController
 
-
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    return textView.text.length + (text.length - range.length) <= 16;
-}
-
 // https://github.com/Matchstic/ReProvision/blob/7b595c699335940f68702bb204c5aa55b8b1896f/Shared/Application%20Database/RPVApplication.m#L102
 
 + (NSDictionary *)_provisioningProfileAtPath:(NSString *)path {
