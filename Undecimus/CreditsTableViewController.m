@@ -107,4 +107,7 @@
 -(IBAction)tappedOnJakeashacks:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Jakeashacks"] options:@{} completionHandler:nil];
 }
+- (IBAction)tappedContributors:(UIButton *)sender {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/pulls"] options:@{} completionHandler:nil];
+}
 @end

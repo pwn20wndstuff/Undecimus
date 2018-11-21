@@ -25,6 +25,7 @@ static const char *message = NULL;
 while (false)
 
 #define NOTICE(msg, wait, destructive) showAlert(@"Notice", @(msg), wait, destructive)
+#define CUSTOMNOTICE(title, msg, wait, destructive) showAlert(@(title), @(msg), wait, destructive)
 
 static inline void showAlert(NSString *title, NSString *message, Boolean wait, Boolean destructive) {
     dispatch_semaphore_t semaphore;

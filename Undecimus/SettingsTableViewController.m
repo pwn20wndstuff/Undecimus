@@ -20,6 +20,11 @@
 
 @implementation SettingsTableViewController
 
+
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    return textView.text.length + (text.length - range.length) <= 16;
+}
+
 // https://github.com/Matchstic/ReProvision/blob/7b595c699335940f68702bb204c5aa55b8b1896f/Shared/Application%20Database/RPVApplication.m#L102
 
 + (NSDictionary *)_provisioningProfileAtPath:(NSString *)path {
@@ -197,6 +202,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if (isJailbroken() == 1) {
+        [_restartSBButton setTitle:@"Restart SpringBoard (unavailable when jailbroken)" forState:UIControlStateNormal];
+        UIFont *font = _restartSBButton.titleLabel.font;
+        _restartSBButton.titleLabel.font = [font fontWithSize:14];
+    }
+    NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    [_appVersion setPlaceholder:(version)];
     UIImageView *myImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Clouds"]];
     [myImageView setContentMode:UIViewContentModeScaleAspectFill];
     [myImageView setFrame:self.tableView.frame];
@@ -250,7 +262,7 @@
     [self.ECIDLabel setPlaceholder:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
     [self.ReloadSystemDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RELOAD_SYSTEM_DAEMONS]];
     [self.RestartSpringBoardButton setEnabled:!(isJailbroken() == 1)];
-    [self.restartButton setEnabled:!(isJailbroken() == 1)];
+    //[self.restartButton setEnabled:!(isJailbroken() == 1)];
     [self.tableView reloadData];
 }
 
@@ -378,11 +390,11 @@ extern int mptcp_die(void);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         NSString *Update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
         if (Update == nil) {
-            NOTICE("Failed to check for update.", 1, 0);
+            CUSTOMNOTICE("Failed", "Failed to check for update", 1, 0);
         } else if ([Update isEqualToString:[NSString stringWithFormat:@"%@\n", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]]) {
-            NOTICE("Already up to date.", 1, 0);
+            CUSTOMNOTICE("Up to date", "unc0ver is on the latest version", 1, 0);
         } else {
-            NOTICE("An update is available.", 1, 0);
+            CUSTOMNOTICE("Update", "An update to unc0ver is available", 1, 0);
         }
     });
 }

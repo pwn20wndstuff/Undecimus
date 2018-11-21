@@ -71,8 +71,11 @@
 @property (weak, nonatomic) IBOutlet UITextField *ECIDLabel;
 @property (weak, nonatomic) IBOutlet UISwitch *ReloadSystemDaemonsSwitch;
 @property (weak, nonatomic) IBOutlet UIButton *RestartSpringBoardButton;
+@property (weak, nonatomic) IBOutlet UIButton *restartSBButton;
+@property (weak, nonatomic) IBOutlet UITextField *appVersion;
 
 + (NSDictionary *)_provisioningProfileAtPath:(NSString *)path;
+
 
 @end
 
