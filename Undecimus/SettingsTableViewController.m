@@ -202,8 +202,6 @@
         UIFont *font = _restartSBButton.titleLabel.font;
         _restartSBButton.titleLabel.font = [font fontWithSize:14];
     }
-    NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-    [_appVersion setPlaceholder:(version)];
     UIImageView *myImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Clouds"]];
     [myImageView setContentMode:UIViewContentModeScaleAspectFill];
     [myImageView setFrame:self.tableView.frame];
@@ -256,7 +254,7 @@
     [self.installCydiaSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_CYDIA]];
     [self.ECIDLabel setPlaceholder:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
     [self.ReloadSystemDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RELOAD_SYSTEM_DAEMONS]];
-    [self.RestartSpringBoardButton setEnabled:!(isJailbroken() == 1)];
+    [self.RestartSpringBoardButton setEnabled:!(isJailbroken() == 1)]; // works Jailbroken.
     //[self.restartButton setEnabled:!(isJailbroken() == 1)];
     [self.tableView reloadData];
 }
