@@ -43,11 +43,11 @@
 		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		21E8CA7E2171CF7800936700 /* debugserver.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21E8CA7D2171CF7700936700 /* debugserver.tar */; };
+		21E9647221A5D81B000625F7 /* Unrestrict.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21E9647121A5D81B000625F7 /* Unrestrict.tar */; };
 		21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */; };
 		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; };
 		221926CA21997DED003511CD /* cydia.tar in Resources */ = {isa = PBXBuildFile; fileRef = 221926C821997DED003511CD /* cydia.tar */; };
 		221926CB21997DED003511CD /* openssh.tar in Resources */ = {isa = PBXBuildFile; fileRef = 221926C921997DED003511CD /* openssh.tar */; };
-		221926CD219A5B40003511CD /* libjailbreacy.tar in Resources */ = {isa = PBXBuildFile; fileRef = 221926CC219A5B3F003511CD /* libjailbreacy.tar */; };
 		8D592A68218E47F60035D2BC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D592A67218E47F60035D2BC /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -116,10 +116,11 @@
 		21C13118214D268F0021AA9D /* multi_path_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multi_path_sploit.h; sourceTree = "<group>"; };
 		21C1312E214D5A710021AA9D /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
 		21E8CA7D2171CF7700936700 /* debugserver.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = debugserver.tar; sourceTree = "<group>"; };
+		21E9642421A1DD6F000625F7 /* NSTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSTask.h; sourceTree = "<group>"; };
+		21E9647121A5D81B000625F7 /* Unrestrict.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = Unrestrict.tar; sourceTree = "<group>"; };
 		21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Painting_With_Chocolate.ttf; sourceTree = "<group>"; };
 		221926C821997DED003511CD /* cydia.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = cydia.tar; sourceTree = "<group>"; };
 		221926C921997DED003511CD /* openssh.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = openssh.tar; sourceTree = "<group>"; };
-		221926CC219A5B3F003511CD /* libjailbreacy.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = libjailbreacy.tar; sourceTree = "<group>"; };
 		8D592A67218E47F60035D2BC /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -167,9 +168,10 @@
 		21C0FC6921369EB700849420 /* Undecimus */ = {
 			isa = PBXGroup;
 			children = (
-				221926CC219A5B3F003511CD /* libjailbreacy.tar */,
+				21E9647121A5D81B000625F7 /* Unrestrict.tar */,
 				221926C821997DED003511CD /* cydia.tar */,
 				221926C921997DED003511CD /* openssh.tar */,
+				21E9642421A1DD6F000625F7 /* NSTask.h */,
 				21395357217CBA1000B17F8D /* MobileGestalt.h */,
 				2139534B21763A0B00B17F8D /* rsync.tar */,
 				21E8CA7D2171CF7700936700 /* debugserver.tar */,
@@ -310,8 +312,8 @@
 				221926CA21997DED003511CD /* cydia.tar in Resources */,
 				21C13106214C20950021AA9D /* jailbreakd.tar in Resources */,
 				21C13116214C51100021AA9D /* lzma.tar in Resources */,
+				21E9647221A5D81B000625F7 /* Unrestrict.tar in Resources */,
 				2139534C21763A0C00B17F8D /* rsync.tar in Resources */,
-				221926CD219A5B40003511CD /* libjailbreacy.tar in Resources */,
 				21C13109214C26AB0021AA9D /* launchctl.tar in Resources */,
 				21C13105214C20950021AA9D /* tar.tar in Resources */,
 			);

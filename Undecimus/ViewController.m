@@ -41,6 +41,7 @@
 #include "multi_path_sploit.h"
 #include "async_wake.h"
 #include "MobileGestalt.h"
+#include "NSTask.h"
 
 @interface ViewController ()
 
@@ -1889,7 +1890,7 @@ void exploit(mach_port_t tfp0,
     {
         // Load preferences.
         LOG("Loading preferences...");
-        PROGRESS("Exploiting... (2/64)", 0, 0);
+        PROGRESS("Exploiting... (2/65)", 0, 0);
         SETMESSAGE("Failed to load preferences.");
         load_tweaks = [defaults[@K_TWEAK_INJECTION] boolValue];
         load_daemons = [defaults[@K_LOAD_DAEMONS] boolValue];
@@ -1912,7 +1913,7 @@ void exploit(mach_port_t tfp0,
         // Initialize patchfinder64.
         
         LOG("Initializing patchfinder64...");
-        PROGRESS("Exploiting... (3/64)", 0, 0);
+        PROGRESS("Exploiting... (3/65)", 0, 0);
         SETMESSAGE("Failed to initialize patchfinder64.");
         _assert(init_kernel(kernel_base, NULL) == 0, message);
         LOG("Successfully initialized patchfinder64.");
@@ -1922,7 +1923,7 @@ void exploit(mach_port_t tfp0,
         // Find offsets.
         
         LOG("Finding offsets...");
-        PROGRESS("Exploiting... (4/64)", 0, 0);
+        PROGRESS("Exploiting... (4/65)", 0, 0);
         SETMESSAGE("Failed to find trust_chain offset.");
         SETOFFSET(trust_chain, find_trustcache());
         LOG("trust_chain: " ADDR "\n", GETOFFSET(trust_chain));
@@ -2005,7 +2006,7 @@ void exploit(mach_port_t tfp0,
         // Deinitialize patchfinder64.
         
         LOG("Deinitializing patchfinder64...");
-        PROGRESS("Exploiting... (5/64)", 0, 0);
+        PROGRESS("Exploiting... (5/65)", 0, 0);
         SETMESSAGE("Failed to deinitialize patchfinder64.");
         term_kernel();
         LOG("Successfully deinitialized patchfinder64.");
@@ -2015,7 +2016,7 @@ void exploit(mach_port_t tfp0,
         // Initialize QiLin.
         
         LOG("Initializing QiLin...");
-        PROGRESS("Exploiting... (6/64)", 0, 0);
+        PROGRESS("Exploiting... (6/65)", 0, 0);
         SETMESSAGE("Failed to initialize QiLin.");
         _assert(initQiLin(tfp0, kernel_base) == 0, message);
         setKernelSymbol("_kernproc", GETOFFSET(kernproc) - kernel_slide);
@@ -2029,7 +2030,7 @@ void exploit(mach_port_t tfp0,
         // Rootify.
         
         LOG("Rootifying...");
-        PROGRESS("Exploiting... (7/64)", 0, 0);
+        PROGRESS("Exploiting... (7/65)", 0, 0);
         SETMESSAGE("Failed to rootify.");
         _assert(rootifyMe() == 0, message);
         _assert(setuid(0) == 0, message);
@@ -2041,7 +2042,7 @@ void exploit(mach_port_t tfp0,
         // Platformize.
         
         LOG("Platformizing...");
-        PROGRESS("Exploiting... (8/64)", 0, 0);
+        PROGRESS("Exploiting... (8/65)", 0, 0);
         SETMESSAGE("Failed to platformize.");
         _assert(platformizeMe() == 0, message);
         LOG("Successfully platformized.");
@@ -2051,7 +2052,7 @@ void exploit(mach_port_t tfp0,
         // Escape Sandbox.
         
         LOG("Escaping Sandbox...");
-        PROGRESS("Exploiting... (9/64)", 0, 0);
+        PROGRESS("Exploiting... (9/65)", 0, 0);
         SETMESSAGE("Failed to escape sandbox.");
         ShaiHuludMe(0);
         LOG("Successfully escaped Sandbox.");
@@ -2061,7 +2062,7 @@ void exploit(mach_port_t tfp0,
         // Write a test file to UserFS.
         
         LOG("Writing a test file to UserFS...");
-        PROGRESS("Exploiting... (10/64)", 0, 0);
+        PROGRESS("Exploiting... (10/65)", 0, 0);
         SETMESSAGE("Failed to write a test file to UserFS.");
         writeTestFile("/var/mobile/test.txt");
         LOG("Successfully wrote a test file to UserFS.");
@@ -2071,7 +2072,7 @@ void exploit(mach_port_t tfp0,
         // Borrow entitlements from sysdiagnose.
         
         LOG("Borrowing entitlements from sysdiagnose...");
-        PROGRESS("Exploiting... (11/64)", 0, 0);
+        PROGRESS("Exploiting... (11/65)", 0, 0);
         SETMESSAGE("Failed to borrow entitlements from sysdiagnose.");
         borrowEntitlementsFromDonor("/usr/bin/sysdiagnose", "--help");
         LOG("Successfully borrowed entitlements from sysdiagnose.");
@@ -2084,7 +2085,7 @@ void exploit(mach_port_t tfp0,
             // Dump APTicket.
             
             LOG("Dumping APTicket...");
-            PROGRESS("Exploiting... (12/64)", 0, 0);
+            PROGRESS("Exploiting... (12/65)", 0, 0);
             SETMESSAGE("Failed to dump APTicket.");
             _assert(([[NSData dataWithContentsOfFile:@"/System/Library/Caches/apticket.der"] writeToFile:[NSString stringWithFormat:@"%@/Documents/apticket.der", NSHomeDirectory()] atomically:YES]) == 1, message);
             LOG("Successfully dumped APTicket.");
@@ -2095,7 +2096,7 @@ void exploit(mach_port_t tfp0,
         // Unlock nvram.
         
         LOG("Unlocking nvram...");
-        PROGRESS("Exploiting... (13/64)", 0, 0);
+        PROGRESS("Exploiting... (13/65)", 0, 0);
         SETMESSAGE("Failed to unlock nvram.");
         _assert(unlocknvram() == 0, message);
         LOG("Successfully unlocked nvram.");
@@ -2106,7 +2107,7 @@ void exploit(mach_port_t tfp0,
         
         if (overwrite_boot_nonce) {
             LOG("Setting boot-nonce...");
-            PROGRESS("Exploiting... (14/64)", 0, 0);
+            PROGRESS("Exploiting... (14/65)", 0, 0);
             SETMESSAGE("Failed to set boot-nonce.");
             _assert(execCommandAndWait("/usr/sbin/nvram", (char *)[[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String], NULL, NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL, NULL, NULL, NULL) == 0, message);
@@ -2118,7 +2119,7 @@ void exploit(mach_port_t tfp0,
         // Lock nvram.
         
         LOG("Locking nvram...");
-        PROGRESS("Exploiting... (15/64)", 0, 0);
+        PROGRESS("Exploiting... (15/65)", 0, 0);
         SETMESSAGE("Failed to lock nvram.");
         _assert(locknvram() == 0, message);
         LOG("Successfully locked nvram.");
@@ -2128,7 +2129,7 @@ void exploit(mach_port_t tfp0,
         // Initialize kexecute.
         
         LOG("Initializing kexecute...");
-        PROGRESS("Exploiting... (16/64)", 0, 0);
+        PROGRESS("Exploiting... (16/65)", 0, 0);
         SETMESSAGE("Failed to initialize kexecute.");
         init_kexecute(GETOFFSET(add_x0_x0_0x40_ret));
         LOG("Successfully initialized kexecute.");
@@ -2138,7 +2139,7 @@ void exploit(mach_port_t tfp0,
         // Get vfs_context.
         
         LOG("Getting vfs_context...");
-        PROGRESS("Exploiting... (17/64)", 0, 0);
+        PROGRESS("Exploiting... (17/65)", 0, 0);
         SETMESSAGE("Failed to get vfs_context.");
         vfs_context = _vfs_context(GETOFFSET(vfs_context_current), GETOFFSET(zone_map_ref));
         LOG("vfs_context: " ADDR "\n", vfs_context);
@@ -2150,7 +2151,7 @@ void exploit(mach_port_t tfp0,
         // Get dev vnode.
         
         LOG("Getting dev vnode...");
-        PROGRESS("Exploiting... (18/64)", 0, 0);
+        PROGRESS("Exploiting... (18/65)", 0, 0);
         SETMESSAGE("Failed to get dev vnode.");
         devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", GETOFFSET(vnode_lookup));
         LOG("devVnode: " ADDR "\n", devVnode);
@@ -2162,7 +2163,7 @@ void exploit(mach_port_t tfp0,
         // Clear dev vnode's si_flags.
         
         LOG("Clearing dev vnode's si_flags...");
-        PROGRESS("Exploiting... (19/64)", 0, 0);
+        PROGRESS("Exploiting... (19/65)", 0, 0);
         SETMESSAGE("Failed to clear dev vnode's si_flags.");
         v_specinfo = rk64(devVnode + GETOFFSET(v_specinfo));
         LOG("v_specinfo: " ADDR "\n", v_specinfo);
@@ -2179,7 +2180,7 @@ void exploit(mach_port_t tfp0,
         // Clean up dev vnode.
         
         LOG("Cleaning up dev vnode...");
-        PROGRESS("Exploiting... (20/64)", 0, 0);
+        PROGRESS("Exploiting... (20/65)", 0, 0);
         SETMESSAGE("Failed to clean up dev vnode.");
         _assert(_vnode_put(GETOFFSET(vnode_put), devVnode) == 0, message);
         LOG("Successfully cleaned up dev vnode.");
@@ -2189,7 +2190,7 @@ void exploit(mach_port_t tfp0,
         // Remount RootFS.
         
         LOG("Remounting RootFS...");
-        PROGRESS("Exploiting... (21/64)", 0, 0);
+        PROGRESS("Exploiting... (21/65)", 0, 0);
         SETMESSAGE("Failed to remount RootFS.");
         rv = snapshot_list("/");
         switch (rv) {
@@ -2205,7 +2206,7 @@ void exploit(mach_port_t tfp0,
                 // Borrow entitlements from fsck_apfs.
                 
                 LOG("Borrowing entitlements from fsck_apfs...");
-                PROGRESS("Exploiting... (22/64)", 0, 0);
+                PROGRESS("Exploiting... (22/65)", 0, 0);
                 borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
                 LOG("Successfully borrowed entitlements from fsck_apfs.");
                 
@@ -2214,7 +2215,7 @@ void exploit(mach_port_t tfp0,
                 // Rename system snapshot.
                 
                 LOG("Renaming system snapshot...");
-                PROGRESS("Exploiting... (23/64)", 0, 0);
+                PROGRESS("Exploiting... (23/65)", 0, 0);
                 SETMESSAGE("Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
                 rv = snapshot_list("/private/var/tmp/rootfsmnt");
                 _assert(!(rv == -1), message);
@@ -2229,7 +2230,7 @@ void exploit(mach_port_t tfp0,
                 // Reboot.
                 
                 LOG("Rebooting...");
-                PROGRESS("Exploiting... (24/64)", 0, 0);
+                PROGRESS("Exploiting... (24/65)", 0, 0);
                 NOTICE("The system snapshot has been successfully renamed. The device will be rebooted now.", 1, 0);
                 _assert(reboot(0x400) == 0, message);
                 LOG("Successfully rebooted.");
@@ -2239,7 +2240,7 @@ void exploit(mach_port_t tfp0,
                 // Borrow entitlements from fsck_apfs.
                 
                 LOG("Borrowing entitlements from fsck_apfs...");
-                PROGRESS("Exploiting... (25/64)", 0, 0);
+                PROGRESS("Exploiting... (25/65)", 0, 0);
                 borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
                 LOG("Successfully borrowed entitlements from fsck_apfs.");
                 
@@ -2248,7 +2249,7 @@ void exploit(mach_port_t tfp0,
                 // Create system snapshot.
                 
                 LOG("Create system snapshot...");
-                PROGRESS("Exploiting... (26/64)", 0, 0);
+                PROGRESS("Exploiting... (26/65)", 0, 0);
                 SETMESSAGE("Unable to create system snapshot.  Delete OTA file from Settings - Storage if present");
                 _assert(snapshot_create("/", "orig-fs") == 0, message);
                 _assert(snapshot_check("/", "orig-fs") == 1, message);
@@ -2256,7 +2257,7 @@ void exploit(mach_port_t tfp0,
                 // Borrow entitlements from sysdiagnose.
                 
                 LOG("Borrowing entitlements from sysdiagnose...");
-                PROGRESS("Exploiting... (27/64)", 0, 0);
+                PROGRESS("Exploiting... (27/65)", 0, 0);
                 borrowEntitlementsFromDonor("/usr/bin/sysdiagnose", "--help");
                 LOG("Successfully borrowed entitlements from sysdiagnose.");
                 
@@ -2281,7 +2282,7 @@ void exploit(mach_port_t tfp0,
         // Write a test file to RootFS.
         
         LOG("Writing a test file to RootFS...");
-        PROGRESS("Exploiting... (28/64)", 0, 0);
+        PROGRESS("Exploiting... (28/65)", 0, 0);
         SETMESSAGE("Failed to write a test file to RootFS.");
         writeTestFile("/test.txt");
         LOG("Successfully wrote a test file to RootFS.");
@@ -2291,7 +2292,7 @@ void exploit(mach_port_t tfp0,
         // Copy over our resources to RootFS.
         
         LOG("Copying over our resources to RootFS...");
-        PROGRESS("Exploiting... (29/64)", 0, 0);
+        PROGRESS("Exploiting... (29/65)", 0, 0);
         SETMESSAGE("Failed to copy over our resources to RootFS.");
         if (access("/jb", F_OK)) {
             _assert(mkdir("/jb", 0755) == 0, message);
@@ -2343,13 +2344,6 @@ void exploit(mach_port_t tfp0,
         
         CLEAN_FILE("/jb/libjailbreacy.tar");
         CLEAN_FILE("/jb/libjailbreacy.dylib");
-        _assert(moveFileFromAppDir("libjailbreacy.tar", "/jb/libjailbreacy.tar") == 0, message);
-        a = fopen("/jb/libjailbreacy.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "libjailbreacy");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/libjailbreacy.dylib", 0, 0644);
         
         CLEAN_FILE("/jb/pspawn_hook.tar");
         CLEAN_FILE("/jb/pspawn_hook.dylib");
@@ -2415,13 +2409,23 @@ void exploit(mach_port_t tfp0,
         _assert(fclose(a) == 0, message);
         INIT_FILE("/jb/rsync", 0, 0755);
         
+        CLEAN_FILE("/jb/Unrestrict.tar");
+        CLEAN_FILE("/jb/Unrestrict.tar");
+        _assert(moveFileFromAppDir("Unrestrict.tar", "/jb/Unrestrict.tar") == 0, message);
+        a = fopen("/jb/Unrestrict.tar", "rb");
+        LOG("a: " "%p" "\n", a);
+        _assert(a != NULL, message);
+        untar(a, "Unrestrict.tar");
+        _assert(fclose(a) == 0, message);
+        INIT_FILE("/jb/Unrestrict.dylib", 0, 0644);
+        
         LOG("Successfully copied over our resources to RootFS.");
     }
     
     {
         // Inject trust cache
         
-        PROGRESS("Exploiting... (30/64)", 0, 0);
+        PROGRESS("Exploiting... (30/65)", 0, 0);
         printf("trust_chain = 0x%llx\n", GETOFFSET(trust_chain));
         SETMESSAGE("Failed to inject trust cache.");
         
@@ -2449,7 +2453,7 @@ void exploit(mach_port_t tfp0,
         // Deinitialize kexecute.
         
         LOG("Deinitializing kexecute...");
-        PROGRESS("Exploiting... (31/64)", 0, 0);
+        PROGRESS("Exploiting... (31/65)", 0, 0);
         SETMESSAGE("Failed to deinitialize kexecute.");
         term_kexecute();
         LOG("Successfully deinitialized kexecute.");
@@ -2459,7 +2463,7 @@ void exploit(mach_port_t tfp0,
         // Log slide.
         
         LOG("Logging slide...");
-        PROGRESS("Exploiting... (32/64)", 0, 0);
+        PROGRESS("Exploiting... (32/65)", 0, 0);
         SETMESSAGE("Failed to log slide.");
         CLEAN_FILE("/private/var/tmp/slide.txt");
         a = fopen("/private/var/tmp/slide.txt", "w+");
@@ -2474,7 +2478,7 @@ void exploit(mach_port_t tfp0,
     {
         // Log ECID.
         LOG("Logging ECID...");
-        PROGRESS("Exploiting... (33/64)", 0, 0);
+        PROGRESS("Exploiting... (33/65)", 0, 0);
         SETMESSAGE("Failed to log ECID.");
         value = MGCopyAnswer(kMGUniqueChipID);
         LOG("ECID: " "%@" "\n", value);
@@ -2487,7 +2491,7 @@ void exploit(mach_port_t tfp0,
     {
         // Log offsets.
         LOG("Logging offsets...");
-        PROGRESS("Exploiting... (34/64)", 0, 0);
+        PROGRESS("Exploiting... (34/65)", 0, 0);
         SETMESSAGE("Failed to log offsets.");
         CLEAN_FILE("/jb/offsets.plist");
         md = [[NSMutableDictionary alloc] init];
@@ -2521,7 +2525,7 @@ void exploit(mach_port_t tfp0,
         // Set HSP4.
         
         LOG("Setting HSP4...");
-        PROGRESS("Exploiting... (35/64)", 0, 0);
+        PROGRESS("Exploiting... (35/65)", 0, 0);
         SETMESSAGE("Failed to set HSP4.");
         _assert(remap_tfp0_set_hsp4(&tfp0, GETOFFSET(zone_map_ref)) == 0, message);
         LOG("Successfully set HSP4.");
@@ -2530,7 +2534,7 @@ void exploit(mach_port_t tfp0,
     {
         if (export_kernel_task_port) {
             // Export Kernel Task Port.
-            PROGRESS("Exploiting... (36/64)", 0, 0);
+            PROGRESS("Exploiting... (36/65)", 0, 0);
             LOG("Exporting Kernel Task Port...");
             SETMESSAGE("Failed to Export Kernel Task Port.");
             make_host_into_host_priv();
@@ -2542,7 +2546,7 @@ void exploit(mach_port_t tfp0,
         // Patch amfid.
         
         LOG("Patching amfid...");
-        PROGRESS("Exploiting... (37/64)", 0, 0);
+        PROGRESS("Exploiting... (37/65)", 0, 0);
         SETMESSAGE("Failed to patch amfid.");
         CLEAN_FILE("/private/var/tmp/amfid_payload.alive");
         _assert(inject_library(findPidOfProcess("amfid"), "/jb/amfid_payload.dylib") == 0, message);
@@ -2554,12 +2558,11 @@ void exploit(mach_port_t tfp0,
         // Spawn jailbreakd.
         
         LOG("Spawning jailbreakd...");
-        PROGRESS("Exploiting... (38/64)", 0, 0);
+        PROGRESS("Exploiting... (38/65)", 0, 0);
         SETMESSAGE("Failed to spawn jailbreakd.");
         CLEAN_FILE("/usr/lib/libjailbreak.dylib");
         _assert(symlink("/jb/libjailbreak.dylib", "/usr/lib/libjailbreak.dylib") == 0, message);
         CLEAN_FILE("/usr/lib/libjailbreacy.dylib");
-        _assert(rename("/jb/libjailbreacy.dylib", "/usr/lib/libjailbreacy.dylib") == 0, message);
         CLEAN_FILE("/bin/launchctl");
         _assert(rename("/jb/launchctl", "/bin/launchctl") == 0, message);
         CLEAN_FILE("/jb/jailbreakd.plist");
@@ -2601,7 +2604,7 @@ void exploit(mach_port_t tfp0,
         _assert(symlink("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib") == 0, message);
         if ((access("/etc/rc.d/substrate", F_OK) != 0) && load_tweaks) {
             LOG("Patching launchd...");
-            PROGRESS("Exploiting... (39/64)", 0, 0);
+            PROGRESS("Exploiting... (39/65)", 0, 0);
             CLEAN_FILE("/var/log/pspawn_hook_launchd.log");
             CLEAN_FILE("/var/log/pspawn_hook_xpcproxy.log");
             CLEAN_FILE("/var/log/pspawn_hook_other.log");
@@ -2614,7 +2617,7 @@ void exploit(mach_port_t tfp0,
         // Update version string.
         
         LOG("Updating version string...");
-        PROGRESS("Exploiting... (40/64)", 0, 0);
+        PROGRESS("Exploiting... (40/65)", 0, 0);
         SETMESSAGE("Failed to update version string.");
         _assert(uname(&u) == 0, message);
         kernelVersionString = (char *)[[NSString stringWithFormat:@"%s %s", u.version, DEFAULT_VERSION_STRING] UTF8String];
@@ -2632,7 +2635,7 @@ void exploit(mach_port_t tfp0,
             // Borrow entitlements from fsck_apfs.
             
             LOG("Borrowing entitlements from fsck_apfs...");
-            PROGRESS("Exploiting... (41/64)", 0, 0);
+            PROGRESS("Exploiting... (41/65)", 0, 0);
             borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
             LOG("Successfully borrowed entitlements from fsck_apfs.");
             
@@ -2641,7 +2644,7 @@ void exploit(mach_port_t tfp0,
             // Rename system snapshot.
             
             LOG("Renaming system snapshot back...");
-            PROGRESS("Exploiting... (42/64)", 0, 0);
+            PROGRESS("Exploiting... (42/65)", 0, 0);
             NOTICE("Will restore RootFS. This may take a while. Don't exit the app and don't let the device lock.", 1, 1);
             SETMESSAGE("Unable to mount or rename system snapshot.  Delete OTA file from Settings - Storage if present");
             if (kCFCoreFoundationVersionNumber < 1452.23) {
@@ -2674,7 +2677,7 @@ void exploit(mach_port_t tfp0,
             // Clean up.
             
             LOG("Cleaning up...");
-            PROGRESS("Exploiting... (43/64)", 0, 0);
+            PROGRESS("Exploiting... (43/65)", 0, 0);
             SETMESSAGE("Failed to clean up.");
             cleanUpFileList = getCleanUpFileList();
             _assert(cleanUpFileList != nil, message);
@@ -2688,7 +2691,7 @@ void exploit(mach_port_t tfp0,
             // Disallow SpringBoard to show non-default system apps.
             
             LOG("Disallowing SpringBoard to show non-default system apps...");
-            PROGRESS("Exploiting... (44/64)", 0, 0);
+            PROGRESS("Exploiting... (44/65)", 0, 0);
             md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
             if (md == nil) {
                 md = [[NSMutableDictionary alloc] init];
@@ -2702,14 +2705,14 @@ void exploit(mach_port_t tfp0,
             // Disable RootFS Restore.
             
             LOG("Disabling RootFS Restore...");
-            PROGRESS("Exploiting... (45/64)", 0, 0);
+            PROGRESS("Exploiting... (45/65)", 0, 0);
             setPreference(@K_RESTORE_ROOTFS, @(NO));
             LOG("Successfully disabled RootFS Restore");
             
             // Reboot.
             
             LOG("Rebooting...");
-            PROGRESS("Exploiting... (46/64)", 0 ,0);
+            PROGRESS("Exploiting... (46/65)", 0 ,0);
             NOTICE("RootFS has successfully been restored. The device will be restarted.", 1, 0);
             _assert(reboot(0x400) == 0, message);
             LOG("Successfully rebooted.");
@@ -2720,7 +2723,7 @@ void exploit(mach_port_t tfp0,
         // Extract bootstrap.
         
         LOG("Extracting bootstrap...");
-        PROGRESS("Exploiting... (47/64)", 0, 0);
+        PROGRESS("Exploiting... (47/65)", 0, 0);
         SETMESSAGE("Failed to extract bootstrap.");
         if (access("/.installed_unc0ver", F_OK)) {
             _assert(chdir("/") == 0, message);
@@ -2769,7 +2772,7 @@ void exploit(mach_port_t tfp0,
             // Disable stashing.
             
             LOG("Disabling stashing...");
-            PROGRESS("Exploiting... (48/64)", 0, 0);
+            PROGRESS("Exploiting... (48/65)", 0, 0);
             SETMESSAGE("Failed to disable stashing.");
             a = fopen("/.cydia_no_stash", "w");
             LOG("a: " "%p" "\n", a);
@@ -2784,7 +2787,7 @@ void exploit(mach_port_t tfp0,
         if (disable_app_revokes) {
             // Disable app revokes.
             LOG("Disabling app revokes...");
-            PROGRESS("Exploiting... (49/64)", 0, 0);
+            PROGRESS("Exploiting... (49/65)", 0, 0);
             SETMESSAGE("Failed to disable app revokes.");
             blockDomainWithName("ocsp.apple.com");
             LOG("Successfully disabled app revokes.");
@@ -2795,7 +2798,7 @@ void exploit(mach_port_t tfp0,
         // Allow SpringBoard to show non-default system apps.
         
         LOG("Allowing SpringBoard to show non-default system apps...");
-        PROGRESS("Exploiting... (50/64)", 0, 0);
+        PROGRESS("Exploiting... (50/65)", 0, 0);
         SETMESSAGE("Failed to allow SpringBoard to show non-default system apps.");
         md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
         _assert(md != nil, message);
@@ -2815,7 +2818,7 @@ void exploit(mach_port_t tfp0,
         // Persist amfid patch.
         
         LOG("Persisting amfid patch...");
-        PROGRESS("Exploiting... (51/64)", 0, 0);
+        PROGRESS("Exploiting... (51/65)", 0, 0);
         SETMESSAGE("Failed to persist amfid patch.");
         CLEAN_FILE("/jb/amfid_payload.plist");
         md = [[NSMutableDictionary alloc] init];
@@ -2824,20 +2827,27 @@ void exploit(mach_port_t tfp0,
         _assert(([md writeToFile:@"/Library/MobileSubstrate/DynamicLibraries/amfid_payload.plist" atomically:YES]) == 1, message);
         INIT_FILE("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.plist", 0, 0644);
         _assert(execCommandAndWait("/bin/mkdir", "-p", "/Library/MobileSubstrate/DynamicLibraries", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/Library/MobileSubstrate", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/chmod", "0755", "/Library/MobileSubstrate", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/Library/MobileSubstrate/DynamicLibraries", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/chmod", "0755", "/Library/MobileSubstrate/DynamicLibraries", NULL, NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/rm", "-rf", "/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", NULL, NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/ln", "-s", "/jb/amfid_payload.dylib", "/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", NULL, NULL) == 0, message);
         LOG("Successfully persisted amfid patch.");
     }
     
     {
+        // Enable Unrestrict.
+        
+        LOG("Enabling Unrestrict...");
+        PROGRESS("Exploiting... (52/65)", 0, 0);
+        _assert(execCommandAndWait("/bin/mkdir", "-p", "/Library/MobileSubstrate/ServerPlugins", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/Library/MobileSubstrate/ServerPlugins/Unrestrict.dylib", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/ln", "-s", "/jb/Unrestrict.dylib", "/Library/MobileSubstrate/ServerPlugins/Unrestrict.dylib", NULL, NULL) == 0, message);
+        LOG("Successfully enabled Unrestrict.");
+    }
+    
+    {
         // Fix Auto Updates.
         
         LOG("Fixing Auto Updates...");
-        PROGRESS("Exploiting... (52/64)", 0, 0);
+        PROGRESS("Exploiting... (53/65)", 0, 0);
         SETMESSAGE("Failed to fix auto updates.");
         if (!access("/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/softwareupdated", F_OK)) {
             _assert(rename("/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/softwareupdated", "/System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/Support/softwareupdated") == 0, message);
@@ -2861,7 +2871,7 @@ void exploit(mach_port_t tfp0,
             // Disable Auto Updates.
             
             LOG("Disabling Auto Updates...");
-            PROGRESS("Exploiting... (53/64)", 0, 0);
+            PROGRESS("Exploiting... (54/65)", 0, 0);
             SETMESSAGE("Failed to disable auto updates.");
             _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL) == 0, message);
@@ -2876,7 +2886,7 @@ void exploit(mach_port_t tfp0,
             // Enable Auto Updates.
             
             LOG("Enabling Auto Updates...");
-            PROGRESS("Exploiting... (54/64)", 0, 0);
+            PROGRESS("Exploiting... (55/65)", 0, 0);
             SETMESSAGE("Failed to enable auto updates.");
             _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
@@ -2898,7 +2908,7 @@ void exploit(mach_port_t tfp0,
             // Increase memory limit.
             
             LOG("Increasing memory limit...");
-            PROGRESS("Exploiting... (55/64)", 0, 0);
+            PROGRESS("Exploiting... (56/65)", 0, 0);
             SETMESSAGE("Failed to increase memory limit.");
             bzero(buf_targettype, sizeof(buf_targettype));
             size = sizeof(buf_targettype);
@@ -2915,7 +2925,7 @@ void exploit(mach_port_t tfp0,
         if (install_openssh) {
             // Extract OpenSSH.
             LOG("Extracting OpenSSH...");
-            PROGRESS("Exploiting... (56/64)", 0, 0);
+            PROGRESS("Exploiting... (57/65)", 0, 0);
             SETMESSAGE("Failed to extract OpenSSH.");
             CLEAN_FILE("/jb/openssh.tar");
             CLEAN_FILE("/jb/openssh.deb");
@@ -2933,7 +2943,7 @@ void exploit(mach_port_t tfp0,
             
             // Install OpenSSH.
             LOG("Installing OpenSSH...");
-            PROGRESS("Exploiting... (57/64)", 0, 0);
+            PROGRESS("Exploiting... (58/65)", 0, 0);
             SETMESSAGE("Failed to install OpenSSH.");
             rv = _system("/usr/bin/dpkg -i /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
             _assert(WEXITSTATUS(rv) == 0, message);
@@ -2941,7 +2951,7 @@ void exploit(mach_port_t tfp0,
             
             // Disable Install OpenSSH.
             LOG("Disabling Install OpenSSH...");
-            PROGRESS("Exploiting... (58/64)", 0, 0);
+            PROGRESS("Exploiting... (59/65)", 0, 0);
             SETMESSAGE("Failed to disable Install OpenSSH.");
             setPreference(@K_INSTALL_OPENSSH, @(NO));
             LOG("Successfully disabled Install OpenSSH.");
@@ -2952,7 +2962,7 @@ void exploit(mach_port_t tfp0,
         if (install_cydia) {
             // Extract Cydia.
             LOG("Extracting Cydia...");
-            PROGRESS("Exploiting... (59/64)", 0, 0);
+            PROGRESS("Exploiting... (60/65)", 0, 0);
             SETMESSAGE("Failed to extract Cydia.");
             CLEAN_FILE("/jb/cydia.tar");
             CLEAN_FILE("/jb/cydia.deb");
@@ -2969,7 +2979,7 @@ void exploit(mach_port_t tfp0,
             
             // Install Cydia.
             LOG("Installing Cydia...");
-            PROGRESS("Exploiting... (60/64)", 0, 0);
+            PROGRESS("Exploiting... (61/65)", 0, 0);
             SETMESSAGE("Failed to install Cydia.");
             rv = _system("/usr/bin/dpkg -i /jb/cydia.deb /jb/cydia-lproj.deb");
             _assert(WEXITSTATUS(rv) == 0, message);
@@ -2977,7 +2987,7 @@ void exploit(mach_port_t tfp0,
             
             // Disable Install Cydia.
             LOG("Disabling Install Cydia...");
-            PROGRESS("Exploiting... (61/64)", 0, 0);
+            PROGRESS("Exploiting... (62/65)", 0, 0);
             SETMESSAGE("Failed to disable Install Cydia.");
             setPreference(@K_INSTALL_CYDIA, @(NO));
             LOG("Successfully disabled Install Cydia.");
@@ -2989,7 +2999,7 @@ void exploit(mach_port_t tfp0,
             // Load Daemons.
             
             LOG("Loading Daemons...");
-            PROGRESS("Exploiting... (62/64)", 0, 0);
+            PROGRESS("Exploiting... (63/65)", 0, 0);
             SETMESSAGE("Failed to load Daemons.");
             _system("echo 'really jailbroken';"
                     "shopt -s nullglob;"
@@ -3022,7 +3032,7 @@ void exploit(mach_port_t tfp0,
             // Run uicache.
             
             LOG("Running uicache...");
-            PROGRESS("Exploiting... (63/64)", 0, 0);
+            PROGRESS("Exploiting... (64/65)", 0, 0);
             SETMESSAGE("Failed to run uicache.");
             _assert(execCommandAndWait("/usr/bin/uicache", NULL, NULL, NULL, NULL, NULL) == 0, message);
             setPreference(@K_REFRESH_ICON_CACHE, @(NO));
@@ -3035,7 +3045,7 @@ void exploit(mach_port_t tfp0,
             // Load Tweaks.
             
             LOG("Loading Tweaks...");
-            PROGRESS("Exploiting... (64/64)", 0, 0);
+            PROGRESS("Exploiting... (65/65)", 0, 0);
             SETMESSAGE("Failed to run ldrestart");
             if (reload_system_daemons) {
                 rv = _system("nohup bash -c \""
@@ -3067,7 +3077,7 @@ void exploit(mach_port_t tfp0,
         }
         // Initialize kernel exploit.
         LOG("Initializing kernel exploit...");
-        PROGRESS("Exploiting... (1/64)", 0, 0);
+        PROGRESS("Exploiting... (1/65)", 0, 0);
         switch ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]) {
             case 0: {
                 vfs_sploit();
