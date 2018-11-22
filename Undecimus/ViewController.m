@@ -2410,12 +2410,12 @@ void exploit(mach_port_t tfp0,
         INIT_FILE("/jb/rsync", 0, 0755);
         
         CLEAN_FILE("/jb/Unrestrict.tar");
-        CLEAN_FILE("/jb/Unrestrict.tar");
+        CLEAN_FILE("/jb/Unrestrict.dylib");
         _assert(moveFileFromAppDir("Unrestrict.tar", "/jb/Unrestrict.tar") == 0, message);
         a = fopen("/jb/Unrestrict.tar", "rb");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
-        untar(a, "Unrestrict.tar");
+        untar(a, "Unrestrict.dylib");
         _assert(fclose(a) == 0, message);
         INIT_FILE("/jb/Unrestrict.dylib", 0, 0644);
         
@@ -2824,12 +2824,12 @@ void exploit(mach_port_t tfp0,
         PROGRESS("Exploiting... (51/65)", 0, 0);
         SETMESSAGE("Failed to persist amfid patch.");
         CLEAN_FILE("/jb/amfid_payload.plist");
+        _assert(execCommandAndWait("/bin/mkdir", "-p", "/Library/MobileSubstrate/DynamicLibraries", NULL, NULL, NULL) == 0, message);
         md = [[NSMutableDictionary alloc] init];
         md[@"Filter"] = [[NSMutableDictionary alloc] init];
         md[@"Filter"][@"Executables"] = @[@"amfid"];
         _assert(([md writeToFile:@"/Library/MobileSubstrate/DynamicLibraries/amfid_payload.plist" atomically:YES]) == 1, message);
         INIT_FILE("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.plist", 0, 0644);
-        _assert(execCommandAndWait("/bin/mkdir", "-p", "/Library/MobileSubstrate/DynamicLibraries", NULL, NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/rm", "-rf", "/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", NULL, NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/ln", "-s", "/jb/amfid_payload.dylib", "/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", NULL, NULL) == 0, message);
         LOG("Successfully persisted amfid patch.");
