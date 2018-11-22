@@ -105,7 +105,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-1.PNG?token=AlyO4wXUInR6oHEgx0Tg31ri0t1q91frks5bx5ZbwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-2.PNG?token=AlyO48vs-YYcaKUgxXh8nIEUQQz_QEoqks5bx5ZqwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-3.PNG?token=AlyO44tYr5-jl7Pg0jup0tCqm3rSjUhiks5bx5Z4wA%3D%3D" width="281.25" height="609" />
 
 ## Changelog
-* ~~rc1: Initial release:~~
+* ~~rc1: Initial release~~
 * ~~rc2: Add the dynastic repo by default and fix a bug in firmware checker~~
 * ~~rc3: Add a switch to manually enable restoring RootFS, stop erasing user preferences when restoring RootFS and fix bugs~~
 * ~~rc4: Add a label to display the uptime, a label to display the app's version number, spawn to the PATH and stop bundling system fonts~~
