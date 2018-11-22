@@ -2746,6 +2746,7 @@ void exploit(mach_port_t tfp0,
         _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/jailbreakd.tar", NULL, NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/libjailbreak.tar", NULL, NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/libjailbreacy.tar", NULL, NULL, NULL) == 0, message);
+        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/Unrestrict.tar", NULL, NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/pspawn_hook.tar", NULL, NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar.tar", NULL, NULL, NULL) == 0, message);
         _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar", NULL, NULL, NULL) == 0, message);
