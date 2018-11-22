@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>v1.1.4</string>
+	<string>v2.0.0</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
