@@ -2549,6 +2549,7 @@ void exploit(mach_port_t tfp0,
         PROGRESS("Exploiting... (37/65)", 0, 0);
         SETMESSAGE("Failed to patch amfid.");
         CLEAN_FILE("/private/var/tmp/amfid_payload.alive");
+        _assert(platformizeProcAtAddr(getProcStructForPid(findPidOfProcess("amfid"))) == 0, message);
         _assert(inject_library(findPidOfProcess("amfid"), "/jb/amfid_payload.dylib") == 0, message);
         _assert(waitForFile("/private/var/tmp/amfid_payload.alive") == 0, message);
         LOG("Successfully patched amfid.");
@@ -2608,6 +2609,7 @@ void exploit(mach_port_t tfp0,
             CLEAN_FILE("/var/log/pspawn_hook_launchd.log");
             CLEAN_FILE("/var/log/pspawn_hook_xpcproxy.log");
             CLEAN_FILE("/var/log/pspawn_hook_other.log");
+            _assert(platformizeProcAtAddr(getProcStructForPid(1)) == 0, message);
             _assert(inject_library(1, "/usr/lib/pspawn_hook.dylib") == 0, message);
             LOG("Successfully patched launchd.");
         }
