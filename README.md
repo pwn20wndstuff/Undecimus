@@ -114,7 +114,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * rc7: Fix a bug in RootFS Restore and multi_path
 * rc8: Fix a bug in RootFS Remount and add a work in progress warning for some firmwares
 * rc9: Fix a bug in RootFS Remount, add even more detailed error messages and add a switch to increase the memory limit to improve the stability and improve the compatibility layer to work correctly with some tweaks that were specifically made for the other jailbreaks
-* v1: Fix a bug in RootFS Restore and Remount, make the settings tab match with the rest of the UI and fix bugs
+* v1.0.0: Fix a bug in RootFS Restore and Remount, make the settings tab match with the rest of the UI and fix bugs
 * v1.0.1: Disable the RootFS Restore for the unstable versions
 * v1.0.2: Enable and fix the RootFS Restore for all versions
 * v1.0.3: Fix the beta firmwares
@@ -123,7 +123,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * v1.1.2: Improve auto layout and code and Significantly improve Empty_List (VFS) exploit and slightly improve Multi_Path (MPTCP)
 * v1.1.3: Fix a bug in starting jailbreakd
 * v1.1.4: Fix a bug in finding offsets:  [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus.ipa)
-* v2.0: Initial Cydia Substrate Support (Cydia Substrate not included yet), removal of jailbreakd for the devices with Cydia Substrate, a switch to (re)install OpenSSH, a switch to reinstall Cydia, a button to restart the SpringBoard for the non-jailbroken state and several bug fixes: Coming soon
+* v2.0.0: Initial Cydia Substrate Support (Cydia Substrate not included yet), removal of jailbreakd for the devices with Cydia Substrate, a switch to (re)install OpenSSH, a switch to reinstall Cydia, a button to restart the SpringBoard for the non-jailbroken state and several bug fixes: Coming soon
 
 ## Special Thanks
 * [@i41nbeer](https://twitter.com/i41nbeer) for triple_fetch, async_wake, empty_list & multi_path
