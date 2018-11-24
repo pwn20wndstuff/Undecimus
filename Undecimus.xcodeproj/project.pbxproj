@@ -17,7 +17,6 @@
 		2139534C21763A0C00B17F8D /* rsync.tar in Resources */ = {isa = PBXBuildFile; fileRef = 2139534B21763A0B00B17F8D /* rsync.tar */; };
 		21675B63214A68B700D20E2B /* qilin.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC8C2136A0D100849420 /* qilin.o */; };
 		21675B6D214A692400D20E2B /* libjb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 21A97FCF2148103C00DC0023 /* libjb.a */; };
-		219A7C862169439C00A5DD60 /* spawn.tar in Resources */ = {isa = PBXBuildFile; fileRef = 219A7C852169439B00A5DD60 /* spawn.tar */; };
 		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
 		21A97FD12148103C00DC0023 /* kexecute.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC82148103B00DC0023 /* kexecute.m */; };
 		21A97FD32148103C00DC0023 /* kutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCC2148103B00DC0023 /* kutils.c */; };
@@ -32,22 +31,21 @@
 		21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C130DE214BC2880021AA9D /* unlocknvram.c */; };
 		21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130EA214C03690021AA9D /* CreditsTableViewController.m */; };
 		21C130FB214C1EBA0021AA9D /* untar.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C130FA214C1EBA0021AA9D /* untar.c */; };
-		21C13102214C20950021AA9D /* libjailbreak.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C130FD214C20940021AA9D /* libjailbreak.tar */; };
-		21C13103214C20950021AA9D /* pspawn_hook.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C130FE214C20950021AA9D /* pspawn_hook.tar */; };
-		21C13104214C20950021AA9D /* amfid_payload.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C130FF214C20950021AA9D /* amfid_payload.tar */; };
 		21C13105214C20950021AA9D /* tar.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13100214C20950021AA9D /* tar.tar */; };
-		21C13106214C20950021AA9D /* jailbreakd.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13101214C20950021AA9D /* jailbreakd.tar */; };
-		21C13109214C26AB0021AA9D /* launchctl.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13108214C26AB0021AA9D /* launchctl.tar */; };
 		21C13110214C2E570021AA9D /* strap.tar.lzma in Resources */ = {isa = PBXBuildFile; fileRef = 21C1310F214C2E570021AA9D /* strap.tar.lzma */; };
 		21C13116214C51100021AA9D /* lzma.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21C13115214C510F0021AA9D /* lzma.tar */; };
 		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
-		21E8CA7E2171CF7800936700 /* debugserver.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21E8CA7D2171CF7700936700 /* debugserver.tar */; };
-		21E9647221A5D81B000625F7 /* Unrestrict.tar in Resources */ = {isa = PBXBuildFile; fileRef = 21E9647121A5D81B000625F7 /* Unrestrict.tar */; };
 		21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */; };
 		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; };
-		221926CA21997DED003511CD /* cydia.tar in Resources */ = {isa = PBXBuildFile; fileRef = 221926C821997DED003511CD /* cydia.tar */; };
-		221926CB21997DED003511CD /* openssh.tar in Resources */ = {isa = PBXBuildFile; fileRef = 221926C921997DED003511CD /* openssh.tar */; };
+		22C546AB21A8A8FD00EFC09C /* utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C546AA21A8A8FD00EFC09C /* utils.m */; };
+		22C546BA21A8D59C00EFC09C /* amfid_payload.tar in Resources */ = {isa = PBXBuildFile; fileRef = 22C546B921A8D59C00EFC09C /* amfid_payload.tar */; };
+		22C546C721A8D8AC00EFC09C /* ca-certificates.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C321A8D7FA00EFC09C /* ca-certificates.deb */; };
+		22C546C821A8D8AC00EFC09C /* cydia-lproj.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C621A8D7FA00EFC09C /* cydia-lproj.deb */; };
+		22C546C921A8D8AC00EFC09C /* cydia.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C521A8D7FA00EFC09C /* cydia.deb */; };
+		22C546CA21A8D8AC00EFC09C /* openssh.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C221A8D7FA00EFC09C /* openssh.deb */; };
+		22C546CB21A8D8AC00EFC09C /* openssl.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C421A8D7FA00EFC09C /* openssl.deb */; };
+		22C546CC21A8D8AC00EFC09C /* resources.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C121A8D7DA00EFC09C /* resources.deb */; };
 		8D592A68218E47F60035D2BC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D592A67218E47F60035D2BC /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -63,7 +61,6 @@
 		212D8849216E4EBE00A36DA5 /* async_wake.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = async_wake.c; sourceTree = "<group>"; };
 		2139534B21763A0B00B17F8D /* rsync.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = rsync.tar; sourceTree = "<group>"; };
 		21395357217CBA1000B17F8D /* MobileGestalt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileGestalt.h; sourceTree = "<group>"; };
-		219A7C852169439B00A5DD60 /* spawn.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = spawn.tar; sourceTree = "<group>"; };
 		21A97FC42148103A00DC0023 /* kexecute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kexecute.h; sourceTree = "<group>"; };
 		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
 		21A97FC62148103B00DC0023 /* remote_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_memory.c; sourceTree = "<group>"; };
@@ -104,23 +101,23 @@
 		21C130EA214C03690021AA9D /* CreditsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CreditsTableViewController.m; sourceTree = "<group>"; };
 		21C130FA214C1EBA0021AA9D /* untar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = untar.c; sourceTree = "<group>"; };
 		21C130FC214C1EC00021AA9D /* untar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = untar.h; sourceTree = "<group>"; };
-		21C130FD214C20940021AA9D /* libjailbreak.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = libjailbreak.tar; sourceTree = "<group>"; };
-		21C130FE214C20950021AA9D /* pspawn_hook.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = pspawn_hook.tar; sourceTree = "<group>"; };
-		21C130FF214C20950021AA9D /* amfid_payload.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = amfid_payload.tar; sourceTree = "<group>"; };
 		21C13100214C20950021AA9D /* tar.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = tar.tar; sourceTree = "<group>"; };
-		21C13101214C20950021AA9D /* jailbreakd.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = jailbreakd.tar; sourceTree = "<group>"; };
-		21C13108214C26AB0021AA9D /* launchctl.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = launchctl.tar; sourceTree = "<group>"; };
 		21C1310F214C2E570021AA9D /* strap.tar.lzma */ = {isa = PBXFileReference; lastKnownFileType = file; path = strap.tar.lzma; sourceTree = "<group>"; };
 		21C13115214C510F0021AA9D /* lzma.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = lzma.tar; sourceTree = "<group>"; };
 		21C13117214D268F0021AA9D /* multi_path_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = multi_path_sploit.c; sourceTree = "<group>"; };
 		21C13118214D268F0021AA9D /* multi_path_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multi_path_sploit.h; sourceTree = "<group>"; };
 		21C1312E214D5A710021AA9D /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
-		21E8CA7D2171CF7700936700 /* debugserver.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = debugserver.tar; sourceTree = "<group>"; };
 		21E9642421A1DD6F000625F7 /* NSTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSTask.h; sourceTree = "<group>"; };
-		21E9647121A5D81B000625F7 /* Unrestrict.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = Unrestrict.tar; sourceTree = "<group>"; };
 		21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Painting_With_Chocolate.ttf; sourceTree = "<group>"; };
-		221926C821997DED003511CD /* cydia.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = cydia.tar; sourceTree = "<group>"; };
-		221926C921997DED003511CD /* openssh.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = openssh.tar; sourceTree = "<group>"; };
+		22C546AA21A8A8FD00EFC09C /* utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = utils.m; sourceTree = "<group>"; };
+		22C546AC21A8A91A00EFC09C /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
+		22C546B921A8D59C00EFC09C /* amfid_payload.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = amfid_payload.tar; sourceTree = "<group>"; };
+		22C546C121A8D7DA00EFC09C /* resources.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = resources.deb; sourceTree = "<group>"; };
+		22C546C221A8D7FA00EFC09C /* openssh.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = openssh.deb; sourceTree = "<group>"; };
+		22C546C321A8D7FA00EFC09C /* ca-certificates.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "ca-certificates.deb"; sourceTree = "<group>"; };
+		22C546C421A8D7FA00EFC09C /* openssl.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = openssl.deb; sourceTree = "<group>"; };
+		22C546C521A8D7FA00EFC09C /* cydia.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = cydia.deb; sourceTree = "<group>"; };
+		22C546C621A8D7FA00EFC09C /* cydia-lproj.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "cydia-lproj.deb"; sourceTree = "<group>"; };
 		8D592A67218E47F60035D2BC /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -168,22 +165,19 @@
 		21C0FC6921369EB700849420 /* Undecimus */ = {
 			isa = PBXGroup;
 			children = (
-				21E9647121A5D81B000625F7 /* Unrestrict.tar */,
-				221926C821997DED003511CD /* cydia.tar */,
-				221926C921997DED003511CD /* openssh.tar */,
+				22C546C321A8D7FA00EFC09C /* ca-certificates.deb */,
+				22C546C621A8D7FA00EFC09C /* cydia-lproj.deb */,
+				22C546C521A8D7FA00EFC09C /* cydia.deb */,
+				22C546C221A8D7FA00EFC09C /* openssh.deb */,
+				22C546C421A8D7FA00EFC09C /* openssl.deb */,
+				22C546C121A8D7DA00EFC09C /* resources.deb */,
+				22C546B921A8D59C00EFC09C /* amfid_payload.tar */,
 				21E9642421A1DD6F000625F7 /* NSTask.h */,
 				21395357217CBA1000B17F8D /* MobileGestalt.h */,
 				2139534B21763A0B00B17F8D /* rsync.tar */,
-				21E8CA7D2171CF7700936700 /* debugserver.tar */,
 				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
-				219A7C852169439B00A5DD60 /* spawn.tar */,
 				21C13115214C510F0021AA9D /* lzma.tar */,
 				21C1310F214C2E570021AA9D /* strap.tar.lzma */,
-				21C13108214C26AB0021AA9D /* launchctl.tar */,
-				21C130FF214C20950021AA9D /* amfid_payload.tar */,
-				21C13101214C20950021AA9D /* jailbreakd.tar */,
-				21C130FD214C20940021AA9D /* libjailbreak.tar */,
-				21C130FE214C20950021AA9D /* pspawn_hook.tar */,
 				21C13100214C20950021AA9D /* tar.tar */,
 				21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */,
 				2101395321A09BB700F9C5F2 /* hideventsystem.c */,
@@ -236,6 +230,8 @@
 				21C0FC7921369EB800849420 /* main.m */,
 				21C130E9214C03690021AA9D /* CreditsTableViewController.h */,
 				21C130EA214C03690021AA9D /* CreditsTableViewController.m */,
+				22C546AC21A8A91A00EFC09C /* utils.h */,
+				22C546AA21A8A8FD00EFC09C /* utils.m */,
 			);
 			path = Undecimus;
 			sourceTree = "<group>";
@@ -250,6 +246,7 @@
 				21C0FC6321369EB700849420 /* Sources */,
 				21C0FC6421369EB700849420 /* Frameworks */,
 				21C0FC6521369EB700849420 /* Resources */,
+				22C546CD21A8E5B800EFC09C /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -298,28 +295,45 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				221926CB21997DED003511CD /* openssh.tar in Resources */,
-				21C13103214C20950021AA9D /* pspawn_hook.tar in Resources */,
-				21E8CA7E2171CF7800936700 /* debugserver.tar in Resources */,
+				22C546C721A8D8AC00EFC09C /* ca-certificates.deb in Resources */,
+				22C546C821A8D8AC00EFC09C /* cydia-lproj.deb in Resources */,
+				22C546C921A8D8AC00EFC09C /* cydia.deb in Resources */,
+				22C546CA21A8D8AC00EFC09C /* openssh.deb in Resources */,
+				22C546CB21A8D8AC00EFC09C /* openssl.deb in Resources */,
+				22C546CC21A8D8AC00EFC09C /* resources.deb in Resources */,
 				21C13110214C2E570021AA9D /* strap.tar.lzma in Resources */,
-				21C13102214C20950021AA9D /* libjailbreak.tar in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
-				21C13104214C20950021AA9D /* amfid_payload.tar in Resources */,
 				8D592A68218E47F60035D2BC /* Main.storyboard in Resources */,
-				219A7C862169439C00A5DD60 /* spawn.tar in Resources */,
 				21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */,
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
-				221926CA21997DED003511CD /* cydia.tar in Resources */,
-				21C13106214C20950021AA9D /* jailbreakd.tar in Resources */,
 				21C13116214C51100021AA9D /* lzma.tar in Resources */,
-				21E9647221A5D81B000625F7 /* Unrestrict.tar in Resources */,
 				2139534C21763A0C00B17F8D /* rsync.tar in Resources */,
-				21C13109214C26AB0021AA9D /* launchctl.tar in Resources */,
+				22C546BA21A8D59C00EFC09C /* amfid_payload.tar in Resources */,
 				21C13105214C20950021AA9D /* tar.tar in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		22C546CD21A8E5B800EFC09C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n# Get path for dpkg\n. ~/.profile\nRESOURCES_VERSION=\"$(dpkg --info Undecimus/resources.deb | grep Version: | awk '{print $2}')\"\ndefaults write \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Info\" BundledResources \"${RESOURCES_VERSION}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		21C0FC6321369EB700849420 /* Sources */ = {
@@ -329,6 +343,7 @@
 				21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */,
 				21A97FD12148103C00DC0023 /* kexecute.m in Sources */,
 				212D8844216E4C4800A36DA5 /* find_port.c in Sources */,
+				22C546AB21A8A8FD00EFC09C /* utils.m in Sources */,
 				212D8841216B9FB400A36DA5 /* patchfinder64.c in Sources */,
 				21A97FD42148103C00DC0023 /* remote_call.c in Sources */,
 				21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */,

@@ -42,6 +42,7 @@
 #include "async_wake.h"
 #include "MobileGestalt.h"
 #include "NSTask.h"
+#include "utils.h"
 
 @interface ViewController ()
 
@@ -49,6 +50,7 @@
 
 @implementation ViewController
 static ViewController *sharedController = nil;
+static NSString* bundledResources = nil;
 
 #define PROGRESS(msg, btnenbld, tbenbld) do { \
         dispatch_async(dispatch_get_main_queue(), ^{ \
@@ -230,20 +232,6 @@ static vm_address_t get_kernel_base(mach_port_t tfp0)
     next:
         addr -= 0x200000;
     }
-}
-
-int sha1_to_str(const unsigned char *hash, int hashlen, char *buf, size_t buflen)
-{
-    if (buflen < (hashlen*2+1)) {
-        return -1;
-    }
-    
-    int i;
-    for (i=0; i<hashlen; i++) {
-        sprintf(buf+i*2, "%02X", hash[i]);
-    }
-    buf[i*2] = 0;
-    return ERR_SUCCESS;
 }
 
 char *copyBootHash(void)
@@ -2288,6 +2276,22 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully wrote a test file to RootFS.");
     }
     
+    bool needResources;
+    bool needStrap;
+    char *amfid_payload;
+    
+    {
+        // Verify resources
+        _assert(chdir("/") == 0, message);
+        needStrap = access("/.installed_unc0ver", F_OK) != ERR_SUCCESS;
+        needResources = needStrap || !verifySha1Sums(@"/usr/share/undecimus/resources.txt");
+        if (needResources) {
+            amfid_payload = "/jb/amfid_payload.dylib";
+        } else {
+            amfid_payload = "/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib";
+        }
+    }
+    
     {
         // Copy over our resources to RootFS.
         
@@ -2299,129 +2303,57 @@ void exploit(mach_port_t tfp0,
             _assert(access("/jb", F_OK) == 0, message);
             _assert(chown("/jb", 0, 0) == 0, message);
         }
-        
         _assert(chdir("/jb") == 0, message);
         
-        CLEAN_FILE("/jb/amfid_payload.tar");
-        CLEAN_FILE("/jb/amfid_payload.dylib");
-        _assert(moveFileFromAppDir("amfid_payload.tar", "/jb/amfid_payload.tar") == 0, message);
-        a = fopen("/jb/amfid_payload.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "amfid_payload");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/amfid_payload.dylib", 0, 0644);
-        
-        CLEAN_FILE("/jb/launchctl.tar");
-        CLEAN_FILE("/jb/launchctl");
-        _assert(moveFileFromAppDir("launchctl.tar", "/jb/launchctl.tar") == 0, message);
-        a = fopen("/jb/launchctl.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "launchctl");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/launchctl", 0, 0755);
-        
-        CLEAN_FILE("/jb/jailbreakd.tar");
-        CLEAN_FILE("/jb/jailbreakd");
-        _assert(moveFileFromAppDir("jailbreakd.tar", "/jb/jailbreakd.tar") == 0, message);
-        a = fopen("/jb/jailbreakd.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "jailbreakd");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/jailbreakd", 0, 0755);
-        
-        CLEAN_FILE("/jb/libjailbreak.tar");
-        CLEAN_FILE("/jb/libjailbreak.dylib");
-        _assert(moveFileFromAppDir("libjailbreak.tar", "/jb/libjailbreak.tar") == 0, message);
-        a = fopen("/jb/libjailbreak.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "libjailbreak");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/libjailbreak.dylib", 501, 0644);
-        
-        CLEAN_FILE("/jb/libjailbreacy.tar");
-        CLEAN_FILE("/jb/libjailbreacy.dylib");
-        
-        CLEAN_FILE("/jb/pspawn_hook.tar");
-        CLEAN_FILE("/jb/pspawn_hook.dylib");
-        _assert(moveFileFromAppDir("pspawn_hook.tar", "/jb/pspawn_hook.tar") == 0, message);
-        a = fopen("/jb/pspawn_hook.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "pspawn_hook");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/pspawn_hook.dylib", 0, 0644);
-        
-        CLEAN_FILE("/jb/tar.tar");
-        CLEAN_FILE("/jb/tar");
-        _assert(moveFileFromAppDir("tar.tar", "/jb/tar.tar") == 0, message);
-        a = fopen("/jb/tar.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "tar");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/tar", 0, 0755);
-        
-        CLEAN_FILE("/jb/lzma.tar");
-        CLEAN_FILE("/jb/lzma");
-        _assert(moveFileFromAppDir("lzma.tar", "/jb/lzma.tar") == 0, message);
-        a = fopen("/jb/lzma.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "lzma");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/lzma", 0, 0755);
-        
-        CLEAN_FILE("/jb/spawn.tar");
-        CLEAN_FILE("/jb/spawn");
-        _assert(moveFileFromAppDir("spawn.tar", "/jb/spawn.tar") == 0, message);
-        a = fopen("/jb/spawn.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "spawn");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/spawn", 0, 0755);
-        
-        CLEAN_FILE("/jb/strap.tar.lzma");
-        _assert(moveFileFromAppDir("strap.tar.lzma", "/jb/strap.tar.lzma") == 0, message);
-        INIT_FILE("/jb/strap.tar.lzma", 0, 0644);
-        
-        CLEAN_FILE("/jb/debugserver.tar");
-        CLEAN_FILE("/jb/debugserver");
-        _assert(moveFileFromAppDir("debugserver.tar", "/jb/debugserver.tar") == 0, message);
-        a = fopen("/jb/debugserver.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "debugserver");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/debugserver", 0, 0755);
-        
-        CLEAN_FILE("/jb/rsync.tar");
-        CLEAN_FILE("/jb/rsync");
-        _assert(moveFileFromAppDir("rsync.tar", "/jb/rsync.tar") == 0, message);
-        a = fopen("/jb/rsync.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "rsync");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/rsync", 0, 0755);
-        
-        CLEAN_FILE("/jb/Unrestrict.tar");
-        CLEAN_FILE("/jb/Unrestrict.dylib");
-        _assert(moveFileFromAppDir("Unrestrict.tar", "/jb/Unrestrict.tar") == 0, message);
-        a = fopen("/jb/Unrestrict.tar", "rb");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message);
-        untar(a, "Unrestrict.dylib");
-        _assert(fclose(a) == 0, message);
-        INIT_FILE("/jb/Unrestrict.dylib", 0, 0644);
-        
+        if (needResources) {
+            CLEAN_FILE("/jb/amfid_payload.tar");
+            CLEAN_FILE("/jb/amfid_payload.dylib");
+            _assert(moveFileFromAppDir("amfid_payload.tar", "/jb/amfid_payload.tar") == 0, message);
+            a = fopen("/jb/amfid_payload.tar", "rb");
+            LOG("a: " "%p" "\n", a);
+            _assert(a != NULL, message);
+            untar(a, "amfid_payload");
+            _assert(fclose(a) == 0, message);
+            INIT_FILE("/jb/amfid_payload.dylib", 0, 0644);
+        }
+        if (needStrap) {
+            CLEAN_FILE("/jb/strap.tar.lzma");
+            _assert(moveFileFromAppDir("strap.tar.lzma", "/jb/strap.tar.lzma") == 0, message);
+            INIT_FILE("/jb/strap.tar.lzma", 0, 0644);
+            
+            CLEAN_FILE("/jb/tar.tar");
+            CLEAN_FILE("/jb/tar");
+            _assert(moveFileFromAppDir("tar.tar", "/jb/tar.tar") == 0, message);
+            a = fopen("/jb/tar.tar", "rb");
+            LOG("a: " "%p" "\n", a);
+            _assert(a != NULL, message);
+            untar(a, "tar");
+            _assert(fclose(a) == 0, message);
+            INIT_FILE("/jb/tar", 0, 0755);
+            
+            CLEAN_FILE("/jb/lzma.tar");
+            CLEAN_FILE("/jb/lzma");
+            _assert(moveFileFromAppDir("lzma.tar", "/jb/lzma.tar") == 0, message);
+            a = fopen("/jb/lzma.tar", "rb");
+            LOG("a: " "%p" "\n", a);
+            _assert(a != NULL, message);
+            untar(a, "lzma");
+            _assert(fclose(a) == 0, message);
+            INIT_FILE("/jb/lzma", 0, 0755);
+        }
         LOG("Successfully copied over our resources to RootFS.");
     }
     
+    {
+        // Deinitialize kexecute.
+        
+        LOG("Deinitializing kexecute...");
+        PROGRESS("Exploiting... (31/65)", 0, 0);
+        SETMESSAGE("Failed to deinitialize kexecute.");
+        term_kexecute();
+        LOG("Successfully deinitialized kexecute.");
+    }
+
     {
         // Inject trust cache
         
@@ -2433,6 +2365,11 @@ void exploit(mach_port_t tfp0,
         *(uint64_t *)&mem.uuid[0] = 0xabadbabeabadbabe;
         *(uint64_t *)&mem.uuid[8] = 0xabadbabeabadbabe;
         
+        if (!needResources) {
+            _assert(grab_hashes("/bin/launchctl", kread, GETOFFSET(amficache), mem.next) == 0, message);
+            _assert(grab_hashes("/usr/libexec/jailbreakd", kread, GETOFFSET(amficache), mem.next) == 0, message);
+            _assert(grab_hashes("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", kread, GETOFFSET(amficache), mem.next) == 0, message);
+        }
         _assert(grab_hashes("/jb", kread, GETOFFSET(amficache), mem.next) == 0, message);
         
         length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
@@ -2445,18 +2382,11 @@ void exploit(mach_port_t tfp0,
         wk64(GETOFFSET(trust_chain), kernel_trust);
         
         free(allhash);
+        allhash = NULL;
         free(allkern);
+        allkern = NULL;
         free(amfitab);
-    }
-    
-    {
-        // Deinitialize kexecute.
-        
-        LOG("Deinitializing kexecute...");
-        PROGRESS("Exploiting... (31/65)", 0, 0);
-        SETMESSAGE("Failed to deinitialize kexecute.");
-        term_kexecute();
-        LOG("Successfully deinitialized kexecute.");
+        amfitab = NULL;
     }
     
     {
@@ -2550,69 +2480,9 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE("Failed to patch amfid.");
         CLEAN_FILE("/private/var/tmp/amfid_payload.alive");
         _assert(platformizeProcAtAddr(getProcStructForPid(findPidOfProcess("amfid"))) == 0, message);
-        _assert(inject_library(findPidOfProcess("amfid"), "/jb/amfid_payload.dylib") == 0, message);
+        _assert(inject_library(findPidOfProcess("amfid"), amfid_payload) == 0, message);
         _assert(waitForFile("/private/var/tmp/amfid_payload.alive") == 0, message);
         LOG("Successfully patched amfid.");
-    }
-    
-    {
-        // Spawn jailbreakd.
-        
-        LOG("Spawning jailbreakd...");
-        PROGRESS("Exploiting... (38/65)", 0, 0);
-        SETMESSAGE("Failed to spawn jailbreakd.");
-        CLEAN_FILE("/usr/lib/libjailbreak.dylib");
-        _assert(symlink("/jb/libjailbreak.dylib", "/usr/lib/libjailbreak.dylib") == 0, message);
-        CLEAN_FILE("/usr/lib/libjailbreacy.dylib");
-        CLEAN_FILE("/bin/launchctl");
-        _assert(rename("/jb/launchctl", "/bin/launchctl") == 0, message);
-        CLEAN_FILE("/jb/jailbreakd.plist");
-        md = [[NSMutableDictionary alloc] init];
-        md[@"Label"] = @"jailbreakd";
-        md[@"Program"] = @"/jb/jailbreakd";
-        md[@"EnvironmentVariables"] = [[NSMutableDictionary alloc] init];
-        md[@"EnvironmentVariables"][@"KernelBase"] = ADDRSTRING(kernel_base);
-        md[@"EnvironmentVariables"][@"KernProcAddr"] = ADDRSTRING(rk64(GETOFFSET(kernproc)));
-        md[@"EnvironmentVariables"][@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref) - kernel_slide);
-        md[@"EnvironmentVariables"][@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
-        md[@"EnvironmentVariables"][@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
-        md[@"EnvironmentVariables"][@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
-        md[@"EnvironmentVariables"][@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
-        md[@"EnvironmentVariables"][@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
-        md[@"UserName"] = @"root";
-        md[@"MachServices"] = [[NSMutableDictionary alloc] init];
-        md[@"MachServices"][@"zone.sparkes.jailbreakd"] = [[NSMutableDictionary alloc] init];
-        md[@"MachServices"][@"zone.sparkes.jailbreakd"][@"HostSpecialPort"] = @(15);
-        md[@"RunAtLoad"] = @(YES);
-        md[@"KeepAlive"] = @(YES);
-        md[@"StandardErrorPath"] = @"/var/log/jailbreakd-stderr.log";
-        md[@"StandardOutPath"] = @"/var/log/jailbreakd-stdout.log";
-        _assert(([md writeToFile:@"/jb/jailbreakd.plist" atomically:YES]) == 1, message);
-        INIT_FILE("/jb/jailbreakd.plist", 0, 0644);
-        CLEAN_FILE("/var/log/jailbreakd-stderr.log");
-        CLEAN_FILE("/var/log/jailbreakd-stdout.log");
-        CLEAN_FILE("/private/var/tmp/jailbreakd.pid");
-        _assert(execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL) == 0, message);
-        _assert(waitForFile("/private/var/tmp/jailbreakd.pid") == 0, message);
-        LOG("Successfully spawned jailbreakd.");
-    }
-    
-    {
-        // Patch launchd.
-        
-        SETMESSAGE("Failed to patch launchd.");
-        CLEAN_FILE("/usr/lib/pspawn_hook.dylib");
-        _assert(symlink("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib") == 0, message);
-        if ((access("/etc/rc.d/substrate", F_OK) != 0) && load_tweaks) {
-            LOG("Patching launchd...");
-            PROGRESS("Exploiting... (39/65)", 0, 0);
-            CLEAN_FILE("/var/log/pspawn_hook_launchd.log");
-            CLEAN_FILE("/var/log/pspawn_hook_xpcproxy.log");
-            CLEAN_FILE("/var/log/pspawn_hook_other.log");
-            _assert(platformizeProcAtAddr(getProcStructForPid(1)) == 0, message);
-            _assert(inject_library(1, "/usr/lib/pspawn_hook.dylib") == 0, message);
-            LOG("Successfully patched launchd.");
-        }
     }
     
     {
@@ -2672,6 +2542,17 @@ void exploit(mach_port_t tfp0,
             }
             if (kCFCoreFoundationVersionNumber < 1452.23) {
                 _assert(waitForFile("/private/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
+                
+                CLEAN_FILE("/jb/rsync.tar");
+                CLEAN_FILE("/jb/rsync");
+                _assert(moveFileFromAppDir("rsync.tar", "/jb/rsync.tar") == 0, message);
+                a = fopen("/jb/rsync.tar", "rb");
+                LOG("a: " "%p" "\n", a);
+                _assert(a != NULL, message);
+                untar(a, "rsync");
+                _assert(fclose(a) == 0, message);
+                INIT_FILE("/jb/rsync", 0, 0755);
+                
                 _assert(easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/private/var/tmp/rootfsmnt/.", @"/"]) == 0, message);
             }
             LOG("Successfully renamed system snapshot back.");
@@ -2727,7 +2608,7 @@ void exploit(mach_port_t tfp0,
         LOG("Extracting bootstrap...");
         PROGRESS("Exploiting... (47/65)", 0, 0);
         SETMESSAGE("Failed to extract bootstrap.");
-        if (access("/.installed_unc0ver", F_OK)) {
+        if (needStrap) {
             _assert(chdir("/") == 0, message);
             rv = execCommandAndWait("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", "/jb/strap.tar.lzma", NULL, NULL);
             _assert(rv == 512 || rv == 0, message);
@@ -2741,35 +2622,122 @@ void exploit(mach_port_t tfp0,
             _assert(fclose(a) == 0, message);
             INIT_FILE("/.installed_unc0ver", 0, 0644);
             run_uicache = 1;
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL, NULL, NULL) == 0, message);
+        }
+        bool updatedResources;
+        {
+            rv = _system([[NSString stringWithFormat:
+                           @"INSTALLED=\"$(dpkg -s xnu.science.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
+                           "dpkg --compare-versions \"${INSTALLED}\" lt \"%@\"", bundledResources] UTF8String]);
+            updatedResources = WEXITSTATUS(rv);
+        }
+        if (needResources || updatedResources) {
+            CLEAN_FILE("/jb/resources.deb");
+            _assert(moveFileFromAppDir("resources.deb", "/jb/resources.deb") == 0, message);
+            rv = _system("/usr/bin/dpkg -i /jb/resources.deb");
+            _assert(WEXITSTATUS(rv) == 0, message);
+            CLEAN_FILE("/jb/resources.deb");
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar.tar", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma.tar", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma", NULL, NULL, NULL) == 0, message);
+            
+            
+            // TODO: inject things to trust cache, this doesn't work
+//            mem.next = rk64(GETOFFSET(trust_chain));
+//            mem.count = 0;
+//            *(uint64_t *)&mem.uuid[0] = 0xabadbabeabadbabe;
+//            *(uint64_t *)&mem.uuid[8] = 0xabadbabeabadbabe;
+//
+//            _assert(grab_hashes("/bin/launchctl", kread, GETOFFSET(amficache), mem.next) == 0, message);
+//            _assert(grab_hashes("/usr/libexec/jailbreakd", kread, GETOFFSET(amficache), mem.next) == 0, message);
+//            _assert(grab_hashes("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", kread, GETOFFSET(amficache), mem.next) == 0, message);
+//
+//            length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
+//            kernel_trust = kmem_alloc(length);
+//            printf("alloced: 0x%zx => 0x%llx\n", length, kernel_trust);
+//
+//            mem.count = numhash;
+//            kwrite(kernel_trust, &mem, sizeof(mem));
+//            kwrite(kernel_trust + sizeof(mem), allhash, numhash * 20);
+//            wk64(GETOFFSET(trust_chain), kernel_trust);
+//
+//            free(allhash);
+//            allhash = NULL;
+//            free(allkern);
+//            allkern = NULL;
+//            free(amfitab);
+//            amfitab = NULL;
         }
         _assert(chdir("/jb") == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/amfid_payload.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/launchctl.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/jailbreakd.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/libjailbreak.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/libjailbreacy.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/Unrestrict.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/pspawn_hook.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/spawn.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/debugserver.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/rsync", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/rsync.tar", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/usr/bin/debugserver", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/ln", "-s", "/jb/debugserver", "/usr/bin/debugserver", NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/usr/bin/spawn", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/ln", "-s", "/jb/spawn", "/usr/bin/spawn", NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/electra", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/ln", "-s", "/jb", "/electra", NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/.bootstrapped_electra", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/ln", "-s", "/.installed_unc0ver", "/.bootstrapped_electra", NULL, NULL) == 0, message);
+        char link[0x100];
+        bzero(link, 0x100);
+        if ((readlink("/electra", link, 0x9f) != ERR_SUCCESS) ||
+            (strcmp(link, "/jb") != 0)) {
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/electra", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/ln", "-s", "/jb", "/electra", NULL, NULL) == 0, message);
+        }
+        if ((readlink("/.bootstrapped_electra", link, 0x9f) != ERR_SUCCESS) ||
+            (strcmp(link, "/.installed_unc0ver") != 0)) {
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/.bootstrapped_electra", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/ln", "-s", "/.installed_unc0ver", "/.bootstrapped_electra", NULL, NULL) == 0, message);
+        }
         LOG("Successfully extracted bootstrap.");
     }
     
+    {
+        // Spawn jailbreakd.
+        
+        LOG("Spawning jailbreakd...");
+        PROGRESS("Exploiting... (38/65)", 0, 0);
+        SETMESSAGE("Failed to spawn jailbreakd.");
+        md = [[NSMutableDictionary alloc] init];
+        md[@"Label"] = @"jailbreakd";
+        md[@"Program"] = @"/usr/libexec/jailbreakd";
+        md[@"EnvironmentVariables"] = [[NSMutableDictionary alloc] init];
+        md[@"EnvironmentVariables"][@"KernelBase"] = ADDRSTRING(kernel_base);
+        md[@"EnvironmentVariables"][@"KernProcAddr"] = ADDRSTRING(rk64(GETOFFSET(kernproc)));
+        md[@"EnvironmentVariables"][@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref) - kernel_slide);
+        md[@"EnvironmentVariables"][@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
+        md[@"EnvironmentVariables"][@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
+        md[@"EnvironmentVariables"][@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
+        md[@"EnvironmentVariables"][@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
+        md[@"EnvironmentVariables"][@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
+        md[@"UserName"] = @"root";
+        md[@"MachServices"] = [[NSMutableDictionary alloc] init];
+        md[@"MachServices"][@"zone.sparkes.jailbreakd"] = [[NSMutableDictionary alloc] init];
+        md[@"MachServices"][@"zone.sparkes.jailbreakd"][@"HostSpecialPort"] = @(15);
+        md[@"RunAtLoad"] = @(YES);
+        md[@"KeepAlive"] = @(YES);
+        md[@"StandardErrorPath"] = @"/var/log/jailbreakd-stderr.log";
+        md[@"StandardOutPath"] = @"/var/log/jailbreakd-stdout.log";
+        _assert(([md writeToFile:@"/jb/jailbreakd.plist" atomically:YES]) == 1, message);
+        INIT_FILE("/jb/jailbreakd.plist", 0, 0644);
+        CLEAN_FILE("/var/log/jailbreakd-stderr.log");
+        CLEAN_FILE("/var/log/jailbreakd-stdout.log");
+        CLEAN_FILE("/private/var/tmp/jailbreakd.pid");
+        _assert(execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL) == 0, message);
+        _assert(waitForFile("/private/var/tmp/jailbreakd.pid") == 0, message);
+        LOG("Successfully spawned jailbreakd.");    }
+    
+    {
+        // Patch launchd.
+        
+        SETMESSAGE("Failed to patch launchd.");
+        CLEAN_FILE("/usr/lib/pspawn_hook.dylib");
+        _assert(symlink("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib") == 0, message);
+        if ((access("/etc/rc.d/substrate", F_OK) != 0) && load_tweaks) {
+            LOG("Patching launchd...");
+            PROGRESS("Exploiting... (39/65)", 0, 0);
+            CLEAN_FILE("/var/log/pspawn_hook_launchd.log");
+            CLEAN_FILE("/var/log/pspawn_hook_xpcproxy.log");
+            CLEAN_FILE("/var/log/pspawn_hook_other.log");
+            _assert(platformizeProcAtAddr(getProcStructForPid(1)) == 0, message);
+            _assert(inject_library(1, "/usr/lib/pspawn_hook.dylib") == 0, message);
+            LOG("Successfully patched launchd.");
+        }
+    }
+
     {
         if (access("/.cydia_no_stash", F_OK)) {
             // Disable stashing.
@@ -2815,35 +2783,6 @@ void exploit(mach_port_t tfp0,
         }
         _assert([md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)], message);
         LOG("Successfully allowed SpringBoard to show non-default system apps.");
-    }
-    
-    {
-        // Persist amfid patch.
-        
-        LOG("Persisting amfid patch...");
-        PROGRESS("Exploiting... (51/65)", 0, 0);
-        SETMESSAGE("Failed to persist amfid patch.");
-        CLEAN_FILE("/jb/amfid_payload.plist");
-        _assert(execCommandAndWait("/bin/mkdir", "-p", "/Library/MobileSubstrate/DynamicLibraries", NULL, NULL, NULL) == 0, message);
-        md = [[NSMutableDictionary alloc] init];
-        md[@"Filter"] = [[NSMutableDictionary alloc] init];
-        md[@"Filter"][@"Executables"] = @[@"amfid"];
-        _assert(([md writeToFile:@"/Library/MobileSubstrate/DynamicLibraries/amfid_payload.plist" atomically:YES]) == 1, message);
-        INIT_FILE("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.plist", 0, 0644);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/ln", "-s", "/jb/amfid_payload.dylib", "/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", NULL, NULL) == 0, message);
-        LOG("Successfully persisted amfid patch.");
-    }
-    
-    {
-        // Enable Unrestrict.
-        
-        LOG("Enabling Unrestrict...");
-        PROGRESS("Exploiting... (52/65)", 0, 0);
-        _assert(execCommandAndWait("/bin/mkdir", "-p", "/Library/MobileSubstrate/ServerPlugins", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/rm", "-rf", "/Library/MobileSubstrate/ServerPlugins/Unrestrict.dylib", NULL, NULL, NULL) == 0, message);
-        _assert(execCommandAndWait("/bin/ln", "-s", "/jb/Unrestrict.dylib", "/Library/MobileSubstrate/ServerPlugins/Unrestrict.dylib", NULL, NULL) == 0, message);
-        LOG("Successfully enabled Unrestrict.");
     }
     
     {
@@ -2930,18 +2869,12 @@ void exploit(mach_port_t tfp0,
             LOG("Extracting OpenSSH...");
             PROGRESS("Exploiting... (57/65)", 0, 0);
             SETMESSAGE("Failed to extract OpenSSH.");
-            CLEAN_FILE("/jb/openssh.tar");
             CLEAN_FILE("/jb/openssh.deb");
+            CLEAN_FILE("/jb/openssl.deb");
             CLEAN_FILE("/jb/ca-certificates.deb");
-            _assert(moveFileFromAppDir("openssh.tar", "/jb/openssh.tar") == 0, message);
-            a = fopen("/jb/openssh.tar", "rb");
-            LOG("a: " "%p" "\n", a);
-            _assert(a != NULL, message);
-            untar(a, "openssh.deb");
-            _assert(fclose(a) == 0, message);
-            INIT_FILE("/jb/openssh.deb", 0, 0644);
-            INIT_FILE("/jb/openssl.deb", 0, 0644);
-            INIT_FILE("/jb/ca-certificates.deb", 0, 0644);
+            _assert(moveFileFromAppDir("openssh.deb", "/jb/openssh.deb") == 0, message);
+            _assert(moveFileFromAppDir("openssl.deb", "/jb/openssl.deb") == 0, message);
+            _assert(moveFileFromAppDir("ca-certificates.deb", "/jb/ca-certificates.deb") == 0, message);
             LOG("Successfully extracted OpenSSH.");
             
             // Install OpenSSH.
@@ -2957,6 +2890,7 @@ void exploit(mach_port_t tfp0,
             PROGRESS("Exploiting... (59/65)", 0, 0);
             SETMESSAGE("Failed to disable Install OpenSSH.");
             setPreference(@K_INSTALL_OPENSSH, @(NO));
+            rv = _system("/bin/rm -f /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
             LOG("Successfully disabled Install OpenSSH.");
         }
     }
@@ -2967,17 +2901,10 @@ void exploit(mach_port_t tfp0,
             LOG("Extracting Cydia...");
             PROGRESS("Exploiting... (60/65)", 0, 0);
             SETMESSAGE("Failed to extract Cydia.");
-            CLEAN_FILE("/jb/cydia.tar");
             CLEAN_FILE("/jb/cydia.deb");
             CLEAN_FILE("/jb/cydia-lproj.deb");
-            _assert(moveFileFromAppDir("cydia.tar", "/jb/cydia.tar") == 0, message);
-            a = fopen("/jb/cydia.tar", "rb");
-            LOG("a: " "%p" "\n", a);
-            _assert(a != NULL, message);
-            untar(a, "cydia.deb");
-            _assert(fclose(a) == 0, message);
-            INIT_FILE("/jb/cydia.deb", 0, 0644);
-            INIT_FILE("/jb/cydia-lproj.deb", 0, 0644);
+            _assert(moveFileFromAppDir("cydia.deb", "/jb/cydia.deb") == 0, message);
+            _assert(moveFileFromAppDir("cydia-lproj.deb", "/jb/cydia-lproj.deb") == 0, message);
             LOG("Successfully extracted Cydia.");
             
             // Install Cydia.
@@ -2993,6 +2920,7 @@ void exploit(mach_port_t tfp0,
             PROGRESS("Exploiting... (62/65)", 0, 0);
             SETMESSAGE("Failed to disable Install Cydia.");
             setPreference(@K_INSTALL_CYDIA, @(NO));
+            rv = _system("/bin/rm -f /jb/cydia.deb /jb/cydia-lproj.deb");
             LOG("Successfully disabled Install Cydia.");
         }
     }
@@ -3057,10 +2985,7 @@ void exploit(mach_port_t tfp0,
                              "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
                              "\" 2>&1 >/dev/null &");
             } else {
-                rv = _system("nohup bash -c \""
-                             "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist ;"
-                             "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
-                             "\" 2>&1 >/dev/null &");
+                rv = _system("launchctl stop com.apple.backboardd");
             }
             _assert(WEXITSTATUS(rv) == 0, message);
             LOG("Successfully loaded Tweaks.");
@@ -3125,6 +3050,8 @@ void exploit(mach_port_t tfp0,
 }
 
 - (void)viewDidLoad {
+    bundledResources = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"BundledResources"];
+    LOG("Bundled Resources: %@", bundledResources);
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     sharedController = self;
