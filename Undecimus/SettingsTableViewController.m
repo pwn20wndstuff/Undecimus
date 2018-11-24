@@ -250,7 +250,6 @@
     [self.ECIDLabel setPlaceholder:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
     [self.ReloadSystemDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RELOAD_SYSTEM_DAEMONS]];
     [self.RestartSpringBoardButton setEnabled:!(isJailbroken() == 1)];
-    [self.restartButton setEnabled:!(isJailbroken() == 1)];
     [self.tableView reloadData];
 }
 
