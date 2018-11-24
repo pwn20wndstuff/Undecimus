@@ -2621,7 +2621,7 @@ void exploit(mach_port_t tfp0,
         bool updatedResources=false;
         if (!needResources) {
             rv = _system([[NSString stringWithFormat:
-                           @"INSTALLED=\"$(dpkg -s xnu.science.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
+                           @"INSTALLED=\"$(dpkg -s science.xnu.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
                            "dpkg --compare-versions \"${INSTALLED}\" lt \"%@\"", bundledResources] UTF8String]);
             updatedResources = WEXITSTATUS(rv);
         }
