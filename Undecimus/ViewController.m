@@ -50,7 +50,6 @@
 
 @implementation ViewController
 static ViewController *sharedController = nil;
-static NSString* bundledResources = nil;
 
 #define PROGRESS(msg, btnenbld, tbenbld) do { \
         dispatch_async(dispatch_get_main_queue(), ^{ \
@@ -174,6 +173,8 @@ const char *async_wake_supported_versions[] = {
 #define ISADDR(val)            (val != HUGE_VAL && val != -HUGE_VAL)
 #define ADDRSTRING(val)        [NSString stringWithFormat:@ADDR, val]
 #define VSHARED_DYLD           0x000200
+
+#define BUNDLEDRESOURCES [[[NSBundle mainBundle] infoDictionary] objectForKey:@"BundledResources"]
 
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
 
@@ -1830,6 +1831,29 @@ NSArray *getCleanUpFileList() {
     return array;
 }
 
+void injectTrustCache(const char *Path, uint64_t trust_chain, uint64_t amficache) {
+    printf("Injecting %s to trust cache...\n", Path);
+    struct trust_mem mem;
+    size_t length = 0;
+    uint64_t kernel_trust = 0;
+    
+    mem.next = rk64(trust_chain);
+    *(uint64_t *)&mem.uuid[0] = 0xabadbabeabadbabe;
+    *(uint64_t *)&mem.uuid[8] = 0xabadbabeabadbabe;
+    
+    _assert(grab_hashes(Path, kread, amficache, mem.next) == 0, message);
+    
+    length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
+    kernel_trust = kmem_alloc(length);
+    printf("alloced: 0x%zx => 0x%llx\n", length, kernel_trust);
+    
+    mem.count = numhash;
+    kwrite(kernel_trust, &mem, sizeof(mem));
+    kwrite(kernel_trust + sizeof(mem), allhash, numhash * 20);
+    wk64(trust_chain, kernel_trust);
+    printf("Successfully injected %s to trust cache.\n", Path);
+}
+
 // TODO: Add more detailed descriptions for the _assert calls.
 
 void exploit(mach_port_t tfp0,
@@ -1846,9 +1870,6 @@ void exploit(mach_port_t tfp0,
     uint64_t v_mount = 0;
     uint32_t v_flag = 0;
     FILE *a = NULL;
-    struct trust_mem mem;
-    size_t length = 0;
-    uint64_t kernel_trust = 0;
     struct utsname u = { 0 };
     char buf_targettype[256];
     size_t size = 0;
@@ -1871,6 +1892,11 @@ void exploit(mach_port_t tfp0,
     int install_cydia = 0;
     int install_openssh = 0;
     int reload_system_daemons = 0;
+    int needResources = 0;
+    int needStrap = 0;
+    const char *amfid_payload = NULL;
+    int updatedResources = 0;
+    char link[0x100];
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
 #define kernel_slide           (kernel_base - KERNEL_SEARCH_ADDRESS)
@@ -2276,22 +2302,6 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully wrote a test file to RootFS.");
     }
     
-    bool needResources;
-    bool needStrap;
-    char *amfid_payload;
-    
-    {
-        // Verify resources
-        _assert(chdir("/") == 0, message);
-        needStrap = access("/.installed_unc0ver", F_OK) != ERR_SUCCESS;
-        needResources = needStrap || !verifySha1Sums(@"/usr/share/undecimus/resources.txt");
-        if (needResources) {
-            amfid_payload = "/jb/amfid_payload.dylib";
-        } else {
-            amfid_payload = "/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib";
-        }
-    }
-    
     {
         // Copy over our resources to RootFS.
         
@@ -2304,6 +2314,14 @@ void exploit(mach_port_t tfp0,
             _assert(chown("/jb", 0, 0) == 0, message);
         }
         _assert(chdir("/jb") == 0, message);
+        
+        needStrap = access("/.installed_unc0ver", F_OK) != 0;
+        needResources = needStrap || !verifySha1Sums(@"/usr/share/undecimus/resources.txt");
+        if (needResources) {
+            amfid_payload = "/jb/amfid_payload.dylib";
+        } else {
+            amfid_payload = "/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib";
+        }
         
         if (needResources) {
             CLEAN_FILE("/jb/amfid_payload.tar");
@@ -2357,30 +2375,16 @@ void exploit(mach_port_t tfp0,
     {
         // Inject trust cache
         
-        PROGRESS("Exploiting... (30/65)", 0, 0);
+        PROGRESS("Exploiting... (31/65)", 0, 0);
         printf("trust_chain = 0x%llx\n", GETOFFSET(trust_chain));
         SETMESSAGE("Failed to inject trust cache.");
-        
-        mem.next = rk64(GETOFFSET(trust_chain));
-        *(uint64_t *)&mem.uuid[0] = 0xabadbabeabadbabe;
-        *(uint64_t *)&mem.uuid[8] = 0xabadbabeabadbabe;
-        
+        injectTrustCache("/jb", GETOFFSET(trust_chain), GETOFFSET(amficache));
         if (!needResources) {
-            _assert(grab_hashes("/bin/launchctl", kread, GETOFFSET(amficache), mem.next) == 0, message);
-            _assert(grab_hashes("/usr/libexec/jailbreakd", kread, GETOFFSET(amficache), mem.next) == 0, message);
-            _assert(grab_hashes("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", kread, GETOFFSET(amficache), mem.next) == 0, message);
+            injectTrustCache("/bin/launchctl", GETOFFSET(trust_chain), GETOFFSET(amficache));
+            injectTrustCache("/usr/libexec/jailbreakd", GETOFFSET(trust_chain), GETOFFSET(amficache));
+            injectTrustCache("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", GETOFFSET(trust_chain), GETOFFSET(amficache));
+            injectTrustCache("/usr/lib/pspawn_hook.dylib", GETOFFSET(trust_chain), GETOFFSET(amficache));
         }
-        _assert(grab_hashes("/jb", kread, GETOFFSET(amficache), mem.next) == 0, message);
-        
-        length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
-        kernel_trust = kmem_alloc(length);
-        printf("alloced: 0x%zx => 0x%llx\n", length, kernel_trust);
-        
-        mem.count = numhash;
-        kwrite(kernel_trust, &mem, sizeof(mem));
-        kwrite(kernel_trust + sizeof(mem), allhash, numhash * 20);
-        wk64(GETOFFSET(trust_chain), kernel_trust);
-        
     }
     
     {
@@ -2483,7 +2487,7 @@ void exploit(mach_port_t tfp0,
         // Update version string.
         
         LOG("Updating version string...");
-        PROGRESS("Exploiting... (40/65)", 0, 0);
+        PROGRESS("Exploiting... (38/65)", 0, 0);
         SETMESSAGE("Failed to update version string.");
         _assert(uname(&u) == 0, message);
         kernelVersionString = (char *)[[NSString stringWithFormat:@"%s %s", u.version, DEFAULT_VERSION_STRING] UTF8String];
@@ -2501,7 +2505,7 @@ void exploit(mach_port_t tfp0,
             // Borrow entitlements from fsck_apfs.
             
             LOG("Borrowing entitlements from fsck_apfs...");
-            PROGRESS("Exploiting... (41/65)", 0, 0);
+            PROGRESS("Exploiting... (39/65)", 0, 0);
             borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
             LOG("Successfully borrowed entitlements from fsck_apfs.");
             
@@ -2510,7 +2514,7 @@ void exploit(mach_port_t tfp0,
             // Rename system snapshot.
             
             LOG("Renaming system snapshot back...");
-            PROGRESS("Exploiting... (42/65)", 0, 0);
+            PROGRESS("Exploiting... (40/65)", 0, 0);
             NOTICE("Will restore RootFS. This may take a while. Don't exit the app and don't let the device lock.", 1, 1);
             SETMESSAGE("Unable to mount or rename system snapshot.  Delete OTA file from Settings - Storage if present");
             if (kCFCoreFoundationVersionNumber < 1452.23) {
@@ -2554,7 +2558,7 @@ void exploit(mach_port_t tfp0,
             // Clean up.
             
             LOG("Cleaning up...");
-            PROGRESS("Exploiting... (43/65)", 0, 0);
+            PROGRESS("Exploiting... (41/65)", 0, 0);
             SETMESSAGE("Failed to clean up.");
             cleanUpFileList = getCleanUpFileList();
             _assert(cleanUpFileList != nil, message);
@@ -2568,7 +2572,7 @@ void exploit(mach_port_t tfp0,
             // Disallow SpringBoard to show non-default system apps.
             
             LOG("Disallowing SpringBoard to show non-default system apps...");
-            PROGRESS("Exploiting... (44/65)", 0, 0);
+            PROGRESS("Exploiting... (42/65)", 0, 0);
             md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
             if (md == nil) {
                 md = [[NSMutableDictionary alloc] init];
@@ -2582,14 +2586,14 @@ void exploit(mach_port_t tfp0,
             // Disable RootFS Restore.
             
             LOG("Disabling RootFS Restore...");
-            PROGRESS("Exploiting... (45/65)", 0, 0);
+            PROGRESS("Exploiting... (43/65)", 0, 0);
             setPreference(@K_RESTORE_ROOTFS, @(NO));
             LOG("Successfully disabled RootFS Restore");
             
             // Reboot.
             
             LOG("Rebooting...");
-            PROGRESS("Exploiting... (46/65)", 0 ,0);
+            PROGRESS("Exploiting... (44/65)", 0 ,0);
             NOTICE("RootFS has successfully been restored. The device will be restarted.", 1, 0);
             _assert(reboot(0x400) == 0, message);
             LOG("Successfully rebooted.");
@@ -2600,7 +2604,7 @@ void exploit(mach_port_t tfp0,
         // Extract bootstrap.
         
         LOG("Extracting bootstrap...");
-        PROGRESS("Exploiting... (47/65)", 0, 0);
+        PROGRESS("Exploiting... (45/65)", 0, 0);
         SETMESSAGE("Failed to extract bootstrap.");
         if (needStrap) {
             _assert(chdir("/") == 0, message);
@@ -2617,12 +2621,16 @@ void exploit(mach_port_t tfp0,
             INIT_FILE("/.installed_unc0ver", 0, 0644);
             run_uicache = 1;
             _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar.tar", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma.tar", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma", NULL, NULL, NULL) == 0, message);
         }
-        bool updatedResources=false;
+        _assert(chdir("/jb") == 0, message);
         if (!needResources) {
             rv = _system([[NSString stringWithFormat:
                            @"INSTALLED=\"$(dpkg -s science.xnu.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
-                           "dpkg --compare-versions \"${INSTALLED}\" lt \"%@\"", bundledResources] UTF8String]);
+                           "dpkg --compare-versions \"${INSTALLED}\" lt \"%@\"", BUNDLEDRESOURCES] UTF8String]);
             updatedResources = WEXITSTATUS(rv);
         }
         if (needResources || updatedResources) {
@@ -2631,29 +2639,13 @@ void exploit(mach_port_t tfp0,
             rv = _system("/usr/bin/dpkg --force-bad-path -i /jb/resources.deb");
             _assert(WEXITSTATUS(rv) == 0, message);
             CLEAN_FILE("/jb/resources.deb");
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar.tar", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma.tar", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma", NULL, NULL, NULL) == 0, message);
-            
-            _assert(grab_hashes("/bin/launchctl", kread, GETOFFSET(amficache), mem.next) == 0, message);
-            _assert(grab_hashes("/usr/libexec/jailbreakd", kread, GETOFFSET(amficache), mem.next) == 0, message);
-            _assert(grab_hashes("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", kread, GETOFFSET(amficache), mem.next) == 0, message);
-
-            uint64_t old_length = length;
-            length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
-            uint64_t old_trust = kernel_trust;
-            kernel_trust = kmem_alloc(length);
-            printf("alloced: 0x%zx => 0x%llx\n", length, kernel_trust);
-
-            mem.count = numhash;
-            kwrite(kernel_trust, &mem, sizeof(mem));
-            kwrite(kernel_trust + sizeof(mem), allhash, numhash * 20);
-            wk64(GETOFFSET(trust_chain), kernel_trust);
-            kmem_free(old_trust, old_length);
+            CLEAN_FILE("/jb/amfid_payload.tar");
+            injectTrustCache("/bin/launchctl", GETOFFSET(trust_chain), GETOFFSET(amficache));
+            injectTrustCache("/usr/libexec/jailbreakd", GETOFFSET(trust_chain), GETOFFSET(amficache));
+            injectTrustCache("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", GETOFFSET(trust_chain), GETOFFSET(amficache));
+            injectTrustCache("/usr/lib/pspawn_hook.dylib", GETOFFSET(trust_chain), GETOFFSET(amficache));
         }
         _assert(chdir("/jb") == 0, message);
-        char link[0x100];
         bzero(link, 0x100);
         if ((readlink("/electra", link, 0x9f) != ERR_SUCCESS) ||
             (strcmp(link, "/jb") != 0)) {
@@ -2701,14 +2693,13 @@ void exploit(mach_port_t tfp0,
         CLEAN_FILE("/private/var/tmp/jailbreakd.pid");
         _assert(execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL) == 0, message);
         _assert(waitForFile("/private/var/tmp/jailbreakd.pid") == 0, message);
-        LOG("Successfully spawned jailbreakd.");    }
+        LOG("Successfully spawned jailbreakd.");
+    }
     
     {
         // Patch launchd.
         
         SETMESSAGE("Failed to patch launchd.");
-        CLEAN_FILE("/usr/lib/pspawn_hook.dylib");
-        _assert(symlink("/jb/pspawn_hook.dylib", "/usr/lib/pspawn_hook.dylib") == 0, message);
         if ((access("/etc/rc.d/substrate", F_OK) != 0) && load_tweaks) {
             LOG("Patching launchd...");
             PROGRESS("Exploiting... (39/65)", 0, 0);
@@ -2866,6 +2857,8 @@ void exploit(mach_port_t tfp0,
             SETMESSAGE("Failed to install OpenSSH.");
             rv = _system("/usr/bin/dpkg -i /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
             _assert(WEXITSTATUS(rv) == 0, message);
+            rv = _system("/bin/rm -f /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
+             _assert(WEXITSTATUS(rv) == 0, message);
             LOG("Successfully installed OpenSSH.");
             
             // Disable Install OpenSSH.
@@ -2873,7 +2866,6 @@ void exploit(mach_port_t tfp0,
             PROGRESS("Exploiting... (59/65)", 0, 0);
             SETMESSAGE("Failed to disable Install OpenSSH.");
             setPreference(@K_INSTALL_OPENSSH, @(NO));
-            rv = _system("/bin/rm -f /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
             LOG("Successfully disabled Install OpenSSH.");
         }
     }
@@ -2896,6 +2888,8 @@ void exploit(mach_port_t tfp0,
             SETMESSAGE("Failed to install Cydia.");
             rv = _system("/usr/bin/dpkg -i /jb/cydia.deb /jb/cydia-lproj.deb");
             _assert(WEXITSTATUS(rv) == 0, message);
+            rv = _system("/bin/rm -rf /jb/cydia.deb /jb/cydia-lproj.deb");
+             _assert(WEXITSTATUS(rv) == 0, message);
             LOG("Successfully installed Cydia.");
             
             // Disable Install Cydia.
@@ -2903,7 +2897,6 @@ void exploit(mach_port_t tfp0,
             PROGRESS("Exploiting... (62/65)", 0, 0);
             SETMESSAGE("Failed to disable Install Cydia.");
             setPreference(@K_INSTALL_CYDIA, @(NO));
-            rv = _system("/bin/rm -f /jb/cydia.deb /jb/cydia-lproj.deb");
             LOG("Successfully disabled Install Cydia.");
         }
     }
@@ -3033,8 +3026,6 @@ void exploit(mach_port_t tfp0,
 }
 
 - (void)viewDidLoad {
-    bundledResources = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"BundledResources"];
-    LOG("Bundled Resources: %@", bundledResources);
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     sharedController = self;
