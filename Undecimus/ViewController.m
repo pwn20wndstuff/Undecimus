@@ -2380,10 +2380,10 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE("Failed to inject trust cache.");
         injectTrustCache("/jb", GETOFFSET(trust_chain), GETOFFSET(amficache));
         if (!needResources) {
-            injectTrustCache("/bin/launchctl", GETOFFSET(trust_chain), GETOFFSET(amficache));
-            injectTrustCache("/usr/libexec/jailbreakd", GETOFFSET(trust_chain), GETOFFSET(amficache));
-            injectTrustCache("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", GETOFFSET(trust_chain), GETOFFSET(amficache));
-            injectTrustCache("/usr/lib/pspawn_hook.dylib", GETOFFSET(trust_chain), GETOFFSET(amficache));
+            NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
+            for (NSString *resource in resources) {
+                injectTrustCache(resource.UTF8String, GETOFFSET(trust_chain), GETOFFSET(amficache));
+            }
         }
     }
     
@@ -2640,10 +2640,6 @@ void exploit(mach_port_t tfp0,
             _assert(WEXITSTATUS(rv) == 0, message);
             CLEAN_FILE("/jb/resources.deb");
             CLEAN_FILE("/jb/amfid_payload.tar");
-            injectTrustCache("/bin/launchctl", GETOFFSET(trust_chain), GETOFFSET(amficache));
-            injectTrustCache("/usr/libexec/jailbreakd", GETOFFSET(trust_chain), GETOFFSET(amficache));
-            injectTrustCache("/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib", GETOFFSET(trust_chain), GETOFFSET(amficache));
-            injectTrustCache("/usr/lib/pspawn_hook.dylib", GETOFFSET(trust_chain), GETOFFSET(amficache));
         }
         _assert(chdir("/jb") == 0, message);
         bzero(link, 0x100);
