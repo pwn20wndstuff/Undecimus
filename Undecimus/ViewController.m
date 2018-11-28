@@ -1097,7 +1097,7 @@ int easyPosixSpawn(NSURL *launchPath,NSArray *arguments) {
     for (int i=0; i<posixSpawnArguments.count; i++)
         args[i]=(char *)[posixSpawnArguments[i]UTF8String];
     
-    printf("File exists at launch path: %d\n",[[NSFileManager defaultManager]fileExistsAtPath:launchPath.path]);
+    printf("File exists at launch path: %d\n",[[NSFileManager defaultManager] fileExistsAtPath:launchPath.path]);
     printf("Executing %s: %s\n",launchPath.path.UTF8String,arguments.description.UTF8String);
     
     posix_spawn_file_actions_t action;
@@ -1271,6 +1271,15 @@ int _system(const char *cmd) {
     posix_spawn(&Pid, "/bin/sh", NULL, NULL, argv, myenviron);
     waitpid(Pid, &Status, 0);
     return Status;
+}
+
+int _systemf(const char *cmd, ...) {
+    va_list ap;
+    va_start(ap, cmd);
+    NSString *cmdstr = [[NSString alloc] initWithFormat:@(cmd) arguments:ap];
+    va_end(ap);
+    LOG("calling system: \"%s\"", [cmdstr UTF8String]);
+    return _system([cmdstr UTF8String]);
 }
 
 void setPreference(NSString *key, id object) {
@@ -1832,53 +1841,67 @@ NSArray *getCleanUpFileList() {
 }
 
 void injectTrustCache(const char *Path, uint64_t trust_chain, uint64_t amficache) {
-    printf("Injecting %s to trust cache...\n", Path);
+    LOG("Injecting %s to trust cache...\n", Path);
+    _assert(grab_hashes(Path, kread, amficache, rk64(trust_chain)) == 0, message);
+}
+
+void commitTrustCache(uint64_t trust_chain, uint64_t amficache) {
+    static uint64_t kernel_trust = 0;
+    static size_t kernel_trust_length = 0;
+    static uint64_t original_trust_chain = 0;
     struct trust_mem mem;
-    size_t length = 0;
-    uint64_t kernel_trust = 0;
+    uint64_t old_trust = kernel_trust;
+    uint64_t old_kernel_trust_length = kernel_trust_length;
     
-    mem.next = rk64(trust_chain);
+    if (original_trust_chain==0) {
+        original_trust_chain = rk64(trust_chain);
+    }
+    
+    mem.next = original_trust_chain;
     *(uint64_t *)&mem.uuid[0] = 0xabadbabeabadbabe;
     *(uint64_t *)&mem.uuid[8] = 0xabadbabeabadbabe;
     
-    _assert(grab_hashes(Path, kread, amficache, mem.next) == 0, message);
-    
-    length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
+    size_t length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
     kernel_trust = kmem_alloc(length);
-    printf("alloced: 0x%zx => 0x%llx\n", length, kernel_trust);
+    LOG("alloced: 0x%zx => 0x%llx\n", length, kernel_trust);
     
     mem.count = numhash;
     kwrite(kernel_trust, &mem, sizeof(mem));
     kwrite(kernel_trust + sizeof(mem), allhash, numhash * 20);
     wk64(trust_chain, kernel_trust);
-    printf("Successfully injected %s to trust cache.\n", Path);
+    if (old_trust != 0 && old_kernel_trust_length != 0) {
+        kmem_free(old_trust, old_kernel_trust_length);
+        old_trust = 0;
+        old_kernel_trust_length = 0;
+    }
+    LOG("Successfully committed %d hashes to trust cache.", numhash);
 }
 
 bool debIsInstalled(char *packageID) {
-    int rv = _system([[NSString stringWithFormat:@"/usr/bin/dpkg -s \"%s\"", packageID] UTF8String]);
-    return !(WEXITSTATUS(rv));
+    int rv = _systemf("/usr/bin/dpkg -s \"%s\" > /dev/null", packageID);
+    bool isInstalled = !WEXITSTATUS(rv);
+    LOG("Deb: \"%s\" is%s installed", packageID, isInstalled?"":" not");
+    return isInstalled;
+}
+
+void installDeb(char *debName) {
+    NSString *destPathStr = [NSString stringWithFormat:@"/jb/%s", debName];
+    const char *destPath = [destPathStr UTF8String];
+    CLEAN_FILE(destPath);
+    _assert(moveFileFromAppDir(debName, (char *)destPath) == 0, message);
+    int rv = _systemf("/usr/bin/dpkg --force-bad-path --force-configure-any -i \"%s\"", destPath);
+    _assert(WEXITSTATUS(rv) == 0, message);
+    CLEAN_FILE(destPath);
 }
 
 void extractResources() {
     if (!debIsInstalled("com.bingner.spawn")) {
-        CLEAN_FILE("/jb/spawn.deb");
-        _assert(moveFileFromAppDir("spawn.deb", "/jb/spawn.deb") == 0, message);
-        int rv = _system("/usr/bin/dpkg --force-bad-path --force-configure-any -i /jb/spawn.deb");
-        _assert(WEXITSTATUS(rv) == 0, message);
-        CLEAN_FILE("/jb/spawn.deb");
+        installDeb("spawn.deb");
     }
     if (!debIsInstalled("science.xnu.injector")) {
-        CLEAN_FILE("/jb/injector.deb");
-        _assert(moveFileFromAppDir("injector.deb", "/jb/injector.deb") == 0, message);
-        int rv = _system("/usr/bin/dpkg --force-bad-path --force-configure-any -i /jb/injector.deb");
-        _assert(WEXITSTATUS(rv) == 0, message);
-        CLEAN_FILE("/jb/injector.deb");
+        installDeb("injector.deb");
     }
-    CLEAN_FILE("/jb/resources.deb");
-    _assert(moveFileFromAppDir("resources.deb", "/jb/resources.deb") == 0, message);
-    int rv = _system("/usr/bin/dpkg --force-bad-path --force-configure-any -i /jb/resources.deb");
-    _assert(WEXITSTATUS(rv) == 0, message);
-    CLEAN_FILE("/jb/resources.deb");
+    installDeb("resources.deb");
 }
 
 // TODO: Add more detailed descriptions for the _assert calls.
@@ -1925,6 +1948,8 @@ void exploit(mach_port_t tfp0,
     int updatedResources = 0;
     char link[0x100];
     NSArray *resources = nil;
+    NSFileManager *fm = [NSFileManager defaultManager];
+    
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
 #define kernel_slide           (kernel_base - KERNEL_SEARCH_ADDRESS)
@@ -2329,10 +2354,20 @@ void exploit(mach_port_t tfp0,
     }
     
     {
+        // Deinitialize kexecute.
+        
+        LOG("Deinitializing kexecute...");
+        PROGRESS("Exploiting... (28/65)", 0, 0);
+        SETMESSAGE("Failed to deinitialize kexecute.");
+        term_kexecute();
+        LOG("Successfully deinitialized kexecute.");
+    }
+    
+    {
         // Write a test file to RootFS.
         
         LOG("Writing a test file to RootFS...");
-        PROGRESS("Exploiting... (28/65)", 0, 0);
+        PROGRESS("Exploiting... (29/65)", 0, 0);
         SETMESSAGE("Failed to write a test file to RootFS.");
         writeTestFile("/test.txt");
         LOG("Successfully wrote a test file to RootFS.");
@@ -2342,7 +2377,7 @@ void exploit(mach_port_t tfp0,
         // Copy over our resources to RootFS.
         
         LOG("Copying over our resources to RootFS...");
-        PROGRESS("Exploiting... (29/65)", 0, 0);
+        PROGRESS("Exploiting... (30/65)", 0, 0);
         SETMESSAGE("Failed to copy over our resources to RootFS.");
         if (access("/jb", F_OK)) {
             _assert(mkdir("/jb", 0755) == 0, message);
@@ -2352,7 +2387,12 @@ void exploit(mach_port_t tfp0,
         _assert(chdir("/jb") == 0, message);
         
         needStrap = access("/.installed_unc0ver", F_OK) != 0;
-        needResources = needStrap || !verifySha1Sums(@"/usr/share/undecimus/resources.txt");
+        {   // Verify checksums of installed resources
+            NSString *currentPath = [fm currentDirectoryPath];
+            [fm changeCurrentDirectoryPath:@"/"];
+            needResources = needStrap || !verifySha1Sums(@"/usr/share/undecimus/resources.txt");
+            [fm changeCurrentDirectoryPath:currentPath];
+        }
         if (needResources) {
             amfid_payload = "/jb/amfid_payload.dylib";
         } else {
@@ -2399,16 +2439,6 @@ void exploit(mach_port_t tfp0,
     }
     
     {
-        // Deinitialize kexecute.
-        
-        LOG("Deinitializing kexecute...");
-        PROGRESS("Exploiting... (31/65)", 0, 0);
-        SETMESSAGE("Failed to deinitialize kexecute.");
-        term_kexecute();
-        LOG("Successfully deinitialized kexecute.");
-    }
-
-    {
         // Inject trust cache
         
         PROGRESS("Exploiting... (31/65)", 0, 0);
@@ -2421,6 +2451,7 @@ void exploit(mach_port_t tfp0,
                 injectTrustCache([resource UTF8String], GETOFFSET(trust_chain), GETOFFSET(amficache));
             }
         }
+        commitTrustCache(GETOFFSET(trust_chain), GETOFFSET(amficache));
     }
     
     {
@@ -2600,7 +2631,7 @@ void exploit(mach_port_t tfp0,
             _assert(cleanUpFileList != nil, message);
             for (NSString *fileName in cleanUpFileList) {
                 if (!access([fileName UTF8String], F_OK)) {
-                    _assert([[NSFileManager defaultManager] removeItemAtPath:fileName error:nil] == 1, message);
+                    _assert([fm removeItemAtPath:fileName error:nil] == 1, message);
                 }
             }
             LOG("Successfully cleaned up.");
@@ -2665,9 +2696,8 @@ void exploit(mach_port_t tfp0,
             _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/amfid_payload.tar", NULL, NULL, NULL) == 0, message);
         } else {
             if (!needResources) {
-                rv = _system([[NSString stringWithFormat:
-                               @"INSTALLED=\"$(dpkg -s science.xnu.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
-                               "dpkg --compare-versions \"${INSTALLED}\" lt \"%@\"", BUNDLEDRESOURCES] UTF8String]);
+                rv = _systemf("INSTALLED=\"$(dpkg -s science.xnu.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
+                               "dpkg --compare-versions \"${INSTALLED}\" le \"%@\"", BUNDLEDRESOURCES);
                 updatedResources = WEXITSTATUS(rv);
             }
             if (needResources || updatedResources) {
@@ -2677,12 +2707,12 @@ void exploit(mach_port_t tfp0,
         }
         _assert(chdir("/jb") == 0, message);
         bzero(link, 0x100);
-        if ((readlink("/electra", link, 0x9f) != ERR_SUCCESS) ||
+        if ((readlink("/electra", link, 0x9f) == -1) ||
             (strcmp(link, "/jb") != 0)) {
             _assert(execCommandAndWait("/bin/rm", "-rf", "/electra", NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/bin/ln", "-s", "/jb", "/electra", NULL, NULL) == 0, message);
         }
-        if ((readlink("/.bootstrapped_electra", link, 0x9f) != ERR_SUCCESS) ||
+        if ((readlink("/.bootstrapped_electra", link, 0x9f) == -1) ||
             (strcmp(link, "/.installed_unc0ver") != 0)) {
             _assert(execCommandAndWait("/bin/rm", "-rf", "/.bootstrapped_electra", NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/bin/ln", "-s", "/.installed_unc0ver", "/.bootstrapped_electra", NULL, NULL) == 0, message);

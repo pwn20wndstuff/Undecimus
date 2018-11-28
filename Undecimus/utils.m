@@ -77,5 +77,6 @@ bool verifySha1Sums(NSString *sumFile) {
         }
         LOG("Verified \"%s\"", [suminfo[1] UTF8String]);
     }
+    LOG("No errors in verifying checksums");
     return true;
 }
