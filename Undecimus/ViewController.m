@@ -2048,8 +2048,16 @@ void exploit(mach_port_t tfp0,
         PROGRESS("Exploiting... (6/65)", 0, 0);
         SETMESSAGE("Failed to initialize QiLin.");
         _assert(initQiLin(tfp0, kernel_base) == 0, message);
-        setKernelSymbol("_kernproc", GETOFFSET(kernproc) - kernel_slide);
-        setKernelSymbol("_rootvnode", GETOFFSET(rootvnode) - kernel_slide);
+        if (ISADDR(findKernelSymbol("_kernproc"))) {
+            SETOFFSET(kernproc, findKernelSymbol("_kernproc"));
+        } else {
+            setKernelSymbol("_kernproc", GETOFFSET(kernproc) - kernel_slide);
+        }
+        if (ISADDR(findKernelSymbol("_rootvnode"))) {
+            SETOFFSET(rootvnode, findKernelSymbol("_rootvnode"));
+        } else {
+            setKernelSymbol("_rootvnode", GETOFFSET(rootvnode) - kernel_slide);
+        }
         _assert(ISADDR(findKernelSymbol("_kernproc")), message);
         _assert(ISADDR(findKernelSymbol("_rootvnode")), message);
         LOG("Successfully initialized QiLin.");

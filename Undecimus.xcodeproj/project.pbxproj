@@ -335,7 +335,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n# Get path for dpkg\n. ~/.profile\nRESOURCES_VERSION=\"$(dpkg --info Undecimus/resources.deb | grep Version: | awk '{print $2}')\"\ndefaults write \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Info\" BundledResources \"${RESOURCES_VERSION}\"\n";
+			shellScript = "set -e\n# Get path for dpkg\ntouch ~/.profile\n. ~/.profile\nRESOURCES_VERSION=\"$(dpkg --info Undecimus/resources.deb | grep Version: | awk '{print $2}')\"\ndefaults write \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Info\" BundledResources \"${RESOURCES_VERSION}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
