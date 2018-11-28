@@ -1854,18 +1854,31 @@ void injectTrustCache(const char *Path, uint64_t trust_chain, uint64_t amficache
     printf("Successfully injected %s to trust cache.\n", Path);
 }
 
+bool debIsInstalled(char *packageID) {
+    int rv = _system([[NSString stringWithFormat:@"/usr/bin/dpkg -s \"%s\"", packageID] UTF8String]);
+    return !(WEXITSTATUS(rv));
+}
+
 void extractResources() {
+    if (!debIsInstalled("com.bingner.spawn")) {
+        CLEAN_FILE("/jb/spawn.deb");
+        _assert(moveFileFromAppDir("spawn.deb", "/jb/spawn.deb") == 0, message);
+        int rv = _system("/usr/bin/dpkg --force-bad-path --force-configure-any -i /jb/spawn.deb");
+        _assert(WEXITSTATUS(rv) == 0, message);
+        CLEAN_FILE("/jb/spawn.deb");
+    }
+    if (!debIsInstalled("science.xnu.injector")) {
+        CLEAN_FILE("/jb/injector.deb");
+        _assert(moveFileFromAppDir("injector.deb", "/jb/injector.deb") == 0, message);
+        int rv = _system("/usr/bin/dpkg --force-bad-path --force-configure-any -i /jb/injector.deb");
+        _assert(WEXITSTATUS(rv) == 0, message);
+        CLEAN_FILE("/jb/injector.deb");
+    }
     CLEAN_FILE("/jb/resources.deb");
-    CLEAN_FILE("/jb/injector.deb");
-    CLEAN_FILE("/jb/spawn.deb");
     _assert(moveFileFromAppDir("resources.deb", "/jb/resources.deb") == 0, message);
-    _assert(moveFileFromAppDir("injector.deb", "/jb/injector.deb") == 0, message);
-    _assert(moveFileFromAppDir("spawn.deb", "/jb/spawn.deb") == 0, message);
-    int rv = _system("/usr/bin/dpkg --force-bad-path --force-configure-any -i /jb/resources.deb /jb/injector.deb /jb/spawn.deb");
+    int rv = _system("/usr/bin/dpkg --force-bad-path --force-configure-any -i /jb/resources.deb");
     _assert(WEXITSTATUS(rv) == 0, message);
     CLEAN_FILE("/jb/resources.deb");
-    CLEAN_FILE("/jb/injector.deb");
-    CLEAN_FILE("/jb/spawn.deb");
 }
 
 // TODO: Add more detailed descriptions for the _assert calls.
