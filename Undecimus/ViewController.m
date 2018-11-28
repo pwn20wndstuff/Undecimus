@@ -1854,6 +1854,13 @@ void injectTrustCache(const char *Path, uint64_t trust_chain, uint64_t amficache
     printf("Successfully injected %s to trust cache.\n", Path);
 }
 
+void extractResources() {
+    CLEAN_FILE("/jb/resources.deb");
+    _assert(moveFileFromAppDir("resources.deb", "/jb/resources.deb") == 0, message);
+    int rv = _system("/usr/bin/dpkg --force-bad-path --force-configure-any -i /jb/resources.deb");
+    _assert(WEXITSTATUS(rv) == 0, message);
+    CLEAN_FILE("/jb/resources.deb");
+}
 // TODO: Add more detailed descriptions for the _assert calls.
 
 void exploit(mach_port_t tfp0,
@@ -2612,6 +2619,7 @@ void exploit(mach_port_t tfp0,
             _assert(rv == 512 || rv == 0, message);
             rv = _system("/usr/libexec/cydia/firmware.sh");
             _assert(WEXITSTATUS(rv) == 0, message);
+            extractResources();
             rv = _system("/usr/bin/dpkg --configure -a");
             _assert(WEXITSTATUS(rv) == 0, message);
             a = fopen("/.installed_unc0ver", "w");
@@ -2625,21 +2633,18 @@ void exploit(mach_port_t tfp0,
             _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar", NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma.tar", NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma", NULL, NULL, NULL) == 0, message);
-        }
-        _assert(chdir("/jb") == 0, message);
-        if (!needResources) {
-            rv = _system([[NSString stringWithFormat:
-                           @"INSTALLED=\"$(dpkg -s science.xnu.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
-                           "dpkg --compare-versions \"${INSTALLED}\" lt \"%@\"", BUNDLEDRESOURCES] UTF8String]);
-            updatedResources = WEXITSTATUS(rv);
-        }
-        if (needResources || updatedResources) {
-            CLEAN_FILE("/jb/resources.deb");
-            _assert(moveFileFromAppDir("resources.deb", "/jb/resources.deb") == 0, message);
-            rv = _system("/usr/bin/dpkg --force-bad-path -i /jb/resources.deb");
-            _assert(WEXITSTATUS(rv) == 0, message);
-            CLEAN_FILE("/jb/resources.deb");
-            CLEAN_FILE("/jb/amfid_payload.tar");
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/amfid_payload.tar", NULL, NULL, NULL) == 0, message);
+        } else {
+            if (!needResources) {
+                rv = _system([[NSString stringWithFormat:
+                               @"INSTALLED=\"$(dpkg -s science.xnu.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
+                               "dpkg --compare-versions \"${INSTALLED}\" lt \"%@\"", BUNDLEDRESOURCES] UTF8String]);
+                updatedResources = WEXITSTATUS(rv);
+            }
+            if (needResources || updatedResources) {
+                extractResources();
+                CLEAN_FILE("/jb/amfid_payload.tar");
+            }
         }
         _assert(chdir("/jb") == 0, message);
         bzero(link, 0x100);
