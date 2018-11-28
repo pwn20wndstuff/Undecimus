@@ -123,7 +123,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * ~~v1.1.2: Improve auto layout and code and Significantly improve Empty_List (VFS) exploit and slightly improve Multi_Path (MPTCP)~~
 * ~~v1.1.3: Fix a bug in starting jailbreakd~~
 * ~~v1.1.4: Fix a bug in finding offsets:  [Download (IPA)](https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Undecimus.ipa)~~
-* ~~v2.0.0: Initial Cydia Substrate Support (Cydia Substrate not included yet), a switch to (re)install OpenSSH, a switch to reinstall Cydia, a button to restart the SpringBoard for the non-jailbroken state and several bug fixes: Coming soon~~
+* ~~v2.0.0: Initial Cydia Substrate Support (Cydia Substrate not included yet), a switch to (re)install OpenSSH, a switch to reinstall Cydia, a button to restart the SpringBoard for the non-jailbroken state, OTA updates for the jailbreak components and several bug fixes: Coming soon~~
 * Releases are now available at https://github.com/pwn20wndstuff/Undecimus/releases
 
 ## Special Thanks
