@@ -15,6 +15,8 @@
 		212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8846216E4DF600A36DA5 /* early_kalloc.c */; };
 		212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8849216E4EBE00A36DA5 /* async_wake.c */; };
 		2139534C21763A0C00B17F8D /* rsync.tar in Resources */ = {isa = PBXBuildFile; fileRef = 2139534B21763A0B00B17F8D /* rsync.tar */; };
+		21466CDC21AEEA3A00B99B4C /* injector.deb in Resources */ = {isa = PBXBuildFile; fileRef = 21466CDB21AEEA3A00B99B4C /* injector.deb */; };
+		21466CDE21AEEC9200B99B4C /* spawn.deb in Resources */ = {isa = PBXBuildFile; fileRef = 21466CDD21AEEC9200B99B4C /* spawn.deb */; };
 		21675B63214A68B700D20E2B /* qilin.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC8C2136A0D100849420 /* qilin.o */; };
 		21675B6D214A692400D20E2B /* libjb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 21A97FCF2148103C00DC0023 /* libjb.a */; };
 		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
@@ -61,6 +63,8 @@
 		212D8849216E4EBE00A36DA5 /* async_wake.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = async_wake.c; sourceTree = "<group>"; };
 		2139534B21763A0B00B17F8D /* rsync.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = rsync.tar; sourceTree = "<group>"; };
 		21395357217CBA1000B17F8D /* MobileGestalt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileGestalt.h; sourceTree = "<group>"; };
+		21466CDB21AEEA3A00B99B4C /* injector.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = injector.deb; sourceTree = "<group>"; };
+		21466CDD21AEEC9200B99B4C /* spawn.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = spawn.deb; sourceTree = "<group>"; };
 		21A97FC42148103A00DC0023 /* kexecute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kexecute.h; sourceTree = "<group>"; };
 		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
 		21A97FC62148103B00DC0023 /* remote_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_memory.c; sourceTree = "<group>"; };
@@ -165,6 +169,8 @@
 		21C0FC6921369EB700849420 /* Undecimus */ = {
 			isa = PBXGroup;
 			children = (
+				21466CDD21AEEC9200B99B4C /* spawn.deb */,
+				21466CDB21AEEA3A00B99B4C /* injector.deb */,
 				22C546C321A8D7FA00EFC09C /* ca-certificates.deb */,
 				22C546C621A8D7FA00EFC09C /* cydia-lproj.deb */,
 				22C546C521A8D7FA00EFC09C /* cydia.deb */,
@@ -295,6 +301,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				21466CDE21AEEC9200B99B4C /* spawn.deb in Resources */,
+				21466CDC21AEEA3A00B99B4C /* injector.deb in Resources */,
 				22C546C721A8D8AC00EFC09C /* ca-certificates.deb in Resources */,
 				22C546C821A8D8AC00EFC09C /* cydia-lproj.deb in Resources */,
 				22C546C921A8D8AC00EFC09C /* cydia.deb in Resources */,

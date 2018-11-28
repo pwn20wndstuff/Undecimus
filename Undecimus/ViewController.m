@@ -1371,7 +1371,7 @@ NSArray *getCleanUpFileList() {
     // Electra
     [array addObject:@"/electra"];
     [array addObject:@"/usr/lib/libjailbreak.dylib"];
-    [array addObject:@"/var/mobile/test.txt"];
+    [array addObject:@"/private/var/mobile/test.txt"];
     [array addObject:@"/.bit_of_fun"];
     [array addObject:@"/.amfid_success"];
     [array addObject:@"/.bootstrapped_electra"];
@@ -1700,12 +1700,12 @@ NSArray *getCleanUpFileList() {
     [array addObject:@"/usr/share/dpkg"];
     [array addObject:@"/usr/share/gnupg"];
     [array addObject:@"/usr/share/tabset"];
-    [array addObject:@"/var/cache/apt"];
-    [array addObject:@"/var/db/stash"];
-    [array addObject:@"/var/lib/apt"];
-    [array addObject:@"/var/lib/dpkg"];
-    [array addObject:@"/var/stash"];
-    [array addObject:@"/var/tweak"];
+    [array addObject:@"/private/var/cache/apt"];
+    [array addObject:@"/private/var/db/stash"];
+    [array addObject:@"/private/var/lib/apt"];
+    [array addObject:@"/private/var/lib/dpkg"];
+    [array addObject:@"/private/var/stash"];
+    [array addObject:@"/private/var/tweak"];
     // Electra Beta Bootstrap
     [array addObject:@"/Applications/Anemone.app"];
     [array addObject:@"/Applications/SafeMode.app"];
@@ -1728,13 +1728,13 @@ NSArray *getCleanUpFileList() {
     [array addObject:@"/Library/MobileSubstrate"];
     // Filza
     [array addObject:@"/Applications/Filza.app"];
-    [array addObject:@"/var/root/Library/Filza"];
-    [array addObject:@"/var/root/Library/Preferences/com.tigisoftware.Filza.plist"];
-    [array addObject:@"/var/root/Library/Caches/com.tigisoftware.Filza"];
-    [array addObject:@"/var/mobile/Library/Filza/"];
-    [array addObject:@"/var/mobile/Library/Filza/.Trash"];
-    [array addObject:@"/var/mobile/Library/Filza/.Trash.metadata"];
-    [array addObject:@"/var/mobile/Library/Preferences/com.tigisoftware.Filza.plist"];
+    [array addObject:@"/private/var/root/Library/Filza"];
+    [array addObject:@"/private/var/root/Library/Preferences/com.tigisoftware.Filza.plist"];
+    [array addObject:@"/private/var/root/Library/Caches/com.tigisoftware.Filza"];
+    [array addObject:@"/private/var/mobile/Library/Filza/"];
+    [array addObject:@"/private/var/mobile/Library/Filza/.Trash"];
+    [array addObject:@"/private/var/mobile/Library/Filza/.Trash.metadata"];
+    [array addObject:@"/private/var/mobile/Library/Preferences/com.tigisoftware.Filza.plist"];
     // Liberios
     [array addObject:@"/etc/motd"];
     [array addObject:@"/.cydia_no_stash"];
@@ -1799,7 +1799,7 @@ NSArray *getCleanUpFileList() {
     [array addObject:@"/usr/libexec/MSUnrestrictProcess"];
     [array addObject:@"/usr/libexec/substrate"];
     [array addObject:@"/usr/sbin/start-stop-daemon"];
-    [array addObject:@"/var/lib"];
+    [array addObject:@"/private/var/lib"];
     [array addObject:@"/bin/bash"];
     [array addObject:@"/bin/bzip2"];
     [array addObject:@"/bin/bzip2_64"];
@@ -1856,11 +1856,18 @@ void injectTrustCache(const char *Path, uint64_t trust_chain, uint64_t amficache
 
 void extractResources() {
     CLEAN_FILE("/jb/resources.deb");
+    CLEAN_FILE("/jb/injector.deb");
+    CLEAN_FILE("/jb/spawn.deb");
     _assert(moveFileFromAppDir("resources.deb", "/jb/resources.deb") == 0, message);
-    int rv = _system("/usr/bin/dpkg --force-bad-path --force-configure-any -i /jb/resources.deb");
+    _assert(moveFileFromAppDir("injector.deb", "/jb/injector.deb") == 0, message);
+    _assert(moveFileFromAppDir("spawn.deb", "/jb/spawn.deb") == 0, message);
+    int rv = _system("/usr/bin/dpkg --force-bad-path --force-configure-any -i /jb/resources.deb /jb/injector.deb /jb/spawn.deb");
     _assert(WEXITSTATUS(rv) == 0, message);
     CLEAN_FILE("/jb/resources.deb");
+    CLEAN_FILE("/jb/injector.deb");
+    CLEAN_FILE("/jb/spawn.deb");
 }
+
 // TODO: Add more detailed descriptions for the _assert calls.
 
 void exploit(mach_port_t tfp0,
@@ -1904,6 +1911,7 @@ void exploit(mach_port_t tfp0,
     const char *amfid_payload = NULL;
     int updatedResources = 0;
     char link[0x100];
+    NSArray *resources = nil;
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
 #define kernel_slide           (kernel_base - KERNEL_SEARCH_ADDRESS)
@@ -2085,7 +2093,7 @@ void exploit(mach_port_t tfp0,
         LOG("Writing a test file to UserFS...");
         PROGRESS("Exploiting... (10/65)", 0, 0);
         SETMESSAGE("Failed to write a test file to UserFS.");
-        writeTestFile("/var/mobile/test.txt");
+        writeTestFile("/private/var/mobile/test.txt");
         LOG("Successfully wrote a test file to UserFS.");
     }
     
@@ -2387,9 +2395,9 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE("Failed to inject trust cache.");
         injectTrustCache("/jb", GETOFFSET(trust_chain), GETOFFSET(amficache));
         if (!needResources) {
-            NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
+            resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
             for (NSString *resource in resources) {
-                injectTrustCache(resource.UTF8String, GETOFFSET(trust_chain), GETOFFSET(amficache));
+                injectTrustCache([resource UTF8String], GETOFFSET(trust_chain), GETOFFSET(amficache));
             }
         }
     }
@@ -2580,13 +2588,13 @@ void exploit(mach_port_t tfp0,
             
             LOG("Disallowing SpringBoard to show non-default system apps...");
             PROGRESS("Exploiting... (42/65)", 0, 0);
-            md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
+            md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/private/var/mobile/Library/Preferences/com.apple.springboard.plist"];
             if (md == nil) {
                 md = [[NSMutableDictionary alloc] init];
             }
             if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@(NO)]) {
                 md[@"SBShowNonDefaultSystemApps"] = @(NO);
-                _assert([md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES] == 1, message);
+                _assert([md writeToFile:@"/private/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES] == 1, message);
             }
             LOG("Successfully disallowed SpringBoard to show non-default system apps.");
             
@@ -2685,12 +2693,12 @@ void exploit(mach_port_t tfp0,
         md[@"MachServices"][@"zone.sparkes.jailbreakd"][@"HostSpecialPort"] = @(15);
         md[@"RunAtLoad"] = @(YES);
         md[@"KeepAlive"] = @(YES);
-        md[@"StandardErrorPath"] = @"/var/log/jailbreakd-stderr.log";
-        md[@"StandardOutPath"] = @"/var/log/jailbreakd-stdout.log";
+        md[@"StandardErrorPath"] = @"/private/var/log/jailbreakd-stderr.log";
+        md[@"StandardOutPath"] = @"/private/var/log/jailbreakd-stdout.log";
         _assert(([md writeToFile:@"/jb/jailbreakd.plist" atomically:YES]) == 1, message);
         INIT_FILE("/jb/jailbreakd.plist", 0, 0644);
-        CLEAN_FILE("/var/log/jailbreakd-stderr.log");
-        CLEAN_FILE("/var/log/jailbreakd-stdout.log");
+        CLEAN_FILE("/private/var/log/jailbreakd-stderr.log");
+        CLEAN_FILE("/private/var/log/jailbreakd-stdout.log");
         CLEAN_FILE("/private/var/tmp/jailbreakd.pid");
         _assert(execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL) == 0, message);
         _assert(waitForFile("/private/var/tmp/jailbreakd.pid") == 0, message);
@@ -2704,9 +2712,9 @@ void exploit(mach_port_t tfp0,
         if ((access("/etc/rc.d/substrate", F_OK) != 0) && load_tweaks) {
             LOG("Patching launchd...");
             PROGRESS("Exploiting... (39/65)", 0, 0);
-            CLEAN_FILE("/var/log/pspawn_hook_launchd.log");
-            CLEAN_FILE("/var/log/pspawn_hook_xpcproxy.log");
-            CLEAN_FILE("/var/log/pspawn_hook_other.log");
+            CLEAN_FILE("/private/var/log/pspawn_hook_launchd.log");
+            CLEAN_FILE("/private/var/log/pspawn_hook_xpcproxy.log");
+            CLEAN_FILE("/private/var/log/pspawn_hook_other.log");
             _assert(platformizeProcAtAddr(getProcStructForPid(1)) == 0, message);
             _assert(inject_library(1, "/usr/lib/pspawn_hook.dylib") == 0, message);
             LOG("Successfully patched launchd.");
@@ -2746,14 +2754,14 @@ void exploit(mach_port_t tfp0,
         LOG("Allowing SpringBoard to show non-default system apps...");
         PROGRESS("Exploiting... (50/65)", 0, 0);
         SETMESSAGE("Failed to allow SpringBoard to show non-default system apps.");
-        md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
+        md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/private/var/mobile/Library/Preferences/com.apple.springboard.plist"];
         _assert(md != nil, message);
         for (int i = 0; !(i >= 5 || [md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)]); i++) {
             _assert(kill(findPidOfProcess("cfprefsd"), SIGSTOP) == 0, message);
             md[@"SBShowNonDefaultSystemApps"] = @(YES);
-            _assert([md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES] == 1, message);
+            _assert([md writeToFile:@"/private/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES] == 1, message);
             _assert(kill(findPidOfProcess("cfprefsd"), SIGKILL) == 0, message);
-            md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
+            md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/private/var/mobile/Library/Preferences/com.apple.springboard.plist"];
             _assert(md != nil, message);
         }
         _assert([md[@"SBShowNonDefaultSystemApps"] isEqual:@(YES)], message);
@@ -2790,14 +2798,14 @@ void exploit(mach_port_t tfp0,
             LOG("Disabling Auto Updates...");
             PROGRESS("Exploiting... (54/65)", 0, 0);
             SETMESSAGE("Failed to disable auto updates.");
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/private/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/private/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/private/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/private/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/private/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/private/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/private/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/private/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL) == 0, message);
             LOG("Successfully disabled Auto Updates.");
         } else {
             // Enable Auto Updates.
@@ -2805,18 +2813,18 @@ void exploit(mach_port_t tfp0,
             LOG("Enabling Auto Updates...");
             PROGRESS("Exploiting... (55/65)", 0, 0);
             SETMESSAGE("Failed to enable auto updates.");
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/private/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/mkdir", "-p", "/private/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/private/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/private/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/mkdir", "-p", "/private/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/private/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/private/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/mkdir", "-p", "/private/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/private/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/private/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/mkdir", "-p", "/private/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/private/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == 0, message);
         }
     }
     
