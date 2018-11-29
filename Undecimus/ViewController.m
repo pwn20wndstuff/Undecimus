@@ -2727,38 +2727,41 @@ void exploit(mach_port_t tfp0,
     
     {
         // Spawn jailbreakd.
-        
-        LOG("Spawning jailbreakd...");
-        PROGRESS("Exploiting... (38/65)", 0, 0);
-        SETMESSAGE("Failed to spawn jailbreakd.");
-        md = [[NSMutableDictionary alloc] init];
-        md[@"Label"] = @"jailbreakd";
-        md[@"Program"] = @"/usr/libexec/jailbreakd";
-        md[@"EnvironmentVariables"] = [[NSMutableDictionary alloc] init];
-        md[@"EnvironmentVariables"][@"KernelBase"] = ADDRSTRING(kernel_base);
-        md[@"EnvironmentVariables"][@"KernProcAddr"] = ADDRSTRING(rk64(GETOFFSET(kernproc)));
-        md[@"EnvironmentVariables"][@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref) - kernel_slide);
-        md[@"EnvironmentVariables"][@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
-        md[@"EnvironmentVariables"][@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
-        md[@"EnvironmentVariables"][@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
-        md[@"EnvironmentVariables"][@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
-        md[@"EnvironmentVariables"][@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
-        md[@"UserName"] = @"root";
-        md[@"MachServices"] = [[NSMutableDictionary alloc] init];
-        md[@"MachServices"][@"zone.sparkes.jailbreakd"] = [[NSMutableDictionary alloc] init];
-        md[@"MachServices"][@"zone.sparkes.jailbreakd"][@"HostSpecialPort"] = @(15);
-        md[@"RunAtLoad"] = @(YES);
-        md[@"KeepAlive"] = @(YES);
-        md[@"StandardErrorPath"] = @"/private/var/log/jailbreakd-stderr.log";
-        md[@"StandardOutPath"] = @"/private/var/log/jailbreakd-stdout.log";
-        _assert(([md writeToFile:@"/jb/jailbreakd.plist" atomically:YES]) == 1, message);
-        INIT_FILE("/jb/jailbreakd.plist", 0, 0644);
-        CLEAN_FILE("/private/var/log/jailbreakd-stderr.log");
-        CLEAN_FILE("/private/var/log/jailbreakd-stdout.log");
-        CLEAN_FILE("/private/var/tmp/jailbreakd.pid");
-        _assert(execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL) == 0, message);
-        _assert(waitForFile("/private/var/tmp/jailbreakd.pid") == 0, message);
-        LOG("Successfully spawned jailbreakd.");
+        if (access("/usr/libexec/jailbreakd", F_OK) == ERR_SUCCESS) {
+            LOG("Spawning jailbreakd...");
+            PROGRESS("Exploiting... (38/65)", 0, 0);
+            SETMESSAGE("Failed to spawn jailbreakd.");
+            md = [[NSMutableDictionary alloc] init];
+            md[@"Label"] = @"jailbreakd";
+            md[@"Program"] = @"/usr/libexec/jailbreakd";
+            md[@"EnvironmentVariables"] = [[NSMutableDictionary alloc] init];
+            md[@"EnvironmentVariables"][@"KernelBase"] = ADDRSTRING(kernel_base);
+            md[@"EnvironmentVariables"][@"KernProcAddr"] = ADDRSTRING(rk64(GETOFFSET(kernproc)));
+            md[@"EnvironmentVariables"][@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref) - kernel_slide);
+            md[@"EnvironmentVariables"][@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
+            md[@"EnvironmentVariables"][@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
+            md[@"EnvironmentVariables"][@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
+            md[@"EnvironmentVariables"][@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
+            md[@"EnvironmentVariables"][@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
+            md[@"UserName"] = @"root";
+            md[@"MachServices"] = [[NSMutableDictionary alloc] init];
+            md[@"MachServices"][@"zone.sparkes.jailbreakd"] = [[NSMutableDictionary alloc] init];
+            md[@"MachServices"][@"zone.sparkes.jailbreakd"][@"HostSpecialPort"] = @(15);
+            md[@"RunAtLoad"] = @(YES);
+            md[@"KeepAlive"] = @(YES);
+            md[@"StandardErrorPath"] = @"/private/var/log/jailbreakd-stderr.log";
+            md[@"StandardOutPath"] = @"/private/var/log/jailbreakd-stdout.log";
+            _assert(([md writeToFile:@"/jb/jailbreakd.plist" atomically:YES]) == 1, message);
+            INIT_FILE("/jb/jailbreakd.plist", 0, 0644);
+            CLEAN_FILE("/private/var/log/jailbreakd-stderr.log");
+            CLEAN_FILE("/private/var/log/jailbreakd-stdout.log");
+            CLEAN_FILE("/private/var/tmp/jailbreakd.pid");
+            _assert(execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL) == 0, message);
+            _assert(waitForFile("/private/var/tmp/jailbreakd.pid") == 0, message);
+            LOG("Successfully spawned jailbreakd.");
+        } else {
+            CLEAN_FILE("/jb/jailbreakd.plist");
+        }
     }
     
     {
