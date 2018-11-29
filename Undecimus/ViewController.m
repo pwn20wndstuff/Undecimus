@@ -1885,6 +1885,13 @@ bool debIsInstalled(char *packageID) {
     return isInstalled;
 }
 
+bool debIsConfigured(char *packageID) {
+    int rv = _systemf("/usr/bin/dpkg -s \"%s\" | grep Status: | grep \"install ok installed\" > /dev/null", packageID);
+    bool isConfigured = !WEXITSTATUS(rv);
+    LOG("Deb: \"%s\" is%s configured", packageID, isConfigured?"":" not");
+    return isConfigured;
+}
+
 void installDeb(char *debName) {
     NSString *destPathStr = [NSString stringWithFormat:@"/jb/%s", debName];
     const char *destPath = [destPathStr UTF8String];
@@ -1899,7 +1906,7 @@ void extractResources() {
     if (!debIsInstalled("com.bingner.spawn")) {
         installDeb("spawn.deb");
     }
-    if (!debIsInstalled("science.xnu.injector")) {
+    if (!debIsConfigured("science.xnu.injector")) {
         installDeb("injector.deb");
     }
     installDeb("resources.deb");
