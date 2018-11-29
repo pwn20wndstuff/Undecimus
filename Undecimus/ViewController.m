@@ -1278,7 +1278,7 @@ int _systemf(const char *cmd, ...) {
     va_start(ap, cmd);
     NSString *cmdstr = [[NSString alloc] initWithFormat:@(cmd) arguments:ap];
     va_end(ap);
-    LOG("calling system: \"%s\"", [cmdstr UTF8String]);
+    LOG("Calling system: \"%s\"", [cmdstr UTF8String]);
     return _system([cmdstr UTF8String]);
 }
 
@@ -1843,6 +1843,7 @@ NSArray *getCleanUpFileList() {
 void injectTrustCache(const char *Path, uint64_t trust_chain, uint64_t amficache) {
     LOG("Injecting %s to trust cache...\n", Path);
     _assert(grab_hashes(Path, kread, amficache, rk64(trust_chain)) == 0, message);
+    LOG("Successfully injected %s to trust cache.\n", Path);
 }
 
 void commitTrustCache(uint64_t trust_chain, uint64_t amficache) {
@@ -1853,7 +1854,7 @@ void commitTrustCache(uint64_t trust_chain, uint64_t amficache) {
     uint64_t old_trust = kernel_trust;
     uint64_t old_kernel_trust_length = kernel_trust_length;
     
-    if (original_trust_chain==0) {
+    if (original_trust_chain == 0) {
         original_trust_chain = rk64(trust_chain);
     }
     
@@ -1948,8 +1949,6 @@ void exploit(mach_port_t tfp0,
     int updatedResources = 0;
     char link[0x100];
     NSArray *resources = nil;
-    NSFileManager *fm = [NSFileManager defaultManager];
-    
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
 #define kernel_slide           (kernel_base - KERNEL_SEARCH_ADDRESS)
@@ -2387,12 +2386,11 @@ void exploit(mach_port_t tfp0,
         _assert(chdir("/jb") == 0, message);
         
         needStrap = access("/.installed_unc0ver", F_OK) != 0;
-        {   // Verify checksums of installed resources
-            NSString *currentPath = [fm currentDirectoryPath];
-            [fm changeCurrentDirectoryPath:@"/"];
-            needResources = needStrap || !verifySha1Sums(@"/usr/share/undecimus/resources.txt");
-            [fm changeCurrentDirectoryPath:currentPath];
-        }
+        
+        _assert(chdir("/") == 0, message);
+        needResources = needStrap || !verifySha1Sums(@"/usr/share/undecimus/resources.txt");
+        _assert(chdir("/jb") == 0, message);
+        
         if (needResources) {
             amfid_payload = "/jb/amfid_payload.dylib";
         } else {
@@ -2631,7 +2629,7 @@ void exploit(mach_port_t tfp0,
             _assert(cleanUpFileList != nil, message);
             for (NSString *fileName in cleanUpFileList) {
                 if (!access([fileName UTF8String], F_OK)) {
-                    _assert([fm removeItemAtPath:fileName error:nil] == 1, message);
+                    _assert([[NSFileManager defaultManager] removeItemAtPath:fileName error:nil] == 1, message);
                 }
             }
             LOG("Successfully cleaned up.");
@@ -2697,8 +2695,8 @@ void exploit(mach_port_t tfp0,
         } else {
             if (!needResources) {
                 rv = _systemf("INSTALLED=\"$(dpkg -s science.xnu.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
-                               "dpkg --compare-versions \"${INSTALLED}\" le \"%@\"", BUNDLEDRESOURCES);
-                updatedResources = WEXITSTATUS(rv);
+                               "dpkg --compare-versions \"${INSTALLED}\" lt \"%@\"", BUNDLEDRESOURCES);
+                updatedResources = !WEXITSTATUS(rv);
             }
             if (needResources || updatedResources) {
                 extractResources();
