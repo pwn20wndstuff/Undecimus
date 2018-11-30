@@ -38,8 +38,12 @@
         [[NSUserDefaults standardUserDefaults] setObject:@"0xbd34a880be0b53f3" forKey:@K_BOOT_NONCE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    if ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT] == MULTI_PATH && !hasMPTCP()) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@K_EXPLOIT];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPLOIT] == nil) {
-        [[NSUserDefaults standardUserDefaults] setInteger:selectExploit() forKey:@K_EXPLOIT];
+        [[NSUserDefaults standardUserDefaults] setInteger:selectJailbreakExploit() forKey:@K_EXPLOIT];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_DISABLE_AUTO_UPDATES] == nil) {

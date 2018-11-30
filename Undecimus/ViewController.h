@@ -52,12 +52,21 @@ enum {
     EMPTY_LIST = 0,
     MULTI_PATH = 1,
     ASYNC_WAKE = 2,
+    DEJA_XNU = 3,
+    NECP = 4,
 };
 
 double uptime(void);
 int isJailbroken(void);
 int isSupportedByExploit(int exploit);
-int selectExploit(void);
+int hasMPTCP(void);
+int selectJailbreakExploit(void);
+int isSupportedByJailbreak(void);
+int selectRestartExploit(void);
+int isSupportedByRestart(void);
+int selectRespringExploit(void);
+int isSupportedByRespring(void);
+
 void setPreference(NSString *key, id object);
 NSString *hexFromInt(NSInteger val);
 

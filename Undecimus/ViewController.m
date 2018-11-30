@@ -22,27 +22,34 @@
 #include <mach-o/dyld.h>
 #include <sys/mman.h>
 #include <sys/param.h>
+#include <sys/syscall.h>
+#include <common.h>
+#include <iokit.h>
+#include <QiLin.h>
+#include <libjb.h>
+#include <NSTask.h>
+#include <MobileGestalt.h>
+#include <netdb.h>
 #import "ViewController.h"
-#include "common.h"
 #include "offsets.h"
 #include "empty_list_sploit.h"
 #include "kmem.h"
 #include "patchfinder64.h"
 #include "kexecute.h"
 #include "kutils.h"
-#include "libjb.h"
 #include "remote_memory.h"
 #include "remote_call.h"
-#include "QiLin.h"
-#include "iokit.h"
 #include "unlocknvram.h"
 #include "SettingsTableViewController.h"
 #include "untar.h"
 #include "multi_path_sploit.h"
 #include "async_wake.h"
-#include "MobileGestalt.h"
-#include "NSTask.h"
 #include "utils.h"
+
+@interface NSUserDefaults ()
+- (id)objectForKey:(id)arg1 inDomain:(id)arg2;
+- (void)setObject:(id)arg1 forKey:(id)arg2 inDomain:(id)arg3;
+@end
 
 @interface ViewController ()
 
@@ -167,6 +174,80 @@ const char *async_wake_supported_versions[] = {
     "4570.20.55~10",
     "4570.20.62~9",
     "4570.20.62~4",
+    NULL
+};
+
+const char *deja_xnu_supported_versions[] = {
+    "4397.0.0.2.4~1",
+    "4481.0.0.2.1~1",
+    "4532.0.0.0.1~30",
+    "4556.0.0.2.5~1",
+    "4570.1.24.2.3~1",
+    "4570.2.3~8",
+    "4570.2.5~84",
+    "4570.2.5~167",
+    "4570.20.55~10",
+    "4570.20.62~9",
+    "4570.20.62~4",
+    "4570.30.79~22",
+    "4570.30.85~18",
+    "4570.32.1~2",
+    "4570.32.1~1",
+    "4570.40.6~8",
+    "4570.40.9~7",
+    "4570.40.9~1",
+    "4570.50.243~9",
+    "4570.50.257~6",
+    "4570.50.279~9",
+    "4570.50.294~5",
+    "4570.52.2~3",
+    "4570.52.2~8",
+    "4570.60.10.0.1~16",
+    "4570.60.16~9",
+    "4570.60.19~25",
+    "4570.60.21~7",
+    "4570.60.21~3",
+    "4570.70.14~16",
+    "4570.70.19~13",
+    "4570.70.24~9",
+    "4570.70.24~3",
+    NULL
+};
+
+const char *necp_supported_versions[] = {
+    "4397.0.0.2.4~1",
+    "4481.0.0.2.1~1",
+    "4532.0.0.0.1~30",
+    "4556.0.0.2.5~1",
+    "4570.1.24.2.3~1",
+    "4570.2.3~8",
+    "4570.2.5~84",
+    "4570.2.5~167",
+    "4570.20.55~10",
+    "4570.20.62~9",
+    "4570.20.62~4",
+    "4570.30.79~22",
+    "4570.30.85~18",
+    "4570.32.1~2",
+    "4570.32.1~1",
+    "4570.40.6~8",
+    "4570.40.9~7",
+    "4570.40.9~1",
+    "4570.50.243~9",
+    "4570.50.257~6",
+    "4570.50.279~9",
+    "4570.50.294~5",
+    "4570.52.2~3",
+    "4570.52.2~8",
+    "4570.60.10.0.1~16",
+    "4570.60.16~9",
+    "4570.60.19~25",
+    "4570.60.21~7",
+    "4570.60.21~3",
+    "4570.70.14~16",
+    "4570.70.19~13",
+    "4570.70.24~9",
+    "4570.70.24~3",
     NULL
 };
 
@@ -1058,6 +1139,19 @@ int mptcp_die() {
     return 0;
 }
 
+// https://blogs.projectmoon.pw/2018/11/30/A-Late-Kernel-Bug-Type-Confusion-in-NECP/NECPTypeConfusion.c
+
+int necp_die() {
+    int necp_fd = syscall(SYS_necp_open, 0);
+    if (necp_fd < 0) {
+        printf("[-] Create NECP client failed!\n");
+        return 0;
+    }
+    printf("[*] NECP client = %d\n", necp_fd);
+    syscall(SYS_necp_session_action, necp_fd, 1, 0x1234, 0x5678);
+    return 0;
+}
+
 #define IO_ACTIVE 0x80000000
 
 #define IKOT_HOST 3
@@ -1214,6 +1308,14 @@ int isSupportedByExploit(int exploit) {
             versions = async_wake_supported_versions;
             break;
         }
+        case DEJA_XNU: {
+            versions = deja_xnu_supported_versions;
+            break;
+        }
+        case NECP: {
+            versions = necp_supported_versions;
+            break;
+        }
         default:
             break;
     }
@@ -1230,10 +1332,55 @@ int isSupportedByExploit(int exploit) {
 }
 
 int hasMPTCP() {
-    return [[SettingsTableViewController _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"Entitlements"][@"com.apple.developer.networking.multipath"] boolValue];
+    int rv = 0;
+    
+    int sock = socket(AF_MULTIPATH, SOCK_STREAM, 0);
+    if (sock < 0) {
+        printf("socket failed\n");
+        perror("");
+        return rv;
+    }
+    printf("got socket: %d\n", sock);
+    
+    struct sockaddr* sockaddr_src = malloc(sizeof(struct sockaddr));
+    memset(sockaddr_src, 'A', sizeof(struct sockaddr));
+    sockaddr_src->sa_len = sizeof(struct sockaddr);
+    sockaddr_src->sa_family = AF_INET6;
+    
+    struct sockaddr* sockaddr_dst = malloc(sizeof(struct sockaddr));
+    memset(sockaddr_dst, 'A', sizeof(struct sockaddr));
+    sockaddr_dst->sa_len = sizeof(struct sockaddr);
+    sockaddr_dst->sa_family = AF_INET;
+    
+    sa_endpoints_t eps = {0};
+    eps.sae_srcif = 0;
+    eps.sae_srcaddr = sockaddr_src;
+    eps.sae_srcaddrlen = sizeof(struct sockaddr);
+    eps.sae_dstaddr = sockaddr_dst;
+    eps.sae_dstaddrlen = sizeof(struct sockaddr);
+    
+    int err = connectx(
+                       sock,
+                       &eps,
+                       SAE_ASSOCID_ANY,
+                       0,
+                       NULL,
+                       0,
+                       NULL,
+                       NULL);
+    
+    rv = (errno != 1);
+    
+    printf("err: %d\n", err);
+    
+    free(sockaddr_src);
+    free(sockaddr_dst);
+    close(sock);
+    
+    return rv;
 }
 
-int selectExploit() {;
+int selectJailbreakExploit() {;
     if (isSupportedByExploit(ASYNC_WAKE) == 1) {
         return ASYNC_WAKE;
     } else if (isSupportedByExploit(MULTI_PATH) == 1 && hasMPTCP() == 1) {
@@ -1245,8 +1392,38 @@ int selectExploit() {;
     }
 }
 
-int isSupported() {
-    return (!(selectExploit() == -1));
+int isSupportedByJailbreak() {
+    return (!(selectJailbreakExploit() == -1));
+}
+
+int selectRestartExploit() {;
+    if (isSupportedByExploit(NECP) == 1) {
+        return NECP;
+    } else if (isSupportedByExploit(ASYNC_WAKE) == 1) {
+        return ASYNC_WAKE;
+    } else if (isSupportedByExploit(MULTI_PATH) == 1 && hasMPTCP() == 1) {
+        return MULTI_PATH;
+    } else if (isSupportedByExploit(EMPTY_LIST) == 1) {
+        return EMPTY_LIST;
+    } else {
+        return -1;
+    }
+}
+
+int isSupportedByRestart() {
+    return (!(selectRestartExploit() == -1));
+}
+
+int selectRespringExploit() {;
+    if (isSupportedByExploit(DEJA_XNU) == 1 && !(isJailbroken() == 1)) {
+        return DEJA_XNU;
+    } else {
+        return -1;
+    }
+}
+
+int isSupportedByRespring() {
+    return (!(selectRespringExploit() == -1));
 }
 
 int waitForFile(const char *filename) {
@@ -2722,6 +2899,11 @@ void exploit(mach_port_t tfp0,
             _assert(execCommandAndWait("/bin/rm", "-rf", "/.bootstrapped_electra", NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/bin/ln", "-s", "/.installed_unc0ver", "/.bootstrapped_electra", NULL, NULL) == 0, message);
         }
+        if ((readlink("/electra/libjailbreak.dylib", link, 0x9f) == -1) ||
+            (strcmp(link, "/usr/lib/libjailbreak.dylib") != 0)) {
+            _assert(execCommandAndWait("/bin/rm", "-rf", "/electra/libjailbreak.dylib", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/bin/ln", "-s", "/usr/lib/libjailbreak.dylib", "/electra/libjailbreak.dylib", NULL, NULL) == 0, message);
+        }
         LOG("Successfully extracted bootstrap.");
     }
     
@@ -3043,7 +3225,7 @@ void exploit(mach_port_t tfp0,
         if (isJailbroken() == 1) {
             PROGRESS("Jailbroken", 0, 1);
             return;
-        } else if (!(isSupported() == 1)) {
+        } else if (!(isSupportedByJailbreak() == 1)) {
             PROGRESS("Unsupported", 0, 1);
             return;
         }
@@ -3051,16 +3233,16 @@ void exploit(mach_port_t tfp0,
         LOG("Initializing kernel exploit...");
         PROGRESS("Exploiting... (1/65)", 0, 0);
         switch ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]) {
-            case 0: {
+            case EMPTY_LIST: {
                 vfs_sploit();
                 break;
             }
             
-            case 1: {
+            case MULTI_PATH: {
                 mptcp_go();
                 break;
             }
-            case 2: {
+            case ASYNC_WAKE: {
                 async_wake_go();
                 break;
             }
@@ -3099,7 +3281,7 @@ void exploit(mach_port_t tfp0,
     sharedController = self;
     if (isJailbroken() == 1) {
         PROGRESS("Jailbroken", 0, 1);
-    } else if (!(isSupported() == 1)) {
+    } else if (!(isSupportedByJailbreak() == 1)) {
         PROGRESS("Unsupported", 0, 1);
     }
 }

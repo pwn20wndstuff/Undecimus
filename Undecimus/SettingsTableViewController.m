@@ -9,7 +9,7 @@
 #include <sys/utsname.h>
 #include <sys/sysctl.h>
 #import "SettingsTableViewController.h"
-#include "common.h"
+#include <common.h>
 #include "hideventsystem.h"
 #include "remote_call.h"
 #include "ViewController.h"
@@ -236,7 +236,7 @@
     [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]];
     [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]];
     [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(EMPTY_LIST) forSegmentAtIndex:0];
-    [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(MULTI_PATH) forSegmentAtIndex:1];
+    [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(MULTI_PATH) && hasMPTCP() forSegmentAtIndex:1];
     [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(ASYNC_WAKE) forSegmentAtIndex:2];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
     [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)[[SettingsTableViewController _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400]];
@@ -249,7 +249,8 @@
     [self.installCydiaSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_CYDIA]];
     [self.ECIDLabel setPlaceholder:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
     [self.ReloadSystemDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RELOAD_SYSTEM_DAEMONS]];
-    [self.RestartSpringBoardButton setEnabled:!(isJailbroken() == 1)];
+    [self.RestartSpringBoardButton setEnabled:isSupportedByRespring()];
+    [self.restartButton setEnabled:isSupportedByRestart()];
     [self.tableView reloadData];
 }
 
@@ -303,14 +304,30 @@
 extern void iosurface_die(void);
 extern int vfs_die(void);
 extern int mptcp_die(void);
+extern int necp_die(void);
 
 - (IBAction)tappedOnRestart:(id)sender {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         NOTICE("The device will be restarted.", 1, 0);
-        while (1) {
-            vfs_die();
-            iosurface_die();
-            mptcp_die();
+        switch (selectRestartExploit()) {
+            case EMPTY_LIST: {
+                vfs_die();
+                break;
+            }
+            case ASYNC_WAKE: {
+                iosurface_die();
+                break;
+            }
+            case MULTI_PATH: {
+                mptcp_die();
+                break;
+            }
+            case NECP: {
+                necp_die();
+                break;
+            }
+            default:
+                break;
         }
     });
 }
@@ -420,7 +437,7 @@ extern int mptcp_die(void);
 }
 
 - (IBAction)tappedOnAutomaticallySelectExploit:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setInteger:selectExploit() forKey:@K_EXPLOIT];
+    [[NSUserDefaults standardUserDefaults] setInteger:selectJailbreakExploit() forKey:@K_EXPLOIT];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
@@ -435,9 +452,16 @@ extern int mptcp_die(void);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         SETMESSAGE("Failed to restart SpringBoard.");
         NOTICE("SpringBoard will be restarted.", 1, 0);
-        mach_port_t bb_tp = hid_event_queue_exploit();
-        _assert(MACH_PORT_VALID(bb_tp), message);
-        _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0)) == 0, message);
+        switch (selectRespringExploit()) {
+            case DEJA_XNU: {
+                mach_port_t bb_tp = hid_event_queue_exploit();
+                _assert(MACH_PORT_VALID(bb_tp), message);
+                _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0)) == 0, message);
+                break;
+            }
+            default:
+                break;
+        }
     });
 }
 

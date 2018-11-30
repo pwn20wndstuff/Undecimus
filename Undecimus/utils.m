@@ -9,7 +9,7 @@
 #import <mach/error.h>
 #import <Foundation/Foundation.h>
 #import <CommonCrypto/CommonDigest.h>
-#import "common.h"
+#include <common.h>
 
 int sha1_to_str(const unsigned char *hash, int hashlen, char *buf, size_t buflen)
 {
