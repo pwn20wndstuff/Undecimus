@@ -2498,7 +2498,8 @@ void exploit(mach_port_t tfp0,
         v_mount = rk64(rootfs_vnode + GETOFFSET(v_mount));
         wk32(v_mount + GETOFFSET(mnt_flag), v_flag);
         rv = snapshot_list("/");
-        if (rv == 0) {
+        needStrap = access("/.installed_unc0ver", F_OK) != 0;
+        if (rv == 0 && needStrap) {
             // Borrow entitlements from fsck_apfs.
             
             LOG("Borrowing entitlements from fsck_apfs...");
@@ -2560,8 +2561,6 @@ void exploit(mach_port_t tfp0,
             _assert(chown("/jb", 0, 0) == 0, message);
         }
         _assert(chdir("/jb") == 0, message);
-        
-        needStrap = access("/.installed_unc0ver", F_OK) != 0;
         
         _assert(chdir("/") == 0, message);
         needResources = needStrap || !verifySha1Sums(@"/usr/share/undecimus/resources.txt");
