@@ -76,7 +76,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 
 ## Getting support
 * Use the built-in diagnostics tool
-* Get technical support on the r/Jailbreak Discord Server
+* Get technical support on the [r/Jailbreak Discord Server](https://discord.gg/jb) by asking for help in the [#unc0ver channel](https://discord.gg/xwBRaWh) or opening a ticket with the Geniuses™️.
 * Tweet [@pwn20wnd](https://twitter.com/Pwn20wnd)
 
 ## Best practices
