@@ -2452,12 +2452,11 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE("Failed to remount RootFS.");
         rv = snapshot_list("/");
         if (rv == -1) {
-            if (!access("/private/var/MobileSoftwareUpdate/mnt1", F_OK)) {
-                _assert(rmdir("/private/var/MobileSoftwareUpdate/mnt1") == 0, message);
+            if (access("/private/var/MobileSoftwareUpdate/mnt1", F_OK)) {
+                _assert(mkdir("/private/var/MobileSoftwareUpdate/mnt1", 0755) == 0, message);
+                _assert(access("/private/var/MobileSoftwareUpdate/mnt1", F_OK) == 0, message);
+                _assert(chown("/private/var/MobileSoftwareUpdate/mnt1", 0, 0) == 0, message);
             }
-            _assert(mkdir("/private/var/MobileSoftwareUpdate/mnt1", 0755) == 0, message);
-            _assert(access("/private/var/MobileSoftwareUpdate/mnt1", F_OK) == 0, message);
-            _assert(chown("/private/var/MobileSoftwareUpdate/mnt1", 0, 0) == 0, message);
             _assert(spawnAndShaiHulud("/sbin/mount_apfs", "/dev/disk0s1s1", "/private/var/MobileSoftwareUpdate/mnt1", NULL, NULL, NULL) == 0, message);
             
             // Borrow entitlements from fsck_apfs.
@@ -2758,10 +2757,9 @@ void exploit(mach_port_t tfp0,
             NOTICE("Will restore RootFS. This may take a while. Don't exit the app and don't let the device lock.", 1, 1);
             SETMESSAGE("Unable to mount or rename system snapshot.  Delete OTA file from Settings - Storage if present");
             if (kCFCoreFoundationVersionNumber < 1452.23) {
-                if (!access("/private/var/MobileSoftwareUpdate/mnt1", F_OK)) {
-                    _assert(rmdir("/private/var/MobileSoftwareUpdate/mnt1") == 0, message);
+                if (access("/private/var/MobileSoftwareUpdate/mnt1", F_OK)) {
+                    _assert(mkdir("/private/var/MobileSoftwareUpdate/mnt1", 0755) == 0, message);
                 }
-                _assert(mkdir("/private/var/MobileSoftwareUpdate/mnt1", 0755) == 0, message);
             }
             if (snapshot_check("/", "electra-prejailbreak") == 1) {
                 if (kCFCoreFoundationVersionNumber < 1452.23) {
