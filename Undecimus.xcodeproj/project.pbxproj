@@ -19,6 +19,7 @@
 		2170BD3721B193650059BD10 /* qilin.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC8C2136A0D100849420 /* qilin.o */; };
 		2170BD3821B193670059BD10 /* libjb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 21A97FCF2148103C00DC0023 /* libjb.a */; };
 		2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */; };
+		2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
 		21A97FD12148103C00DC0023 /* kexecute.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC82148103B00DC0023 /* kexecute.m */; };
 		21A97FD32148103C00DC0023 /* kutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCC2148103B00DC0023 /* kutils.c */; };
@@ -29,7 +30,6 @@
 		21C0FC7A21369EB800849420 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC7921369EB800849420 /* main.m */; };
 		21C0FC8721369EE900849420 /* kmem.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8021369EE900849420 /* kmem.c */; };
 		21C0FC8A21369EE900849420 /* offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8621369EE900849420 /* offsets.m */; };
-		21C0FC912136A46500849420 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C130DE214BC2880021AA9D /* unlocknvram.c */; };
 		21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130EA214C03690021AA9D /* CreditsTableViewController.m */; };
 		21C130FB214C1EBA0021AA9D /* untar.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C130FA214C1EBA0021AA9D /* untar.c */; };
@@ -130,10 +130,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */,
-				21C0FC912136A46500849420 /* SpringBoardServices.framework in Frameworks */,
 				2170BD3721B193650059BD10 /* qilin.o in Frameworks */,
+				2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */,
 				2170BD3821B193670059BD10 /* libjb.a in Frameworks */,
+				2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,6 +173,7 @@
 		2170BD3621B192B90059BD10 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
 				21466CDD21AEEC9200B99B4C /* spawn.deb */,
 				21466CDB21AEEA3A00B99B4C /* injector.deb */,
 				22C546C321A8D7FA00EFC09C /* ca-certificates.deb */,
@@ -191,32 +192,9 @@
 			path = resources;
 			sourceTree = "<group>";
 		};
-		21C0FC5E21369EB700849420 = {
+		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
-				21C0FC6921369EB700849420 /* Undecimus */,
-				21C0FC6821369EB700849420 /* Products */,
-				21675B62214A68B700D20E2B /* Frameworks */,
-			);
-			sourceTree = "<group>";
-			wrapsLines = 0;
-		};
-		21C0FC6821369EB700849420 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				21C0FC6721369EB700849420 /* Undecimus.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		21C0FC6921369EB700849420 /* Undecimus */ = {
-			isa = PBXGroup;
-			children = (
-				2170BD3621B192B90059BD10 /* resources */,
-				2170BD3521B192A30059BD10 /* libs */,
-				2170BD3421B192750059BD10 /* include */,
-				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
-				21C0FC902136A46500849420 /* SpringBoardServices.framework */,
 				2101395321A09BB700F9C5F2 /* hideventsystem.c */,
 				2101395421A09BB700F9C5F2 /* hideventsystem.h */,
 				21C130FC214C1EC00021AA9D /* untar.h */,
@@ -253,15 +231,53 @@
 				21C0FC6E21369EB700849420 /* ViewController.m */,
 				21C130E4214BDDE20021AA9D /* SettingsTableViewController.h */,
 				21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */,
-				8D592A67218E47F60035D2BC /* Main.storyboard */,
-				21C0FC7321369EB800849420 /* Assets.xcassets */,
-				21C0FC7521369EB800849420 /* LaunchScreen.storyboard */,
-				21C0FC7821369EB800849420 /* Info.plist */,
 				21C0FC7921369EB800849420 /* main.m */,
 				21C130E9214C03690021AA9D /* CreditsTableViewController.h */,
 				21C130EA214C03690021AA9D /* CreditsTableViewController.m */,
 				22C546AC21A8A91A00EFC09C /* utils.h */,
 				22C546AA21A8A8FD00EFC09C /* utils.m */,
+			);
+			path = source;
+			sourceTree = "<group>";
+		};
+		2170BDCC21B330210059BD10 /* frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				21C0FC902136A46500849420 /* SpringBoardServices.framework */,
+			);
+			path = frameworks;
+			sourceTree = "<group>";
+		};
+		21C0FC5E21369EB700849420 = {
+			isa = PBXGroup;
+			children = (
+				21C0FC6921369EB700849420 /* Undecimus */,
+				21C0FC6821369EB700849420 /* Products */,
+				21675B62214A68B700D20E2B /* Frameworks */,
+			);
+			sourceTree = "<group>";
+			wrapsLines = 0;
+		};
+		21C0FC6821369EB700849420 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				21C0FC6721369EB700849420 /* Undecimus.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		21C0FC6921369EB700849420 /* Undecimus */ = {
+			isa = PBXGroup;
+			children = (
+				2170BDCC21B330210059BD10 /* frameworks */,
+				2170BDCB21B32FF10059BD10 /* source */,
+				2170BD3621B192B90059BD10 /* resources */,
+				2170BD3521B192A30059BD10 /* libs */,
+				2170BD3421B192750059BD10 /* include */,
+				8D592A67218E47F60035D2BC /* Main.storyboard */,
+				21C0FC7321369EB800849420 /* Assets.xcassets */,
+				21C0FC7521369EB800849420 /* LaunchScreen.storyboard */,
+				21C0FC7821369EB800849420 /* Info.plist */,
 			);
 			path = Undecimus;
 			sourceTree = "<group>";
@@ -522,7 +538,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/multi_path.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/resources/multi_path.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
@@ -530,6 +546,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus",
+					"$(PROJECT_DIR)/Undecimus/frameworks",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -561,7 +578,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/multi_path.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/resources/multi_path.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
@@ -569,6 +586,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus",
+					"$(PROJECT_DIR)/Undecimus/frameworks",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
