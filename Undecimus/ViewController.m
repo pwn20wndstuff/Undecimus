@@ -2451,78 +2451,42 @@ void exploit(mach_port_t tfp0,
         PROGRESS("Exploiting... (21/65)", 0, 0);
         SETMESSAGE("Failed to remount RootFS.");
         rv = snapshot_list("/");
-        switch (rv) {
-            case -1: {
-                if (!access("/private/var/tmp/rootfsmnt", F_OK)) {
-                    _assert(rmdir("/private/var/tmp/rootfsmnt") == 0, message);
-                }
-                _assert(mkdir("/private/var/tmp/rootfsmnt", 0755) == 0, message);
-                _assert(access("/private/var/tmp/rootfsmnt", F_OK) == 0, message);
-                _assert(chown("/private/var/tmp/rootfsmnt", 0, 0) == 0, message);
-                _assert(spawnAndShaiHulud("/sbin/mount_apfs", "/dev/disk0s1s1", "/private/var/tmp/rootfsmnt", NULL, NULL, NULL) == 0, message);
-                
-                // Borrow entitlements from fsck_apfs.
-                
-                LOG("Borrowing entitlements from fsck_apfs...");
-                PROGRESS("Exploiting... (22/65)", 0, 0);
-                borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
-                LOG("Successfully borrowed entitlements from fsck_apfs.");
-                
-                // We now have fs_snapshot_rename.
-                
-                // Rename system snapshot.
-                
-                LOG("Renaming system snapshot...");
-                PROGRESS("Exploiting... (23/65)", 0, 0);
-                SETMESSAGE("Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
-                rv = snapshot_list("/private/var/tmp/rootfsmnt");
-                _assert(!(rv == -1), message);
-                if (snapshot_check("/private/var/tmp/rootfsmnt", "orig-fs") == 1) {
-                    _assert(snapshot_rename("/private/var/tmp/rootfsmnt", systemSnapshot(), "electra-prejailbreak") == 0, message);
-                } else {
-                    _assert(snapshot_rename("/private/var/tmp/rootfsmnt", systemSnapshot(), "orig-fs") == 0, message);
-                }
-                
-                LOG("Successfully renamed system snapshot.");
-                
-                // Reboot.
-                
-                LOG("Rebooting...");
-                PROGRESS("Exploiting... (24/65)", 0, 0);
-                NOTICE("The system snapshot has been successfully renamed. The device will be rebooted now.", 1, 0);
-                _assert(reboot(0x400) == 0, message);
-                LOG("Successfully rebooted.");
-                break;
+        if (rv == -1) {
+            if (!access("/private/var/MobileSoftwareUpdate/mnt1", F_OK)) {
+                _assert(rmdir("/private/var/MobileSoftwareUpdate/mnt1") == 0, message);
             }
-            case 0: {
-                // Borrow entitlements from fsck_apfs.
-                
-                LOG("Borrowing entitlements from fsck_apfs...");
-                PROGRESS("Exploiting... (25/65)", 0, 0);
-                borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
-                LOG("Successfully borrowed entitlements from fsck_apfs.");
-                
-                // We now have fs_snapshot_rename.
-                
-                // Create system snapshot.
-                
-                LOG("Create system snapshot...");
-                PROGRESS("Exploiting... (26/65)", 0, 0);
-                SETMESSAGE("Unable to create system snapshot.  Delete OTA file from Settings - Storage if present");
-                _assert(snapshot_create("/", "orig-fs") == 0, message);
-                _assert(snapshot_check("/", "orig-fs") == 1, message);
-                
-                // Borrow entitlements from sysdiagnose.
-                
-                LOG("Borrowing entitlements from sysdiagnose...");
-                PROGRESS("Exploiting... (27/65)", 0, 0);
-                borrowEntitlementsFromDonor("/usr/bin/sysdiagnose", "--help");
-                LOG("Successfully borrowed entitlements from sysdiagnose.");
-                
-                // We now have Task_for_pid.
-            }
-            default:
-                break;
+            _assert(mkdir("/private/var/MobileSoftwareUpdate/mnt1", 0755) == 0, message);
+            _assert(access("/private/var/MobileSoftwareUpdate/mnt1", F_OK) == 0, message);
+            _assert(chown("/private/var/MobileSoftwareUpdate/mnt1", 0, 0) == 0, message);
+            _assert(spawnAndShaiHulud("/sbin/mount_apfs", "/dev/disk0s1s1", "/private/var/MobileSoftwareUpdate/mnt1", NULL, NULL, NULL) == 0, message);
+            
+            // Borrow entitlements from fsck_apfs.
+            
+            LOG("Borrowing entitlements from fsck_apfs...");
+            PROGRESS("Exploiting... (22/65)", 0, 0);
+            borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
+            LOG("Successfully borrowed entitlements from fsck_apfs.");
+            
+            // We now have fs_snapshot_rename.
+            
+            // Rename system snapshot.
+            
+            LOG("Renaming system snapshot...");
+            PROGRESS("Exploiting... (23/65)", 0, 0);
+            SETMESSAGE("Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present");
+            rv = snapshot_list("/private/var/MobileSoftwareUpdate/mnt1");
+            _assert(!(rv == -1), message);
+            _assert(snapshot_rename("/private/var/MobileSoftwareUpdate/mnt1", systemSnapshot(), "orig-fs") == 0, message);
+            
+            LOG("Successfully renamed system snapshot.");
+            
+            // Reboot.
+            
+            LOG("Rebooting...");
+            PROGRESS("Exploiting... (24/65)", 0, 0);
+            NOTICE("The system snapshot has been successfully renamed. The device will be rebooted now.", 1, 0);
+            _assert(reboot(0x400) == 0, message);
+            LOG("Successfully rebooted.");
         }
         rootfs_vnode = rk64(GETOFFSET(rootvnode));
         v_mount = rk64(rootfs_vnode + GETOFFSET(v_mount));
@@ -2533,6 +2497,34 @@ void exploit(mach_port_t tfp0,
         _assert(execCommandAndWait("/sbin/mount", "-u", "/", NULL, NULL, NULL) == 0, message);
         v_mount = rk64(rootfs_vnode + GETOFFSET(v_mount));
         wk32(v_mount + GETOFFSET(mnt_flag), v_flag);
+        rv = snapshot_list("/");
+        if (rv == 0) {
+            // Borrow entitlements from fsck_apfs.
+            
+            LOG("Borrowing entitlements from fsck_apfs...");
+            PROGRESS("Exploiting... (25/65)", 0, 0);
+            borrowEntitlementsFromDonor("/sbin/fsck_apfs", NULL);
+            LOG("Successfully borrowed entitlements from fsck_apfs.");
+            
+            // We now have fs_snapshot_rename.
+            
+            // Create system snapshot.
+            
+            LOG("Create system snapshot...");
+            PROGRESS("Exploiting... (26/65)", 0, 0);
+            SETMESSAGE("Unable to create system snapshot.  Delete OTA file from Settings - Storage if present");
+            _assert(snapshot_create("/", "orig-fs") == 0, message);
+            _assert(snapshot_check("/", "orig-fs") == 1, message);
+            
+            // Borrow entitlements from sysdiagnose.
+            
+            LOG("Borrowing entitlements from sysdiagnose...");
+            PROGRESS("Exploiting... (27/65)", 0, 0);
+            borrowEntitlementsFromDonor("/usr/bin/sysdiagnose", "--help");
+            LOG("Successfully borrowed entitlements from sysdiagnose.");
+            
+            // We now have Task_for_pid.
+        }
         LOG("Successfully remounted RootFS.");
     }
     
@@ -2767,28 +2759,28 @@ void exploit(mach_port_t tfp0,
             NOTICE("Will restore RootFS. This may take a while. Don't exit the app and don't let the device lock.", 1, 1);
             SETMESSAGE("Unable to mount or rename system snapshot.  Delete OTA file from Settings - Storage if present");
             if (kCFCoreFoundationVersionNumber < 1452.23) {
-                if (!access("/private/var/tmp/rootfsmnt", F_OK)) {
-                    _assert(rmdir("/private/var/tmp/rootfsmnt") == 0, message);
+                if (!access("/private/var/MobileSoftwareUpdate/mnt1", F_OK)) {
+                    _assert(rmdir("/private/var/MobileSoftwareUpdate/mnt1") == 0, message);
                 }
-                _assert(mkdir("/private/var/tmp/rootfsmnt", 0755) == 0, message);
+                _assert(mkdir("/private/var/MobileSoftwareUpdate/mnt1", 0755) == 0, message);
             }
             if (snapshot_check("/", "electra-prejailbreak") == 1) {
                 if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    _assert(snapshot_mount("/", "electra-prejailbreak", "/private/var/tmp/rootfsmnt") == 0, message);
+                    _assert(snapshot_mount("/", "electra-prejailbreak", "/private/var/MobileSoftwareUpdate/mnt1") == 0, message);
                 } else {
                     _assert(snapshot_rename("/", "electra-prejailbreak", systemSnapshot()) == 0, message);
                 }
             } else if (snapshot_check("/", "orig-fs") == 1) {
                 if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    _assert(snapshot_mount("/", "orig-fs", "/private/var/tmp/rootfsmnt") == 0, message);
+                    _assert(snapshot_mount("/", "orig-fs", "/private/var/MobileSoftwareUpdate/mnt1") == 0, message);
                 } else {
                     _assert(snapshot_rename("/", "orig-fs", systemSnapshot()) == 0, message);
                 }
             } else {
-                _assert(snapshot_mount("/", systemSnapshot(), "/private/var/tmp/rootfsmnt") == 0, message);
+                _assert(snapshot_mount("/", systemSnapshot(), "/private/var/MobileSoftwareUpdate/mnt1") == 0, message);
             }
             if (kCFCoreFoundationVersionNumber < 1452.23) {
-                _assert(waitForFile("/private/var/tmp/rootfsmnt/sbin/launchd") == 0, message);
+                _assert(waitForFile("/private/var/MobileSoftwareUpdate/mnt1/sbin/launchd") == 0, message);
                 
                 CLEAN_FILE("/jb/rsync.tar");
                 CLEAN_FILE("/jb/rsync");
@@ -2800,7 +2792,7 @@ void exploit(mach_port_t tfp0,
                 _assert(fclose(a) == 0, message);
                 INIT_FILE("/jb/rsync", 0, 0755);
                 
-                _assert(easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/private/var/tmp/rootfsmnt/.", @"/"]) == 0, message);
+                _assert(easyPosixSpawn([NSURL fileURLWithPath:@"/jb/rsync"], @[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/private/var/MobileSoftwareUpdate/mnt1/.", @"/"]) == 0, message);
             }
             LOG("Successfully renamed system snapshot back.");
             
