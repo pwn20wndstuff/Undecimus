@@ -1271,7 +1271,7 @@ int snapshot_revert(const char *vol, const char *name) {
 
 int snapshot_mount(const char *vol, const char *name, const char *dir) {
     int rv = 0;
-    rv = spawnAndShaihuludAndWait("/sbin/mount_apfs", "-s", (char *)name, (char *)vol, (char *)dir, NULL);
+    rv = execCommandAndWait("/sbin/mount_apfs", "-s", (char *)name, (char *)vol, (char *)dir, NULL);
     return rv;
 }
 
@@ -2019,6 +2019,14 @@ NSArray *getCleanUpFileList() {
 
 void injectTrustCache(const char *Path, uint64_t trust_chain, uint64_t amficache) {
     LOG("Injecting %s to trust cache...\n", Path);
+    if (access(Path, F_OK)) {
+        LOG("File %s doesn't exist, ignoring...", Path);
+        return;
+    }
+    if (is_symlink(Path) == 1) {
+        LOG("File %s is a symlink, ignoring...", Path);
+        return;
+    }
     _assert(grab_hashes(Path, kread, amficache, rk64(trust_chain)) == 0, message);
     LOG("Successfully injected %s to trust cache.\n", Path);
 }
@@ -2457,7 +2465,7 @@ void exploit(mach_port_t tfp0,
                 _assert(access("/private/var/MobileSoftwareUpdate/mnt1", F_OK) == 0, message);
                 _assert(chown("/private/var/MobileSoftwareUpdate/mnt1", 0, 0) == 0, message);
             }
-            _assert(spawnAndShaiHulud("/sbin/mount_apfs", "/dev/disk0s1s1", "/private/var/MobileSoftwareUpdate/mnt1", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/sbin/mount_apfs", "/dev/disk0s1s1", "/private/var/MobileSoftwareUpdate/mnt1", NULL, NULL, NULL) == 0, message);
             
             // Borrow entitlements from fsck_apfs.
             
