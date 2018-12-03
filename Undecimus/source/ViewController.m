@@ -3329,6 +3329,7 @@ void exploit(mach_port_t tfp0,
     return self;
 }
 
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     @synchronized(sharedController) {
         if (sharedController == nil) {
