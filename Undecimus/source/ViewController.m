@@ -2022,8 +2022,8 @@ NSArray *getCleanUpFileList() {
     return array;
 }
 
-void injectTrustCache(const char *Path, uint64_t trust_chain, uint64_t amficache) {
-    LOG("Injecting %s to trust cache...\n", Path);
+void addTrustCache(const char *Path, uint64_t trust_chain, uint64_t amficache) {
+    LOG("Adding %s to trust chain...\n", Path);
     if (access(Path, F_OK)) {
         LOG("File %s doesn't exist, ignoring...", Path);
         return;
@@ -2033,10 +2033,10 @@ void injectTrustCache(const char *Path, uint64_t trust_chain, uint64_t amficache
         return;
     }
     _assert(grab_hashes(Path, kread, amficache, rk64(trust_chain)) == 0, message);
-    LOG("Successfully injected %s to trust cache.\n", Path);
+    LOG("Successfully added %s to trust chain.\n", Path);
 }
 
-void commitTrustCache(uint64_t trust_chain, uint64_t amficache) {
+void commitTrustChain(uint64_t trust_chain, uint64_t amficache) {
     static uint64_t kernel_trust = 0;
     static size_t kernel_trust_length = 0;
     static uint64_t original_trust_chain = 0;
@@ -2065,7 +2065,7 @@ void commitTrustCache(uint64_t trust_chain, uint64_t amficache) {
         old_trust = 0;
         old_kernel_trust_length = 0;
     }
-    LOG("Successfully committed %d hashes to trust cache.", numhash);
+    LOG("Successfully committed %d hashes to trust chain.", numhash);
 }
 
 bool debIsInstalled(char *packageID) {
@@ -2629,14 +2629,14 @@ void exploit(mach_port_t tfp0,
         PROGRESS("Exploiting... (31/65)", 0, 0);
         printf("trust_chain = 0x%llx\n", GETOFFSET(trust_chain));
         SETMESSAGE("Failed to inject trust cache.");
-        injectTrustCache("/jb", GETOFFSET(trust_chain), GETOFFSET(amficache));
+        addTrustCache("/jb", GETOFFSET(trust_chain), GETOFFSET(amficache));
         if (!needResources) {
             resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
             for (NSString *resource in resources) {
-                injectTrustCache([resource UTF8String], GETOFFSET(trust_chain), GETOFFSET(amficache));
+                addTrustCache([resource UTF8String], GETOFFSET(trust_chain), GETOFFSET(amficache));
             }
         }
-        commitTrustCache(GETOFFSET(trust_chain), GETOFFSET(amficache));
+        commitTrustChain(GETOFFSET(trust_chain), GETOFFSET(amficache));
     }
     
     {
