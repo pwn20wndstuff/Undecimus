@@ -2987,11 +2987,11 @@ void exploit(mach_port_t tfp0,
             PROGRESS("Exploiting... (49/64)", 0, 0);
             SETMESSAGE("Failed to disable app revokes.");
             blockDomainWithName("ocsp.apple.com");
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/private/var/Keychains/ocspcache.sqlite3", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/usr/bin/unlink", "/private/var/Keychains/ocspcache.sqlite3", NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/private/var/Keychains/ocspcache.sqlite3", NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/private/var/Keychains/ocspcache.sqlite3-shm", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/usr/bin/unlink", "/private/var/Keychains/ocspcache.sqlite3-shm", NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/private/var/Keychains/ocspcache.sqlite3-shm", NULL, NULL) == 0, message);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/private/var/Keychains/ocspcache.sqlite3-wal", NULL, NULL, NULL) == 0, message);
+            _assert(execCommandAndWait("/usr/bin/unlink", "/private/var/Keychains/ocspcache.sqlite3-wal", NULL, NULL, NULL) == 0, message);
             _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/private/var/Keychains/ocspcache.sqlite3-wal", NULL, NULL) == 0, message);
             LOG("Successfully disabled app revokes.");
         }
