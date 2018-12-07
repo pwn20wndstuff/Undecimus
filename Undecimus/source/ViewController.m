@@ -2087,7 +2087,9 @@ void installDeb(char *debName) {
     const char *destPath = [destPathStr UTF8String];
     CLEAN_FILE(destPath);
     _assert(moveFileFromAppDir(debName, (char *)destPath) == 0, message);
-    int rv = _systemf("/usr/bin/dpkg --force-bad-path --force-configure-any -i \"%s\"", destPath);
+    int rv = _systemf("/usr/bin/dpkg --force-bad-path --force-configure-any -i \"%s\" > /jb/dpkg.log 2>&1", destPath);
+    LOG("DPKG: %@", [NSString stringWithContentsOfFile:@"/jb/dpkg.log"]);
+    CLEAN_FILE("/jb/dpkg.log");
     _assert(WEXITSTATUS(rv) == 0, message);
     CLEAN_FILE(destPath);
 }
