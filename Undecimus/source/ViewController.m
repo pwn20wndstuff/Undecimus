@@ -3251,23 +3251,28 @@ void exploit(mach_port_t tfp0,
         // Initialize kernel exploit.
         LOG("Initializing kernel exploit...");
         PROGRESS("Exploiting... (1/64)", 0, 0);
-        switch ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]) {
-            case EMPTY_LIST: {
-                vfs_sploit();
-                break;
-            }
-            
-            case MULTI_PATH: {
-                mptcp_go();
-                break;
-            }
-            case ASYNC_WAKE: {
-                async_wake_go();
-                break;
-            }
-                
-            default: {
-                break;
+        mach_port_t persisted_port = try_restore_port();
+        if (MACH_PORT_VALID(persisted_port)) {
+            prepare_for_rw_with_fake_tfp0(persisted_port);
+        } else {
+            switch ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]) {
+                case EMPTY_LIST: {
+                    vfs_sploit();
+                    break;
+                }
+                    
+                case MULTI_PATH: {
+                    mptcp_go();
+                    break;
+                }
+                case ASYNC_WAKE: {
+                    async_wake_go();
+                    break;
+                }
+                    
+                default: {
+                    break;
+                }
             }
         }
         // Validate TFP0.
