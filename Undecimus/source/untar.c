@@ -36,6 +36,8 @@
 /* This is for mkdir(); this may need to be changed for some platforms. */
 #include <sys/stat.h>  /* For mkdir() */
 
+#include <common.h>
+
 /* Parse an octal number, ignoring leading and trailing nonsense. */
 static int
 parseoct(const char *p, size_t n)
@@ -97,7 +99,7 @@ create_dir(char *pathname, int mode, int owner, int group)
 		}
 	}
 	if (r != 0)
-		fprintf(stderr, "Could not create directory %s\n", pathname);
+		LOG("Could not create directory %s\n", pathname);
 	else if (owner >= 0 && group >= 0)
 		chown(pathname, owner, group);
 }
@@ -150,58 +152,58 @@ untar(FILE *a, const char *path)
 	size_t bytes_read;
 	int filesize;
 
-	printf("Extracting from %s\n", path);
+	LOG("Extracting from %s\n", path);
 	for (;;) {
 		bytes_read = fread(buff, 1, 512, a);
 		if (bytes_read < 512) {
-			fprintf(stderr,
+			LOG(
 			    "Short read on %s: expected 512, got %zd\n",
 			    path, bytes_read);
 			return;
 		}
 		if (is_end_of_archive(buff)) {
-			printf("End of %s\n", path);
+			LOG("End of %s\n", path);
 			return;
 		}
 		if (!verify_checksum(buff)) {
-			fprintf(stderr, "Checksum failure\n");
+			LOG("Checksum failure\n");
 			return;
 		}
 		filesize = parseoct(buff + 124, 12);
 		switch (buff[156]) {
 		case '1':
-			printf(" Ignoring hardlink %s\n", buff);
+			LOG(" Ignoring hardlink %s\n", buff);
 			break;
 		case '2':
-			printf(" Extracting symlink %s -> %s\n", buff, buff + 157);
+			LOG(" Extracting symlink %s -> %s\n", buff, buff + 157);
 			if (unlink(buff) && errno != ENOENT) {
 				break;
 			}
 			symlink(buff + 157, buff);
 			break;
 		case '3':
-			printf(" Ignoring character device %s\n", buff);
+			LOG(" Ignoring character device %s\n", buff);
 				break;
 		case '4':
-			printf(" Ignoring block device %s\n", buff);
+			LOG(" Ignoring block device %s\n", buff);
 			break;
 		case '5':
-			printf(" Extracting dir %s\n", buff);
+			LOG(" Extracting dir %s\n", buff);
 			create_dir(buff, parseoct(buff + 100, 8), parseoct(buff + 108, 8), parseoct(buff + 116, 8));
 			filesize = 0;
 			break;
 		case '6':
-			printf(" Ignoring FIFO %s\n", buff);
+			LOG(" Ignoring FIFO %s\n", buff);
 			break;
 		default:
-			printf(" Extracting file %s\n", buff);
+			LOG(" Extracting file %s\n", buff);
 			f = create_file(buff, parseoct(buff + 100, 8), parseoct(buff + 108, 8), parseoct(buff + 116, 8));
 			break;
 		}
 		while (filesize > 0) {
 			bytes_read = fread(buff, 1, 512, a);
 			if (bytes_read < 512) {
-				fprintf(stderr,
+				LOG(
 				    "Short read on %s: Expected 512, got %zd\n",
 				    path, bytes_read);
 				return;
@@ -212,7 +214,7 @@ untar(FILE *a, const char *path)
 				if (write(f, buff, bytes_read)
 				    != bytes_read)
 				{
-					fprintf(stderr, "Failed write\n");
+					LOG("Failed write\n");
 					close(f);
 					f = -1;
 				}
@@ -236,7 +238,7 @@ main(int argc, char **argv)
 	for ( ;*argv != NULL; ++argv) {
 		a = fopen(*argv, "r");
 		if (a == NULL)
-			fprintf(stderr, "Unable to open %s\n", *argv);
+			LOG("Unable to open %s\n", *argv);
 		else {
 			untar(a, *argv);
 			fclose(a);

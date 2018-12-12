@@ -10,21 +10,21 @@
 
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
-static const char *message = NULL;
+static NSString *message = nil;
 #define SETMESSAGE(msg) (message = msg)
 
 #define _assert(test, message) do \
     if (!(test)) { \
         fprintf(stderr, "__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
-        if (message) \
-            showAlert(@"Error", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s\nDescription: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__, message], 1, 0); \
+        if (message != nil) \
+            showAlert(@"Error", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s\nDescription: %@", errno, #test, __FILENAME__, __LINE__, __FUNCTION__, message], 1, 0); \
         else \
             showAlert(@"Error", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s", errno, #test, __FILENAME__, __LINE__, __FUNCTION__], 1, 0); \
         exit(1); \
     } \
 while (false)
 
-#define NOTICE(msg, wait, destructive) showAlert(@"Notice", @(msg), wait, destructive)
+#define NOTICE(msg, wait, destructive) showAlert(@"Notice", msg, wait, destructive)
 
 static inline void showAlert(NSString *title, NSString *message, Boolean wait, Boolean destructive) {
     dispatch_semaphore_t semaphore;

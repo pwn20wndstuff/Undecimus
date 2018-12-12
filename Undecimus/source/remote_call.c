@@ -16,6 +16,7 @@ find_blr_x19_gadget(void);
 #include "remote_call.h"
 #include "remote_memory.h"
 
+#include <common.h>
 
 // no support for non-register args
 #define MAX_REMOTE_ARGS 8
@@ -28,7 +29,7 @@ _pthread_set_self(
 uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
 {
   if (n_params > MAX_REMOTE_ARGS || n_params < 0){
-    printf("unsupported number of arguments to remote function (%d)\n", n_params);
+    LOG("unsupported number of arguments to remote function (%d)\n", n_params);
     return 0;
   }
   
@@ -67,17 +68,17 @@ uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
   
   err = thread_create_running(task_port, ARM_THREAD_STATE64, (thread_state_t)&thread_state, thread_stateCnt, &thread_port);
   if (err != KERN_SUCCESS){
-    printf("error creating thread in child: %s\n", mach_error_string(err));
+    LOG("error creating thread in child: %s\n", mach_error_string(err));
     return 0;
   }
-  printf("new thread running in child: %x\n", thread_port);
+  LOG("new thread running in child: %x\n", thread_port);
   
   // wait for it to hit the loop:
   while(1){
     // monitor the thread until we see it's in the infinite loop indicating it's done:
     err = thread_get_state(thread_port, ARM_THREAD_STATE64, (thread_state_t)&thread_state, &thread_stateCnt);
     if (err != KERN_SUCCESS){
-      printf("error getting thread state: %s\n", mach_error_string(err));
+      LOG("error getting thread state: %s\n", mach_error_string(err));
       return 0;
     }
     
@@ -92,14 +93,14 @@ uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
   
   err = thread_suspend(thread_port);
   if (err != KERN_SUCCESS){
-    printf("unable to suspend target thread\n");
+    LOG("unable to suspend target thread\n");
     return 0;
   }
   
   /*
    err = thread_abort(thread_port);
    if (err != KERN_SUCCESS){
-   printf("unable to get thread out of any traps\n");
+   LOG("unable to get thread out of any traps\n");
    return 0;
    }
    */
@@ -144,7 +145,7 @@ uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
       case ARG_OUT_BUFFER:
       {
         uint64_t remote_buffer = remote_alloc(task_port, arg->length);
-        printf("allocated a remote out buffer: %llx\n", remote_buffer);
+        LOG("allocated a remote out buffer: %llx\n", remote_buffer);
         remote_buffers[i] = remote_buffer;
         thread_state.__x[i] = remote_buffer;
         break;
@@ -152,7 +153,7 @@ uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
         
       default:
       {
-        printf("invalid argument type!\n");
+        LOG("invalid argument type!\n");
       }
     }
   }
@@ -161,14 +162,14 @@ uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
   
   err = thread_set_state(thread_port, ARM_THREAD_STATE64, (thread_state_t)&thread_state, thread_stateCnt);
   if (err != KERN_SUCCESS){
-    printf("error setting new thread state: %s\n", mach_error_string(err));
+    LOG("error setting new thread state: %s\n", mach_error_string(err));
     return 0;
   }
-  printf("thread state updated in target: %x\n", thread_port);
+  LOG("thread state updated in target: %x\n", thread_port);
   
   err = thread_resume(thread_port);
   if (err != KERN_SUCCESS){
-    printf("unable to resume target thread\n");
+    LOG("unable to resume target thread\n");
     return 0;
   }
   
@@ -176,7 +177,7 @@ uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
     // monitor the thread until we see it's in the infinite loop indicating it's done:
     err = thread_get_state(thread_port, ARM_THREAD_STATE64, (thread_state_t)&thread_state, &thread_stateCnt);
     if (err != KERN_SUCCESS){
-      printf("error getting thread state: %s\n", mach_error_string(err));
+      LOG("error getting thread state: %s\n", mach_error_string(err));
       return 0;
     }
     
@@ -191,7 +192,7 @@ uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
   // deallocate the remote thread
   err = thread_terminate(thread_port);
   if (err != KERN_SUCCESS){
-    printf("failed to terminate thread\n");
+    LOG("failed to terminate thread\n");
     return 0;
   }
   mach_port_deallocate(mach_task_self(), thread_port);
@@ -221,7 +222,7 @@ uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
   
   uint64_t ret_val = thread_state.__x[0];
   
-  printf("remote function call return value: %llx\n", ret_val);
+  LOG("remote function call return value: %llx\n", ret_val);
   
   // deallocate the stack in the target:
   remote_free(task_port, remote_stack_base, remote_stack_size);
@@ -233,7 +234,7 @@ uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
 uint64_t thread_call_remote(mach_port_t thread_port, void* fptr, int n_params, ...)
 {
     if (n_params > MAX_REMOTE_ARGS || n_params < 0){
-        printf("unsupported number of arguments to remote function (%d)\n", n_params);
+        LOG("unsupported number of arguments to remote function (%d)\n", n_params);
         return 0;
     }
     
@@ -242,7 +243,7 @@ uint64_t thread_call_remote(mach_port_t thread_port, void* fptr, int n_params, .
     // suspend the target thread we'll hijack:
     err = thread_suspend(thread_port);
     if (err != KERN_SUCCESS) {
-        printf("failed to suspend the thread we're trying to hijack: %s\n", mach_error_string(err));
+        LOG("failed to suspend the thread we're trying to hijack: %s\n", mach_error_string(err));
         return 0;
     }
     //#endif
@@ -250,18 +251,18 @@ uint64_t thread_call_remote(mach_port_t thread_port, void* fptr, int n_params, .
     // save its suspended state so we can restore it:
     _STRUCT_ARM_THREAD_STATE64 saved_thread_state = {0};
     mach_msg_type_number_t saved_thread_stateCnt = sizeof(saved_thread_state)/4;
-    // printf("saved thread state count before: %d\n", saved_thread_stateCnt);
+    // LOG("saved thread state count before: %d\n", saved_thread_stateCnt);
     err = thread_get_state(thread_port, ARM_THREAD_STATE64, (thread_state_t)&saved_thread_state, &saved_thread_stateCnt);
     if (err != KERN_SUCCESS){
-        printf("error getting thread state to save: %s\n", mach_error_string(err));
+        LOG("error getting thread state to save: %s\n", mach_error_string(err));
         return 0;
     }
     
     // dump the state:
-    //printf("pc: 0x%016llx\n", saved_thread_state.__pc);
-    //printf("sp: 0x%016llx\n", saved_thread_state.__sp);
+    //LOG("pc: 0x%016llx\n", saved_thread_state.__pc);
+    //LOG("sp: 0x%016llx\n", saved_thread_state.__sp);
     //for (int i = 0; i < 29; i++) {
-    //  printf("x%d: 0x%016llx\n", i, saved_thread_state.__x[i]);
+    //  LOG("x%d: 0x%016llx\n", i, saved_thread_state.__x[i]);
     //}
     
     // build the state we need for the arbitrary call:
@@ -291,7 +292,7 @@ uint64_t thread_call_remote(mach_port_t thread_port, void* fptr, int n_params, .
         switch(arg->type){
             case ARG_LITERAL:
             {
-                //printf("setting arg %d to literal %llx\n", i, arg->value);
+                //LOG("setting arg %d to literal %llx\n", i, arg->value);
                 fcall_thread_state.__x[i] = arg->value;
                 break;
             }
@@ -308,7 +309,7 @@ uint64_t thread_call_remote(mach_port_t thread_port, void* fptr, int n_params, .
             case ARG_OUT_BUFFER:
             {
                 uint64_t remote_buffer = remote_alloc(task_port, arg->length);
-                printf("allocated a remote out buffer: %llx\n", remote_buffer);
+                LOG("allocated a remote out buffer: %llx\n", remote_buffer);
                 remote_buffers[i] = remote_buffer;
                 thread_state.__x[i] = remote_buffer;
                 break;
@@ -316,37 +317,37 @@ uint64_t thread_call_remote(mach_port_t thread_port, void* fptr, int n_params, .
 #endif
             default:
             {
-                printf("invalid argument type!\n");
+                LOG("invalid argument type!\n");
             }
         }
     }
     
     va_end(ap);
 #if 0
-    printf("fcall thread state:\n");
-    printf("pc: 0x%016llx\n", fcall_thread_state.__pc);
-    printf("sp: 0x%016llx\n", fcall_thread_state.__sp);
-    printf("fp: 0x%016llx\n", fcall_thread_state.__fp);
-    printf("lr: 0x%016llx\n", fcall_thread_state.__lr);
+    LOG("fcall thread state:\n");
+    LOG("pc: 0x%016llx\n", fcall_thread_state.__pc);
+    LOG("sp: 0x%016llx\n", fcall_thread_state.__sp);
+    LOG("fp: 0x%016llx\n", fcall_thread_state.__fp);
+    LOG("lr: 0x%016llx\n", fcall_thread_state.__lr);
     for (int i = 0; i < 29; i++) {
-        printf("x%d: 0x%016llx\n", i, fcall_thread_state.__x[i]);
+        LOG("x%d: 0x%016llx\n", i, fcall_thread_state.__x[i]);
     }
 #endif
     
     // set the thread state:
     err = thread_set_state(thread_port, ARM_THREAD_STATE64, (thread_state_t)&fcall_thread_state, fcall_thread_stateCnt);
     if (err != KERN_SUCCESS){
-        printf("error setting new thread state for hijacked thread: %s\n", mach_error_string(err));
+        LOG("error setting new thread state for hijacked thread: %s\n", mach_error_string(err));
         return 0;
     }
     
     // let the thread continue running with the new state:
     err = thread_resume(thread_port);
     if (err != KERN_SUCCESS) {
-        printf("error resuming hijacked thread: %s\n", mach_error_string(err));
+        LOG("error resuming hijacked thread: %s\n", mach_error_string(err));
         return 0;
     }
-    //printf("resumed thread\n");
+    //LOG("resumed thread\n");
     
     // monitor for the function call ending and the thread hitting the infinite loop:
     // we're reusing fcall state so we can also get the return value via x0
@@ -355,7 +356,7 @@ uint64_t thread_call_remote(mach_port_t thread_port, void* fptr, int n_params, .
         thread_suspend(thread_port);
         err = thread_get_state(thread_port, ARM_THREAD_STATE64, (thread_state_t)&fcall_thread_state, &fcall_thread_stateCnt);
         if (err != KERN_SUCCESS){
-            printf("error getting thread state: %s\n", mach_error_string(err));
+            LOG("error getting thread state: %s\n", mach_error_string(err));
             return 0;
         }
         
@@ -363,10 +364,10 @@ uint64_t thread_call_remote(mach_port_t thread_port, void* fptr, int n_params, .
         
         if (fcall_thread_state.__pc == find_blr_x19_gadget()){
             // thread has returned from the target function
-            //printf("hit looper!\n");
+            //LOG("hit looper!\n");
             break;
         }
-        //printf("got bad pc: 0x%llx\n", fcall_thread_state.__pc);
+        //LOG("got bad pc: 0x%llx\n", fcall_thread_state.__pc);
     }
     
     uint64_t ret_val = fcall_thread_state.__x[0];

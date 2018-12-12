@@ -237,11 +237,11 @@
     [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(MULTI_PATH) && hasMPTCP() forSegmentAtIndex:1];
     [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(ASYNC_WAKE) forSegmentAtIndex:2];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
-    [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)[[SettingsTableViewController _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400]];
+    [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[SettingsTableViewController _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, NSLocalizedString(@"Days", nil)]];
     [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE]];
     [self.ExportKernelTaskPortSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT]];
     [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]];
-    [self.UptimeLabel setPlaceholder:[NSString stringWithFormat:@"%d Days", (int)uptime() / 86400]];
+    [self.UptimeLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)uptime() / 86400, NSLocalizedString(@"Days", nil)]];
     [self.IncreaseMemoryLimitSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INCREASE_MEMORY_LIMIT]];
     [self.installSSHSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_OPENSSH]];
     [self.installCydiaSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_CYDIA]];
@@ -274,8 +274,8 @@
         [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@ADDR, val] forKey:@K_BOOT_NONCE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     } else {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Invalid Entry" message:@"The boot nonce entered could not be parsed" preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Invalid Entry", nil) message:NSLocalizedString(@"The boot nonce entered could not be parsed", nil) preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *OK = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleDefault handler:nil];
         [alertController addAction:OK];
         [self presentViewController:alertController animated:YES completion:nil];
     }
@@ -306,7 +306,7 @@ extern int necp_die(void);
 
 - (IBAction)tappedOnRestart:(id)sender {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-        NOTICE("The device will be restarted.", 1, 0);
+        NOTICE(NSLocalizedString(@"The device will be restarted.", nil), true, false);
         switch (selectRestartExploit()) {
             case EMPTY_LIST: {
                 vfs_die();
@@ -361,22 +361,22 @@ extern int necp_die(void);
 }
 
 - (IBAction)tappedOnCopyNonce:(id)sender{
-    UIAlertController *copyBootNonceAlert = [UIAlertController alertControllerWithTitle:@"Copy boot nonce?" message:@"Would you like to copy nonce generator to clipboard?" preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertController *copyBootNonceAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Copy boot nonce?", nil) message:NSLocalizedString(@"Would you like to copy nonce generator to clipboard?", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [[UIPasteboard generalPasteboard] setString:[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE]];
     }];
-    UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"No" style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil) style:UIAlertActionStyleCancel handler:nil];
     [copyBootNonceAlert addAction:copyAction];
     [copyBootNonceAlert addAction:noAction];
     [self presentViewController:copyBootNonceAlert animated:TRUE completion:nil];
 }
 
 - (IBAction)tappedOnCopyECID:(id)sender {
-    UIAlertController *copyBootNonceAlert = [UIAlertController alertControllerWithTitle:@"Copy ECID?" message:@"Would you like to ECID to clipboard?" preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertController *copyBootNonceAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Copy ECID?", nil) message:NSLocalizedString(@"Would you like to ECID to clipboard?", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [[UIPasteboard generalPasteboard] setString:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
     }];
-    UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"No" style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil) style:UIAlertActionStyleCancel handler:nil];
     [copyBootNonceAlert addAction:copyAction];
     [copyBootNonceAlert addAction:noAction];
     [self presentViewController:copyBootNonceAlert animated:TRUE completion:nil];
@@ -390,11 +390,11 @@ extern int necp_die(void);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         NSString *Update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
         if (Update == nil) {
-            NOTICE("Failed to check for update.", 1, 0);
+            NOTICE(NSLocalizedString(@"Failed to check for update.", nil), true, false);
         } else if ([Update isEqualToString:[NSString stringWithFormat:@"%@\n", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]]) {
-            NOTICE("Already up to date.", 1, 0);
+            NOTICE(NSLocalizedString(@"Already up to date.", nil), true, false);
         } else {
-            NOTICE("An update is available.", 1, 0);
+            NOTICE(NSLocalizedString(@"An update is available.", nil), true, false);
         }
     });
 }
@@ -446,8 +446,8 @@ extern int necp_die(void);
 
 - (IBAction)tappedRestartSpringBoard:(id)sender {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-        SETMESSAGE("Failed to restart SpringBoard.");
-        NOTICE("SpringBoard will be restarted.", 1, 0);
+        SETMESSAGE(NSLocalizedString(@"Failed to restart SpringBoard.", nil));
+        NOTICE(NSLocalizedString(@"SpringBoard will be restarted.", nil), true, false);
         switch (selectRespringExploit()) {
             case DEJA_XNU: {
                 mach_port_t bb_tp = hid_event_queue_exploit();

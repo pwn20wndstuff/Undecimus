@@ -12,6 +12,8 @@
 
 #include "remote_memory.h"
 
+#include <common.h>
+
 // no headers for these in iOS SDK:
 extern kern_return_t mach_vm_allocate
 (
@@ -58,7 +60,7 @@ remote_alloc(mach_port_t task_port,
   mach_vm_size_t remote_size = (mach_vm_size_t)size;
   err = mach_vm_allocate(task_port, &remote_addr, remote_size, 1); // ANYWHERE
   if (err != KERN_SUCCESS){
-    printf("unable to allocate buffer in remote process\n");
+    LOG("unable to allocate buffer in remote process\n");
     return 0;
   }
   return (uint64_t)remote_addr;
@@ -73,7 +75,7 @@ remote_free(mach_port_t task_port,
   
   err = mach_vm_deallocate(task_port, (mach_vm_address_t)base, (mach_vm_size_t)size);
   if (err !=  KERN_SUCCESS){
-    printf("unabble to deallocate remote buffer\n");
+    LOG("unabble to deallocate remote buffer\n");
     return;
   }
   return;
@@ -90,7 +92,7 @@ alloc_and_fill_remote_buffer(mach_port_t task_port,
   
   err = mach_vm_write(task_port, remote_address, (mach_vm_offset_t)local_address, (mach_msg_type_number_t)length);
   if (err != KERN_SUCCESS){
-    printf("unable to write to remote memory\n");
+    LOG("unable to write to remote memory\n");
     return 0;
   }
   
@@ -108,12 +110,12 @@ remote_read_overwrite(mach_port_t task_port,
   mach_vm_size_t outsize = 0;
   err = mach_vm_read_overwrite(task_port, (mach_vm_address_t)remote_address, (mach_vm_size_t)length, (mach_vm_address_t)local_address, &outsize);
   if (err != KERN_SUCCESS){
-    printf("remote read failed\n");
+    LOG("remote read failed\n");
     return;
   }
   
   if (outsize != length){
-    printf("remote read was short (expected %llx, got %llx\n", length, outsize);
+    LOG("remote read was short (expected %llx, got %llx\n", length, outsize);
     return;
   }
 }
@@ -129,7 +131,7 @@ remote_write(mach_port_t remote_task_port,
                                     (vm_offset_t)local_address,
                                     (mach_msg_type_number_t)length);
   if (err != KERN_SUCCESS) {
-    printf("remote write failed: %s %x\n", mach_error_string(err), err);
+    LOG("remote write failed: %s %x\n", mach_error_string(err), err);
     return;
   }
 }

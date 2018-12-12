@@ -1398,7 +1398,7 @@ addr_t find_OSBoolean_True(void) {
         return 0;
     }
     
-    return rk64(val + kerndumpbase);
+    return ReadAnywhere64(val + kerndumpbase);
 }
 
 addr_t find_OSBoolean_False(void) {
@@ -1574,6 +1574,7 @@ addr_t find_kernproc(void) {
     addr_t kernproc = calc64(kernel, ret_str, end_of_function, 19);
     return kernproc + kerndumpbase;
 }
+
 #ifdef HAVE_MAIN
 #include <mach-o/nlist.h>
 
