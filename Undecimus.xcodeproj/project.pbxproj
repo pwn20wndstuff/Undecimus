@@ -290,8 +290,8 @@
 			buildConfigurationList = 21C0FC7D21369EB800849420 /* Build configuration list for PBXNativeTarget "Undecimus" */;
 			buildPhases = (
 				21C0FC6321369EB700849420 /* Sources */,
-				21C0FC6421369EB700849420 /* Frameworks */,
 				21C0FC6521369EB700849420 /* Resources */,
+				21C0FC6421369EB700849420 /* Frameworks */,
 				22C546CD21A8E5B800EFC09C /* ShellScript */,
 			);
 			buildRules = (
@@ -370,12 +370,13 @@
 			files = (
 			);
 			inputPaths = (
+				"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}",
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n# Get path for dpkg\ntouch ~/.profile\n. ~/.profile\nRESOURCES_VERSION=\"$(dpkg --info Undecimus/resources/resources.deb | grep Version: | awk '{print $2}')\"\ndefaults write \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Info\" BundledResources \"${RESOURCES_VERSION}\"\n";
+			shellScript = "# Get path for dpkg\nset -e\nif [ -f ~/.profile ]; then\n    . ~/.profile\nfi\nRESOURCES_VERSION=\"$(dpkg --info Undecimus/resources/resources.deb | grep Version: | awk '{print $2}')\"\nif [ -z \"${RESOURCES_VERSION}\" ]; then\n    echo \"dpkg not found or resources.deb missing\"\n    exit 1\nfi\ndefaults write \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\" BundledResources \"${RESOURCES_VERSION}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

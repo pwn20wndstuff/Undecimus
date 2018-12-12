@@ -30,6 +30,7 @@ static inline void showAlert(NSString *title, NSString *message, Boolean wait, B
     dispatch_semaphore_t semaphore;
     if (wait)
         semaphore = dispatch_semaphore_create(0);
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [[[[[UIApplication sharedApplication] delegate] window] rootViewController] dismissViewControllerAnimated:YES completion:nil];
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];

@@ -70,18 +70,6 @@ static ViewController *sharedController = nil;
         }); \
 } while (false)
 
-#define CLEAN_FILE(file) do { \
-    if (access(file, F_OK) == ERR_SUCCESS) { \
-        _assert(unlink(file) == ERR_SUCCESS, message); \
-    } \
-} while (false)
-
-#define INIT_FILE(file, owner, mode) do { \
-        _assert(access(file, F_OK) == ERR_SUCCESS, message); \
-        _assert(chmod(file, mode) == ERR_SUCCESS, message); \
-        _assert(chown(file, owner, owner) == ERR_SUCCESS, message); \
-} while (false)
-
 typedef struct {
     kptr_t trust_chain;
     kptr_t amficache;
@@ -273,12 +261,12 @@ const char *necp_supported_versions[] = {
 #define ptrSize sizeof(uintptr_t)
 
 static void writeTestFile(const char *file) {
-    CLEAN_FILE(file);
+    _assert(clean_file(file), message);
     FILE *a = fopen(file, "w");
     LOG("a: " "%p" "\n", a);
     _assert(a != NULL, message);
     _assert(fclose(a) == ERR_SUCCESS, message);
-    INIT_FILE(file, 0, 0644);
+    _assert(init_file(file, 0, 0644), message);
     _assert(unlink(file) == ERR_SUCCESS, message);
 }
 
@@ -1302,31 +1290,6 @@ int waitForFile(const char *filename) {
     return rv;
 }
 
-int _system(const char *cmd) {
-    pid_t Pid = 0;
-    int Status = 0;
-    char *myenviron[] = {
-        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/X11:/usr/games",
-        "PS1=\\h:\\w \\u\\$ ",
-        NULL
-    };
-    char *argv[] = {"sh", "-c", (char *)cmd, NULL};
-    Status = posix_spawn(&Pid, "/bin/sh", NULL, NULL, argv, myenviron);
-    if (Status == ERR_SUCCESS) {
-        waitpid(Pid, &Status, 0);
-    }
-    return Status;
-}
-
-int _systemf(const char *cmd, ...) {
-    va_list ap;
-    va_start(ap, cmd);
-    NSString *cmdstr = [[NSString alloc] initWithFormat:@(cmd) arguments:ap];
-    va_end(ap);
-    LOG("Calling system: \"%s\"", [cmdstr UTF8String]);
-    return _system([cmdstr UTF8String]);
-}
-
 void setPreference(NSString *key, id object) {
     NSMutableDictionary *md = nil;
     md = [NSMutableDictionary dictionaryWithContentsOfFile:PREFERENCES_FILE];
@@ -1858,32 +1821,6 @@ void commitTrustChain(uint64_t trust_chain, uint64_t amficache) {
     LOG("Successfully committed %d hashes to trust chain.", numhash);
 }
 
-bool debIsInstalled(char *packageID) {
-    int rv = _systemf("/usr/bin/dpkg -s \"%s\" > /dev/null", packageID);
-    bool isInstalled = !WEXITSTATUS(rv);
-    LOG("Deb: \"%s\" is%s installed", packageID, isInstalled?"":" not");
-    return isInstalled;
-}
-
-bool debIsConfigured(char *packageID) {
-    int rv = _systemf("/usr/bin/dpkg -s \"%s\" | grep Status: | grep \"install ok installed\" > /dev/null", packageID);
-    bool isConfigured = !WEXITSTATUS(rv);
-    LOG("Deb: \"%s\" is%s configured", packageID, isConfigured?"":" not");
-    return isConfigured;
-}
-
-void installDeb(char *debName) {
-    NSString *destPathStr = [NSString stringWithFormat:@"/jb/%s", debName];
-    const char *destPath = [destPathStr UTF8String];
-    CLEAN_FILE(destPath);
-    _assert(moveFileFromAppDir(debName, (char *)destPath) == ERR_SUCCESS, message);
-    int rv = _systemf("/usr/bin/dpkg --force-bad-path --force-configure-any -i \"%s\" > /jb/dpkg.log 2>&1", destPath);
-    LOG("DPKG: %@", [NSString stringWithContentsOfFile:@"/jb/dpkg.log"]);
-    CLEAN_FILE("/jb/dpkg.log");
-    _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message);
-    CLEAN_FILE(destPath);
-}
-
 void extractResources() {
     if (!debIsInstalled("com.bingner.spawn")) {
         installDeb("spawn.deb");
@@ -2292,7 +2229,7 @@ void exploit(mach_port_t tfp0,
         v_mount = ReadAnywhere64(rootfs_vnode + GETOFFSET(v_mount));
         WriteAnywhere32(v_mount + GETOFFSET(mnt_flag), v_flag);
         rv = snapshot_list("/");
-        needStrap = access("/.installed_unc0ver", F_OK) != ERR_SUCCESS;
+        needStrap = access("/.installed_unc0ver", F_OK) != ERR_SUCCESS && access("/.bootstrapped_electra", F_OK) != ERR_SUCCESS;
         if (rv == 0 && needStrap) {
             // Borrow entitlements from fsck_apfs.
             
@@ -2367,41 +2304,41 @@ void exploit(mach_port_t tfp0,
         }
         
         if (needResources) {
-            CLEAN_FILE("/jb/amfid_payload.tar");
-            CLEAN_FILE("/jb/amfid_payload.dylib");
+            _assert(clean_file("/jb/amfid_payload.tar"), message);
+            _assert(clean_file("/jb/amfid_payload.dylib"), message);
             _assert(moveFileFromAppDir("amfid_payload.tar", "/jb/amfid_payload.tar") == ERR_SUCCESS, message);
             a = fopen("/jb/amfid_payload.tar", "rb");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message);
             untar(a, "amfid_payload");
             _assert(fclose(a) == ERR_SUCCESS, message);
-            INIT_FILE("/jb/amfid_payload.dylib", 0, 0644);
+            _assert(init_file("/jb/amfid_payload.dylib", 0, 0644), message);
         }
         
         if (needStrap) {
-            CLEAN_FILE("/jb/strap.tar.lzma");
+            _assert(clean_file("/jb/strap.tar.lzma"), message);
             _assert(moveFileFromAppDir("strap.tar.lzma", "/jb/strap.tar.lzma") == ERR_SUCCESS, message);
-            INIT_FILE("/jb/strap.tar.lzma", 0, 0644);
+            _assert(init_file("/jb/strap.tar.lzma", 0, 0644), message);
             
-            CLEAN_FILE("/jb/tar.tar");
-            CLEAN_FILE("/jb/tar");
+            _assert(clean_file("/jb/tar.tar"), message);
+            _assert(clean_file("/jb/tar"), message);
             _assert(moveFileFromAppDir("tar.tar", "/jb/tar.tar") == ERR_SUCCESS, message);
             a = fopen("/jb/tar.tar", "rb");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message);
             untar(a, "tar");
             _assert(fclose(a) == ERR_SUCCESS, message);
-            INIT_FILE("/jb/tar", 0, 0755);
+            _assert(init_file("/jb/tar", 0, 0755), message);
             
-            CLEAN_FILE("/jb/lzma.tar");
-            CLEAN_FILE("/jb/lzma");
+            _assert(clean_file("/jb/lzma.tar"), message);
+            _assert(clean_file("/jb/lzma"), message);
             _assert(moveFileFromAppDir("lzma.tar", "/jb/lzma.tar") == ERR_SUCCESS, message);
             a = fopen("/jb/lzma.tar", "rb");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message);
             untar(a, "lzma");
             _assert(fclose(a) == ERR_SUCCESS, message);
-            INIT_FILE("/jb/lzma", 0, 0755);
+            _assert(init_file("/jb/lzma", 0, 0755), message);
         }
         LOG("Successfully copied over our resources to RootFS.");
     }
@@ -2430,13 +2367,13 @@ void exploit(mach_port_t tfp0,
         LOG("Logging slide...");
         PROGRESS(NSLocalizedString(@"Exploiting... (32/64)", nil), false, false);
         SETMESSAGE(NSLocalizedString(@"Failed to log slide.", nil));
-        CLEAN_FILE("/var/tmp/slide.txt");
+        _assert(clean_file("/var/tmp/slide.txt"), message);
         a = fopen("/var/tmp/slide.txt", "w+");
         LOG("a: " "%p" "\n", a);
         _assert(a != NULL, message);
         fprintf(a, ADDR "\n", kernel_slide);
         _assert(fclose(a) == ERR_SUCCESS, message);
-        INIT_FILE("/var/tmp/slide.txt", 0, 0644);
+        _assert(init_file("/var/tmp/slide.txt", 0, 0644), message);
         LOG("Successfully logged slide.");
     }
     
@@ -2460,7 +2397,7 @@ void exploit(mach_port_t tfp0,
         LOG("Logging offsets...");
         PROGRESS(NSLocalizedString(@"Exploiting... (34/64)", nil), false, false);
         SETMESSAGE(NSLocalizedString(@"Failed to log offsets.", nil));
-        CLEAN_FILE("/jb/offsets.plist");
+        _assert(clean_file("/jb/offsets.plist"), message);
         md = [NSMutableDictionary dictionary];
         md[@"KernelBase"] = ADDRSTRING(kernel_base);
         md[@"KernelSlide"] = ADDRSTRING(kernel_slide);
@@ -2484,7 +2421,7 @@ void exploit(mach_port_t tfp0,
         md[@"SiFlags"] = ADDRSTRING(GETOFFSET(si_flags));
         md[@"VFlags"] = ADDRSTRING(GETOFFSET(v_flags));
         _assert((![md writeToFile:@"/jb/offsets.plist" atomically:YES]) == ERR_SUCCESS, message);
-        INIT_FILE("/jb/offsets.plist", 0, 0644);
+        _assert(init_file("/jb/offsets.plist", 0, 0644), message);
         LOG("Successfully logged offsets.");
     }
     
@@ -2511,35 +2448,48 @@ void exploit(mach_port_t tfp0,
     
     {
         // Patch amfid.
-        
-        LOG("Patching amfid...");
+        LOG("Testing amfid...");
         PROGRESS(NSLocalizedString(@"Exploiting... (37/64)", nil), false, false);
-        SETMESSAGE(NSLocalizedString(@"Failed to patch amfid.", nil));
-        CLEAN_FILE("/var/tmp/amfid_payload.alive");
-        _assert(platformizeProcAtAddr(getProcStructForPid(findPidOfProcess("amfid"))) == ERR_SUCCESS, message);
-        _assert(inject_library(findPidOfProcess("amfid"), amfid_payload) == ERR_SUCCESS, message);
-        _assert(waitForFile("/var/tmp/amfid_payload.alive") == ERR_SUCCESS, message);
-        LOG("Successfully patched amfid.");
+        pid_t pid;
+        char *argv[2] = { "/bin/true", NULL };
+        extern char **environ;
+        rv = posix_spawn(&pid, "/bin/true", NULL, NULL, argv, environ);
+        if (rv == ERR_SUCCESS) {
+            waitpid(pid, &rv, 0);
+            rv = WEXITSTATUS(rv);
+        }
+        if (rv) {
+            LOG("Patching amfid...");
+            SETMESSAGE(NSLocalizedString(@"Failed to patch amfid.", nil));
+            _assert(clean_file("/var/tmp/amfid_payload.alive"), message);
+            _assert(platformizeProcAtAddr(getProcStructForPid(findPidOfProcess("amfid"))) == ERR_SUCCESS, message);
+            _assert(inject_library(findPidOfProcess("amfid"), amfid_payload) == ERR_SUCCESS, message);
+            _assert(waitForFile("/var/tmp/amfid_payload.alive") == ERR_SUCCESS, message);
+            LOG("Successfully patched amfid.");
+        } else {
+            LOG("Amfid already patched.");
+        }
     }
     
     {
         // Update version string.
-        
-        LOG("Updating version string...");
-        PROGRESS(NSLocalizedString(@"Exploiting... (38/64)", nil), false, false);
-        SETMESSAGE(NSLocalizedString(@"Failed to update version string.", nil));
-        _assert(uname(&u) == ERR_SUCCESS, message);
-        kernelVersionString = (char *)[[NSString stringWithFormat:@"%s %s", u.version, DEFAULT_VERSION_STRING] UTF8String];
-        for (int i = 0; !(i >= 5 || strstr(u.version, kernelVersionString) != NULL); i++) {
-            _assert(updateVersionString(kernelVersionString, tfp0, kernel_base) == ERR_SUCCESS, message);
+        if (!isJailbroken()) {
+            LOG("Updating version string...");
+            PROGRESS(NSLocalizedString(@"Exploiting... (38/64)", nil), false, false);
+            SETMESSAGE(NSLocalizedString(@"Failed to update version string.", nil));
             _assert(uname(&u) == ERR_SUCCESS, message);
+            kernelVersionString = (char *)[[NSString stringWithFormat:@"%s %s", u.version, DEFAULT_VERSION_STRING] UTF8String];
+            for (int i = 0; !(i >= 5 || strstr(u.version, kernelVersionString) != NULL); i++) {
+                _assert(updateVersionString(kernelVersionString, tfp0, kernel_base) == ERR_SUCCESS, message);
+                _assert(uname(&u) == ERR_SUCCESS, message);
+            }
+            _assert(strstr(u.version, kernelVersionString) != NULL, message);
+            LOG("Successfully updated version string.");
         }
-        _assert(strstr(u.version, kernelVersionString) != NULL, message);
-        LOG("Successfully updated version string.");
     }
     
     {
-        if ((access("/electra", F_OK) == ERR_SUCCESS && is_symlink("/electra") != true) || restore_rootfs) {
+        if (restore_rootfs) {
             SETMESSAGE(NSLocalizedString(@"Failed to Restore RootFS.", nil));
             
             // Borrow entitlements from fsck_apfs.
@@ -2582,15 +2532,15 @@ void exploit(mach_port_t tfp0,
             if (kCFCoreFoundationVersionNumber < 1452.23) {
                 _assert(waitForFile("/var/MobileSoftwareUpdate/mnt1/sbin/launchd") == ERR_SUCCESS, message);
                 
-                CLEAN_FILE("/jb/rsync.tar");
-                CLEAN_FILE("/jb/rsync");
+                _assert(clean_file("/jb/rsync.tar"), message);
+                _assert(clean_file("/jb/rsync"), message);
                 _assert(moveFileFromAppDir("rsync.tar", "/jb/rsync.tar") == ERR_SUCCESS, message);
                 a = fopen("/jb/rsync.tar", "rb");
                 LOG("a: " "%p" "\n", a);
                 _assert(a != NULL, message);
                 untar(a, "rsync");
                 _assert(fclose(a) == ERR_SUCCESS, message);
-                INIT_FILE("/jb/rsync", 0, 0755);
+                _assert(init_file("/jb/rsync", 0, 0755), message);
                 
                 task = [NSTask launchedTaskWithLaunchPath:@"/jb/rsync" arguments:@[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/var/MobileSoftwareUpdate/mnt1/.", @"/"]];
                 _assert(task != nil, message);
@@ -2657,11 +2607,6 @@ void exploit(mach_port_t tfp0,
             extractResources();
             rv = _system("/usr/bin/dpkg --configure -a");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message);
-            a = fopen("/.installed_unc0ver", "w");
-            LOG("a: " "%p" "\n", a);
-            _assert(a != NULL, message);
-            _assert(fclose(a) == ERR_SUCCESS, message);
-            INIT_FILE("/.installed_unc0ver", 0, 0644);
             run_uicache = true;
             _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL, NULL, NULL) == ERR_SUCCESS, message);
             _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar.tar", NULL, NULL, NULL) == ERR_SUCCESS, message);
@@ -2677,8 +2622,15 @@ void exploit(mach_port_t tfp0,
             }
             if (needResources || updatedResources) {
                 extractResources();
-                CLEAN_FILE("/jb/amfid_payload.tar");
+                _assert(clean_file("/jb/amfid_payload.tar"), message);
             }
+        }
+        if (access("/.installed_unc0ver", F_OK) != ERR_SUCCESS) {
+            a = fopen("/.installed_unc0ver", "w");
+            LOG("a: " "%p" "\n", a);
+            _assert(a != NULL, message);
+            _assert(fclose(a) == ERR_SUCCESS, message);
+            _assert(init_file("/.installed_unc0ver", 0, 0644), message);
         }
         _assert(chdir("/jb") == ERR_SUCCESS, message);
         bzero(link, 0x100);
@@ -2711,7 +2663,7 @@ void exploit(mach_port_t tfp0,
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message);
             _assert(fclose(a) == ERR_SUCCESS, message);
-            INIT_FILE("/.cydia_no_stash", 0, 0644);
+            _assert(init_file("/.cydia_no_stash", 0, 0644), message);
             LOG("Successfully disabled stashing.");
         }
     }
@@ -2723,52 +2675,62 @@ void exploit(mach_port_t tfp0,
             LOG("Spawning jailbreakd...");
             PROGRESS(NSLocalizedString(@"Exploiting... (47/64)", nil), false, false);
             SETMESSAGE(NSLocalizedString(@"Failed to spawn jailbreakd.", nil));
-            md = [NSMutableDictionary dictionary];
-            md[@"Label"] = @"jailbreakd";
-            md[@"Program"] = @"/usr/libexec/jailbreakd";
-            md[@"EnvironmentVariables"] = [NSMutableDictionary dictionary];
-            md[@"EnvironmentVariables"][@"KernelBase"] = ADDRSTRING(kernel_base);
-            md[@"EnvironmentVariables"][@"KernProcAddr"] = ADDRSTRING(ReadAnywhere64(GETOFFSET(kernproc)));
-            md[@"EnvironmentVariables"][@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref) - kernel_slide);
-            md[@"EnvironmentVariables"][@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
-            md[@"EnvironmentVariables"][@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
-            md[@"EnvironmentVariables"][@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
-            md[@"EnvironmentVariables"][@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
-            md[@"EnvironmentVariables"][@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
-            md[@"UserName"] = @"root";
-            md[@"MachServices"] = [NSMutableDictionary dictionary];
-            md[@"MachServices"][@"zone.sparkes.jailbreakd"] = [NSMutableDictionary dictionary];
-            md[@"MachServices"][@"zone.sparkes.jailbreakd"][@"HostSpecialPort"] = @(15);
-            md[@"RunAtLoad"] = @(YES);
-            md[@"KeepAlive"] = @(YES);
-            md[@"StandardErrorPath"] = @"/var/log/jailbreakd-stderr.log";
-            md[@"StandardOutPath"] = @"/var/log/jailbreakd-stdout.log";
-            _assert((![md writeToFile:@"/jb/jailbreakd.plist" atomically:YES]) == ERR_SUCCESS, message);
-            INIT_FILE("/jb/jailbreakd.plist", 0, 0644);
-            CLEAN_FILE("/var/log/jailbreakd-stderr.log");
-            CLEAN_FILE("/var/log/jailbreakd-stdout.log");
-            CLEAN_FILE("/var/tmp/jailbreakd.pid");
-            _assert(execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL) == ERR_SUCCESS, message);
-            _assert(waitForFile("/var/tmp/jailbreakd.pid") == ERR_SUCCESS, message);
-            LOG("Successfully spawned jailbreakd.");
+            char *jbdPidFile = "/var/tmp/jailbreakd.pid";
+            if (!pidFileIsValid(@(jbdPidFile))) {
+                md = [NSMutableDictionary dictionary];
+                md[@"Label"] = @"jailbreakd";
+                md[@"Program"] = @"/usr/libexec/jailbreakd";
+                md[@"EnvironmentVariables"] = [NSMutableDictionary dictionary];
+                md[@"EnvironmentVariables"][@"KernelBase"] = ADDRSTRING(kernel_base);
+                md[@"EnvironmentVariables"][@"KernProcAddr"] = ADDRSTRING(ReadAnywhere64(GETOFFSET(kernproc)));
+                md[@"EnvironmentVariables"][@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref) - kernel_slide);
+                md[@"EnvironmentVariables"][@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
+                md[@"EnvironmentVariables"][@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
+                md[@"EnvironmentVariables"][@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
+                md[@"EnvironmentVariables"][@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
+                md[@"EnvironmentVariables"][@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
+                md[@"UserName"] = @"root";
+                md[@"MachServices"] = [NSMutableDictionary dictionary];
+                md[@"MachServices"][@"zone.sparkes.jailbreakd"] = [NSMutableDictionary dictionary];
+                md[@"MachServices"][@"zone.sparkes.jailbreakd"][@"HostSpecialPort"] = @(15);
+                md[@"RunAtLoad"] = @(YES);
+                md[@"KeepAlive"] = @(YES);
+                md[@"StandardErrorPath"] = @"/var/log/jailbreakd-stderr.log";
+                md[@"StandardOutPath"] = @"/var/log/jailbreakd-stdout.log";
+                _assert((![md writeToFile:@"/jb/jailbreakd.plist" atomically:YES]) == ERR_SUCCESS, message);
+                _assert(init_file("/jb/jailbreakd.plist", 0, 0644), message);
+                _assert(clean_file("/var/log/jailbreakd-stderr.log"), message);
+                _assert(clean_file("/var/log/jailbreakd-stdout.log"), message);
+                _assert(clean_file(jbdPidFile), message);
+                // Stop first in case it was already running
+                execCommandAndWait("/bin/launchctl", "stop", "jailbreakd", NULL, NULL, NULL);
+                _assert(execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL) == ERR_SUCCESS, message);
+                _assert(waitForFile(jbdPidFile) == ERR_SUCCESS, message);
+                _assert(pidFileIsValid(@(jbdPidFile)), message);
+                LOG("Successfully spawned jailbreakd.");
+            } else {
+                LOG("Jailbreakd already running.");
+            }
         } else {
-            CLEAN_FILE("/jb/jailbreakd.plist");
+            _assert(clean_file("/jb/jailbreakd.plist"), message);
         }
     }
     
     {
         // Patch launchd.
         
-        if ((access("/etc/rc.d/substrate", F_OK) != ERR_SUCCESS) && load_tweaks) {
+        if (load_tweaks && (access("/etc/rc.d/substrate", F_OK) != ERR_SUCCESS) && !pspawnHookLoaded()) {
             LOG("Patching launchd...");
             PROGRESS(NSLocalizedString(@"Exploiting... (48/64)", nil), false, false);
             SETMESSAGE(NSLocalizedString(@"Failed to patch launchd.", nil));
-            CLEAN_FILE("/var/log/pspawn_hook_launchd.log");
-            CLEAN_FILE("/var/log/pspawn_hook_xpcproxy.log");
-            CLEAN_FILE("/var/log/pspawn_hook_other.log");
+            _assert(clean_file("/var/log/pspawn_hook_launchd.log"), message);
+            _assert(clean_file("/var/log/pspawn_hook_xpcproxy.log"), message);
+            _assert(clean_file("/var/log/pspawn_hook_other.log"), message);
             _assert(platformizeProcAtAddr(getProcStructForPid(1)) == ERR_SUCCESS, message);
             _assert(inject_library(1, "/usr/lib/pspawn_hook.dylib") == ERR_SUCCESS, message);
             LOG("Successfully patched launchd.");
+        } else {
+            LOG("Not injecting to launchd.");
         }
     }
     
@@ -2893,9 +2855,9 @@ void exploit(mach_port_t tfp0,
             LOG("Extracting OpenSSH...");
             PROGRESS(NSLocalizedString(@"Exploiting... (55/64)", nil), false, false);
             SETMESSAGE(NSLocalizedString(@"Failed to extract OpenSSH.", nil));
-            CLEAN_FILE("/jb/openssh.deb");
-            CLEAN_FILE("/jb/openssl.deb");
-            CLEAN_FILE("/jb/ca-certificates.deb");
+            _assert(clean_file("/jb/openssh.deb"), message);
+            _assert(clean_file("/jb/openssl.deb"), message);
+            _assert(clean_file("/jb/ca-certificates.deb"), message);
             _assert(moveFileFromAppDir("openssh.deb", "/jb/openssh.deb") == ERR_SUCCESS, message);
             _assert(moveFileFromAppDir("openssl.deb", "/jb/openssl.deb") == ERR_SUCCESS, message);
             _assert(moveFileFromAppDir("ca-certificates.deb", "/jb/ca-certificates.deb") == ERR_SUCCESS, message);
@@ -2921,13 +2883,19 @@ void exploit(mach_port_t tfp0,
     }
 
     {
+        if (debIsInstalled("cydia-gui")) {
+            int rv = _systemf("/usr/bin/dpkg --force-depends -r cydia-gui");
+            _assert(WEXITSTATUS(rv)==0, @"Unable to remove electra's Cydia");
+            install_cydia = true;
+            setPreference(@K_INSTALL_CYDIA, @YES);
+        }
         if (install_cydia) {
             // Extract Cydia.
             LOG("Extracting Cydia...");
             PROGRESS(NSLocalizedString(@"Exploiting... (58/64)", nil), false, false);
             SETMESSAGE(NSLocalizedString(@"Failed to extract Cydia.", nil));
-            CLEAN_FILE("/jb/cydia.deb");
-            CLEAN_FILE("/jb/cydia-lproj.deb");
+            _assert(clean_file("/jb/cydia.deb"), message);
+            _assert(clean_file("/jb/cydia-lproj.deb"), message);
             _assert(moveFileFromAppDir("cydia.deb", "/jb/cydia.deb") == ERR_SUCCESS, message);
             _assert(moveFileFromAppDir("cydia-lproj.deb", "/jb/cydia-lproj.deb") == ERR_SUCCESS, message);
             LOG("Successfully extracted Cydia.");
@@ -2939,7 +2907,7 @@ void exploit(mach_port_t tfp0,
             rv = _system("/usr/bin/dpkg -i /jb/cydia.deb /jb/cydia-lproj.deb");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message);
             rv = _system("/bin/rm -rf /jb/cydia.deb /jb/cydia-lproj.deb");
-             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message);
+            _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message);
             LOG("Successfully installed Cydia.");
             
             // Disable Install Cydia.
@@ -3033,10 +3001,8 @@ void exploit(mach_port_t tfp0,
 - (IBAction)tappedOnJailbreak:(id)sender
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-        if (isJailbroken() == true) {
-            PROGRESS(NSLocalizedString(@"Jailbroken", nil), false, true);
-            return;
-        } else if (isSupportedByJailbreak() != true) {
+        _assert(BUNDLEDRESOURCES != nil, @"Bundled Resources version missing");
+        if (isSupportedByJailbreak() != true) {
             PROGRESS(NSLocalizedString(@"Unsupported", nil), false, true);
             return;
         }
@@ -3096,10 +3062,14 @@ void exploit(mach_port_t tfp0,
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     sharedController = self;
-    if (isJailbroken() == true) {
-        PROGRESS(NSLocalizedString(@"Jailbroken", nil), false, true);
-    } else if (isSupportedByJailbreak() != true) {
+    if (isJailbroken()) {
+        PROGRESS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);
+    } else if (!isSupportedByJailbreak()) {
         PROGRESS(NSLocalizedString(@"Unsupported", nil), false, true);
+    }
+    LOG("Bundled Resources Version: %@", BUNDLEDRESOURCES);
+    if (BUNDLEDRESOURCES == nil) {
+        showAlert(@"Error", @"Bundled Resources version is missing.  This build is invalid.", false, false);
     }
 }
 
@@ -3134,7 +3104,6 @@ void exploit(mach_port_t tfp0,
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
-    NSLog(@"initWithCoder called");
     @synchronized(sharedController) {
         if (sharedController == nil) {
             sharedController = [super initWithCoder:aDecoder];
