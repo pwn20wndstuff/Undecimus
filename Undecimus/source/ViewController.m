@@ -664,7 +664,7 @@ void blockDomainWithName(const char *name) {
     NSString *newHostsFile = nil;
     SETMESSAGE(NSLocalizedString(@"Failed to block domain with name.", nil));
     hostsFile = [NSString stringWithContentsOfFile:@"/etc/hosts" encoding:NSUTF8StringEncoding error:nil];
-    newLine = [NSString stringWithFormat:@"\n127.0.0.1 %s\n", name];
+    newLine = [NSString stringWithFormat:@"\n127.0.0.1 %s\n::1 %s\n", name, name];
     if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
         return;
     }
