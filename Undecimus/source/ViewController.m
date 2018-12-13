@@ -1107,7 +1107,7 @@ int snapshot_revert(const char *vol, const char *name) {
 
 int snapshot_mount(const char *vol, const char *name, const char *dir) {
     int rv = 0;
-    rv = execCommandAndWait("/sbin/mount_apfs", "-s", (char *)name, (char *)vol, (char *)dir, NULL);
+    rv = runCommand("/sbin/mount_apfs", "-s", name, vol, dir, NULL);
     return rv;
 }
 
@@ -1805,12 +1805,12 @@ void commitTrustChain(uint64_t trust_chain, uint64_t amficache) {
 
 void extractResources() {
     if (!debIsInstalled("com.bingner.spawn")) {
-        installDeb("spawn.deb");
+        _assert(installDeb("spawn.deb"), message, true);
     }
     if (!debIsConfigured("science.xnu.injector")) {
-        installDeb("injector.deb");
+        _assert(installDeb("injector.deb"), message, true);
     }
-    installDeb("resources.deb");
+    _assert(installDeb("resources.deb"), message, true);
 }
 
 void exploit(mach_port_t tfp0,
@@ -1855,7 +1855,6 @@ void exploit(mach_port_t tfp0,
     int updatedResources = 0;
     char link[0x100];
     NSArray *resources = nil;
-    NSTask *task = nil;
     const char *jbdPidFile = NULL;
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
@@ -2082,8 +2081,8 @@ void exploit(mach_port_t tfp0,
             LOG("Setting boot-nonce...");
             PROGRESS(NSLocalizedString(@"Exploiting... (14/64)", nil), false, false);
             SETMESSAGE(NSLocalizedString(@"Failed to set boot-nonce.", nil));
-            _assert(execCommandAndWait("/usr/sbin/nvram", (char *)[[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String], NULL, NULL, NULL, NULL) == ERR_SUCCESS, message, true);
-            _assert(execCommandAndWait("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL, NULL, NULL, NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/usr/sbin/nvram", (char *)[[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String], NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL) == ERR_SUCCESS, message, true);
             LOG("Successfully set boot-nonce.");
         }
     }
@@ -2172,7 +2171,7 @@ void exploit(mach_port_t tfp0,
                 _assert(access("/var/MobileSoftwareUpdate/mnt1", F_OK) == ERR_SUCCESS, message, true);
                 _assert(chown("/var/MobileSoftwareUpdate/mnt1", 0, 0) == ERR_SUCCESS, message, true);
             }
-            _assert(execCommandAndWait("/sbin/mount_apfs", "/dev/disk0s1s1", "/var/MobileSoftwareUpdate/mnt1", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/sbin/mount_apfs", "/dev/disk0s1s1", "/var/MobileSoftwareUpdate/mnt1", NULL) == ERR_SUCCESS, message, true);
             
             // Borrow entitlements from fsck_apfs.
             
@@ -2208,7 +2207,7 @@ void exploit(mach_port_t tfp0,
         v_flag = v_flag & ~MNT_NOSUID;
         v_flag = v_flag & ~MNT_RDONLY;
         WriteAnywhere32(v_mount + GETOFFSET(mnt_flag), v_flag & ~MNT_ROOTFS);
-        _assert(execCommandAndWait("/sbin/mount", "-u", "/", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
+        _assert(runCommand("/sbin/mount", "-u", "/", NULL) == ERR_SUCCESS, message, true);
         v_mount = ReadAnywhere64(rootfs_vnode + GETOFFSET(v_mount));
         WriteAnywhere32(v_mount + GETOFFSET(mnt_flag), v_flag);
         rv = snapshot_list("/");
@@ -2433,7 +2432,7 @@ void exploit(mach_port_t tfp0,
         // Patch amfid.
         LOG("Testing amfid...");
         PROGRESS(NSLocalizedString(@"Exploiting... (37/64)", nil), false, false);
-        if (!amfidPayloadLoaded()) {
+        if (runCommand("/bin/true", NULL) != ERR_SUCCESS) {
             LOG("Patching amfid...");
             SETMESSAGE(NSLocalizedString(@"Failed to patch amfid.", nil));
             _assert(clean_file("/var/tmp/amfid_payload.alive"), message, true);
@@ -2517,11 +2516,7 @@ void exploit(mach_port_t tfp0,
                 _assert(fclose(a) == ERR_SUCCESS, message, true);
                 _assert(init_file("/jb/rsync", 0, 0755), message, true);
                 
-                task = [NSTask launchedTaskWithLaunchPath:@"/jb/rsync" arguments:@[@"-vaxcH", @"--progress", @"--delete-after", @"--exclude=/Developer", @"/var/MobileSoftwareUpdate/mnt1/.", @"/"]];
-                _assert(task != nil, message, true);
-                [task waitUntilExit];
-                rv = [task terminationStatus];
-                _assert(rv == ERR_SUCCESS, message, true);
+                _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "/var/MobileSoftwareUpdate/mnt1/.", "/", NULL) == 0, message, true);
             }
             LOG("Successfully renamed system snapshot back.");
             
@@ -2575,7 +2570,7 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to extract bootstrap.", nil));
         if (needStrap) {
             _assert(chdir("/") == ERR_SUCCESS, message, true);
-            rv = execCommandAndWait("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", "/jb/strap.tar.lzma", NULL, NULL);
+            rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", "/jb/strap.tar.lzma", NULL, true);
             _assert(rv == 512 || rv == ERR_SUCCESS, message, true);
             rv = _system("/usr/libexec/cydia/firmware.sh");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
@@ -2583,12 +2578,12 @@ void exploit(mach_port_t tfp0,
             rv = _system("/usr/bin/dpkg --configure -a");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             run_uicache = true;
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar.tar", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/tar", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma.tar", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/lzma", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/jb/amfid_payload.tar", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/rm", "-rf", "/jb/tar.tar", NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/rm", "-rf", "/jb/tar", NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/rm", "-rf", "/jb/lzma.tar", NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/rm", "-rf", "/jb/lzma", NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/rm", "-rf", "/jb/amfid_payload.tar", NULL) == ERR_SUCCESS, message, true);
         } else {
             if (!needResources) {
                 rv = _systemf("INSTALLED=\"$(dpkg -s science.xnu.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
@@ -2611,18 +2606,18 @@ void exploit(mach_port_t tfp0,
         bzero(link, 0x100);
         if ((readlink("/electra", link, 0x9f) == -1) ||
             (strcmp(link, "/jb") != ERR_SUCCESS)) {
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/electra", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/jb", "/electra", NULL, NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/rm", "-rf", "/electra", NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/ln", "-s", "/jb", "/electra", NULL) == ERR_SUCCESS, message, true);
         }
         if ((readlink("/.bootstrapped_electra", link, 0x9f) == -1) ||
             (strcmp(link, "/.installed_unc0ver") != ERR_SUCCESS)) {
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/.bootstrapped_electra", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/.installed_unc0ver", "/.bootstrapped_electra", NULL, NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/rm", "-rf", "/.bootstrapped_electra", NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/ln", "-s", "/.installed_unc0ver", "/.bootstrapped_electra", NULL) == ERR_SUCCESS, message, true);
         }
         if ((readlink("/electra/libjailbreak.dylib", link, 0x9f) == -1) ||
             (strcmp(link, "/usr/lib/libjailbreak.dylib") != ERR_SUCCESS)) {
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/electra/libjailbreak.dylib", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/usr/lib/libjailbreak.dylib", "/electra/libjailbreak.dylib", NULL, NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/rm", "-rf", "/electra/libjailbreak.dylib", NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/bin/ln", "-s", "/usr/lib/libjailbreak.dylib", "/electra/libjailbreak.dylib", NULL) == ERR_SUCCESS, message, true);
         }
         LOG("Successfully extracted bootstrap.");
     }
@@ -2678,8 +2673,8 @@ void exploit(mach_port_t tfp0,
                 _assert(clean_file("/var/log/jailbreakd-stdout.log"), message, true);
                 _assert(clean_file(jbdPidFile), message, true);
                 // Stop first in case it was already running
-                execCommandAndWait("/bin/launchctl", "stop", "jailbreakd", NULL, NULL, NULL);
-                _assert(execCommandAndWait("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL, NULL, NULL) == ERR_SUCCESS, message, true);
+                runCommand("/bin/launchctl", "stop", "jailbreakd", NULL);
+                _assert(runCommand("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL) == ERR_SUCCESS, message, true);
                 _assert(waitForFile(jbdPidFile) == ERR_SUCCESS, message, true);
                 _assert(pidFileIsValid(@(jbdPidFile)), message, true);
                 LOG("Successfully spawned jailbreakd.");
@@ -2716,12 +2711,12 @@ void exploit(mach_port_t tfp0,
             PROGRESS(NSLocalizedString(@"Exploiting... (49/64)", nil), false, false);
             SETMESSAGE(NSLocalizedString(@"Failed to disable app revokes.", nil));
             blockDomainWithName("ocsp.apple.com");
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3", NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3-shm", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3-shm", NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3-wal", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3-wal", NULL, NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3-shm", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3-shm", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3-wal", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3-wal", NULL) == ERR_SUCCESS, message, false);
             LOG("Successfully disabled app revokes.");
         }
     }
@@ -2760,11 +2755,11 @@ void exploit(mach_port_t tfp0,
         }
         if (access("/System/Library/com.apple.mobile.softwareupdated.plist", F_OK) == ERR_SUCCESS) {
             _assert(rename("/System/Library/com.apple.mobile.softwareupdated.plist", "/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist") == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/launchctl", "load", "/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/launchctl", "load", "/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist", NULL) == ERR_SUCCESS, message, false);
         }
         if (access("/System/Library/com.apple.softwareupdateservicesd.plist", F_OK) == ERR_SUCCESS) {
             _assert(rename("/System/Library/com.apple.softwareupdateservicesd.plist", "/System/Library/LaunchDaemons/com.apple.softwareupdateservicesd.plist") == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/launchctl", "load", "/System/Library/LaunchDaemons/com.apple.softwareupdateservicesd.plist", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/launchctl", "load", "/System/Library/LaunchDaemons/com.apple.softwareupdateservicesd.plist", NULL) == ERR_SUCCESS, message, false);
         }
         LOG("Successfully fixed Auto Updates.");
     }
@@ -2776,14 +2771,14 @@ void exploit(mach_port_t tfp0,
             LOG("Disabling Auto Updates...");
             PROGRESS(NSLocalizedString(@"Exploiting... (52/64)", nil), false, false);
             SETMESSAGE(NSLocalizedString(@"Failed to disable auto updates.", nil));
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
             LOG("Successfully disabled Auto Updates.");
         } else {
             // Enable Auto Updates.
@@ -2791,18 +2786,18 @@ void exploit(mach_port_t tfp0,
             LOG("Enabling Auto Updates...");
             PROGRESS(NSLocalizedString(@"Exploiting... (53/64)", nil), false, false);
             SETMESSAGE(NSLocalizedString(@"Failed to enable auto updates.", nil));
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
-            _assert(execCommandAndWait("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL, NULL, NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
+            _assert(runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
         }
     }
     
@@ -2859,8 +2854,8 @@ void exploit(mach_port_t tfp0,
 
     {
         if (debIsInstalled("cydia-gui")) {
-            int rv = _systemf("/usr/bin/dpkg --force-depends -r cydia-gui");
-            _assert(WEXITSTATUS(rv) == ERR_SUCCESS, NSLocalizedString(@"Unable to remove Electra's Cydia.", nil), true);
+            int rv = _system("/usr/bin/dpkg --force-depends -r cydia-gui");
+            _assert(WEXITSTATUS(rv)==0, @"Unable to remove electra's Cydia", true);
             install_cydia = true;
             setPreference(@K_INSTALL_CYDIA, @YES);
         }
@@ -2945,7 +2940,7 @@ void exploit(mach_port_t tfp0,
             LOG("Running uicache...");
             PROGRESS(@"Exploiting... (63/64)", false, false);
             SETMESSAGE(NSLocalizedString(@"Failed to run uicache.", nil));
-            _assert(execCommandAndWait("/usr/bin/uicache", NULL, NULL, NULL, NULL, NULL) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/usr/bin/uicache", NULL) == ERR_SUCCESS, message, true);
             setPreference(@K_REFRESH_ICON_CACHE, @NO);
             LOG("Successfully ran uicache.");
         }

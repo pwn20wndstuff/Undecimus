@@ -15,6 +15,10 @@
 #include <common.h>
 #import "utils.h"
 
+extern char **environ;
+
+NSData *lastSystemOutput=nil;
+
 int sha1_to_str(const unsigned char *hash, int hashlen, char *buf, size_t buflen)
 {
     if (buflen < (hashlen*2+1)) {
@@ -115,6 +119,7 @@ int _system(const char *cmd) {
         if (valid_pipe) {
             NSData *outData = [[[NSFileHandle alloc] initWithFileDescriptor:out_pipe[0]] availableData];
             LOG("system(\"%s\") [%d]: %s", cmd, WEXITSTATUS(Status), [outData bytes]);
+            lastSystemOutput = outData;
         }
     }
     if (valid_pipe) {
@@ -171,19 +176,6 @@ bool pidFileIsValid(NSString *pidfile) {
     return false;
 }
 
-bool amfidPayloadLoaded() {
-    int rv = 0;
-    pid_t pid = 0;
-    char *argv[2] = { "/bin/true", NULL };
-    extern char **environ;
-    rv = posix_spawn(&pid, "/bin/true", NULL, NULL, argv, environ);
-    if (rv == ERR_SUCCESS) {
-        waitpid(pid, &rv, 0);
-        rv = WEXITSTATUS(rv);
-    }
-    return !rv;
-}
-
 bool pspawnHookLoaded() {
     static int request[2] = { CTL_KERN, KERN_BOOTTIME };
     struct timeval result;
@@ -214,4 +206,63 @@ bool is_directory(const char *filename) {
         return false;
     }
     return S_ISDIR(buf.st_mode);
+}
+    
+int runCommand(const char *cmd, ...) {
+    posix_spawn_file_actions_t *actions = NULL;
+    posix_spawn_file_actions_t actionsStruct;
+    va_list ap, ap2;
+    pid_t pid;
+    int argc = 1;
+    int out_pipe[2];
+    bool valid_pipe = false;
+
+    va_start(ap, cmd);
+    va_copy(ap2, ap);
+
+    while (va_arg(ap, const char *) != NULL) {
+        argc++;
+    }
+    va_end(ap);
+    
+    const char *argv[argc+1];
+    argv[0] = cmd;
+    for (int i=1; i<argc; i++) {
+        argv[i] = va_arg(ap2, const char *);
+    }
+    va_end(ap2);
+    argv[argc] = NULL;
+    
+    valid_pipe = pipe(out_pipe) == ERR_SUCCESS;
+    if (valid_pipe && posix_spawn_file_actions_init(&actionsStruct) == ERR_SUCCESS) {
+        actions = &actionsStruct;
+        posix_spawn_file_actions_adddup2(actions, out_pipe[1], 1);
+        posix_spawn_file_actions_adddup2(actions, out_pipe[1], 2);
+        posix_spawn_file_actions_addclose(actions, out_pipe[0]);
+        posix_spawn_file_actions_addclose(actions, out_pipe[1]);
+    }
+
+    int rv = posix_spawn(&pid, cmd, NULL, NULL, (char *const *)argv, environ);
+
+    if (valid_pipe) {
+        close(out_pipe[1]);
+    }
+
+    if (rv == ERR_SUCCESS) {
+        if (waitpid(pid, &rv, 0) == -1) {
+            LOG("ERROR: Waitpid failed");
+        } else {
+            rv = WEXITSTATUS(rv);
+            if (valid_pipe) {
+                NSData *outData = [[[NSFileHandle alloc] initWithFileDescriptor:out_pipe[0]] availableData];
+                LOG("runCommand(\"%s\") [%d]: %s", cmd, rv, [outData bytes]);
+                lastSystemOutput = outData;
+            }
+        }
+    }
+    if (valid_pipe) {
+        close(out_pipe[0]);
+    }
+
+    return rv;
 }
