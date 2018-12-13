@@ -32,7 +32,10 @@ int _systemf(const char *cmd, ...);
 bool debIsInstalled(char *packageID);
 bool debIsConfigured(char *packageID);
 bool installDeb(char *debName);
+bool amfidPayloadLoaded(void);
 bool pidFileIsValid(NSString *pidfile);
 bool pspawnHookLoaded(void);
+bool is_symlink(const char *filename);
+bool is_directory(const char *filename);
 
 #endif /* utils_h */

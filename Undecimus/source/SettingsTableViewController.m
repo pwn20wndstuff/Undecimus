@@ -451,8 +451,8 @@ extern int necp_die(void);
         switch (selectRespringExploit()) {
             case DEJA_XNU: {
                 mach_port_t bb_tp = hid_event_queue_exploit();
-                _assert(MACH_PORT_VALID(bb_tp), message);
-                _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0)) == 0, message);
+                _assert(MACH_PORT_VALID(bb_tp), message, true);
+                _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0)) == 0, message, true);
                 break;
             }
             default:

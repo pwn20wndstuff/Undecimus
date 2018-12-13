@@ -171,13 +171,26 @@ bool pidFileIsValid(NSString *pidfile) {
     return false;
 }
 
+bool amfidPayloadLoaded() {
+    int rv = 0;
+    pid_t pid = 0;
+    char *argv[2] = { "/bin/true", NULL };
+    extern char **environ;
+    rv = posix_spawn(&pid, "/bin/true", NULL, NULL, argv, environ);
+    if (rv == ERR_SUCCESS) {
+        waitpid(pid, &rv, 0);
+        rv = WEXITSTATUS(rv);
+    }
+    return !rv;
+}
+
 bool pspawnHookLoaded() {
     static int request[2] = { CTL_KERN, KERN_BOOTTIME };
     struct timeval result;
     size_t result_len = sizeof result;
 
-    if (access("/private/var/run/pspawn_hook.ts", F_OK) == ERR_SUCCESS) {
-        NSString *stamp = [NSString stringWithContentsOfFile:@"/private/var/run/pspawn_hook.ts" encoding:NSUTF8StringEncoding error:NULL];
+    if (access("/var/run/pspawn_hook.ts", F_OK) == ERR_SUCCESS) {
+        NSString *stamp = [NSString stringWithContentsOfFile:@"/var/run/pspawn_hook.ts" encoding:NSUTF8StringEncoding error:NULL];
         if (stamp != nil && sysctl(request, 2, &result, &result_len, NULL, 0) >= 0) {
             if ([stamp integerValue] > result.tv_sec) {
                 return true;
@@ -185,4 +198,20 @@ bool pspawnHookLoaded() {
         }
     }
     return false;
+}
+
+bool is_symlink(const char *filename) {
+    struct stat buf;
+    if (lstat(filename, &buf) != ERR_SUCCESS) {
+        return false;
+    }
+    return S_ISLNK(buf.st_mode);
+}
+
+bool is_directory(const char *filename) {
+    struct stat buf;
+    if (lstat(filename, &buf) != ERR_SUCCESS) {
+        return false;
+    }
+    return S_ISDIR(buf.st_mode);
 }
