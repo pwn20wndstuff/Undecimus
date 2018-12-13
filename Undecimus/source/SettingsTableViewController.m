@@ -464,6 +464,7 @@ extern int necp_die(void);
 - (IBAction)tappedOnCleanDiagnosticsData:(id)sender {
     RESET_LOGS();
     START_LOGGING();
+    NOTICE(@"Cleaned diagnostics data.", false, false);
 }
 
 - (void)didReceiveMemoryWarning {
