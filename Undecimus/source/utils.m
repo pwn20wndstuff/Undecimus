@@ -274,7 +274,12 @@ bool copyResourceFromBundle(NSString *resource, NSString *to) {
     NSString *pathForResource = [bundlePath stringByAppendingPathComponent:resource];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:pathForResource]) {
+        LOG(@"Unable to find \"%@\" in bundle at path \"%@\"", resource, pathForResource);
         return false;
     }
-    return ([fileManager copyItemAtPath:pathForResource toPath:to error:nil]);
+    if (![fileManager copyItemAtPath:pathForResource toPath:to error:nil]) {
+        LOG(@"Unable to copy \"%@\" in bundle at path \"%@\" to \"%@\"", resource, pathForResource, to);
+        return false;
+    }
+    return true;
 }
