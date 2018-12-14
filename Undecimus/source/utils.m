@@ -12,6 +12,7 @@
 #import <CommonCrypto/CommonDigest.h>
 #import <spawn.h>
 #import <QiLin.h>
+#include <copyfile.h>
 #include <common.h>
 #import "utils.h"
 
@@ -156,7 +157,7 @@ bool installDeb(char *debName) {
     if (!clean_file(destPath)) {
         return false;
     }
-    if (moveFileFromAppDir(debName, (char *)destPath) != ERR_SUCCESS) {
+    if (copyResourceFromBundle(@(debName), @(destPath)) != ERR_SUCCESS) {
         return false;
     }
     int rv = _systemf("/usr/bin/dpkg --force-bad-path --force-configure-any -i \"%s\"", destPath);
@@ -265,4 +266,15 @@ int runCommand(const char *cmd, ...) {
     }
 
     return rv;
+}
+
+bool copyResourceFromBundle(NSString *resource, NSString *to) {
+    NSBundle *bundle = [NSBundle mainBundle];
+    NSString *bundlePath = [bundle bundlePath];
+    NSString *pathForResource = [bundlePath stringByAppendingPathComponent:resource];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (![fileManager fileExistsAtPath:pathForResource]) {
+        return false;
+    }
+    return ([fileManager copyItemAtPath:pathForResource toPath:to error:nil]);
 }

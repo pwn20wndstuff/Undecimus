@@ -37,6 +37,7 @@ bool pspawnHookLoaded(void);
 bool is_symlink(const char *filename);
 bool is_directory(const char *filename);
 int runCommand(const char *cmd, ...);
+bool copyResourceFromBundle(NSString *resource, NSString *to);
 
 extern NSData *lastSystemOutput;
 
