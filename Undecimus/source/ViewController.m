@@ -2861,8 +2861,10 @@ void exploit(mach_port_t tfp0,
             rv = _system("/usr/bin/dpkg --force-depends -r cydia-gui");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             install_cydia = true;
-            setPreference(@K_INSTALL_CYDIA, @YES);
             LOG("Successfully removed Electra's Cydia.");
+        }
+        if (access("/etc/apt/sources.list.d/electra.list", F_OK) == ERR_SUCCESS) {
+            install_cydia = true;
         }
         if (install_cydia) {
             // Extract Cydia.
