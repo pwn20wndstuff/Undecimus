@@ -157,7 +157,7 @@ bool installDeb(char *debName) {
     if (!clean_file(destPath)) {
         return false;
     }
-    if (copyResourceFromBundle(@(debName), @(destPath)) != ERR_SUCCESS) {
+    if (!copyResourceFromBundle(@(debName), @(destPath))) {
         return false;
     }
     int rv = _systemf("/usr/bin/dpkg --force-bad-path --force-configure-any -i \"%s\"", destPath);
