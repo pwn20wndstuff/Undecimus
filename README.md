@@ -1,10 +1,13 @@
-# unc0ver
-### The most advanced jailbreak tool
-![unc0ver logo](https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Undecimus/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png?token=AlyO4xDujoguob2DCFfUbNI8jO82OyCgks5bx5ZPwA%3D%3D)
 
-unc0ver jailbreak for iOS 11.0 - 11.4b3<br/>
-by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
-UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](https://reddit.com/u/Samg_is_a_Ninja)<br/>
+![unc0ver banner](/Resources/Banner.png)
+
+<p align='center' style='font-weight: bold'>
+  The most advanced jailbreak tool.
+  <br>
+  The unc0ver jailbreak is compatible with iOS versions 11.0 - 11.4b3.
+  Developed by <a href="https://twitter.com/Pwn20wnd">@pwn20wnd</a> & <a href="https://twitter.com/sbinger">@sbinger</a><br>
+  UI by <a href="https://twitter.com/DennisBednarz">@DennisBednarz</a> & <a href="https://reddit.com/u/Samg_is_a_Ninja">u/Samg_is_a_Ninja</a>
+</p>
 
 ## The most outstanding changes over the other jailbreaks
 * All exploits in same app
@@ -141,3 +144,4 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@Swag_iOS](https://twitter.com/Swag_iOS) for testing
 * [@jailbreakbuster](https://twitter.com/jailbreakbuster) for testing
 * [@Jakeashacks](https://twitter.com/Jakeashacks) for testing
+* [@jvcks0n](https://twitter.com/jvcks0n) for README design
