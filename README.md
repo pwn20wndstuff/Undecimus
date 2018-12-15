@@ -93,7 +93,6 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * <a href="https://youtu.be/TqHYjLHO0zs">https://youtu.be/TqHYjLHO0zs</a>
 
 ## To Do List
-* Contact [@saurik](https://twitter.com/saurik) to enable the Cydia Store purchases on iOS 11 and remove the empty front page ads in Cydia: Partially done
 * Completely switch to Cydia Substrate and ditch Substitute: Done, testing...
 * Make switching from other jailbreaks without wiping the device possible: Almost done
 * Fix a kernel panic that's triggered by a kernel data abort which is caused by a UaF bug in jailbreakd: Almost done
