@@ -260,6 +260,8 @@ int runCommand(const char *cmd, ...) {
                 lastSystemOutput = outData;
             }
         }
+    } else {
+        LOG("ERROR: posix_spawn failed (%d): %s", rv, strerror(rv));
     }
     if (valid_pipe) {
         close(out_pipe[0]);
