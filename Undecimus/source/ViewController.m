@@ -2211,7 +2211,7 @@ void exploit(mach_port_t tfp0,
         v_mount = ReadAnywhere64(rootfs_vnode + GETOFFSET(v_mount));
         WriteAnywhere32(v_mount + GETOFFSET(mnt_flag), v_flag);
         rv = snapshot_list("/");
-        needStrap = access("/.installed_unc0ver", F_OK) != ERR_SUCCESS && access("/.bootstrapped_electra", F_OK) != ERR_SUCCESS;
+        needStrap = access("/.installed_unc0ver", F_OK) != ERR_SUCCESS && access("/electra", F_OK) != ERR_SUCCESS;
         if (rv == 0 && needStrap) {
             // Borrow entitlements from fsck_apfs.
             
@@ -2570,8 +2570,8 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to extract bootstrap.", nil));
         if (needStrap) {
             _assert(chdir("/") == ERR_SUCCESS, message, true);
-            rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", "/jb/strap.tar.lzma", NULL, true);
-            _assert(rv == 512 || rv == ERR_SUCCESS, message, true);
+            rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", "/jb/strap.tar.lzma", NULL);
+            _assert(rv == ENOENT || rv == ERR_SUCCESS, message, true);
             rv = _system("/usr/libexec/cydia/firmware.sh");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             extractResources();
