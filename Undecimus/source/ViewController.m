@@ -2884,8 +2884,8 @@ void exploit(mach_port_t tfp0,
             SETMESSAGE(NSLocalizedString(@"Failed to install Cydia.", nil));
             rv = _system("/usr/bin/dpkg -i /jb/cydia.deb /jb/cydia-lproj.deb");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
-            rv = _system("/bin/rm -rf /jb/cydia.deb /jb/cydia-lproj.deb");
-            _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
+            clean_file("/jb/cydia.deb");
+            clean_file("/jb/cydia-lproj.deb");
             LOG("Successfully installed Cydia.");
             
             // Disable Install Cydia.
