@@ -15,7 +15,7 @@ static NSString *message = nil;
 
 #define _assert(test, message, fatal) do \
     if (!(test)) { \
-        fprintf(stderr, "__assert(%d:%s)@%s:%u[%s]\n", errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
+        LOG("__assert(%d:%s)@%s:%u[%s]", errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
         if (message != nil) \
             showAlert(fatal ? @"Error (Fatal)" : @"Error (Nonfatal)", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s\nDescription: %@", errno, #test, __FILENAME__, __LINE__, __FUNCTION__, message], true, false); \
         else \

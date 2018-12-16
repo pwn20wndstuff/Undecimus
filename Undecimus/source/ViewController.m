@@ -60,6 +60,7 @@
 static ViewController *sharedController = nil;
 
 #define PROGRESS(msg, btnenbld, tbenbld) do { \
+        LOG("PROGRESS: %@", msg); \
         dispatch_async(dispatch_get_main_queue(), ^{ \
             [UIView performWithoutAnimation:^{ \
                 [[[ViewController sharedController] goButton] setEnabled:btnenbld]; \
