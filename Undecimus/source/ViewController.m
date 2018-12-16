@@ -1805,12 +1805,12 @@ void commitTrustChain(uint64_t trust_chain, uint64_t amficache) {
 
 void extractResources() {
     if (!debIsInstalled("com.bingner.spawn")) {
-        _assert(installDeb("spawn.deb"), message, true);
+        _assert(installDeb("spawn.deb", false), message, true);
     }
     if (!debIsConfigured("science.xnu.injector")) {
-        _assert(installDeb("injector.deb"), message, true);
+        _assert(installDeb("injector.deb", false), message, true);
     }
-    _assert(installDeb("resources.deb"), message, true);
+    _assert(installDeb("resources.deb", false), message, true);
 }
 
 void exploit(mach_port_t tfp0,
@@ -2586,9 +2586,7 @@ void exploit(mach_port_t tfp0,
             _assert(runCommand("/bin/rm", "-rf", "/jb/amfid_payload.tar", NULL) == ERR_SUCCESS, message, true);
         } else {
             if (!needResources) {
-                rv = _systemf("INSTALLED=\"$(dpkg -s science.xnu.undecimus.resources | grep Version: | sed -e s/'^Version: '//)\"; "\
-                               "dpkg --compare-versions \"${INSTALLED}\" lt \"%@\"", BUNDLEDRESOURCES);
-                updatedResources = !WEXITSTATUS(rv);
+                updatedResources = compareInstalledVersion("dpkg", "lt", [BUNDLEDRESOURCES UTF8String]);
             }
             if (needResources || updatedResources) {
                 extractResources();
@@ -2866,6 +2864,12 @@ void exploit(mach_port_t tfp0,
         if (access("/etc/apt/sources.list.d/electra.list", F_OK) == ERR_SUCCESS) {
             install_cydia = true;
         }
+        if (compareInstalledVersion("mobilesubstrate", "eq", "99.0")) {
+            LOG("Fixing version of Electra's mobilesubstrate dummy package.");
+            _assert(installDeb("substrate-dummy.deb", true), message, false);
+        }
+        // This is not a stock file for iOS11+
+        _system("sed -ie '/^\\/sbin\\/fstyp/d' /Library/dpkg/info/firmware-sbin.list");
         if (install_cydia) {
             // Extract Cydia.
             LOG("Extracting Cydia...");

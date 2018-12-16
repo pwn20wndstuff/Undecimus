@@ -138,20 +138,28 @@ int _systemf(const char *cmd, ...) {
 }
 
 bool debIsInstalled(char *packageID) {
-    int rv = _systemf("/usr/bin/dpkg -s \"%s\" > /dev/null 2>&1", packageID);
+    int rv = _systemf("/usr/bin/dpkg -s \"%s\" | grep Status: | grep -q \"install ok\"", packageID);
     bool isInstalled = !WEXITSTATUS(rv);
     LOG("Deb: \"%s\" is%s installed", packageID, isInstalled?"":" not");
     return isInstalled;
 }
 
 bool debIsConfigured(char *packageID) {
-    int rv = _systemf("/usr/bin/dpkg -s \"%s\" | grep Status: | grep \"install ok installed\" > /dev/null", packageID);
+    int rv = _systemf("/usr/bin/dpkg -s \"%s\" | grep Status: | grep -q \"install ok installed\"", packageID);
     bool isConfigured = !WEXITSTATUS(rv);
-    LOG("Deb: \"%s\" is%s configured", packageID, isConfigured?"":" not");
+    LOG("Deb: \"%s\" is%s installed", packageID, isConfigured?"":" not");
     return isConfigured;
 }
 
-bool installDeb(char *debName) {
+bool compareInstalledVersion(const char *packageID, const char *op, const char *version) {
+    int rv = _systemf("dpkg --compare-versions $(dpkg-query --showformat='${Version}' --show \"%s\") \"%s\" \"%s\"",
+                      packageID, op, version);
+    rv = !WEXITSTATUS(rv);
+    LOG("Deb %s is%s %s %s", packageID, rv?"":" not", op, version);
+    return rv;
+}
+
+bool installDeb(char *debName, bool forceDeps) {
     NSString *destPathStr = [NSString stringWithFormat:@"/jb/%s", debName];
     const char *destPath = [destPathStr UTF8String];
     if (!clean_file(destPath)) {
@@ -160,7 +168,7 @@ bool installDeb(char *debName) {
     if (!copyResourceFromBundle(@(debName), @(destPath))) {
         return false;
     }
-    int rv = _systemf("/usr/bin/dpkg --force-bad-path --force-configure-any -i \"%s\"", destPath);
+    int rv = _systemf("/usr/bin/dpkg %s --force-bad-path --force-configure-any -i \"%s\"", (forceDeps?"--force-depends":""), destPath);
     clean_file(destPath);
     return !WEXITSTATUS(rv);
 }
