@@ -2601,7 +2601,7 @@ void exploit(mach_port_t tfp0,
             _assert(init_file("/.installed_unc0ver", 0, 0644), message, true);
         }
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
-        bzero(link, 0x100);
+        bzero(link, sizeof(link));
         if ((readlink("/electra", link, 0x9f) == -1) ||
             (strcmp(link, "/jb") != ERR_SUCCESS)) {
             _assert(runCommand("/bin/rm", "-rf", "/electra", NULL) == ERR_SUCCESS, message, true);
