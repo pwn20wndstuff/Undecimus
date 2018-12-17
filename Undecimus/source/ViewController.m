@@ -2649,7 +2649,9 @@ void exploit(mach_port_t tfp0,
     {
         // Spawn jailbreakd.
         
-        if (access("/usr/libexec/jailbreakd", F_OK) == ERR_SUCCESS) {
+        if (access("/usr/libexec/jailbreakd", F_OK) == ERR_SUCCESS &&
+            (access("/.disable_jailbreakd", F_OK) != ERR_SUCCESS || access("/etc/rc.d/substrate", F_OK) != ERR_SUCCESS)
+            ) {
             LOG("Spawning jailbreakd...");
             UPSTAGE();
             SETMESSAGE(NSLocalizedString(@"Failed to spawn jailbreakd.", nil));
