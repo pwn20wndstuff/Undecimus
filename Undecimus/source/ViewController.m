@@ -2914,6 +2914,11 @@ void exploit(mach_port_t tfp0,
     }
 
     {
+        if (load_tweaks) {
+            clean_file("/var/tmp/.substrated_disable_loader");
+        } else {
+            init_file("/var/tmp/.substrated_disable_loader", 0, 644);
+        }
         if (load_daemons) {
             // Load Daemons.
             
@@ -2926,23 +2931,15 @@ void exploit(mach_port_t tfp0,
                         "do echo loading $a;"
                         "launchctl load \"$a\" ;"
                     "done; ");
-            if (load_tweaks) {
-                _system("for file in /etc/rc.d/*; do "
-                            "if [[ -x \"$file\" ]]; then "
-                                "\"$file\";"
-                            "fi;"
-                        "done");
-            } else {
-                _system("for file in /etc/rc.d/*; do "
-                            "if [[ \"$file\" != \"/etc/rc.d/substrate\" ]]; then "
-                                "if [[ -x \"$file\" ]]; then "
-                                    "\"$file\";"
-                                "fi;"
-                            "fi;"
-                        "done");
-            }
+            _system("for file in /etc/rc.d/*; do "
+                        "if [[ -x \"$file\" ]]; then "
+                            "\"$file\";"
+                        "fi;"
+                    "done");
             sleep(2);
             LOG("Successfully loaded Daemons.");
+        } else if (load_tweaks && access("/etc/rc.d/substrate", F_OK) == ERR_SUCCESS) {
+            _system("/etc/rc.d/substrate");
         }
     }
 
