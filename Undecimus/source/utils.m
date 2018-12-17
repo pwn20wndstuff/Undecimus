@@ -216,7 +216,15 @@ bool is_directory(const char *filename) {
     }
     return S_ISDIR(buf.st_mode);
 }
-    
+
+bool mode_is(const char *filename, mode_t mode) {
+    struct stat buf;
+    if (lstat(filename, &buf) != ERR_SUCCESS) {
+        return false;
+    }
+    return buf.st_mode == mode;
+}
+
 int runCommand(const char *cmd, ...) {
     posix_spawn_file_actions_t *actions = NULL;
     posix_spawn_file_actions_t actionsStruct;

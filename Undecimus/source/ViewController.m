@@ -2593,7 +2593,7 @@ void exploit(mach_port_t tfp0,
             _assert(runCommand("/bin/rm", "-rf", "/jb/amfid_payload.tar", NULL) == ERR_SUCCESS, message, true);
         } else {
             if (!needResources) {
-                updatedResources = compareInstalledVersion("dpkg", "lt", [BUNDLEDRESOURCES UTF8String]);
+                updatedResources = compareInstalledVersion("science.xnu.undecimus.resources", "lt", [BUNDLEDRESOURCES UTF8String]);
             }
             if (needResources || updatedResources) {
                 extractResources();
@@ -2640,6 +2640,22 @@ void exploit(mach_port_t tfp0,
             _assert(fclose(a) == ERR_SUCCESS, message, true);
             _assert(init_file("/.cydia_no_stash", 0, 0644), message, true);
             LOG("Successfully disabled stashing.");
+        }
+    }
+    
+    {
+        // Verify some stuff on filesystem isn't corrupted
+        if (!is_directory("/Library/Caches")) {
+            LOG("/Library/Caches is not a directory... removing");
+            _assert(clean_file("/Library/Caches"), @"Unable to clean invalid file at /Library/Caches", true);
+        }
+        if (access("/Library/Caches", F_OK) != ERR_SUCCESS) {
+            LOG("/Library/Caches is missing... recreating");
+            _assert(mkdir("/Library/Caches", S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO) == ERR_SUCCESS, @"Unable to mkdir /Library/Caches", false);
+        }
+        if (!mode_is("/Library/Caches", S_IFDIR|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)) {
+            LOG(@"Modes on /Library/Caches are wrong... fixing");
+            _assert(init_file("/Library/Caches", 0, S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO), @"Unable to set modes on /Library/Caches", false);
         }
     }
     
