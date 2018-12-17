@@ -3028,7 +3028,7 @@ void exploit(mach_port_t tfp0,
         }
         // Validate TFP0.
         LOG("Validating TFP0...");
-        _assert(MACH_PORT_VALID(tfp0), NSLocalizedString(@"Exploit failed. Reboot and try again.", nil), true);
+        _assert(MACH_PORT_VALID(tfp0), NSLocalizedString(@"Exploit failed. THIS IS NOT AN ERROR! Reboot and try again. ", nil), true);
         LOG("Successfully validated TFP0.");
         // NOTICE(@"Jailbreak succeeded, but still needs a few minutes to respring.", 0, 0);
         exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
