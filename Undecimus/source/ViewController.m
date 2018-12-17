@@ -1080,9 +1080,6 @@ int snapshot_rename(const char *vol, const char *from, const char *to) {
     int rv = 0;
     int fd = 0;
     fd = open(vol, O_RDONLY, 0);
-    if (rv != ERR_SUCCESS) {
-        return -1;
-    }
     rv = fs_snapshot_rename(fd, from, to, 0);
     close(fd);
     return rv;
