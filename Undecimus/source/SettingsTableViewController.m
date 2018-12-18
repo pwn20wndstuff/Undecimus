@@ -299,34 +299,10 @@
     [self reloadData];
 }
 
-extern void iosurface_die(void);
-extern int vfs_die(void);
-extern int mptcp_die(void);
-extern int necp_die(void);
-
 - (IBAction)tappedOnRestart:(id)sender {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         NOTICE(NSLocalizedString(@"The device will be restarted.", nil), true, false);
-        switch (selectRestartExploit()) {
-            case EMPTY_LIST: {
-                vfs_die();
-                break;
-            }
-            case ASYNC_WAKE: {
-                iosurface_die();
-                break;
-            }
-            case MULTI_PATH: {
-                mptcp_die();
-                break;
-            }
-            case NECP: {
-                necp_die();
-                break;
-            }
-            default:
-                break;
-        }
+        crashKernel();
     });
 }
 

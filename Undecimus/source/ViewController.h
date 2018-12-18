@@ -68,6 +68,7 @@ int selectRestartExploit(void);
 int isSupportedByRestart(void);
 int selectRespringExploit(void);
 int isSupportedByRespring(void);
+void crashKernel(void);
 
 void setPreference(NSString *key, id object);
 NSString *hexFromInt(NSInteger val);
