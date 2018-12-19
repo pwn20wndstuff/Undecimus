@@ -2928,8 +2928,9 @@ void exploit(mach_port_t tfp0,
             SETMESSAGE(NSLocalizedString(@"Failed to install OpenSSH.", nil));
             rv = _system("/usr/bin/dpkg -i /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
-            rv = _system("/bin/rm -f /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
-             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
+            clean_file("/jb/openssh.deb");
+            clean_file("/jb/openssl.deb");
+            clean_file("/jb/ca-certificates.deb");
             LOG("Successfully installed OpenSSH.");
             
             // Disable Install OpenSSH.
