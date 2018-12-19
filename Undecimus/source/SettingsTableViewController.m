@@ -372,7 +372,7 @@
         } else if ([Update compare:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] options:NSNumericSearch] == NSOrderedDescending){
             NOTICE(NSLocalizedString(@"An update is available.", nil), true, false);
         } else {
-            NOTICE(NSLocalizedString(@"You're using a pre-release version", nil), true, false);
+            NOTICE(NSLocalizedString(@"You're using a pre-release version.", nil), true, false);
         }
     });
 }

@@ -3166,7 +3166,7 @@ void exploit(mach_port_t tfp0,
     }
     LOG("Bundled Resources Version: %@", BUNDLEDRESOURCES);
     if (BUNDLEDRESOURCES == nil) {
-        showAlert(@"Error", NSLocalizedString(@"Bundled Resources version is missing. This build is invalid.", nil), false, false);
+        showAlert(NSLocalizedString(@"Error", nil), NSLocalizedString(@"Bundled Resources version is missing. This build is invalid.", nil), false, false);
     }
 }
 
