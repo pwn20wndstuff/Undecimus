@@ -75,7 +75,8 @@ int stage = __COUNTER__;
 extern int maxStage;
 
 #define PROGRESSWITHSTAGE(Stage, MaxStage) PROGRESS(([NSString stringWithFormat:@"%@ (%d/%d)", NSLocalizedString(@"Exploiting", nil), Stage, MaxStage]), false, false)
-#define UPSTAGE(x) do { \
+#define UPSTAGE() do { \
+    __COUNTER__; \
     stage++; \
     PROGRESSWITHSTAGE(stage, maxStage); \
 } while (false)
@@ -1891,7 +1892,7 @@ void exploit(mach_port_t tfp0,
 #define kernel_slide           (kernel_base - KERNEL_SEARCH_ADDRESS)
     
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Load preferences.
@@ -1914,7 +1915,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully loaded preferences.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Initialize patchfinder64.
@@ -1925,7 +1926,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully initialized patchfinder64.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Find offsets.
@@ -2000,7 +2001,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully found offsets.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Deinitialize patchfinder64.
@@ -2011,7 +2012,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully deinitialized patchfinder64.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Initialize QiLin.
@@ -2034,7 +2035,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully initialized QiLin.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Get root.
@@ -2047,7 +2048,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully got root.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Platformize.
@@ -2058,7 +2059,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully platformized.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Escape Sandbox.
@@ -2069,7 +2070,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully escaped Sandbox.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Write a test file to UserFS.
@@ -2080,7 +2081,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully wrote a test file to UserFS.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Borrow entitlements from sysdiagnose.
@@ -2093,7 +2094,7 @@ void exploit(mach_port_t tfp0,
         // We now have Task_for_pid.
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         if (dump_apticket) {
@@ -2106,7 +2107,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Unlock nvram.
@@ -2117,7 +2118,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully unlocked nvram.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Set boot-nonce.
@@ -2131,7 +2132,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Lock nvram.
@@ -2142,7 +2143,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully locked nvram.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Initialize kexecute.
@@ -2153,7 +2154,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully initialized kexecute.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Get vfs_context.
@@ -2166,7 +2167,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully got vfs_context.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Get dev vnode.
@@ -2179,7 +2180,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully got dev vnode.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Clear dev vnode's si_flags.
@@ -2197,7 +2198,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully cleared dev vnode's si_flags.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Clean up dev vnode.
@@ -2208,7 +2209,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully cleaned up dev vnode.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Remount RootFS.
@@ -2290,7 +2291,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully remounted RootFS.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Deinitialize kexecute.
@@ -2301,7 +2302,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully deinitialized kexecute.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Write a test file to RootFS.
@@ -2312,7 +2313,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully wrote a test file to RootFS.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Copy over our resources to RootFS.
@@ -2376,7 +2377,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully copied over our resources to RootFS.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Inject trust cache
@@ -2395,7 +2396,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully injected trust cache.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Log slide.
@@ -2412,7 +2413,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully logged slide.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Log ECID.
@@ -2427,7 +2428,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully logged ECID.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Log offsets.
@@ -2462,7 +2463,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully logged offsets.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Set HSP4.
@@ -2473,7 +2474,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully set HSP4.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         if (export_kernel_task_port) {
@@ -2485,7 +2486,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Patch amfid.
@@ -2503,7 +2504,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Update version string.
@@ -2521,7 +2522,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         if (restore_rootfs) {
@@ -2621,7 +2622,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Extract bootstrap.
@@ -2680,7 +2681,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully extracted bootstrap.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         if (access("/.cydia_no_stash", F_OK) != ERR_SUCCESS) {
@@ -2697,7 +2698,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Verify filesystem.
@@ -2718,7 +2719,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully verified filesystem.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Spawn jailbreakd.
@@ -2769,7 +2770,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Patch launchd.
@@ -2788,7 +2789,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         if (disable_app_revokes) {
@@ -2806,7 +2807,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Allow SpringBoard to show non-default system apps.
@@ -2827,7 +2828,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully allowed SpringBoard to show non-default system apps.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Fix Auto Updates.
@@ -2851,7 +2852,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully fixed Auto Updates.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         if (disable_auto_updates) {
@@ -2888,7 +2889,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         if (increase_memory_limit) {
@@ -2907,7 +2908,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         if (install_openssh) {
@@ -2939,7 +2940,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         if (debIsInstalled("cydia-gui")) {
@@ -2988,7 +2989,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Flush preference cache.
@@ -3000,7 +3001,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully flushed preference cache.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         // Set Disable Loader.
@@ -3018,7 +3019,7 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully set Disable Loader.");
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         rv = false;
@@ -3053,7 +3054,7 @@ void exploit(mach_port_t tfp0,
     }
 
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         if (run_uicache) {
@@ -3067,7 +3068,7 @@ void exploit(mach_port_t tfp0,
         }
     }
     
-    UPSTAGE(__COUNTER__);
+    UPSTAGE();
     
     {
         if (load_tweaks) {
@@ -3098,7 +3099,7 @@ void exploit(mach_port_t tfp0,
             PROGRESS(NSLocalizedString(@"Unsupported", nil), false, true);
             return;
         }
-        UPSTAGE(__COUNTER__);
+        UPSTAGE();
         // Initialize kernel exploit.
         LOG("Initializing kernel exploit...");
         mach_port_t persisted_port = try_restore_port();
