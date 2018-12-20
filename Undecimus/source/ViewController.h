@@ -27,6 +27,7 @@ static NSString *message = nil;
 while (false)
 
 #define NOTICE(msg, wait, destructive) showAlert(@"Notice", msg, wait, destructive)
+#define NOTICEWITHTITLE(title, msg, wait, destructive) showAlert(title, msg, wait, destructive)
 
 static inline void showAlert(NSString *title, NSString *message, Boolean wait, Boolean destructive) {
     dispatch_semaphore_t semaphore;
@@ -73,6 +74,7 @@ void crashKernel(void);
 
 void setPreference(NSString *key, id object);
 NSString *hexFromInt(NSInteger val);
+NSString *uptimeWithFormat(void);
 
 - (IBAction)tappedOnJailbreak:(id)sender;
 +(ViewController*)sharedController;

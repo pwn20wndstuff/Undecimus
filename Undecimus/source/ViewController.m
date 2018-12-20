@@ -1119,15 +1119,39 @@ int snapshot_mount(const char *vol, const char *name, const char *dir) {
     return rv;
 }
 
-double uptime() {
-    struct timeval boottime;
-    size_t len = sizeof(boottime);
-    int mib[2] = { CTL_KERN, KERN_BOOTTIME };
-    if (sysctl(mib, 2, &boottime, &len, NULL, 0) < 0) {
-        return -1.0;
+NSString *uptimeWithFormat() {
+    struct timeval sys_boot_time;
+    int arg_arr[2] = {CTL_KERN, KERN_BOOTTIME};
+    size_t struct_size = sizeof(sys_boot_time);
+    sysctl(arg_arr, 2, &sys_boot_time, &struct_size, NULL, 0);
+    
+    __darwin_time_t uptime = time(NULL) - sys_boot_time.tv_sec;
+    if(!uptime)
+    {
+        uptime = (__darwin_time_t)[NSProcessInfo processInfo].systemUptime;
     }
-    time_t bsec = boottime.tv_sec, csec = time(NULL);
-    return difftime(csec, bsec);
+    
+    NSMutableString* uptimeString = [[NSMutableString alloc] init];
+    
+    if(uptime)
+    {
+        int dividers[] = {86400, 3600, 60};
+        NSArray *unitNames = @[@"Day", @"Hour", @"Minute"];
+        long usable = 0;
+        int loopcounter;
+        long res = uptime;
+        for(loopcounter = 0; loopcounter < 3; loopcounter++)
+        {
+            usable = res / dividers[loopcounter];
+            res = (int)uptime % dividers[loopcounter];
+            
+            if(usable)
+            {
+                [uptimeString appendString:[NSString stringWithFormat:@"%ld %@%s ", usable, [unitNames objectAtIndex:loopcounter], (usable > 1 ? "s" : "")]];
+            }
+        }
+    }
+    return uptimeString;
 }
 
 int isJailbroken() {
@@ -3142,7 +3166,7 @@ void exploit(mach_port_t tfp0,
     });
 }
 
-+ (NSURL *)getURLForUserName:(NSString *)userName {
++ (NSURL *)openTwitterProfileForUsername:(NSString *)userName {
     if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetbot://"]]) {
         return [NSURL URLWithString:[NSString stringWithFormat:@"tweetbot:///user_profile/%@", userName]];
     } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitterrific://"]]) {
@@ -3153,6 +3177,15 @@ void exploit(mach_port_t tfp0,
         return [NSURL URLWithString:[NSString stringWithFormat:@"https://mobile.twitter.com/%@", userName]];
     } else {
         return [NSURL URLWithString:[NSString stringWithFormat:@"https://mobile.twitter.com/%@", userName]];
+    }
+}
++ (NSURL *)openRedditProfileForUsername:(NSString *)userName {
+    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"apollo://"]]) {
+        return [NSURL URLWithString:[NSString stringWithFormat:@"apollo://www.reddit.com/u/%@", userName]];
+    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"reddit://"]]) {
+        return [NSURL URLWithString:[NSString stringWithFormat:@"reddit:///u/%@", userName]];
+    } else {
+        return [NSURL URLWithString:[NSString stringWithFormat:@"https://reddit.com/u/%@", userName]];
     }
 }
 
@@ -3181,19 +3214,19 @@ void exploit(mach_port_t tfp0,
 }
 
 - (IBAction)tappedOnPwn:(id)sender{
-    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[ViewController openTwitterProfileForUsername:@"Pwn20wnd"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnDennis:(id)sender{
-    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[ViewController openTwitterProfileForUsername:@"DennisBednarz"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnSamB:(id)sender{
-    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[ViewController openTwitterProfileForUsername:@"sbingner"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnSamG:(id)sender{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://reddit.com/u/Samg_is_a_Ninja"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[ViewController openRedditProfileForUsername:@"Samg_is_a_ninja"] options:@{} completionHandler:nil];
 }
 
 // This intentionally returns nil if called before it's been created by a proper init

@@ -49,7 +49,7 @@
 		22C546CA21A8D8AC00EFC09C /* openssh.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C221A8D7FA00EFC09C /* openssh.deb */; };
 		22C546CB21A8D8AC00EFC09C /* openssl.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C421A8D7FA00EFC09C /* openssl.deb */; };
 		22C546CC21A8D8AC00EFC09C /* resources.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C121A8D7DA00EFC09C /* resources.deb */; };
-		8D592A68218E47F60035D2BC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D592A67218E47F60035D2BC /* Main.storyboard */; };
+		E7F60FA121CC2C580009B49D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E7F60FA021CC2C580009B49D /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -124,7 +124,7 @@
 		22C546C421A8D7FA00EFC09C /* openssl.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = openssl.deb; sourceTree = "<group>"; };
 		22C546C521A8D7FA00EFC09C /* cydia.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = cydia.deb; sourceTree = "<group>"; };
 		22C546C621A8D7FA00EFC09C /* cydia-lproj.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "cydia-lproj.deb"; sourceTree = "<group>"; };
-		8D592A67218E47F60035D2BC /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		E7F60FA021CC2C580009B49D /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -277,8 +277,8 @@
 				2170BD3621B192B90059BD10 /* resources */,
 				2170BD3521B192A30059BD10 /* libs */,
 				2170BD3421B192750059BD10 /* include */,
-				8D592A67218E47F60035D2BC /* Main.storyboard */,
 				21C0FC7321369EB800849420 /* Assets.xcassets */,
+				E7F60FA021CC2C580009B49D /* Main.storyboard */,
 				21C0FC7521369EB800849420 /* LaunchScreen.storyboard */,
 				21C0FC7821369EB800849420 /* Info.plist */,
 			);
@@ -355,11 +355,11 @@
 				22C546CC21A8D8AC00EFC09C /* resources.deb in Resources */,
 				21C13110214C2E570021AA9D /* strap.tar.lzma in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
-				8D592A68218E47F60035D2BC /* Main.storyboard in Resources */,
 				21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */,
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
 				21C13116214C51100021AA9D /* lzma.tar in Resources */,
 				2139534C21763A0C00B17F8D /* rsync.tar in Resources */,
+				E7F60FA121CC2C580009B49D /* Main.storyboard in Resources */,
 				22C546BA21A8D59C00EFC09C /* amfid_payload.tar in Resources */,
 				21C13105214C20950021AA9D /* tar.tar in Resources */,
 			);

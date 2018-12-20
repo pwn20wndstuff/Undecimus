@@ -210,12 +210,23 @@
     self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
     self.tap.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:self.tap];
+    [self updateUptime];
     [self reloadData];
+    NSTimer *updateUptimeConstantly = [NSTimer scheduledTimerWithTimeInterval:60
+                                                                       target:self
+                                                                     selector:@selector(updateUptime)
+                                                                     userInfo:nil
+                                                                      repeats:YES];
 }
 
 - (void)userTappedAnyware:(UITapGestureRecognizer *) sender
 {
     [self.view endEditing:YES];
+}
+
+- (void)updateUptime {
+    [self.UptimeLabel setPlaceholder:[NSString stringWithFormat:@"%@", uptimeWithFormat()]];
+    [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:3 inSection:2]] withRowAnimation:UITableViewRowAnimationNone];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -241,7 +252,6 @@
     [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE]];
     [self.ExportKernelTaskPortSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT]];
     [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]];
-    [self.UptimeLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)uptime() / 86400, NSLocalizedString(@"Days", nil)]];
     [self.IncreaseMemoryLimitSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INCREASE_MEMORY_LIMIT]];
     [self.installSSHSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_OPENSSH]];
     [self.installCydiaSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_CYDIA]];
@@ -274,11 +284,19 @@
         [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@ADDR, val] forKey:@K_BOOT_NONCE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     } else {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Invalid Entry", nil) message:NSLocalizedString(@"The boot nonce entered could not be parsed", nil) preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *OK = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleDefault handler:nil];
-        [alertController addAction:OK];
-        [self presentViewController:alertController animated:YES completion:nil];
+        UIAlertController *invalidEntryAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Invalid Entry", nil) message:NSLocalizedString(@"The boot nonce entered could not be parsed.", nil) preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Close", nil) style:UIAlertActionStyleDefault handler:nil];
+        [invalidEntryAlert addAction:defaultAction];
+        [self presentViewController:invalidEntryAlert animated:YES completion:nil];
     }
+    UIAlertController *copyBootNonceAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Boot Nonce", nil) message:NSLocalizedString(@"Boot Nonce was successfully changed. Would you like to copy to Clipboard?", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Copy", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UIPasteboard generalPasteboard] setString:[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE]];
+    }];
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil) style:UIAlertActionStyleCancel handler:nil];
+    [copyBootNonceAlert addAction:copyAction];
+    [copyBootNonceAlert addAction:noAction];
+    [self presentViewController:copyBootNonceAlert animated:TRUE completion:nil];
     [self reloadData];
 }
 
@@ -299,10 +317,16 @@
     [self reloadData];
 }
 
-- (IBAction)tappedOnRestart:(id)sender {
+- (IBAction)tappedOnReboot:(id)sender {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-        NOTICE(NSLocalizedString(@"The device will be restarted.", nil), true, false);
+        UIAlertController *confirmAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Reboot Device", nil) message:NSLocalizedString(@"Are you sure you want to reboot your device?", nil) preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         crashKernel();
+        }];
+        UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil) style:UIAlertActionStyleCancel handler:nil];
+        [confirmAlert addAction:yesAction];
+        [confirmAlert addAction:noAction];
+        [self presentViewController:confirmAlert animated:TRUE completion:nil];
     });
 }
 
@@ -336,26 +360,54 @@
     [self reloadData];
 }
 
-- (IBAction)tappedOnCopyNonce:(id)sender{
-    UIAlertController *copyBootNonceAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Copy boot nonce?", nil) message:NSLocalizedString(@"Would you like to copy nonce generator to clipboard?", nil) preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [[UIPasteboard generalPasteboard] setString:[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE]];
-    }];
-    UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil) style:UIAlertActionStyleCancel handler:nil];
-    [copyBootNonceAlert addAction:copyAction];
-    [copyBootNonceAlert addAction:noAction];
-    [self presentViewController:copyBootNonceAlert animated:TRUE completion:nil];
+- (IBAction)tappedNonceLabel:(id)sender{
+    UIAlertController *nonceDefinitionAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Boot Nonce", nil) message:NSLocalizedString(@"A boot nonce is a generator created for deriving your system of a nonce.", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Close", nil) style:UIAlertActionStyleDefault handler:nil];
+    [nonceDefinitionAlert addAction:defaultAction];
+    [self presentViewController:nonceDefinitionAlert animated:TRUE completion:nil];
 }
 
-- (IBAction)tappedOnCopyECID:(id)sender {
-    UIAlertController *copyBootNonceAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Copy ECID?", nil) message:NSLocalizedString(@"Would you like to ECID to clipboard?", nil) preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+- (IBAction)tappedRec0verLabel:(id)sender {
+    UIAlertController *rec0verDefinitionAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Restore RootFS (rec0ver)", nil) message:NSLocalizedString(@"Enabling this option will return your device's file system to the state immediately after your first jailbreak was completely successfully.", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Close", nil) style:UIAlertActionStyleDefault handler:nil];
+    [rec0verDefinitionAlert addAction:defaultAction];
+    [self presentViewController:rec0verDefinitionAlert animated:TRUE completion:nil];
+    
+}
+
+- (IBAction)tappedTFP0Label:(id)sender {
+    UIAlertController *tfp0DefinitionAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Export TFP0", nil) message:NSLocalizedString(@"Enabling this option will allow any sandboxed application to access anything it wants. This could give a malicious application access to your personal data.", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Close", nil) style:UIAlertActionStyleDefault handler:nil];
+    [tfp0DefinitionAlert addAction:defaultAction];
+    [self presentViewController:tfp0DefinitionAlert animated:TRUE completion:nil];
+}
+- (IBAction)tappedIncreaseMemLabel:(id)sender {
+    UIAlertController *memDefinitionAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Increase Memory Limit", nil) message:NSLocalizedString(@"Enabling this option will theoretically prevent memory leaks from crashing your system. This is especially useful when using Substitute.", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Close", nil) style:UIAlertActionStyleDefault handler:nil];
+    [memDefinitionAlert addAction:defaultAction];
+    [self presentViewController:memDefinitionAlert animated:TRUE completion:nil];
+}
+
+- (IBAction)tappedECIDLabel:(id)sender {
+    UIAlertController *ecidDefinitionAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"ECID", nil) message:NSLocalizedString(@"Electronic Chip IDentifier is a device-specific hexadecimal used when requesting an APTicket on Apple's servers. Used during any type of restore/upgrade.", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Copy ECID", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [[UIPasteboard generalPasteboard] setString:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
     }];
-    UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil) style:UIAlertActionStyleCancel handler:nil];
-    [copyBootNonceAlert addAction:copyAction];
-    [copyBootNonceAlert addAction:noAction];
-    [self presentViewController:copyBootNonceAlert animated:TRUE completion:nil];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Close", nil) style:UIAlertActionStyleCancel handler:nil];
+    [ecidDefinitionAlert addAction:copyAction];
+    [ecidDefinitionAlert addAction:defaultAction];
+    [self presentViewController:ecidDefinitionAlert animated:TRUE completion:nil];
+}
+- (IBAction)tappedKELabel:(id)sender {
+    NSString *main = @"A kernel exploit is the leading role when jailbreaking your device. These exploits are targetted at vulnerable locations in iOS. Once sucessfully exploited, the actual jailbreaking of your device can commence.";
+    NSString *elString = @"EL - least reliable for 11.0-11.4b3";
+    NSString *mpString = @"MP - reliable for 11.0-11.3.1";
+    NSString *awString = @"AW - most reliable for 11.0-11.1.2";
+    NSString *msg = [NSString stringWithFormat:@"%@\n%@\n%@\n%@",main,elString,mpString,awString];
+    UIAlertController *keDefinitionAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Kernel Exploit", nil) message:NSLocalizedString(msg, nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Close", nil) style:UIAlertActionStyleDefault handler:nil];
+    [keDefinitionAlert addAction:defaultAction];
+    [self presentViewController:keDefinitionAlert animated:TRUE completion:nil];
 }
 
 - (IBAction)tappedOnGetTechnicalSupport:(id)sender {
@@ -366,13 +418,11 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         NSString *Update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
         if (Update == nil) {
-            NOTICE(NSLocalizedString(@"Failed to check for update.", nil), true, false);
-        } else if ([Update isEqualToString:[NSString stringWithFormat:@"%@", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]]) {
-            NOTICE(NSLocalizedString(@"Already up to date.", nil), true, false);
-        } else if ([Update compare:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] options:NSNumericSearch] == NSOrderedDescending){
-            NOTICE(NSLocalizedString(@"An update is available.", nil), true, false);
+            NOTICEWITHTITLE(@"Error", @"The application failed to check for an update. Please try again later.", true, false);
+        } else if ([Update isEqualToString:[NSString stringWithFormat:@"%@\n", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]]) {
+            NOTICEWITHTITLE(@"Up to Date", @"This is the latest version of unc0ver.", true, false);
         } else {
-            NOTICE(NSLocalizedString(@"You're using a pre-release version.", nil), true, false);
+            NOTICEWITHTITLE(@"Update", @"unc0ver has an update!", true, false);
         }
     });
 }
@@ -422,27 +472,53 @@
     [self reloadData];
 }
 
+- (IBAction)tappedUptimeLabel:(id)sender {
+    UIAlertController *uptimeDefinitionAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Device Uptime", nil) message:NSLocalizedString(@"This number is how long your device has been running. A reboot, shutdown, or anything leading to the phone entering an unjailbroken state will cause this number to reset.", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Close", nil) style:UIAlertActionStyleDefault handler:nil];
+    [uptimeDefinitionAlert addAction:defaultAction];
+    [self presentViewController:uptimeDefinitionAlert animated:TRUE completion:nil];
+}
+- (IBAction)tappedExpireLabel:(id)sender {
+    UIAlertController *expiryDefinitionAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Application Expiration", nil) message:NSLocalizedString(@"Apple signs applications for different periods of time. Eventually, this app will expire. This number is an estimation on the number of days remaining before the application expires.", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Close", nil) style:UIAlertActionStyleDefault handler:nil];
+    [expiryDefinitionAlert addAction:defaultAction];
+    [self presentViewController:expiryDefinitionAlert animated:TRUE completion:nil];
+}
+
 - (IBAction)tappedRestartSpringBoard:(id)sender {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         SETMESSAGE(NSLocalizedString(@"Failed to restart SpringBoard.", nil));
-        NOTICE(NSLocalizedString(@"SpringBoard will be restarted.", nil), true, false);
-        switch (selectRespringExploit()) {
-            case DEJA_XNU: {
-                mach_port_t bb_tp = hid_event_queue_exploit();
-                _assert(MACH_PORT_VALID(bb_tp), message, true);
-                _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0)) == 0, message, true);
-                break;
+        UIAlertController *confirmAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Restart SpringBoard", nil) message:NSLocalizedString(@"Are you sure you want to restart the SpringBoard?", nil) preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            switch (selectRespringExploit()) {
+                case DEJA_XNU: {
+                    mach_port_t bb_tp = hid_event_queue_exploit();
+                    _assert(MACH_PORT_VALID(bb_tp), message, true);
+                    _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0)) == 0, message, true);
+                    break;
+                }
+                default:
+                    break;
             }
-            default:
-                break;
-        }
+        }];
+        UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil) style:UIAlertActionStyleCancel handler:nil];
+        [confirmAlert addAction:yesAction];
+        [confirmAlert addAction:noAction];
+        [self presentViewController:confirmAlert animated:TRUE completion:nil];
     });
 }
 
 - (IBAction)tappedOnCleanDiagnosticsData:(id)sender {
-    RESET_LOGS();
-    START_LOGGING();
-    NOTICE(@"Cleaned diagnostics data.", false, false);
+    UIAlertController *confirmAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Clear Diagnostics Data", nil) message:NSLocalizedString(@"Are you sure you want to clear the Diagnostics Data?", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        RESET_LOGS();
+        START_LOGGING();
+        NOTICEWITHTITLE(@"Diagnostics Data cleared", @"Diagnostics Data for this device have been successfully cleared.", false, false);
+    }];
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil) style:UIAlertActionStyleCancel handler:nil];
+    [confirmAlert addAction:yesAction];
+    [confirmAlert addAction:noAction];
+    [self presentViewController:confirmAlert animated:TRUE completion:nil];
 }
 
 - (void)didReceiveMemoryWarning {
