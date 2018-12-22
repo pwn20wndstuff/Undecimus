@@ -1113,7 +1113,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="About" footerTitle="unc0ver v2.2.0" id="BPp-X8-rgq">
+                            <tableViewSection headerTitle="About" footerTitle="unc0ver v2.1.0" id="BPp-X8-rgq">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="kWZ-BF-1IZ">
                                         <rect key="frame" x="0.0" y="1443" width="375" height="44"/>

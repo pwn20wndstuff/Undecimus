@@ -133,7 +133,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */,
 				2170BD3721B193650059BD10 /* qilin.o in Frameworks */,
 				2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */,
 				2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */,
@@ -163,7 +162,6 @@
 		21675B62214A68B700D20E2B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				22CFED9121CDFE6B00A216BE /* libmis.tbd */,
 				211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */,
 			);
 			name = Frameworks;
@@ -218,8 +216,6 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
-				22CFED8F21CDF5C900A216BE /* inject.h */,
-				22CFED8E21CDF5C900A216BE /* inject.m */,
 				2101395321A09BB700F9C5F2 /* hideventsystem.c */,
 				2101395421A09BB700F9C5F2 /* hideventsystem.h */,
 				21C130FC214C1EC00021AA9D /* untar.h */,
@@ -421,7 +417,6 @@
 				21C130FB214C1EBA0021AA9D /* untar.c in Sources */,
 				21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */,
 				2116449A21737F9500250744 /* ViewController.m in Sources */,
-				22CFED9021CDF5C900A216BE /* inject.m in Sources */,
 				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* kmem.c in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
