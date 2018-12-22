@@ -26,7 +26,6 @@
 #include <common.h>
 #include <iokit.h>
 #include <QiLin.h>
-#include <libjb.h>
 #include <NSTask.h>
 #include <MobileGestalt.h>
 #include <netdb.h>
@@ -46,6 +45,7 @@
 #include "multi_path_sploit.h"
 #include "async_wake.h"
 #include "utils.h"
+#import "../../Injector/inject.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -1765,52 +1765,6 @@ NSArray *getCleanUpFileList() {
     return array;
 }
 
-void addTrustChain(const char *Path, uint64_t trust_chain, uint64_t amficache) {
-    LOG("Adding %s to trust chain...\n", Path);
-    if (access(Path, F_OK) != ERR_SUCCESS) {
-        LOG("File %s doesn't exist, ignoring...", Path);
-        return;
-    }
-    if (is_symlink(Path)) {
-        LOG("File %s is a symlink, ignoring...", Path);
-        return;
-    }
-    _assert(grab_hashes(Path, kread, amficache, ReadAnywhere64(trust_chain)) == ERR_SUCCESS, message, true);
-    LOG("Successfully added %s to trust chain.\n", Path);
-}
-
-void commitTrustChain(uint64_t trust_chain, uint64_t amficache) {
-    static uint64_t kernel_trust = 0;
-    static size_t kernel_trust_length = 0;
-    static uint64_t original_trust_chain = 0;
-    struct trust_mem mem;
-    uint64_t old_trust = kernel_trust;
-    uint64_t old_kernel_trust_length = kernel_trust_length;
-    
-    if (original_trust_chain == 0) {
-        original_trust_chain = ReadAnywhere64(trust_chain);
-    }
-    
-    mem.next = original_trust_chain;
-    *(uint64_t *)&mem.uuid[0] = 0xabadbabeabadbabe;
-    *(uint64_t *)&mem.uuid[8] = 0xabadbabeabadbabe;
-    
-    size_t length = (sizeof(mem) + numhash * 20 + 0xFFFF) & ~0xFFFF;
-    kernel_trust = kmem_alloc(length);
-    LOG("alloced: 0x%zx => 0x%llx\n", length, kernel_trust);
-    
-    mem.count = numhash;
-    kwrite(kernel_trust, &mem, sizeof(mem));
-    kwrite(kernel_trust + sizeof(mem), allhash, numhash * 20);
-    WriteAnywhere64(trust_chain, kernel_trust);
-    if (old_trust != 0 && old_kernel_trust_length != 0) {
-        kmem_free(old_trust, old_kernel_trust_length);
-        old_trust = 0;
-        old_kernel_trust_length = 0;
-    }
-    LOG("Successfully committed %d hashes to trust chain.", numhash);
-}
-
 void extractResources() {
     if (!debIsInstalled("com.bingner.spawn")) {
         _assert(installDeb("spawn.deb", false), message, true);
@@ -1885,7 +1839,6 @@ void exploit(mach_port_t tfp0,
     const char *amfid_payload = NULL;
     bool updatedResources = false;
     char link[0x100];
-    NSArray *resources = nil;
     const char *jbdPidFile = NULL;
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
@@ -2385,14 +2338,17 @@ void exploit(mach_port_t tfp0,
         LOG("Injecting trust cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
         LOG("trust_chain = 0x%llx\n", GETOFFSET(trust_chain));
-        addTrustChain("/jb", GETOFFSET(trust_chain), GETOFFSET(amficache));
+        NSMutableArray *resources = [NSMutableArray new];
         if (!needResources) {
-            resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
-            for (NSString *resource in resources) {
-                addTrustChain([resource UTF8String], GETOFFSET(trust_chain), GETOFFSET(amficache));
-            }
+            [resources addObjectsFromArray:[NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"]];
         }
-        commitTrustChain(GETOFFSET(trust_chain), GETOFFSET(amficache));
+        [resources addObject:@(amfid_payload)];
+        const char *resarray[resources.count + 1];
+        for (int i=0; i<resources.count; i++) {
+            resarray[i] = [resources[i] UTF8String];
+        }
+        resarray[resources.count] = NULL;
+        _assert(injectTrustCache((int)resources.count, (char **)resarray, GETOFFSET(trust_chain)) == 0, message, true);
         LOG("Successfully injected trust cache.");
     }
     
