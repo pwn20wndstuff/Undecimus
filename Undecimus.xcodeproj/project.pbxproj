@@ -56,6 +56,10 @@
 /* Begin PBXFileReference section */
 		2101395321A09BB700F9C5F2 /* hideventsystem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hideventsystem.c; sourceTree = "<group>"; };
 		2101395421A09BB700F9C5F2 /* hideventsystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hideventsystem.h; sourceTree = "<group>"; };
+		211C372521CE2DD700ADBEA2 /* reboot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reboot.h; sourceTree = "<group>"; };
+		211C372721CE2DD800ADBEA2 /* route.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = route.h; sourceTree = "<group>"; };
+		211C372921CE2DD800ADBEA2 /* proc_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = proc_info.h; sourceTree = "<group>"; };
+		211C372A21CE2DD800ADBEA2 /* kern_control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kern_control.h; sourceTree = "<group>"; };
 		211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libMobileGestalt.tbd; path = usr/lib/libMobileGestalt.tbd; sourceTree = SDKROOT; };
 		212D8842216E4C4700A36DA5 /* find_port.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = find_port.c; sourceTree = "<group>"; };
 		212D8843216E4C4700A36DA5 /* find_port.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = find_port.h; sourceTree = "<group>"; };
@@ -144,6 +148,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		211C372621CE2DD800ADBEA2 /* net */ = {
+			isa = PBXGroup;
+			children = (
+				211C372721CE2DD800ADBEA2 /* route.h */,
+			);
+			path = net;
+			sourceTree = "<group>";
+		};
+		211C372821CE2DD800ADBEA2 /* sys */ = {
+			isa = PBXGroup;
+			children = (
+				211C372921CE2DD800ADBEA2 /* proc_info.h */,
+				211C372A21CE2DD800ADBEA2 /* kern_control.h */,
+			);
+			path = sys;
+			sourceTree = "<group>";
+		};
 		21675B62214A68B700D20E2B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -156,6 +177,9 @@
 		2170BD3421B192750059BD10 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				211C372621CE2DD800ADBEA2 /* net */,
+				211C372521CE2DD700ADBEA2 /* reboot.h */,
+				211C372821CE2DD800ADBEA2 /* sys */,
 				21C0FC8B21369FC500849420 /* common.h */,
 				21C0FC8F2136A2C500849420 /* iokit.h */,
 				21C0FC8D2136A0D100849420 /* QiLin.h */,

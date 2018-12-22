@@ -1326,9 +1326,9 @@ void setPreference(NSString *key, id object) {
     _assert(md != nil, message, true);
     if (![md[key] isEqual:object]) {
         md[key] = object;
-        _assert(kill(findPidOfProcess("cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
+        _assert(kill(pidOfProcess("cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
         _assert(([md writeToFile:PREFERENCES_FILE atomically:YES]), message, true);
-        _assert(kill(findPidOfProcess("cfprefsd"), SIGCONT) == ERR_SUCCESS, message, true);
+        _assert(kill(pidOfProcess("cfprefsd"), SIGCONT) == ERR_SUCCESS, message, true);
     }
 }
 
@@ -2507,7 +2507,7 @@ void exploit(mach_port_t tfp0,
             LOG("Patching amfid...");
             SETMESSAGE(NSLocalizedString(@"Failed to patch amfid.", nil));
             _assert(clean_file("/var/tmp/amfid_payload.alive"), message, true);
-            amfidPid = findPidOfProcess("amfid");
+            amfidPid = pidOfProcess("amfid");
             LOG("amfidPid: " "0x%x" "\n", amfidPid);
             _assert(amfidPid > 1, message, true);
             amfidProcAddr = getProcStructForPid(amfidPid);
@@ -2846,10 +2846,10 @@ void exploit(mach_port_t tfp0,
         md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
         _assert(md != nil, message, true);
         for (int i = 0; !(i >= 5 || [md[@"SBShowNonDefaultSystemApps"] isEqual:@YES]); i++) {
-            _assert(kill(findPidOfProcess("cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
+            _assert(kill(pidOfProcess("cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
             md[@"SBShowNonDefaultSystemApps"] = @YES;
             _assert(([md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES]), message, true);
-            _assert(kill(findPidOfProcess("cfprefsd"), SIGCONT) == ERR_SUCCESS, message, true);
+            _assert(kill(pidOfProcess("cfprefsd"), SIGCONT) == ERR_SUCCESS, message, true);
             md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
             _assert(md != nil, message, true);
         }
@@ -3022,8 +3022,8 @@ void exploit(mach_port_t tfp0,
         
         LOG("Flushing preference cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to flush preference cache.", nil));
-        _assert(kill(findPidOfProcess("cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
-        _assert(kill(findPidOfProcess("cfprefsd"), SIGKILL) == ERR_SUCCESS, message, true);
+        _assert(kill(pidOfProcess("cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
+        _assert(kill(pidOfProcess("cfprefsd"), SIGKILL) == ERR_SUCCESS, message, true);
         LOG("Successfully flushed preference cache.");
     }
     

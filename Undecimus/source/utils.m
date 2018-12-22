@@ -14,6 +14,7 @@
 #import <QiLin.h>
 #include <copyfile.h>
 #include <common.h>
+#include <libproc.h>
 #import "utils.h"
 
 extern char **environ;
@@ -300,4 +301,23 @@ bool copyResourceFromBundle(NSString *resource, NSString *to) {
         return false;
     }
     return true;
+}
+
+pid_t pidOfProcess(const char *name) {
+    int numberOfProcesses = proc_listpids(PROC_ALL_PIDS, 0, NULL, 0);
+    pid_t pids[numberOfProcesses];
+    bzero(pids, sizeof(pids));
+    proc_listpids(PROC_ALL_PIDS, 0, pids, (int)sizeof(pids));
+    for (int i = 0; i < numberOfProcesses; ++i) {
+        if (pids[i] == 0) {
+            continue;
+        }
+        char pathBuffer[PROC_PIDPATHINFO_MAXSIZE];
+        bzero(pathBuffer, PROC_PIDPATHINFO_MAXSIZE);
+        proc_pidpath(pids[i], pathBuffer, sizeof(pathBuffer));
+        if (strlen(pathBuffer) > 0 && strcmp(pathBuffer, name) == ERR_SUCCESS) {
+            return pids[i];
+        }
+    }
+    return 0;
 }
