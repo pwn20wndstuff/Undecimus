@@ -32,7 +32,7 @@
     // Dispose of any resources that can be recreated.
 }
 
-+ (NSURL *)openTwitterProfileForUsername:(NSString *)userName {
++ (NSURL *)getURLForUserName:(NSString *)userName {
     if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetbot://"]]) {
         return [NSURL URLWithString:[NSString stringWithFormat:@"tweetbot:///user_profile/%@", userName]];
     } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitterrific://"]]) {
@@ -46,89 +46,63 @@
     }
 }
 
-+ (NSURL *)openRedditProfileForUsername:(NSString *)userName {
-    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"apollo://"]]) {
-        return [NSURL URLWithString:[NSString stringWithFormat:@"apollo://www.reddit.com/u/%@", userName]];
-    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"reddit://"]]) {
-        return [NSURL URLWithString:[NSString stringWithFormat:@"reddit:///u/%@", userName]];
-    } else {
-        return [NSURL URLWithString:[NSString stringWithFormat:@"https://reddit.com/u/%@", userName]];
-    }
-}
-
--(IBAction)tappedPwn:(id)sender {
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"pwn20wnd"] options:@{} completionHandler:nil];
-}
-
--(IBAction)tappedBing:(id)sender {
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"sbingner"] options:@{} completionHandler:nil];
-}
-
--(IBAction)tappedDennis:(id)sender {
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"DennisBednarz"] options:@{} completionHandler:nil];
-}
-
--(IBAction)tappedSamg:(id)sender {
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openRedditProfileForUsername:@"Samg_is_a_ninja"] options:@{} completionHandler:nil];
-}
-
 -(IBAction)tappedOnIanBeer:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"i41nbeer"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"i41nbeer"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnMorpheus:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"morpheus______"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"morpheus______"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnXerub:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"xerub"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"xerub"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnPsychoTea:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"ibsparkes"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"ibsparkes"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnStek:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"stek29"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"stek29"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnNinjaPrawn:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"theninjaprawn"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"theninjaprawn"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnCryptic:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"Cryptiiiic"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Cryptiiiic"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnXerusDesign:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"xerusdesign"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"xerusdesign"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnAppleDry:(id)sender{
-   [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"AppleDry05"] options:@{} completionHandler:nil];
+   [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"AppleDry05"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnRob:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"Rob_Coleman123"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Rob_Coleman123"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnMidnightChip:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"MidnightChip"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"MidnightChip"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnGeoSn0w:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"FCE365"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"FCE365"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnSwaggo:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"Swag_iOS"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Swag_iOS"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnJailbreakbuster:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"jailbreakbuster"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"jailbreakbuster"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnJakeashacks:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController openTwitterProfileForUsername:@"Jakeashacks"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Jakeashacks"] options:@{} completionHandler:nil];
 }
 @end
