@@ -17,7 +17,6 @@
 		21466CDC21AEEA3A00B99B4C /* injector.deb in Resources */ = {isa = PBXBuildFile; fileRef = 21466CDB21AEEA3A00B99B4C /* injector.deb */; };
 		21466CDE21AEEC9200B99B4C /* spawn.deb in Resources */ = {isa = PBXBuildFile; fileRef = 21466CDD21AEEC9200B99B4C /* spawn.deb */; };
 		2170BD3721B193650059BD10 /* qilin.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC8C2136A0D100849420 /* qilin.o */; };
-		2170BD3821B193670059BD10 /* libjb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 21A97FCF2148103C00DC0023 /* libjb.a */; };
 		2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */; };
 		2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
@@ -55,6 +54,10 @@
 /* Begin PBXFileReference section */
 		2101395321A09BB700F9C5F2 /* hideventsystem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hideventsystem.c; sourceTree = "<group>"; };
 		2101395421A09BB700F9C5F2 /* hideventsystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hideventsystem.h; sourceTree = "<group>"; };
+		211C372521CE2DD700ADBEA2 /* reboot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reboot.h; sourceTree = "<group>"; };
+		211C372721CE2DD800ADBEA2 /* route.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = route.h; sourceTree = "<group>"; };
+		211C372921CE2DD800ADBEA2 /* proc_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = proc_info.h; sourceTree = "<group>"; };
+		211C372A21CE2DD800ADBEA2 /* kern_control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kern_control.h; sourceTree = "<group>"; };
 		211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libMobileGestalt.tbd; path = usr/lib/libMobileGestalt.tbd; sourceTree = SDKROOT; };
 		212D8842216E4C4700A36DA5 /* find_port.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = find_port.c; sourceTree = "<group>"; };
 		212D8843216E4C4700A36DA5 /* find_port.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = find_port.h; sourceTree = "<group>"; };
@@ -69,7 +72,6 @@
 		21A97FC42148103A00DC0023 /* kexecute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kexecute.h; sourceTree = "<group>"; };
 		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
 		21A97FC62148103B00DC0023 /* remote_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_memory.c; sourceTree = "<group>"; };
-		21A97FC72148103B00DC0023 /* libjb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libjb.h; sourceTree = "<group>"; };
 		21A97FC82148103B00DC0023 /* kexecute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = kexecute.m; sourceTree = "<group>"; };
 		21A97FC92148103B00DC0023 /* kutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kutils.h; sourceTree = "<group>"; };
 		21A97FCA2148103B00DC0023 /* patchfinder64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = patchfinder64.c; sourceTree = "<group>"; };
@@ -77,7 +79,6 @@
 		21A97FCC2148103B00DC0023 /* kutils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kutils.c; sourceTree = "<group>"; };
 		21A97FCD2148103B00DC0023 /* remote_call.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_call.c; sourceTree = "<group>"; };
 		21A97FCE2148103C00DC0023 /* remote_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_memory.h; sourceTree = "<group>"; };
-		21A97FCF2148103C00DC0023 /* libjb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjb.a; sourceTree = "<group>"; };
 		21C0FC6721369EB700849420 /* Undecimus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Undecimus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		21C0FC6A21369EB700849420 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		21C0FC6B21369EB700849420 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -132,9 +133,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */,
 				2170BD3721B193650059BD10 /* qilin.o in Frameworks */,
 				2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */,
-				2170BD3821B193670059BD10 /* libjb.a in Frameworks */,
 				2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -142,9 +143,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		211C372621CE2DD800ADBEA2 /* net */ = {
+			isa = PBXGroup;
+			children = (
+				211C372721CE2DD800ADBEA2 /* route.h */,
+			);
+			path = net;
+			sourceTree = "<group>";
+		};
+		211C372821CE2DD800ADBEA2 /* sys */ = {
+			isa = PBXGroup;
+			children = (
+				211C372921CE2DD800ADBEA2 /* proc_info.h */,
+				211C372A21CE2DD800ADBEA2 /* kern_control.h */,
+			);
+			path = sys;
+			sourceTree = "<group>";
+		};
 		21675B62214A68B700D20E2B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				22CFED9121CDFE6B00A216BE /* libmis.tbd */,
 				211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */,
 			);
 			name = Frameworks;
@@ -153,10 +172,12 @@
 		2170BD3421B192750059BD10 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				211C372621CE2DD800ADBEA2 /* net */,
+				211C372521CE2DD700ADBEA2 /* reboot.h */,
+				211C372821CE2DD800ADBEA2 /* sys */,
 				21C0FC8B21369FC500849420 /* common.h */,
 				21C0FC8F2136A2C500849420 /* iokit.h */,
 				21C0FC8D2136A0D100849420 /* QiLin.h */,
-				21A97FC72148103B00DC0023 /* libjb.h */,
 				21E9642421A1DD6F000625F7 /* NSTask.h */,
 				21395357217CBA1000B17F8D /* MobileGestalt.h */,
 			);
@@ -166,7 +187,6 @@
 		2170BD3521B192A30059BD10 /* libs */ = {
 			isa = PBXGroup;
 			children = (
-				21A97FCF2148103C00DC0023 /* libjb.a */,
 				21C0FC8C2136A0D100849420 /* qilin.o */,
 			);
 			path = libs;
@@ -198,6 +218,8 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				22CFED8F21CDF5C900A216BE /* inject.h */,
+				22CFED8E21CDF5C900A216BE /* inject.m */,
 				2101395321A09BB700F9C5F2 /* hideventsystem.c */,
 				2101395421A09BB700F9C5F2 /* hideventsystem.h */,
 				21C130FC214C1EC00021AA9D /* untar.h */,
@@ -399,6 +421,7 @@
 				21C130FB214C1EBA0021AA9D /* untar.c in Sources */,
 				21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */,
 				2116449A21737F9500250744 /* ViewController.m in Sources */,
+				22CFED9021CDF5C900A216BE /* inject.m in Sources */,
 				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* kmem.c in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
@@ -566,6 +589,7 @@
 					"$(PROJECT_DIR)/Undecimus/libs",
 				);
 				OTHER_CFLAGS = "";
+				"OTHER_CFLAGS[arch=*]" = "-DUNDECIMUS";
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,
@@ -606,6 +630,7 @@
 					"$(PROJECT_DIR)/Undecimus/libs",
 				);
 				OTHER_CFLAGS = "";
+				"OTHER_CFLAGS[arch=*]" = "-DUNDECIMUS";
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,

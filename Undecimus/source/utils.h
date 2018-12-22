@@ -40,6 +40,7 @@ bool is_directory(const char *filename);
 bool mode_is(const char *filename, mode_t mode);
 int runCommand(const char *cmd, ...);
 bool copyResourceFromBundle(NSString *resource, NSString *to);
+pid_t pidOfProcess(const char *name);
 
 extern NSData *lastSystemOutput;
 

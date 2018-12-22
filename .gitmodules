@@ -1,3 +1,3 @@
-[submodule "theos"]
-	path = theos
-	url = https://github.com/theos/theos.git
+[submodule "Injector"]
+	path = Injector
+	url = https://github.com/pwn20wndstuff/Injector.git
