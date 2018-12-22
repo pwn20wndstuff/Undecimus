@@ -672,7 +672,37 @@ void blockDomainWithName(const char *name) {
     if ([hostsFile rangeOfString:newLine].location == NSNotFound) {
         newHostsFile = [newHostsFile stringByAppendingString:newLine];
     }
-    _assert((![newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil]) == ERR_SUCCESS, message, true);
+    if (![newHostsFile isEqual:hostsFile]) {
+        _assert(([newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil]), message, true);
+    }
+}
+
+void unblockDomainWithName(const char *name) {
+    NSString *hostsFile = nil;
+    NSString *newLine = nil;
+    NSString *newHostsFile = nil;
+    SETMESSAGE(NSLocalizedString(@"Failed to unblock domain with name.", nil));
+    hostsFile = [NSString stringWithContentsOfFile:@"/etc/hosts" encoding:NSUTF8StringEncoding error:nil];
+    newHostsFile = hostsFile;
+    newLine = [NSString stringWithFormat:@"\n127.0.0.1 %s\n", name];
+    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
+    }
+    newLine = [NSString stringWithFormat:@"\n0.0.0.0 %s\n", name];
+    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
+    }
+    newLine = [NSString stringWithFormat:@"\n0.0.0.0    %s\n", name];
+    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
+    }
+    newLine = [NSString stringWithFormat:@"\n::1 %s\n", name];
+    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
+    }
+    if (![newHostsFile isEqual:hostsFile]) {
+        _assert(([newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil]), message, true);
+    }
 }
 
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
@@ -1064,6 +1094,13 @@ void make_host_into_host_priv() {
     WriteAnywhere32(hostport_addr, IO_ACTIVE | IKOT_HOST_PRIV);
 }
 
+void make_host_priv_into_host() {
+    uint64_t hostport_addr = getAddressOfPort(getpid(), mach_host_self());
+    uint32_t old = ReadAnywhere32(hostport_addr);
+    LOG("old host type: 0x%08x\n", old);
+    WriteAnywhere32(hostport_addr, IO_ACTIVE | IKOT_HOST);
+}
+
 mach_port_t try_restore_port() {
     mach_port_t port = MACH_PORT_NULL;
     kern_return_t err;
@@ -1290,7 +1327,7 @@ void setPreference(NSString *key, id object) {
     if (![md[key] isEqual:object]) {
         md[key] = object;
         _assert(kill(findPidOfProcess("cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
-        _assert((![md writeToFile:PREFERENCES_FILE atomically:YES]) == ERR_SUCCESS, message, true);
+        _assert(([md writeToFile:PREFERENCES_FILE atomically:YES]), message, true);
         _assert(kill(findPidOfProcess("cfprefsd"), SIGCONT) == ERR_SUCCESS, message, true);
     }
 }
@@ -1802,10 +1839,17 @@ void exploit(mach_port_t tfp0,
              uint64_t kernel_base,
              NSDictionary *defaults)
 {
-    // Initialize variables.
     int rv = 0;
     offsets_t offsets = { 0 };
     NSMutableDictionary *md = nil;
+    pid_t myPid = getpid();
+    uint64_t myProcAddr = 0;
+    uint64_t myCredAddr = 0;
+    uint64_t kernelCredAddr = 0;
+    pid_t amfidPid = 0;
+    uint64_t amfidProcAddr = 0;
+    pid_t launchdPid = 1;
+    uint64_t launchdProcAddr = 0;
     uint64_t vfs_context = 0;
     uint64_t devVnode = 0;
     uint64_t rootfs_vnode = 0;
@@ -1840,6 +1884,7 @@ void exploit(mach_port_t tfp0,
     bool updatedResources = false;
     char link[0x100];
     const char *jbdPidFile = NULL;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
 #define kernel_slide           (kernel_base - KERNEL_SEARCH_ADDRESS)
@@ -1995,21 +2040,13 @@ void exploit(mach_port_t tfp0,
         
         LOG("Getting root...");
         SETMESSAGE(NSLocalizedString(@"Failed to get root.", nil));
-        _assert(rootifyMe() == ERR_SUCCESS, message, true);
+        myProcAddr = getProcStructForPid(myPid);
+        LOG("myProcAddr: " ADDR "\n", myProcAddr);
+        _assert(ISADDR(myProcAddr), message, true);
+        _assert(setuidProcessAtAddr(0, myProcAddr) == ERR_SUCCESS, message, true);
         _assert(setuid(0) == ERR_SUCCESS, message, true);
         _assert(getuid() == 0, message, true);
         LOG("Successfully got root.");
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Platformize.
-        
-        LOG("Platformizing...");
-        SETMESSAGE(NSLocalizedString(@"Failed to platformize.", nil));
-        _assert(platformizeMe() == ERR_SUCCESS, message, true);
-        LOG("Successfully platformized.");
     }
     
     UPSTAGE();
@@ -2019,8 +2056,22 @@ void exploit(mach_port_t tfp0,
         
         LOG("Escaping Sandbox...");
         SETMESSAGE(NSLocalizedString(@"Failed to escape sandbox.", nil));
-        _assert(ShaiHuludMe(0) == ERR_SUCCESS, message, true);
+        kernelCredAddr = getKernelCredAddr();
+        LOG("kernelCredAddr: " ADDR "\n", kernelCredAddr);
+        _assert(ISADDR(kernelCredAddr), message, true);
+        _assert(ShaiHulud2ProcessAtAddr(myProcAddr) == ERR_SUCCESS, message, true);
         LOG("Successfully escaped Sandbox.");
+    }
+    
+    UPSTAGE();
+    
+    {
+        // Platformize.
+        
+        LOG("Platformizing...");
+        SETMESSAGE(NSLocalizedString(@"Failed to platformize.", nil));
+        _assert(platformizeProcAtAddr(myProcAddr) == ERR_SUCCESS, message, true);
+        LOG("Successfully platformized.");
     }
     
     UPSTAGE();
@@ -2041,7 +2092,9 @@ void exploit(mach_port_t tfp0,
         
         LOG("Borrowing entitlements from sysdiagnose...");
         SETMESSAGE(NSLocalizedString(@"Failed to borrow entitlements from sysdiagnose.", nil));
-        borrowEntitlementsFromDonor("/usr/bin/sysdiagnose", "--help");
+        myProcAddr = borrowEntitlementsFromDonor("/usr/bin/sysdiagnose", "--help");
+        LOG("myProcAddr: " ADDR "\n", myProcAddr);
+        _assert(ISADDR(myProcAddr), message, true);
         LOG("Successfully borrowed entitlements from sysdiagnose.");
         
         // We now have Task_for_pid.
@@ -2055,7 +2108,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Dumping APTicket...");
             SETMESSAGE(NSLocalizedString(@"Failed to dump APTicket.", nil));
-            _assert((![[NSData dataWithContentsOfFile:@"/System/Library/Caches/apticket.der"] writeToFile:[NSString stringWithFormat:@"%@/Documents/apticket.der", NSHomeDirectory()] atomically:YES]) == ERR_SUCCESS, message, true);
+            _assert(([[NSData dataWithContentsOfFile:@"/System/Library/Caches/apticket.der"] writeToFile:[NSString stringWithFormat:@"%@/Documents/apticket.der", NSHomeDirectory()] atomically:YES]), message, true);
             LOG("Successfully dumped APTicket.");
         }
     }
@@ -2123,60 +2176,53 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        // Get dev vnode.
-        
-        LOG("Getting dev vnode...");
-        SETMESSAGE(NSLocalizedString(@"Failed to get dev vnode.", nil));
-        devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", GETOFFSET(vnode_lookup));
-        LOG("devVnode: " ADDR "\n", devVnode);
-        _assert(ISADDR(devVnode), message, true);
-        LOG("Successfully got dev vnode.");
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Clear dev vnode's si_flags.
-        
-        LOG("Clearing dev vnode's si_flags...");
-        SETMESSAGE(NSLocalizedString(@"Failed to clear dev vnode's si_flags.", nil));
-        v_specinfo = ReadAnywhere64(devVnode + GETOFFSET(v_specinfo));
-        LOG("v_specinfo: " ADDR "\n", v_specinfo);
-        _assert(ISADDR(v_specinfo), message, true);
-        WriteAnywhere32(v_specinfo + GETOFFSET(si_flags), 0);
-        si_flags = ReadAnywhere64(v_specinfo + GETOFFSET(si_flags));
-        LOG("si_flags: " ADDR "\n", si_flags);
-        _assert(ISADDR(si_flags), message, true);
-        _assert(si_flags == 0, message, true);
-        LOG("Successfully cleared dev vnode's si_flags.");
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Clean up dev vnode.
-        
-        LOG("Cleaning up dev vnode...");
-        SETMESSAGE(NSLocalizedString(@"Failed to clean up dev vnode.", nil));
-        _assert(_vnode_put(GETOFFSET(vnode_put), devVnode) == ERR_SUCCESS, message, true);
-        LOG("Successfully cleaned up dev vnode.");
-    }
-    
-    UPSTAGE();
-    
-    {
         // Remount RootFS.
         
         LOG("Remounting RootFS...");
         SETMESSAGE(NSLocalizedString(@"Failed to remount RootFS.", nil));
         rv = snapshot_list("/");
         if (rv == -1) {
+            // Get dev vnode.
+            
+            LOG("Getting dev vnode...");
+            SETMESSAGE(NSLocalizedString(@"Failed to get dev vnode.", nil));
+            devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", GETOFFSET(vnode_lookup));
+            LOG("devVnode: " ADDR "\n", devVnode);
+            _assert(ISADDR(devVnode), message, true);
+            LOG("Successfully got dev vnode.");
+            
+            // Clear dev vnode's si_flags.
+            
+            LOG("Clearing dev vnode's si_flags...");
+            SETMESSAGE(NSLocalizedString(@"Failed to clear dev vnode's si_flags.", nil));
+            v_specinfo = ReadAnywhere64(devVnode + GETOFFSET(v_specinfo));
+            LOG("v_specinfo: " ADDR "\n", v_specinfo);
+            _assert(ISADDR(v_specinfo), message, true);
+            WriteAnywhere32(v_specinfo + GETOFFSET(si_flags), 0);
+            si_flags = ReadAnywhere64(v_specinfo + GETOFFSET(si_flags));
+            LOG("si_flags: " ADDR "\n", si_flags);
+            _assert(ISADDR(si_flags), message, true);
+            _assert(si_flags == 0, message, true);
+            LOG("Successfully cleared dev vnode's si_flags.");
+            
+            // Clean up dev vnode.
+            
+            LOG("Cleaning up dev vnode...");
+            SETMESSAGE(NSLocalizedString(@"Failed to clean up dev vnode.", nil));
+            _assert(_vnode_put(GETOFFSET(vnode_put), devVnode) == ERR_SUCCESS, message, true);
+            LOG("Successfully cleaned up dev vnode.");
+            
+            // Mount system snapshot.
+            
+            LOG("Mounting system snapshot...");
+            SETMESSAGE(NSLocalizedString(@"Failed to mount system snapshot.", nil));
             if (access("/var/MobileSoftwareUpdate/mnt1", F_OK) != ERR_SUCCESS) {
                 _assert(mkdir("/var/MobileSoftwareUpdate/mnt1", 0755) == ERR_SUCCESS, message, true);
                 _assert(access("/var/MobileSoftwareUpdate/mnt1", F_OK) == ERR_SUCCESS, message, true);
                 _assert(chown("/var/MobileSoftwareUpdate/mnt1", 0, 0) == ERR_SUCCESS, message, true);
             }
             _assert(runCommand("/sbin/mount_apfs", "/dev/disk0s1s1", "/var/MobileSoftwareUpdate/mnt1", NULL) == ERR_SUCCESS, message, true);
+            LOG("Successfully mounted system snapshot.");
             
             // Borrow entitlements from fsck_apfs.
             
@@ -2202,18 +2248,21 @@ void exploit(mach_port_t tfp0,
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
             NOTICE(NSLocalizedString(@"The system snapshot has been successfully renamed. The device will be rebooted now.", nil), true, false);
+            _assert(unmount("/var/MobileSoftwareUpdate/mnt1", 0), message, true);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         }
         rootfs_vnode = ReadAnywhere64(GETOFFSET(rootvnode));
         v_mount = ReadAnywhere64(rootfs_vnode + GETOFFSET(v_mount));
         v_flag = ReadAnywhere32(v_mount + GETOFFSET(mnt_flag));
-        v_flag = v_flag & ~MNT_NOSUID;
-        v_flag = v_flag & ~MNT_RDONLY;
-        WriteAnywhere32(v_mount + GETOFFSET(mnt_flag), v_flag & ~MNT_ROOTFS);
-        _assert(runCommand("/sbin/mount", "-u", "/", NULL) == ERR_SUCCESS, message, true);
-        v_mount = ReadAnywhere64(rootfs_vnode + GETOFFSET(v_mount));
-        WriteAnywhere32(v_mount + GETOFFSET(mnt_flag), v_flag);
+        if ((v_flag & MNT_NOSUID) || (v_flag & MNT_RDONLY)) {
+            v_flag = v_flag & ~MNT_NOSUID;
+            v_flag = v_flag & ~MNT_RDONLY;
+            WriteAnywhere32(v_mount + GETOFFSET(mnt_flag), v_flag & ~MNT_ROOTFS);
+            _assert(runCommand("/sbin/mount", "-u", "/", NULL) == ERR_SUCCESS, message, true);
+            v_mount = ReadAnywhere64(rootfs_vnode + GETOFFSET(v_mount));
+            WriteAnywhere32(v_mount + GETOFFSET(mnt_flag), v_flag);
+        }
         rv = snapshot_list("/");
         needStrap = access("/.installed_unc0ver", F_OK) != ERR_SUCCESS && access("/electra", F_OK) != ERR_SUCCESS;
         if (rv == 0 && needStrap) {
@@ -2236,6 +2285,7 @@ void exploit(mach_port_t tfp0,
             // Borrow entitlements from sysdiagnose.
             
             LOG("Borrowing entitlements from sysdiagnose...");
+            SETMESSAGE(NSLocalizedString(@"Failed to borrow entitlements from sysdiagnose.", nil));
             borrowEntitlementsFromDonor("/usr/bin/sysdiagnose", "--help");
             LOG("Successfully borrowed entitlements from sysdiagnose.");
             
@@ -2414,7 +2464,7 @@ void exploit(mach_port_t tfp0,
         md[@"VSpecinfo"] = ADDRSTRING(GETOFFSET(v_specinfo));
         md[@"SiFlags"] = ADDRSTRING(GETOFFSET(si_flags));
         md[@"VFlags"] = ADDRSTRING(GETOFFSET(v_flags));
-        _assert((![md writeToFile:@"/jb/offsets.plist" atomically:YES]) == ERR_SUCCESS, message, true);
+        _assert(([md writeToFile:@"/jb/offsets.plist" atomically:YES]), message, true);
         _assert(init_file("/jb/offsets.plist", 0, 0644), message, true);
         LOG("Successfully logged offsets.");
     }
@@ -2434,11 +2484,17 @@ void exploit(mach_port_t tfp0,
     
     {
         if (export_kernel_task_port) {
-            // Export Kernel Task Port.
-            LOG("Exporting Kernel Task Port...");
-            SETMESSAGE(NSLocalizedString(@"Failed to Export Kernel Task Port.", nil));
+            // Export kernel task port.
+            LOG("Exporting kernel task port...");
+            SETMESSAGE(NSLocalizedString(@"Failed to export kernel task port.", nil));
             make_host_into_host_priv();
-            LOG("Successfully Exported Kernel Task Port.");
+            LOG("Successfully exported kernel task port.");
+        } else {
+            // Unexport kernel task port.
+            LOG("Unexporting kernel task port...");
+            SETMESSAGE(NSLocalizedString(@"Failed to unexport kernel task port.", nil));
+            make_host_priv_into_host();
+            LOG("Successfully unexported kernel task port.");
         }
     }
     
@@ -2451,8 +2507,14 @@ void exploit(mach_port_t tfp0,
             LOG("Patching amfid...");
             SETMESSAGE(NSLocalizedString(@"Failed to patch amfid.", nil));
             _assert(clean_file("/var/tmp/amfid_payload.alive"), message, true);
-            _assert(platformizeProcAtAddr(getProcStructForPid(findPidOfProcess("amfid"))) == ERR_SUCCESS, message, true);
-            _assert(inject_library(findPidOfProcess("amfid"), amfid_payload) == ERR_SUCCESS, message, true);
+            amfidPid = findPidOfProcess("amfid");
+            LOG("amfidPid: " "0x%x" "\n", amfidPid);
+            _assert(amfidPid > 1, message, true);
+            amfidProcAddr = getProcStructForPid(amfidPid);
+            LOG("amfidProcAddr: " ADDR "\n", amfidProcAddr);
+            _assert(ISADDR(amfidProcAddr), message, true);
+            _assert(platformizeProcAtAddr(amfidProcAddr) == ERR_SUCCESS, message, true);
+            _assert(inject_library(amfidPid, amfid_payload) == ERR_SUCCESS, message, true);
             _assert(waitForFile("/var/tmp/amfid_payload.alive") == ERR_SUCCESS, message, true);
             LOG("Successfully patched amfid.");
         } else {
@@ -2464,6 +2526,7 @@ void exploit(mach_port_t tfp0,
     
     {
         // Update version string.
+        
         if (!isJailbroken()) {
             LOG("Updating version string...");
             SETMESSAGE(NSLocalizedString(@"Failed to update version string.", nil));
@@ -2545,7 +2608,7 @@ void exploit(mach_port_t tfp0,
             _assert(cleanUpFileList != nil, message, true);
             for (NSString *fileName in cleanUpFileList) {
                 if (access([fileName UTF8String], F_OK) == ERR_SUCCESS) {
-                    _assert((![[NSFileManager defaultManager] removeItemAtPath:fileName error:nil]) == ERR_SUCCESS, message, true);
+                    _assert(([fileManager removeItemAtPath:fileName error:nil]), message, true);
                 }
             }
             LOG("Successfully cleaned up.");
@@ -2557,7 +2620,7 @@ void exploit(mach_port_t tfp0,
             md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
             if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@NO]) {
                 md[@"SBShowNonDefaultSystemApps"] = @NO;
-                _assert((![md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES]) == ERR_SUCCESS, message, true);
+                _assert(([md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES]), message, true);
             }
             LOG("Successfully disallowed SpringBoard to show non-default system apps.");
             
@@ -2573,6 +2636,7 @@ void exploit(mach_port_t tfp0,
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
             NOTICE(NSLocalizedString(@"RootFS has successfully been restored. The device will be restarted.", nil), true, false);
+            _assert(unmount("/var/MobileSoftwareUpdate/mnt1", 0), message, true);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         }
@@ -2595,12 +2659,12 @@ void exploit(mach_port_t tfp0,
             rv = _system("/usr/bin/dpkg --configure -a");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             run_uicache = true;
-            _assert(runCommand("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL) == ERR_SUCCESS, message, true);
-            _assert(runCommand("/bin/rm", "-rf", "/jb/tar.tar", NULL) == ERR_SUCCESS, message, true);
-            _assert(runCommand("/bin/rm", "-rf", "/jb/tar", NULL) == ERR_SUCCESS, message, true);
-            _assert(runCommand("/bin/rm", "-rf", "/jb/lzma.tar", NULL) == ERR_SUCCESS, message, true);
-            _assert(runCommand("/bin/rm", "-rf", "/jb/lzma", NULL) == ERR_SUCCESS, message, true);
-            _assert(runCommand("/bin/rm", "-rf", "/jb/amfid_payload.tar", NULL) == ERR_SUCCESS, message, true);
+            runCommand("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL);
+            runCommand("/bin/rm", "-rf", "/jb/tar.tar", NULL);
+            runCommand("/bin/rm", "-rf", "/jb/tar", NULL);
+            runCommand("/bin/rm", "-rf", "/jb/lzma.tar", NULL);
+            runCommand("/bin/rm", "-rf", "/jb/lzma", NULL);
+            runCommand("/bin/rm", "-rf", "/jb/amfid_payload.tar", NULL);
         } else {
             if (!needResources) {
                 updatedResources = compareInstalledVersion("science.xnu.undecimus.resources", "lt", [BUNDLEDRESOURCES UTF8String]);
@@ -2621,18 +2685,18 @@ void exploit(mach_port_t tfp0,
         bzero(link, sizeof(link));
         if ((readlink("/electra", link, 0x9f) == -1) ||
             (strcmp(link, "/jb") != ERR_SUCCESS)) {
-            _assert(runCommand("/bin/rm", "-rf", "/electra", NULL) == ERR_SUCCESS, message, true);
-            _assert(runCommand("/bin/ln", "-s", "/jb", "/electra", NULL) == ERR_SUCCESS, message, true);
+            runCommand("/bin/rm", "-rf", "/electra", NULL);
+            runCommand("/bin/ln", "-s", "/jb", "/electra", NULL);
         }
         if ((readlink("/.bootstrapped_electra", link, 0x9f) == -1) ||
             (strcmp(link, "/.installed_unc0ver") != ERR_SUCCESS)) {
-            _assert(runCommand("/bin/rm", "-rf", "/.bootstrapped_electra", NULL) == ERR_SUCCESS, message, true);
-            _assert(runCommand("/bin/ln", "-s", "/.installed_unc0ver", "/.bootstrapped_electra", NULL) == ERR_SUCCESS, message, true);
+            runCommand("/bin/rm", "-rf", "/.bootstrapped_electra", NULL);
+            runCommand("/bin/ln", "-s", "/.installed_unc0ver", "/.bootstrapped_electra", NULL);
         }
         if ((readlink("/electra/libjailbreak.dylib", link, 0x9f) == -1) ||
             (strcmp(link, "/usr/lib/libjailbreak.dylib") != ERR_SUCCESS)) {
-            _assert(runCommand("/bin/rm", "-rf", "/electra/libjailbreak.dylib", NULL) == ERR_SUCCESS, message, true);
-            _assert(runCommand("/bin/ln", "-s", "/usr/lib/libjailbreak.dylib", "/electra/libjailbreak.dylib", NULL) == ERR_SUCCESS, message, true);
+            runCommand("/bin/rm", "-rf", "/electra/libjailbreak.dylib", NULL);
+            runCommand("/bin/ln", "-s", "/usr/lib/libjailbreak.dylib", "/electra/libjailbreak.dylib", NULL);
         }
         LOG("Successfully extracted bootstrap.");
     }
@@ -2707,7 +2771,7 @@ void exploit(mach_port_t tfp0,
                 md[@"KeepAlive"] = @YES;
                 md[@"StandardErrorPath"] = @"/var/log/jailbreakd-stderr.log";
                 md[@"StandardOutPath"] = @"/var/log/jailbreakd-stdout.log";
-                _assert((![md writeToFile:@"/jb/jailbreakd.plist" atomically:YES]) == ERR_SUCCESS, message, true);
+                _assert(([md writeToFile:@"/jb/jailbreakd.plist" atomically:YES]), message, true);
                 _assert(init_file("/jb/jailbreakd.plist", 0, 0644), message, true);
                 _assert(clean_file("/var/log/jailbreakd-stderr.log"), message, true);
                 _assert(clean_file("/var/log/jailbreakd-stdout.log"), message, true);
@@ -2737,8 +2801,11 @@ void exploit(mach_port_t tfp0,
             _assert(clean_file("/var/log/pspawn_hook_launchd.log"), message, true);
             _assert(clean_file("/var/log/pspawn_hook_xpcproxy.log"), message, true);
             _assert(clean_file("/var/log/pspawn_hook_other.log"), message, true);
-            _assert(platformizeProcAtAddr(getProcStructForPid(1)) == ERR_SUCCESS, message, true);
-            _assert(inject_library(1, "/usr/lib/pspawn_hook.dylib") == ERR_SUCCESS, message, true);
+            launchdProcAddr = getProcStructForPid(launchdPid);
+            LOG("launchdProcAddr: " ADDR "\n", launchdProcAddr);
+            _assert(ISADDR(launchdProcAddr), message, true);
+            _assert(platformizeProcAtAddr(launchdProcAddr) == ERR_SUCCESS, message, true);
+            _assert(inject_library(launchdPid, "/usr/lib/pspawn_hook.dylib") == ERR_SUCCESS, message, true);
             LOG("Successfully patched launchd.");
         } else {
             LOG("Not injecting to launchd.");
@@ -2753,13 +2820,19 @@ void exploit(mach_port_t tfp0,
             LOG("Disabling app revokes...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable app revokes.", nil));
             blockDomainWithName("ocsp.apple.com");
-            _assert(runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3-shm", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3-shm", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3-wal", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3-wal", NULL) == ERR_SUCCESS, message, false);
+            runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3", NULL);
+            runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3", NULL);
+            runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3-shm", NULL);
+            runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3-shm", NULL);
+            runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3-wal", NULL);
+            runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3-wal", NULL);
             LOG("Successfully disabled app revokes.");
+        } else {
+            // Enable app revokes.
+            LOG("Enabling app revokes...");
+            SETMESSAGE(NSLocalizedString(@"Failed to enable app revokes.", nil));
+            unblockDomainWithName("ocsp.apple.com");
+            LOG("Successfully enabled app revokes.");
         }
     }
     
@@ -2775,7 +2848,7 @@ void exploit(mach_port_t tfp0,
         for (int i = 0; !(i >= 5 || [md[@"SBShowNonDefaultSystemApps"] isEqual:@YES]); i++) {
             _assert(kill(findPidOfProcess("cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
             md[@"SBShowNonDefaultSystemApps"] = @YES;
-            _assert((![md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES]) == ERR_SUCCESS, message, true);
+            _assert(([md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES]), message, true);
             _assert(kill(findPidOfProcess("cfprefsd"), SIGCONT) == ERR_SUCCESS, message, true);
             md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
             _assert(md != nil, message, true);
@@ -2816,32 +2889,32 @@ void exploit(mach_port_t tfp0,
             
             LOG("Disabling Auto Updates...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable auto updates.", nil));
-            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
+            runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
+            runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
+            runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
+            runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
             LOG("Successfully disabled Auto Updates.");
         } else {
             // Enable Auto Updates.
             
             LOG("Enabling Auto Updates...");
             SETMESSAGE(NSLocalizedString(@"Failed to enable auto updates.", nil));
-            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
-            _assert(runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL) == ERR_SUCCESS, message, false);
+            runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            runCommand("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
+            runCommand("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
+            runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
+            runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            runCommand("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
+            runCommand("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
+            runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
         }
     }
     
@@ -2859,7 +2932,7 @@ void exploit(mach_port_t tfp0,
             md = [NSMutableDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype]];
             _assert(md != nil, message, true);
             md[@"Version4"][@"System"][@"Override"][@"Global"][@"UserHighWaterMark"] = [NSNumber numberWithInteger:[md[@"Version4"][@"PListDevice"][@"MemoryCapacity"] integerValue]];
-            _assert((![md writeToFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype] atomically:YES]) == ERR_SUCCESS, message, true);
+            _assert(([md writeToFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype] atomically:YES]), message, true);
             LOG("Successfully increased memory limit.");
         }
     }
@@ -2871,9 +2944,7 @@ void exploit(mach_port_t tfp0,
             // Extract OpenSSH.
             LOG("Extracting OpenSSH...");
             SETMESSAGE(NSLocalizedString(@"Failed to extract OpenSSH.", nil));
-            _assert(clean_file("/jb/openssh.deb"), message, true);
-            _assert(clean_file("/jb/openssl.deb"), message, true);
-            _assert(clean_file("/jb/ca-certificates.deb"), message, true);
+            runCommand("/bin/rm", "-rf", "/jb/openssh.deb", "/jb/openssl.deb", "/jb/ca-certificates.deb", NULL);
             _assert(copyResourceFromBundle(@"openssh.deb", @"/jb/openssh.deb"), message, true);
             _assert(copyResourceFromBundle(@"openssl.deb", @"/jb/openssl.deb"), message, true);
             _assert(copyResourceFromBundle(@"ca-certificates.deb", @"/jb/ca-certificates.deb"), message, true);
@@ -2884,9 +2955,7 @@ void exploit(mach_port_t tfp0,
             SETMESSAGE(NSLocalizedString(@"Failed to install OpenSSH.", nil));
             rv = _system("/usr/bin/dpkg -i /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
-            clean_file("/jb/openssh.deb");
-            clean_file("/jb/openssl.deb");
-            clean_file("/jb/ca-certificates.deb");
+            runCommand("/bin/rm", "-rf", "/jb/openssh.deb", "/jb/openssl.deb", "/jb/ca-certificates.deb", NULL);
             LOG("Successfully installed OpenSSH.");
             
             // Disable Install OpenSSH.
@@ -2918,12 +2987,13 @@ void exploit(mach_port_t tfp0,
         }
         // This is not a stock file for iOS11+
         _system("sed -ie '/^\\/sbin\\/fstyp/d' /Library/dpkg/info/firmware-sbin.list");
+        // Unblock Saurik's repo if it is blocked.
+        unblockDomainWithName("apt.saurik.com");
         if (install_cydia) {
             // Extract Cydia.
             LOG("Extracting Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to extract Cydia.", nil));
-            _assert(clean_file("/jb/cydia.deb"), message, true);
-            _assert(clean_file("/jb/cydia-lproj.deb"), message, true);
+            runCommand("/bin/rm", "-rf", "/jb/cydia.deb", "/jb/cydia-lproj.deb", NULL);
             _assert(copyResourceFromBundle(@"cydia.deb", @"/jb/cydia.deb"), message, true);
             _assert(copyResourceFromBundle(@"cydia-lproj.deb", @"/jb/cydia-lproj.deb"), message, true);
             LOG("Successfully extracted Cydia.");
@@ -2934,8 +3004,7 @@ void exploit(mach_port_t tfp0,
             SETMESSAGE(NSLocalizedString(@"Failed to install Cydia.", nil));
             rv = _system("/usr/bin/dpkg -i /jb/cydia.deb /jb/cydia-lproj.deb");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
-            clean_file("/jb/cydia.deb");
-            clean_file("/jb/cydia-lproj.deb");
+            runCommand("/bin/rm", "-rf", "/jb/cydia.deb", "/jb/cydia-lproj.deb", NULL);
             LOG("Successfully installed Cydia.");
             
             // Disable Install Cydia.
