@@ -2319,8 +2319,7 @@ void exploit(mach_port_t tfp0,
             [resources addObjectsFromArray:[NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"]];
         }
         [resources addObject:@(amfid_payload)];
-        [resources addObject:@"/bin/launchctl"];
-        
+
         const char *resarray[resources.count + 1];
         for (int i=0; i<resources.count; i++) {
             resarray[i] = [resources[i] UTF8String];
