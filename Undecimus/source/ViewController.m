@@ -2320,8 +2320,6 @@ void exploit(mach_port_t tfp0,
         }
         [resources addObject:@(amfid_payload)];
         [resources addObject:@"/bin/launchctl"];
-        //[resources addObject:@"/etc/rc.d/substrate"];
-        //[resources addObject:@"/usr/libexec/substrated"];
         
         const char *resarray[resources.count + 1];
         for (int i=0; i<resources.count; i++) {
