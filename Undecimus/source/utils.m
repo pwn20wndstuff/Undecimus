@@ -176,12 +176,8 @@ bool installDeb(char *debName, bool forceDeps) {
 
 bool pidFileIsValid(NSString *pidfile) {
     NSString *jbdpid = [NSString stringWithContentsOfFile:pidfile encoding:NSUTF8StringEncoding error:NULL];
-    if (jbdpid != nil) {
-        char pidpath[MAXPATHLEN];
-        int len = proc_pidpath([jbdpid intValue], pidpath, sizeof(pidpath));
-        if (len > 0 && strncmp(pidpath, "/usr/libexec/jailbreakd", len) == 0) {
-            return true;
-        }
+    if (jbdpid != nil && pidOfProcess("/usr/libexec/jailbreakd") == jbdpid.integerValue) {
+        return true;
     }
     return false;
 }

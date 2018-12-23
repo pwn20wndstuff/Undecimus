@@ -240,6 +240,17 @@ bof64(const uint8_t *buf, addr_t start, addr_t where)
                     //printf("%x: STP x, y, [SP,#-imm]!\n", prev);
                     return prev;
                 }
+                for (addr_t diff = 4; diff < delta/4+4; diff+=4) {
+                    uint32_t ai = *(uint32_t *)(buf + where - diff);
+                    // SUB SP, SP, #imm
+                    if ((ai&0xFFC003FF) == 0xD10003FF) {
+                        return where - diff;
+                    }
+                    // Not stp and not str
+                    if (((ai & 0xFFC003E0) != 0xA90003E0) && (ai&0xFFC001F0) != 0xF90001E0) {
+                        break;
+                    }
+                }
             }
         }
     }
@@ -1575,6 +1586,50 @@ addr_t find_kernproc(void) {
     return kernproc + kerndumpbase;
 }
 
+addr_t find_shenanigans(void) {
+    addr_t ref = find_strref("\"shenanigans!", 1, 1);
+    ref -= kerndumpbase;
+    
+    // find sb_evaluate
+    ref = bof64(kernel, prelink_base, ref);
+    
+    // ADRP Xm, #_is_kernel_cred_kerncred@PAGE
+    ref = step64(kernel, ref, 0x100, 0x90000000, 0x9F000000);
+    
+    // pc base
+    uint64_t val = kerndumpbase;
+    
+    uint32_t *insn = (uint32_t*)(kernel+ref);
+    // add pc (well, offset)
+    val += ((uint8_t*)(insn) - kernel) & ~0xfff;
+    uint8_t xm = *insn & 0x1f;
+    
+    // add imm: immhi(bits 23-5)|immlo(bits 30-29)
+    val += (*insn<<9 & 0x1ffffc000) | (*insn>>17 & 0x3000);
+    
+    ++insn;
+    // LDR Xn, [Xm,#_is_kernel_cred_kerncred@PAGEOFF]
+    if ((*insn & 0xF9C00000) != 0xF9400000) {
+        return 0;
+    }
+    if (((*insn>>5)&0x1f) != xm) {
+        return 0;
+    }
+    // add pageoff
+    val += ((*insn >> 10) & 0xFFF) << 3;
+    uint8_t xn = (*insn&0x1f);
+    
+    ++insn;
+    // CBNZ Xn, ...
+    if ((*insn & 0xFC000000) != 0xB4000000) {
+        return 0;
+    }
+    if ((*insn & 0x1f) != xn) {
+        return 0;
+    }
+    
+    return val;
+}
 #ifdef HAVE_MAIN
 #include <mach-o/nlist.h>
 

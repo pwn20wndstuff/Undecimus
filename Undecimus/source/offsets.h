@@ -26,6 +26,7 @@ enum kstruct_offset {
   /* struct proc */
   KSTRUCT_OFFSET_PROC_PID,
   KSTRUCT_OFFSET_PROC_P_FD,
+  KSTRUCT_OFFSET_PROC_TASK,    
   
   /* struct filedesc */
   KSTRUCT_OFFSET_FILEDESC_FD_OFILES,
@@ -45,6 +46,16 @@ enum kstruct_offset {
   /* struct ipc_space */
   KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE_SIZE,
   KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE,
+    
+  /* struct vnode */
+  KSTRUCT_OFFSET_VNODE_V_MOUNT,
+  KSTRUCT_OFFSET_VNODE_VU_SPECINFO,
+    
+  /* struct specinfo */
+  KSTRUCT_OFFSET_SPECINFO_SI_FLAGS,
+    
+  /* struct mount */
+  KSTRUCT_OFFSET_MOUNT_MNT_FLAG, 
   
   KFREE_ADDR_OFFSET,
 };

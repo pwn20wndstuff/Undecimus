@@ -11,4 +11,7 @@ uint64_t current_thread(void);
 
 mach_port_t fake_host_priv(void);
 
+uint64_t get_proc_ipc_table(uint64_t proc);
+mach_port_t proc_to_task_port(uint64_t proc, uint64_t our_proc);
+
 #endif /* kutils_h */

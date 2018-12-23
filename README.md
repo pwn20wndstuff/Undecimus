@@ -126,11 +126,11 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Releases are now available at https://github.com/pwn20wndstuff/Undecimus/releases
 
 ## Special Thanks
-* [@i41nbeer](https://twitter.com/i41nbeer) for triple_fetch, async_wake, empty_list, multi_path & deja_xnu
+* [@i41nbeer](https://twitter.com/i41nbeer) for mach_portal, triple_fetch, async_wake, empty_list, multi_path & deja_xnu
 * [@Morpheus______](https://twitter.com/Morpheus______) for the QiLin Toolkit
 * [@xerub](https://twitter.com/xerub) for libjb and the original patchfinder64
 * [@iBSparkes](https://twitter.com/iBSparkes) for the original amfid_payload, jailbreakd and pspawn_hook
-* [@stek29](https://twitter.com/stek29) for the patchfinder64 additions, unlocknvram and hsp4
+* [@stek29](https://twitter.com/stek29) for the patchfinder64 additions, unlocknvram, host_get_special_port(4) patch and shenanigans bypass
 * [@theninjaprawn](https://twitter.com/theninjaprawn) for the patchfinder64 additions
 * [@Cryptiiiic](https://twitter.com/Cryptiiiic) for testing
 * [@xanDesign_](https://twitter.com/xanDesign_) for testing

