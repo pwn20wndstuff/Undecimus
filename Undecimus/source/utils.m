@@ -256,7 +256,7 @@ int runCommand(const char *cmd, ...) {
         posix_spawn_file_actions_addclose(actions, out_pipe[1]);
     }
 
-    int rv = posix_spawn(&pid, cmd, NULL, NULL, (char *const *)argv, environ);
+    int rv = posix_spawn(&pid, cmd, actions, NULL, (char *const *)argv, environ);
 
     if (valid_pipe) {
         close(out_pipe[1]);

@@ -105,4 +105,9 @@
 -(IBAction)tappedOnJakeashacks:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Jakeashacks"] options:@{} completionHandler:nil];
 }
+
+-(IBAction)tappedOnJonathanSeals:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"JonathanSeals"] options:@{} completionHandler:nil];
+}
+
 @end

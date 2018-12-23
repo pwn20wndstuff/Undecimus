@@ -1135,7 +1135,10 @@ int snapshot_revert(const char *vol, const char *name) {
 
 int snapshot_mount(const char *vol, const char *name, const char *dir) {
     int rv = 0;
-    rv = runCommand("/sbin/mount_apfs", "-s", name, vol, dir, NULL);
+    int fd = 0;
+    fd = open(vol, O_RDONLY, 0);
+    rv = fs_snapshot_mount(fd, dir, name, 0);
+    close(fd);
     return rv;
 }
 
@@ -2298,6 +2301,7 @@ void exploit(mach_port_t tfp0,
             [resources addObjectsFromArray:[NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"]];
         }
         [resources addObject:@(amfid_payload)];
+        [resources addObject:@"/bin/launchctl"];
         const char *resarray[resources.count + 1];
         for (int i=0; i<resources.count; i++) {
             resarray[i] = [resources[i] UTF8String];
