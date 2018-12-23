@@ -2020,6 +2020,24 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
+        if (export_kernel_task_port) {
+            // Export kernel task port.
+            LOG("Exporting kernel task port...");
+            SETMESSAGE(NSLocalizedString(@"Failed to export kernel task port.", nil));
+            make_host_into_host_priv();
+            LOG("Successfully exported kernel task port.");
+        } else {
+            // Unexport kernel task port.
+            LOG("Unexporting kernel task port...");
+            SETMESSAGE(NSLocalizedString(@"Failed to unexport kernel task port.", nil));
+            make_host_priv_into_host();
+            LOG("Successfully unexported kernel task port.");
+        }
+    }
+    
+    UPSTAGE();
+    
+    {
         // Escape Sandbox.
         
         LOG("Escaping Sandbox...");
@@ -2302,6 +2320,9 @@ void exploit(mach_port_t tfp0,
         }
         [resources addObject:@(amfid_payload)];
         [resources addObject:@"/bin/launchctl"];
+        //[resources addObject:@"/etc/rc.d/substrate"];
+        //[resources addObject:@"/usr/libexec/substrated"];
+        
         const char *resarray[resources.count + 1];
         for (int i=0; i<resources.count; i++) {
             resarray[i] = [resources[i] UTF8String];
@@ -2383,24 +2404,6 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to set HSP4.", nil));
         _assert(remap_tfp0_set_hsp4(&tfp0, GETOFFSET(zone_map_ref)) == ERR_SUCCESS, message, true);
         LOG("Successfully set HSP4.");
-    }
-    
-    UPSTAGE();
-    
-    {
-        if (export_kernel_task_port) {
-            // Export kernel task port.
-            LOG("Exporting kernel task port...");
-            SETMESSAGE(NSLocalizedString(@"Failed to export kernel task port.", nil));
-            make_host_into_host_priv();
-            LOG("Successfully exported kernel task port.");
-        } else {
-            // Unexport kernel task port.
-            LOG("Unexporting kernel task port...");
-            SETMESSAGE(NSLocalizedString(@"Failed to unexport kernel task port.", nil));
-            make_host_priv_into_host();
-            LOG("Successfully unexported kernel task port.");
-        }
     }
     
     UPSTAGE();
@@ -2644,9 +2647,9 @@ void exploit(mach_port_t tfp0,
     {
         // Spawn jailbreakd.
         
-        if (access("/usr/libexec/jailbreakd", F_OK) == ERR_SUCCESS &&
-            (access("/.disable_jailbreakd", F_OK) != ERR_SUCCESS || access("/etc/rc.d/substrate", F_OK) != ERR_SUCCESS)
-            ) {
+        if (access("/usr/libexec/jailbreakd", F_OK) == ERR_SUCCESS && // jailbreakd must exist
+            access("/.disable_jailbreakd", F_OK) != ERR_SUCCESS && // we've not been told to disable it
+            access("/etc/rc.d/substrate", F_OK) != ERR_SUCCESS) { // substrate must not be installed
             LOG("Spawning jailbreakd...");
             SETMESSAGE(NSLocalizedString(@"Failed to spawn jailbreakd.", nil));
             jbdPidFile = "/var/tmp/jailbreakd.pid";
@@ -2967,7 +2970,7 @@ void exploit(mach_port_t tfp0,
             _system("for file in /etc/rc.d/*; do "
                         "if [[ -x \"$file\" ]]; then "
                             "\"$file\";"
-                        "fi;"
+                         "fi;"
                     "done");
             rv = true;
             LOG("Successfully loaded Daemons.");
