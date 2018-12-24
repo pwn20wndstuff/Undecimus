@@ -1681,7 +1681,6 @@
                                                 <state key="normal" title="@iOS_App_Dev"/>
                                                 <connections>
                                                     <action selector="tappedOnJoonwoo:" destination="dpq-Ft-RH3" eventType="touchUpInside" id="blk-Ig-D6m"/>
-                                                    <action selector="tappedOnSamB:" destination="dpq-Ft-RH3" eventType="touchUpInside" id="eQA-N3-8iP"/>
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&amp; " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wwu-8F-Edh">
