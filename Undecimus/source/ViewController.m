@@ -2096,13 +2096,16 @@ void exploit(mach_port_t tfp0,
             _assert(unlocknvram() == ERR_SUCCESS, message, true);
             LOG("Successfully unlocked nvram.");
             
-            // Set boot-nonce.
-            
-            LOG("Setting boot-nonce...");
-            SETMESSAGE(NSLocalizedString(@"Failed to set boot-nonce.", nil));
-            _assert(runCommand("/usr/sbin/nvram", [[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String], NULL) == ERR_SUCCESS, message, true);
-            _assert(runCommand("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL) == ERR_SUCCESS, message, true);
-            LOG("Successfully set boot-nonce.");
+            if (runCommand("/usr/sbin/nvram", "com.apple.System.boot-nonce", NULL) != ERR_SUCCESS ||
+                strstr([lastSystemOutput bytes], boot_nonce) == NULL) {
+                // Set boot-nonce.
+                
+                LOG("Setting boot-nonce...");
+                SETMESSAGE(NSLocalizedString(@"Failed to set boot-nonce.", nil));
+                _assert(runCommand("/usr/sbin/nvram", [[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String], NULL) == ERR_SUCCESS, message, true);
+                _assert(runCommand("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL) == ERR_SUCCESS, message, true);
+                LOG("Successfully set boot-nonce.");
+            }
             
             // Lock nvram.
             
@@ -3001,6 +3004,20 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
+        // Drop kernel credentials.
+        
+        LOG("Dropping kernel credentials...");
+        SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
+        ShaiHuludProcessAtAddr(myProcAddr, myOriginalCredAddr);
+        WriteAnywhere64(GETOFFSET(shenanigans), Shenanigans);
+        setuidProcessAtAddr(0, myProcAddr);
+        ShaiHulud2ProcessAtAddr(myProcAddr);
+        LOG("Successfully dropped kernel credentials.");
+    }
+    
+    UPSTAGE();
+    
+    {
         if (load_tweaks) {
             // Load Tweaks.
             
@@ -3017,12 +3034,6 @@ void exploit(mach_port_t tfp0,
             }
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             LOG("Successfully loaded Tweaks.");
-        } else {
-            // Clean up.
-            LOG("Cleaning up...");
-            SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
-            ShaiHuludProcessAtAddr(myProcAddr, myOriginalCredAddr);
-            LOG("Successfully cleaned up.");
         }
     }
 }
@@ -3073,7 +3084,7 @@ void exploit(mach_port_t tfp0,
         }
         // NOTICE(@"Jailbreak succeeded, but still needs a few minutes to respring.", 0, 0);
         exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
-        PROGRESS(NSLocalizedString(@"Jailbroken", nil), false, true);
+        PROGRESS(NSLocalizedString(@"Jailbroken", nil), false, false);
     });
 }
 

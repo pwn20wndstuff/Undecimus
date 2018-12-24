@@ -183,7 +183,7 @@ int platformizePid(pid_t Whom);
 int setuidProcessAtAddr (uid_t Uid, uint64_t ProcStructAddr);
 int rootifyPid(pid_t Whom);
 uint64_t ShaiHuludProcessAtAddr(uint64_t ProcStructAddr, uint64_t CredAddr);
-uint64_t ShaiHulud2ProcessAtAddr(uint64_t CredAddr);
+uint64_t ShaiHulud2ProcessAtAddr(uint64_t ProcStructAddr);
 int ShaiHuludPid (pid_t Whom, uint64_t CredAddr); // leave 0 for root creds.
 int unShaiHuludPid (pid_t Whom);
 
