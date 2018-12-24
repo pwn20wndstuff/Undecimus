@@ -2972,8 +2972,8 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
         WriteAnywhere64(myProcAddr + koffset(KSTRUCT_OFFSET_PROC_UCRED), myOriginalCredAddr);
         WriteAnywhere64(GETOFFSET(shenanigans), Shenanigans);
-        setuidProcessAtAddr(0, myProcAddr);
-        ShaiHulud2ProcessAtAddr(myProcAddr);
+        WriteAnywhere64(myOriginalCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL), ReadAnywhere64(kernelCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL)));
+        WriteAnywhere64(myOriginalCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_UID), 0);
         LOG("Successfully dropped kernel credentials.");
     }
     

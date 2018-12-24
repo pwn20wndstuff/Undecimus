@@ -56,7 +56,11 @@ enum kstruct_offset {
   KSTRUCT_OFFSET_SPECINFO_SI_FLAGS,
     
   /* struct mount */
-  KSTRUCT_OFFSET_MOUNT_MNT_FLAG, 
+  KSTRUCT_OFFSET_MOUNT_MNT_FLAG,
+    
+  /* struct ucred */
+  KSTRUCT_OFFSET_UCRED_CR_UID,
+  KSTRUCT_OFFSET_UCRED_CR_LABEL,
   
   KFREE_ADDR_OFFSET,
 };
