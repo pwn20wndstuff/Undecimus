@@ -2205,7 +2205,7 @@ void exploit(mach_port_t tfp0,
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
             NOTICE(NSLocalizedString(@"The system snapshot has been successfully renamed. The device will be rebooted now.", nil), true, false);
-            _assert(unmount("/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
+            unmount("/var/MobileSoftwareUpdate/mnt1", 0);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         }
@@ -2539,7 +2539,7 @@ void exploit(mach_port_t tfp0,
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
             NOTICE(NSLocalizedString(@"RootFS has successfully been restored. The device will be restarted.", nil), true, false);
-            _assert(unmount("/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
+            unmount("/var/MobileSoftwareUpdate/mnt1", 0);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         }
