@@ -2317,21 +2317,15 @@ void exploit(mach_port_t tfp0,
         LOG("Injecting trust cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
         LOG("trust_chain = 0x%llx\n", GETOFFSET(trust_chain));
-        NSMutableArray *resources = [NSMutableArray new];
-        if (!needResources) {
-            [resources addObjectsFromArray:[NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"]];
+        NSArray *resources = nil;
+        if (needResources) {
+            resources = @[@(amfid_payload)];
+        } else {
+            resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
         }
-        [resources addObject:@(amfid_payload)];
-
-        const char *resarray[resources.count + 1];
-        for (int i=0; i<resources.count; i++) {
-            resarray[i] = [resources[i] UTF8String];
-        }
-        resarray[resources.count] = NULL;
-        _assert(injectTrustCache((int)resources.count, (char **)resarray, GETOFFSET(trust_chain)) == 0, message, true);
+        _assert(injectTrustCache(resources, GETOFFSET(trust_chain)) == 0, message, true);
         LOG("Successfully injected trust cache.");
     }
-    
     UPSTAGE();
     
     {
