@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AudioToolbox/AudioToolbox.h>
 #include <common.h>
 
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
@@ -50,6 +51,35 @@ static inline void showAlert(NSString *title, NSString *message, Boolean wait, B
 
 @interface ViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UIButton *goButton;
+@property (weak, nonatomic) IBOutlet UIView *mainView;
+@property (weak, nonatomic) IBOutlet UIView *jailbreakView;
+@property (weak, nonatomic) IBOutlet UILabel *swipeUpLabel;
+@property (weak, nonatomic) IBOutlet UILabel *uOLabel;
+@property (weak,nonatomic) IBOutlet UIView *settingsButtonView;
+@property (weak, nonatomic) IBOutlet UIView *creditsButtonView;
+@property (weak, nonatomic) IBOutlet UIView *settingsTransitionView;
+@property (weak, nonatomic) IBOutlet UIView *creditsTransitionView;
+@property (weak,nonatomic) IBOutlet UINavigationBar *settingsNavBar;
+@property (weak,nonatomic) IBOutlet UINavigationBar *creditsNavBar;
+@property (weak,nonatomic) IBOutlet UIVisualEffectView *initalErrorView;
+@property (weak,nonatomic) IBOutlet UITextView *errorMessage;
+@property (weak,nonatomic) IBOutlet UILabel *errorStatus;
+@property (weak,nonatomic) IBOutlet UIProgressView *jailbreakProgressView;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *mainViewTopConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *mainViewBottomConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *settingsViewTopConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *settingsViewBottomConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *creditsViewTopConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *creditsViewBottomConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *jailbreakViewTopConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *jailbreakViewBottomConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *creditsHapticTouchBottomConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *settingssHapticTouchBottomConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *initialErrorViewTopConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *initialErrorViewBottomConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *initialErrorViewLabelTopConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *initialErrorViewButtonBottomConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *swipeUpLabelBottomConstraint;
 
 enum {
     EMPTY_LIST = 0,

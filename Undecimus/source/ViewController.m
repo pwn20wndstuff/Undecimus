@@ -64,10 +64,7 @@ static ViewController *sharedController = nil;
         LOG("PROGRESS: %@", msg); \
         dispatch_async(dispatch_get_main_queue(), ^{ \
             [UIView performWithoutAnimation:^{ \
-                [[[ViewController sharedController] goButton] setEnabled:btnenbld]; \
-                [[[[ViewController sharedController] tabBarController] tabBar] setUserInteractionEnabled:tbenbld]; \
-                [[[ViewController sharedController] goButton] setTitle:msg forState: btnenbld ? UIControlStateNormal : UIControlStateDisabled]; \
-                [[[ViewController sharedController] goButton] layoutIfNeeded]; \
+                [[[ViewController sharedController] jailbreakProgressView] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
             }]; \
         }); \
 } while (false)
@@ -3064,9 +3061,96 @@ void exploit(mach_port_t tfp0,
     }
 }
 
+bool up = NO;
+bool down = YES;
+NSTimer *swipeUpTimer;
+- (void) swipeUpAnimation:(NSTimer *)timer {
+    if ((up == NO) && (down == YES)) {
+        
+        [UIView animateWithDuration:1.6 delay:0.4 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            
+            self.swipeUpLabel.alpha = 1;
+            self.swipeUpLabel.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, -50);
+            //(translationX: 0, y: -50)
+            
+        } completion:nil];
+        
+        up = YES;
+        down = NO;
+        
+    }else if ((up == YES) && (down == NO)) {
+        
+        [UIView animateWithDuration:1.6 delay:0.4 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            
+            self.swipeUpLabel.alpha = 0;
+        } completion:nil];
+        
+        [UIView animateWithDuration:0.1 delay:1.6 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            self.swipeUpLabel.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, 0);
+        } completion:nil];
+        
+        
+        up = NO;
+        down = YES;
+        
+    }
+    
+}
+
+BOOL notchedDevice = NO;
+
+- (void)viewWillAppear:(BOOL)animated {
+    self.initalErrorView.alpha = 0;
+    self.settingsTransitionView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, [UIScreen mainScreen].bounds.size.height, 0);
+    self.creditsTransitionView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, -[UIScreen mainScreen].bounds.size.height, 0);
+    
+    if (@available(iOS 11.0, *)) {
+        UIWindow *mainWindow = [[[UIApplication sharedApplication] delegate] window];
+        if (mainWindow.safeAreaInsets.top > 24.0) {
+            notchedDevice = YES;
+            _swipeUpLabelBottomConstraint.constant = _swipeUpLabelBottomConstraint.constant + 44;
+            _mainViewTopConstraint.constant = -44;
+            _mainViewBottomConstraint.constant = -44;
+            _settingsViewTopConstraint.constant = -44;
+            _settingsViewBottomConstraint.constant = 44;
+            _creditsViewTopConstraint.constant = -44;
+            _creditsViewBottomConstraint.constant = 44;
+            _jailbreakViewTopConstraint.constant = -44;
+            _jailbreakViewBottomConstraint.constant = 44;
+            _creditsHapticTouchBottomConstraint.constant = _creditsHapticTouchBottomConstraint.constant + 44;
+            _settingssHapticTouchBottomConstraint.constant = _settingssHapticTouchBottomConstraint.constant + 44;
+            _initialErrorViewTopConstraint.constant = -44;
+            _initialErrorViewBottomConstraint.constant = 44;
+            _initialErrorViewLabelTopConstraint.constant = _initialErrorViewLabelTopConstraint.constant + 44;
+            _initialErrorViewButtonBottomConstraint.constant = _initialErrorViewButtonBottomConstraint.constant + 44;
+        }
+    }
+    
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    
+    swipeUpTimer = [NSTimer scheduledTimerWithTimeInterval:1.6 target:self selector:@selector(swipeUpAnimation:) userInfo:nil
+                                                   repeats:YES];
+    self.creditsTransitionView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.25, 0.25);
+    self.settingsTransitionView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.25, 0.25);
+    self.settingsButtonView.layer.cornerRadius = 30;
+    self.settingsButtonView.clipsToBounds = YES;
+    self.jailbreakView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 3, 3);
+    self.jailbreakView.alpha = 0;
+    self.creditsButtonView.layer.cornerRadius = 30;
+    self.creditsButtonView.clipsToBounds = YES;
+    
+    [self.settingsNavBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
+    [self.settingsNavBar setShadowImage:[UIImage new]];
+    
+    [self.creditsNavBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
+    [self.creditsNavBar setShadowImage:[UIImage new]];
+    self.swipeUpLabel.alpha = 0;
+    
+    
     sharedController = self;
     if (isJailbroken()) {
         PROGRESS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);
@@ -3088,6 +3172,219 @@ void exploit(mach_port_t tfp0,
     return UIStatusBarStyleDefault;
 }
 
+CGFloat initialYLocation;
+CGFloat moveOnValidNumber;
+
+-(void)hapticTouchFeedback {
+    if ([UIDevice.currentDevice valueForKey:@"_feedbackSupportLevel"] == 2) {
+        UIImpactFeedbackGenerator *generator = [[UIImpactFeedbackGenerator alloc] initWithStyle: UIImpactFeedbackStyleLight];
+        [generator prepare];
+        [generator impactOccurred];
+        generator = nil;
+        
+    } else {
+        AudioServicesPlaySystemSound(1519);
+    }
+}
+
+
+-(void)noHaptic {
+    
+    AudioServicesPlaySystemSound(1519);
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, 0.15 * NSEC_PER_SEC);
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        
+        AudioServicesPlaySystemSound(1519);
+        
+    });
+}
+
+
+
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [touches anyObject];
+    CGPoint secondaryLocation = [touch locationInView: _mainView];
+    
+    CGFloat yLocation = secondaryLocation.y;
+    
+    if ([touch view] == _mainView) {
+        initialYLocation = yLocation;
+        
+        if (!(isSupportedByJailbreak() == 1)) {
+            
+            [self noHaptic];
+            
+            [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                self.initalErrorView.alpha = 1;
+            } completion:nil];
+        } else if (isJailbroken() == 1) {
+            
+            _errorStatus.text = @"Your device is jailbroken already.";
+            _errorMessage.text = @"In order to jailbreak your device again, reboot your device.";
+            
+            
+            
+            
+        }
+        
+    } else if ([touch view] == _creditsButtonView) {
+        [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            _creditsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.5, 1.5);
+        } completion:nil];
+        
+        [self hapticTouchFeedback];
+        
+    } else if ([touch view] == _settingsButtonView) {
+        
+        [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            _settingsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.5, 1.5);
+        } completion:nil];
+        
+        [self hapticTouchFeedback];
+        
+        
+    }
+    
+}
+
+
+
+
+-(void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [touches anyObject];
+    CGPoint secondaryLocation = [touch locationInView: _mainView];
+    CGFloat yLocation = secondaryLocation.y;
+    
+    if ([touch view] == _mainView) {
+        
+        
+        
+        moveOnValidNumber = ((initialYLocation - yLocation) / 280) + 1;
+        
+        if (moveOnValidNumber > (CGFloat)1.0) {
+            
+            
+            self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity,
+                                                             (( initialYLocation - yLocation) / 280) + 1, (( initialYLocation - yLocation) / 280) + 1);
+            //self.jailbreakView.transform = CGAffineTransformScale(CGAffineTransformIdentity,
+            //(( initialYLocation - yLocation) / 280), (( initialYLocation - yLocation) / 280));
+            
+            self.mainView.alpha = 2 -  ((( initialYLocation - yLocation) / 280) + 1);
+            
+            
+            
+        }
+        
+    }
+}
+
+-(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event  {
+    
+    UITouch *touch = [touches anyObject];
+    
+    if ([touch view] == _mainView) {
+        if ((moveOnValidNumber > 2.0) && (isSupportedByJailbreak() == 1)) {
+            
+            [self tappedOnJailbreak:nil];
+            [UIView animateWithDuration:0.75 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                self.jailbreakView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+                self.jailbreakView.alpha = 1;
+            } completion:nil];
+            
+            //swipeUpTimer.invalidate;
+            self.mainView.alpha = 0;
+            
+        } else if ((moveOnValidNumber < 2.0) || (!(isSupportedByJailbreak() == 1)))  {
+            
+            [UIView animateWithDuration:0.75 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                
+                self.mainView.alpha = 1;
+                self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+                self.jailbreakView.transform = CGAffineTransformScale(CGAffineTransformIdentity,
+                                                                      3, 3);
+                self.jailbreakView.alpha = 0;
+                
+            } completion:nil];
+            
+            
+            
+        }
+        
+    }  else if ([touch view] == _settingsButtonView) {
+        [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            _settingsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        } completion:nil];
+        
+        [self hapticTouchFeedback];
+        
+        [UIView animateWithDuration:0.75 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            
+            self.settingsTransitionView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+            
+            self.settingsTransitionView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, 0);
+            self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.5, 0.5);
+            
+            self.mainView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, -[UIScreen mainScreen].bounds.size.height, 0);
+        } completion:nil];
+        
+        
+    } else if ([touch view] == _creditsButtonView) {
+        [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            _creditsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        } completion:nil];
+        
+        [self hapticTouchFeedback];
+        
+        [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            
+            self.creditsTransitionView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+            self.creditsTransitionView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, 0);
+            
+            self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.5, 0.5);
+            self.mainView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, [UIScreen mainScreen].bounds.size.height, 0);
+            
+        } completion:nil];
+        
+        
+    }
+    
+}
+
+- (IBAction)doneSettings:(id)sender {
+    
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        
+        self.settingsTransitionView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.settingsTransitionView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, [UIScreen mainScreen].bounds.size.height, 0);
+        self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.mainView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, 0);
+        
+    } completion:nil];
+    
+}
+
+- (IBAction)doneCredits:(id)sender {
+    
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        
+        self.creditsTransitionView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.creditsTransitionView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, -[UIScreen mainScreen].bounds.size.height, 0);
+        self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.mainView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, 0);
+        
+    } completion:nil];
+}
+
+- (IBAction)dismissInitialError:(id)sender {
+    
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        
+        self.initalErrorView.alpha = 0;
+        
+    } completion:nil];
+    
+}
+
 - (IBAction)tappedOnPwn:(id)sender{
     [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
 }
@@ -3102,6 +3399,10 @@ void exploit(mach_port_t tfp0,
 
 - (IBAction)tappedOnSamG:(id)sender{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://reddit.com/u/Samg_is_a_Ninja"] options:@{} completionHandler:nil];
+}
+
+- (IBAction)tappedOnJoonwoo:(id)sender {
+    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"iOS_App_Dev"] options:@{} completionHandler:nil];
 }
 
 // This intentionally returns nil if called before it's been created by a proper init
