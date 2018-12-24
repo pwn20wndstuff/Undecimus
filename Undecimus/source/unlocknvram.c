@@ -17,6 +17,7 @@
 #include "kutils.h"
 #include "offsets.h"
 #include "kmem.h"
+#include "find_port.h"
 
 // from vtable start in bytes
 unsigned VTB_IODTNVRAM__SEARCHNVRAMPROPERTY = 0x590;
@@ -41,7 +42,7 @@ uint64_t get_iodtnvram_obj(void) {
             ERROR("Failed to get IODTNVRAM service");
             return 0;
         }
-        uint64_t nvram_up = getAddressOfPort(getpid(), IODTNVRAMSrv);
+        uint64_t nvram_up = find_port_address(IODTNVRAMSrv, 0x41414141);
         IODTNVRAMObj = ReadAnywhere64(nvram_up + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
 
         INFO("IODTNVRAM obj at 0x%llx", IODTNVRAMObj);

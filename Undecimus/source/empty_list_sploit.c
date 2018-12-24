@@ -15,6 +15,7 @@
 #include "offsets.h"
 #include "kmem.h"
 #include <common.h>
+#include "kutils.h"
 
 
 static void increase_limits() {
@@ -879,6 +880,7 @@ void vfs_sploit() {
     
     
     uint64_t task_port_kaddr = early_rk64(host_kmsg + 0xac);
+    cached_task_self_addr = task_port_kaddr;
     
     LOG("our task port is at %016llx\n", task_port_kaddr);
     

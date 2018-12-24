@@ -3,6 +3,8 @@
 
 #include <mach/mach.h>
 
+extern uint64_t cached_task_self_addr;
+
 uint64_t task_self_addr(void);
 uint64_t ipc_space_kernel(void);
 uint64_t find_kernel_base(void);

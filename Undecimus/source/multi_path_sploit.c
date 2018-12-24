@@ -16,6 +16,7 @@
 #include "offsets.h"
 #include "kmem.h"
 #include <common.h>
+#include "kutils.h"
 
 kern_return_t mach_vm_read(
                            vm_map_t target_task,
@@ -709,6 +710,7 @@ void mptcp_go() {
     
     // we can also find our task port kaddr:
     uint64_t task_port_kaddr = *((uint64_t*)(new_contents + 0x67c));
+    cached_task_self_addr = task_port_kaddr;
     
     mach_port_t kport = prepare_early_read_primitive(pipe_buf, replacer_pipe, replacer_pipe+1, replacer_port, new_contents);
     
