@@ -1411,51 +1411,6 @@
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Clouds" translatesAutoresizingMaskIntoConstraints="NO" id="fbT-RN-N2y">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                             </imageView>
-                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1oJ-6o-Gw1">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="iaO-HY-z5K">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your device is not compatible." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Yg-fG-KY1">
-                                            <rect key="frame" x="37" y="70" width="246" height="21"/>
-                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
-                                            <color key="textColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4oR-Xh-wWM">
-                                            <rect key="frame" x="122" y="496" width="76" height="42"/>
-                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="25"/>
-                                            <state key="normal" title="Ok... :(">
-                                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            </state>
-                                            <connections>
-                                                <action selector="dismissInitialError:" destination="dpq-Ft-RH3" eventType="touchUpInside" id="bGL-R3-sJC"/>
-                                            </connections>
-                                        </button>
-                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="You should downgrade this device to lower version of iOS, or this device is not compatible." textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="HIQ-w0-WpI">
-                                            <rect key="frame" x="40" y="246.5" width="240" height="75"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="75" id="DKK-5l-UiU"/>
-                                                <constraint firstAttribute="width" constant="240" id="NPB-sd-Fqj"/>
-                                            </constraints>
-                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                        </textView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="HIQ-w0-WpI" firstAttribute="centerY" secondItem="iaO-HY-z5K" secondAttribute="centerY" id="3k9-gW-ENP"/>
-                                        <constraint firstItem="7Yg-fG-KY1" firstAttribute="top" secondItem="iaO-HY-z5K" secondAttribute="top" constant="70" id="JLf-dd-OVA"/>
-                                        <constraint firstItem="4oR-Xh-wWM" firstAttribute="centerX" secondItem="iaO-HY-z5K" secondAttribute="centerX" id="U45-2U-Dz5"/>
-                                        <constraint firstItem="HIQ-w0-WpI" firstAttribute="centerX" secondItem="iaO-HY-z5K" secondAttribute="centerX" id="Wgl-V1-gxo"/>
-                                        <constraint firstItem="7Yg-fG-KY1" firstAttribute="centerX" secondItem="iaO-HY-z5K" secondAttribute="centerX" id="mNu-Ju-Q9T"/>
-                                        <constraint firstAttribute="bottom" secondItem="4oR-Xh-wWM" secondAttribute="bottom" constant="30" id="mX5-vO-b6h"/>
-                                    </constraints>
-                                </view>
-                                <blurEffect style="dark"/>
-                            </visualEffectView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7n9-VM-P4Y">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <subviews>
@@ -1467,7 +1422,7 @@
                                         <rect key="frame" x="150" y="405" width="20" height="20"/>
                                     </activityIndicatorView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="u0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="njK-Qm-dbA">
-                                        <rect key="frame" x="81.5" y="202" width="157" height="164.5"/>
+                                        <rect key="frame" x="85.5" y="213.5" width="149" height="141"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="149" id="Hsi-lL-hWl"/>
                                         </constraints>
@@ -1573,7 +1528,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="u0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="d8F-fc-Rnv">
-                                        <rect key="frame" x="81.5" y="132" width="157" height="164.5"/>
+                                        <rect key="frame" x="85.5" y="143.5" width="149" height="141"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="149" id="Fyy-7c-Rmv"/>
                                         </constraints>
@@ -1628,7 +1583,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gS1-Yb-dgY">
-                                        <rect key="frame" x="17.5" y="306.5" width="285" height="93"/>
+                                        <rect key="frame" x="17.5" y="294.5" width="285" height="93"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="unc0ver jailbreak for iOS 11.0-11.4b3" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fGP-UL-EVR">
                                                 <rect key="frame" x="14" y="4" width="257" height="18"/>
@@ -1785,6 +1740,51 @@
                                     <constraint firstItem="1iE-dY-j5H" firstAttribute="centerX" secondItem="Jer-5A-2ei" secondAttribute="centerX" id="wth-VD-fcK"/>
                                 </constraints>
                             </view>
+                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1oJ-6o-Gw1">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="iaO-HY-z5K">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your device is not compatible." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Yg-fG-KY1">
+                                            <rect key="frame" x="37" y="70" width="246" height="21"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                            <color key="textColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4oR-Xh-wWM">
+                                            <rect key="frame" x="122" y="496" width="76" height="42"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="25"/>
+                                            <state key="normal" title="Ok... :(">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="dismissInitialError:" destination="dpq-Ft-RH3" eventType="touchUpInside" id="bGL-R3-sJC"/>
+                                            </connections>
+                                        </button>
+                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="You should downgrade this device to lower version of iOS, or this device is not compatible." textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="HIQ-w0-WpI">
+                                            <rect key="frame" x="40" y="246.5" width="240" height="75"/>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="75" id="DKK-5l-UiU"/>
+                                                <constraint firstAttribute="width" constant="240" id="NPB-sd-Fqj"/>
+                                            </constraints>
+                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                        </textView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="HIQ-w0-WpI" firstAttribute="centerY" secondItem="iaO-HY-z5K" secondAttribute="centerY" id="3k9-gW-ENP"/>
+                                        <constraint firstItem="7Yg-fG-KY1" firstAttribute="top" secondItem="iaO-HY-z5K" secondAttribute="top" constant="70" id="JLf-dd-OVA"/>
+                                        <constraint firstItem="4oR-Xh-wWM" firstAttribute="centerX" secondItem="iaO-HY-z5K" secondAttribute="centerX" id="U45-2U-Dz5"/>
+                                        <constraint firstItem="HIQ-w0-WpI" firstAttribute="centerX" secondItem="iaO-HY-z5K" secondAttribute="centerX" id="Wgl-V1-gxo"/>
+                                        <constraint firstItem="7Yg-fG-KY1" firstAttribute="centerX" secondItem="iaO-HY-z5K" secondAttribute="centerX" id="mNu-Ju-Q9T"/>
+                                        <constraint firstAttribute="bottom" secondItem="4oR-Xh-wWM" secondAttribute="bottom" constant="30" id="mX5-vO-b6h"/>
+                                    </constraints>
+                                </view>
+                                <blurEffect style="dark"/>
+                            </visualEffectView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
