@@ -66,6 +66,14 @@ static ViewController *sharedController = nil;
             [UIView performWithoutAnimation:^{ \
                 [[[ViewController sharedController] jailbreakProgressView] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
             }]; \
+        if (stage == maxStage)  {\
+            UIApplication *app = [UIApplication sharedApplication];\
+            [app performSelector:@selector(suspend)];\
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC));\
+            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){\
+                exit(0);\
+            }); \
+        }\
         }); \
 } while (false)
 
@@ -2989,6 +2997,8 @@ void exploit(mach_port_t tfp0,
             LOG("Successfully loaded Tweaks.");
         }
     }
+    
+    
 }
 
 - (IBAction)tappedOnJailbreak:(id)sender
@@ -3037,7 +3047,15 @@ void exploit(mach_port_t tfp0,
         }
         // NOTICE(@"Jailbreak succeeded, but still needs a few minutes to respring.", 0, 0);
         exploit(tfp0, find_kernel_base(), [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
-        PROGRESS(NSLocalizedString(@"Jailbroken", nil), false, false);
+        dispatch_async(dispatch_get_main_queue(), ^{
+     
+        });
+        PROGRESS(NSLocalizedString(@"Jailbroken", nil), true, true);
+
+   
+        
+
+        
     });
 }
 
@@ -3066,7 +3084,6 @@ NSTimer *swipeUpTimer;
             
             self.swipeUpLabel.alpha = 1;
             self.swipeUpLabel.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, -50);
-            //(translationX: 0, y: -50)
             
         } completion:nil];
         
@@ -3089,6 +3106,22 @@ NSTimer *swipeUpTimer;
         down = YES;
         
     }
+    if (stage == maxStage) {
+        
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_TWEAK_INJECTION] == false) {
+            
+            [UIView animateWithDuration:0.75 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                
+                self.mainView.alpha = 1;
+                self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+                self.jailbreakView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 3, 3);
+                self.jailbreakView.alpha = 0;
+                
+            } completion:nil];
+        }
+    }
+    
+
     
 }
 
@@ -3150,6 +3183,7 @@ BOOL notchedDevice = NO;
     sharedController = self;
     if (isJailbroken()) {
         PROGRESS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);
+        _swipeUpLabel.text = @"Swipe up to re-jailbreak";
     } else if (!isSupportedByJailbreak()) {
         PROGRESS(NSLocalizedString(@"Unsupported", nil), false, true);
     }
@@ -3175,7 +3209,7 @@ CGFloat initialYLocation;
 CGFloat moveOnValidNumber;
 
 -(void)hapticTouchFeedback {
-    if ([UIDevice.currentDevice valueForKey:@"_feedbackSupportLevel"] == 2) {
+    if ([[UIDevice currentDevice] valueForKey:@"_feedbackSupportLevel"] == 2) {
         UIImpactFeedbackGenerator *generator = [[UIImpactFeedbackGenerator alloc] initWithStyle: UIImpactFeedbackStyleLight];
         [generator prepare];
         [generator impactOccurred];
@@ -3218,8 +3252,8 @@ CGFloat moveOnValidNumber;
             } completion:nil];
         } else if (isJailbroken() == 1) {
             
-            _errorStatus.text = @"Your device is jailbroken already.";
-            _errorMessage.text = @"In order to jailbreak your device again, reboot your device.";
+            //_errorStatus.text = @"Your device is jailbroken already.";
+            //_errorMessage.text = @"In order to jailbreak your device again, reboot your device.";
             
             
             
@@ -3228,7 +3262,7 @@ CGFloat moveOnValidNumber;
         
     } else if ([touch view] == _creditsButtonView) {
         [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            _creditsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.5, 1.5);
+            self->_creditsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.5, 1.5);
         } completion:nil];
         
         [self hapticTouchFeedback];
@@ -3236,7 +3270,7 @@ CGFloat moveOnValidNumber;
     } else if ([touch view] == _settingsButtonView) {
         
         [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            _settingsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.5, 1.5);
+            self->_settingsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.5, 1.5);
         } completion:nil];
         
         [self hapticTouchFeedback];
@@ -3265,9 +3299,6 @@ CGFloat moveOnValidNumber;
             
             self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity,
                                                              (( initialYLocation - yLocation) / 280) + 1, (( initialYLocation - yLocation) / 280) + 1);
-            //self.jailbreakView.transform = CGAffineTransformScale(CGAffineTransformIdentity,
-            //(( initialYLocation - yLocation) / 280), (( initialYLocation - yLocation) / 280));
-            
             self.mainView.alpha = 2 -  ((( initialYLocation - yLocation) / 280) + 1);
             
             
@@ -3290,7 +3321,7 @@ CGFloat moveOnValidNumber;
                 self.jailbreakView.alpha = 1;
             } completion:nil];
             
-            //swipeUpTimer.invalidate;
+           // [swipeUpTimer invalidate];
             self.mainView.alpha = 0;
             
         } else if ((moveOnValidNumber < 2.0) || (!(isSupportedByJailbreak() == 1)))  {
@@ -3299,8 +3330,7 @@ CGFloat moveOnValidNumber;
                 
                 self.mainView.alpha = 1;
                 self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
-                self.jailbreakView.transform = CGAffineTransformScale(CGAffineTransformIdentity,
-                                                                      3, 3);
+                self.jailbreakView.transform = CGAffineTransformScale(CGAffineTransformIdentity,3, 3);
                 self.jailbreakView.alpha = 0;
                 
             } completion:nil];
@@ -3311,7 +3341,7 @@ CGFloat moveOnValidNumber;
         
     }  else if ([touch view] == _settingsButtonView) {
         [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            _settingsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+            self->_settingsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
         } completion:nil];
         
         [self hapticTouchFeedback];
@@ -3329,7 +3359,7 @@ CGFloat moveOnValidNumber;
         
     } else if ([touch view] == _creditsButtonView) {
         [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            _creditsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+            self->_creditsButtonView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
         } completion:nil];
         
         [self hapticTouchFeedback];
