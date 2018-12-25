@@ -50,6 +50,7 @@
 		22C546CC21A8D8AC00EFC09C /* resources.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C121A8D7DA00EFC09C /* resources.deb */; };
 		22CFED9021CDF5C900A216BE /* inject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFED8E21CDF5C900A216BE /* inject.m */; };
 		22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 22CFED9121CDFE6B00A216BE /* libmis.tbd */; };
+		51A45C6821D2C6110085ED65 /* Credits.png in Resources */ = {isa = PBXBuildFile; fileRef = 51A45C6721D2C6110085ED65 /* Credits.png */; };
 		8D592A68218E47F60035D2BC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D592A67218E47F60035D2BC /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -130,6 +131,7 @@
 		22CFED8E21CDF5C900A216BE /* inject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = inject.m; path = Injector/inject.m; sourceTree = SOURCE_ROOT; };
 		22CFED8F21CDF5C900A216BE /* inject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inject.h; path = Injector/inject.h; sourceTree = SOURCE_ROOT; };
 		22CFED9121CDFE6B00A216BE /* libmis.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libmis.tbd; path = usr/lib/libmis.tbd; sourceTree = SDKROOT; };
+		51A45C6721D2C6110085ED65 /* Credits.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Credits.png; sourceTree = "<group>"; };
 		8D592A67218E47F60035D2BC /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -216,6 +218,7 @@
 				21C1310F214C2E570021AA9D /* strap.tar.lzma */,
 				21C13100214C20950021AA9D /* tar.tar */,
 				21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */,
+				51A45C6721D2C6110085ED65 /* Credits.png */,
 			);
 			path = resources;
 			sourceTree = "<group>";
@@ -382,6 +385,7 @@
 				22C546CC21A8D8AC00EFC09C /* resources.deb in Resources */,
 				21C13110214C2E570021AA9D /* strap.tar.lzma in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
+				51A45C6821D2C6110085ED65 /* Credits.png in Resources */,
 				8D592A68218E47F60035D2BC /* Main.storyboard in Resources */,
 				21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */,
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
