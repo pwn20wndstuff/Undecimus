@@ -2968,7 +2968,7 @@ void exploit(mach_port_t tfp0,
                     "done");
             rv = true;
             LOG("Successfully loaded Daemons.");
-        } else if (load_tweaks && access("/etc/rc.d/substrate", F_OK) == ERR_SUCCESS) {
+        } else if (access("/etc/rc.d/substrate", F_OK) == ERR_SUCCESS) {
             LOG("Loading Substrate...");
             SETMESSAGE(NSLocalizedString(@"Failed to load Substrate.", nil));
             _system("/etc/rc.d/substrate");
