@@ -2323,7 +2323,10 @@ void exploit(mach_port_t tfp0,
         } else {
             resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
         }
-        _assert(injectTrustCache(resources, GETOFFSET(trust_chain)) == 0, message, true);
+        if (cdhashFor(@"/usr/libexec/substrate") != nil) {
+            resources = [resources arrayByAddingObject:@"/usr/libexec/substrate"];
+        }
+        _assert(injectTrustCache(resources, GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
     }
     UPSTAGE();
@@ -2403,7 +2406,33 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
+        // Set Disable Loader.
+        LOG("Setting Disable Loader...");
+        SETMESSAGE(NSLocalizedString(@"Failed to set Disable Loader.", nil));
+        if (load_tweaks) {
+            clean_file("/var/tmp/.substrated_disable_loader");
+        } else {
+            a = fopen("/var/tmp/.substrated_disable_loader", "w");
+            LOG("a: " "%p" "\n", a);
+            _assert(a != NULL, message, true);
+            _assert(fclose(a) == ERR_SUCCESS, message, true);
+            init_file("/var/tmp/.substrated_disable_loader", 0, 644);
+        }
+        LOG("Successfully set Disable Loader.");
+    }
+    
+    UPSTAGE();
+    
+    {
         // Patch amfid.
+        if (access("/usr/libexec/substrate", F_OK) == ERR_SUCCESS)
+        {
+            // Run substrate
+            LOG("Starting Substrate...");
+            SETMESSAGE(NSLocalizedString(@"Failed to start Substrate.", nil));
+            _assert(runCommand("/usr/libexec/substrate", NULL) == ERR_SUCCESS, message, false);
+        }
+        
         LOG("Testing amfid...");
         if (runCommand("/bin/true", NULL) != ERR_SUCCESS) {
             LOG("Patching amfid...");
@@ -2645,7 +2674,7 @@ void exploit(mach_port_t tfp0,
         
         if (access("/usr/libexec/jailbreakd", F_OK) == ERR_SUCCESS && // jailbreakd must exist
             access("/.disable_jailbreakd", F_OK) != ERR_SUCCESS && // we've not been told to disable it
-            access("/etc/rc.d/substrate", F_OK) != ERR_SUCCESS) { // substrate must not be installed
+            access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) { // substrate must not be installed
             LOG("Spawning jailbreakd...");
             SETMESSAGE(NSLocalizedString(@"Failed to spawn jailbreakd.", nil));
             jbdPidFile = "/var/tmp/jailbreakd.pid";
@@ -2694,7 +2723,7 @@ void exploit(mach_port_t tfp0,
     {
         // Patch launchd.
         
-        if (load_tweaks && (access("/etc/rc.d/substrate", F_OK) != ERR_SUCCESS) && !pspawnHookLoaded()) {
+        if (load_tweaks && (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) && !pspawnHookLoaded()) {
             LOG("Patching launchd...");
             SETMESSAGE(NSLocalizedString(@"Failed to patch launchd.", nil));
             _assert(clean_file("/var/log/pspawn_hook_launchd.log"), message, true);
@@ -2933,25 +2962,6 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        // Set Disable Loader.
-        LOG("Setting Disable Loader...");
-        SETMESSAGE(NSLocalizedString(@"Failed to set Disable Loader.", nil));
-        if (load_tweaks) {
-            clean_file("/var/tmp/.substrated_disable_loader");
-        } else {
-            a = fopen("/var/tmp/.substrated_disable_loader", "w");
-            LOG("a: " "%p" "\n", a);
-            _assert(a != NULL, message, true);
-            _assert(fclose(a) == ERR_SUCCESS, message, true);
-            init_file("/var/tmp/.substrated_disable_loader", 0, 644);
-        }
-        LOG("Successfully set Disable Loader.");
-    }
-    
-    UPSTAGE();
-    
-    {
-        rv = false;
         if (load_daemons) {
             // Load Daemons.
             
@@ -2968,17 +2978,7 @@ void exploit(mach_port_t tfp0,
                             "\"$file\";"
                          "fi;"
                     "done");
-            rv = true;
             LOG("Successfully loaded Daemons.");
-        } else if (access("/etc/rc.d/substrate", F_OK) == ERR_SUCCESS) {
-            LOG("Loading Substrate...");
-            SETMESSAGE(NSLocalizedString(@"Failed to load Substrate.", nil));
-            _system("/etc/rc.d/substrate");
-            rv = true;
-            LOG("Successfully loaded Substrate.");
-        }
-        if (rv) {
-            sleep(2);
         }
     }
 
