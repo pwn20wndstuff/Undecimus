@@ -2493,7 +2493,7 @@ void exploit(mach_port_t tfp0,
                 _assert(fclose(a) == ERR_SUCCESS, message, true);
                 _assert(init_file("/jb/rsync", 0, 0755), message, true);
                 
-                _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trust_chain) == ERR_SUCCESS), message, true);
+                _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
                 
                 _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "/var/MobileSoftwareUpdate/mnt1/.", "/", NULL) == 0, message, true);
             }
