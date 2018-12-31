@@ -2312,6 +2312,100 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
+        if (restore_rootfs) {
+            SETMESSAGE(NSLocalizedString(@"Failed to Restore RootFS.", nil));
+            
+            // Rename system snapshot.
+            
+            LOG("Renaming system snapshot back...");
+            NOTICE(NSLocalizedString(@"Will restore RootFS. This may take a while. Don't exit the app and don't let the device lock.", nil), 1, 1);
+            SETMESSAGE(NSLocalizedString(@"Unable to mount or rename system snapshot.  Delete OTA file from Settings - Storage if present", nil));
+            if (kCFCoreFoundationVersionNumber < 1452.23) {
+                if (access("/var/MobileSoftwareUpdate/mnt1", F_OK) != ERR_SUCCESS) {
+                    _assert(mkdir("/var/MobileSoftwareUpdate/mnt1", 0755) == ERR_SUCCESS, message, true);
+                    _assert(access("/var/MobileSoftwareUpdate/mnt1", F_OK) == ERR_SUCCESS, message, true);
+                    _assert(chown("/var/MobileSoftwareUpdate/mnt1", 0, 0) == ERR_SUCCESS, message, true);
+                }
+            }
+            if (snapshot_check("/", "electra-prejailbreak")) {
+                if (kCFCoreFoundationVersionNumber < 1452.23) {
+                    _assert(snapshot_mount("/", "electra-prejailbreak", "/var/MobileSoftwareUpdate/mnt1") == ERR_SUCCESS, message, true);
+                } else {
+                    _assert(snapshot_rename("/", "electra-prejailbreak", systemSnapshot()) == ERR_SUCCESS, message, true);
+                }
+            } else if (snapshot_check("/", "orig-fs")) {
+                if (kCFCoreFoundationVersionNumber < 1452.23) {
+                    _assert(snapshot_mount("/", "orig-fs", "/var/MobileSoftwareUpdate/mnt1") == ERR_SUCCESS, message, true);
+                } else {
+                    _assert(snapshot_rename("/", "orig-fs", systemSnapshot()) == ERR_SUCCESS, message, true);
+                }
+            } else {
+                _assert(snapshot_mount("/", systemSnapshot(), "/var/MobileSoftwareUpdate/mnt1") == ERR_SUCCESS, message, true);
+            }
+            if (kCFCoreFoundationVersionNumber < 1452.23) {
+                _assert(waitForFile("/var/MobileSoftwareUpdate/mnt1/sbin/launchd") == ERR_SUCCESS, message, true);
+                
+                _assert(clean_file("/jb/rsync.tar"), message, true);
+                _assert(clean_file("/jb/rsync"), message, true);
+                _assert(copyResourceFromBundle(@"rsync.tar", @"/jb/rsync.tar"), message, true);
+                a = fopen("/jb/rsync.tar", "rb");
+                LOG("a: " "%p" "\n", a);
+                _assert(a != NULL, message, true);
+                untar(a, "rsync");
+                _assert(fclose(a) == ERR_SUCCESS, message, true);
+                _assert(init_file("/jb/rsync", 0, 0755), message, true);
+                
+                _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
+                
+                _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "/var/MobileSoftwareUpdate/mnt1/.", "/", NULL) == 0, message, true);
+            }
+            LOG("Successfully renamed system snapshot back.");
+            
+            // Clean up.
+            
+            LOG("Cleaning up...");
+            SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
+            cleanUpFileList = getCleanUpFileList();
+            _assert(cleanUpFileList != nil, message, true);
+            for (NSString *fileName in cleanUpFileList) {
+                if (access([fileName UTF8String], F_OK) == ERR_SUCCESS) {
+                    _assert(([fileManager removeItemAtPath:fileName error:nil]), message, true);
+                }
+            }
+            LOG("Successfully cleaned up.");
+            
+            // Disallow SpringBoard to show non-default system apps.
+            
+            LOG("Disallowing SpringBoard to show non-default system apps...");
+            SETMESSAGE(NSLocalizedString(@"Failed to disallow SpringBoard to show non-default system apps.", nil));
+            md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
+            if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@NO]) {
+                md[@"SBShowNonDefaultSystemApps"] = @NO;
+                _assert(([md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES]), message, true);
+            }
+            LOG("Successfully disallowed SpringBoard to show non-default system apps.");
+            
+            // Disable RootFS Restore.
+            
+            LOG("Disabling RootFS Restore...");
+            SETMESSAGE(NSLocalizedString(@"Failed to disable RootFS Restore.", nil));
+            setPreference(@K_RESTORE_ROOTFS, @NO);
+            LOG("Successfully disabled RootFS Restore.");
+            
+            // Reboot.
+            
+            LOG("Rebooting...");
+            SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
+            NOTICE(NSLocalizedString(@"RootFS has successfully been restored. The device will be restarted.", nil), true, false);
+            unmount("/var/MobileSoftwareUpdate/mnt1", 0);
+            _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
+            LOG("Successfully rebooted.");
+        }
+    }
+    
+    UPSTAGE();
+    
+    {
         // Inject trust cache
         
         LOG("Injecting trust cache...");
@@ -2473,100 +2567,6 @@ void exploit(mach_port_t tfp0,
             }
             _assert(strstr(u.version, kernelVersionString) != NULL, message, true);
             LOG("Successfully updated version string.");
-        }
-    }
-    
-    UPSTAGE();
-    
-    {
-        if (restore_rootfs) {
-            SETMESSAGE(NSLocalizedString(@"Failed to Restore RootFS.", nil));
-            
-            // Rename system snapshot.
-            
-            LOG("Renaming system snapshot back...");
-            NOTICE(NSLocalizedString(@"Will restore RootFS. This may take a while. Don't exit the app and don't let the device lock.", nil), 1, 1);
-            SETMESSAGE(NSLocalizedString(@"Unable to mount or rename system snapshot.  Delete OTA file from Settings - Storage if present", nil));
-            if (kCFCoreFoundationVersionNumber < 1452.23) {
-                if (access("/var/MobileSoftwareUpdate/mnt1", F_OK) != ERR_SUCCESS) {
-                    _assert(mkdir("/var/MobileSoftwareUpdate/mnt1", 0755) == ERR_SUCCESS, message, true);
-                    _assert(access("/var/MobileSoftwareUpdate/mnt1", F_OK) == ERR_SUCCESS, message, true);
-                    _assert(chown("/var/MobileSoftwareUpdate/mnt1", 0, 0) == ERR_SUCCESS, message, true);
-                }
-            }
-            if (snapshot_check("/", "electra-prejailbreak")) {
-                if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    _assert(snapshot_mount("/", "electra-prejailbreak", "/var/MobileSoftwareUpdate/mnt1") == ERR_SUCCESS, message, true);
-                } else {
-                    _assert(snapshot_rename("/", "electra-prejailbreak", systemSnapshot()) == ERR_SUCCESS, message, true);
-                }
-            } else if (snapshot_check("/", "orig-fs")) {
-                if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    _assert(snapshot_mount("/", "orig-fs", "/var/MobileSoftwareUpdate/mnt1") == ERR_SUCCESS, message, true);
-                } else {
-                    _assert(snapshot_rename("/", "orig-fs", systemSnapshot()) == ERR_SUCCESS, message, true);
-                }
-            } else {
-                _assert(snapshot_mount("/", systemSnapshot(), "/var/MobileSoftwareUpdate/mnt1") == ERR_SUCCESS, message, true);
-            }
-            if (kCFCoreFoundationVersionNumber < 1452.23) {
-                _assert(waitForFile("/var/MobileSoftwareUpdate/mnt1/sbin/launchd") == ERR_SUCCESS, message, true);
-                
-                _assert(clean_file("/jb/rsync.tar"), message, true);
-                _assert(clean_file("/jb/rsync"), message, true);
-                _assert(copyResourceFromBundle(@"rsync.tar", @"/jb/rsync.tar"), message, true);
-                a = fopen("/jb/rsync.tar", "rb");
-                LOG("a: " "%p" "\n", a);
-                _assert(a != NULL, message, true);
-                untar(a, "rsync");
-                _assert(fclose(a) == ERR_SUCCESS, message, true);
-                _assert(init_file("/jb/rsync", 0, 0755), message, true);
-                
-                _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
-                
-                _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "/var/MobileSoftwareUpdate/mnt1/.", "/", NULL) == 0, message, true);
-            }
-            LOG("Successfully renamed system snapshot back.");
-            
-            // Clean up.
-            
-            LOG("Cleaning up...");
-            SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
-            cleanUpFileList = getCleanUpFileList();
-            _assert(cleanUpFileList != nil, message, true);
-            for (NSString *fileName in cleanUpFileList) {
-                if (access([fileName UTF8String], F_OK) == ERR_SUCCESS) {
-                    _assert(([fileManager removeItemAtPath:fileName error:nil]), message, true);
-                }
-            }
-            LOG("Successfully cleaned up.");
-            
-            // Disallow SpringBoard to show non-default system apps.
-            
-            LOG("Disallowing SpringBoard to show non-default system apps...");
-            SETMESSAGE(NSLocalizedString(@"Failed to disallow SpringBoard to show non-default system apps.", nil));
-            md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
-            if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@NO]) {
-                md[@"SBShowNonDefaultSystemApps"] = @NO;
-                _assert(([md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES]), message, true);
-            }
-            LOG("Successfully disallowed SpringBoard to show non-default system apps.");
-            
-            // Disable RootFS Restore.
-            
-            LOG("Disabling RootFS Restore...");
-            SETMESSAGE(NSLocalizedString(@"Failed to disable RootFS Restore.", nil));
-            setPreference(@K_RESTORE_ROOTFS, @NO);
-            LOG("Successfully disabled RootFS Restore.");
-            
-            // Reboot.
-            
-            LOG("Rebooting...");
-            SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
-            NOTICE(NSLocalizedString(@"RootFS has successfully been restored. The device will be restarted.", nil), true, false);
-            unmount("/var/MobileSoftwareUpdate/mnt1", 0);
-            _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
-            LOG("Successfully rebooted.");
         }
     }
     
