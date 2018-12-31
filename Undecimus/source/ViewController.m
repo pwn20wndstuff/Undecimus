@@ -2581,10 +2581,10 @@ void exploit(mach_port_t tfp0,
             _assert(chdir("/") == ERR_SUCCESS, message, true);
             rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", "/jb/strap.tar.lzma", NULL);
             _assert(rv == ENOENT || rv == ERR_SUCCESS, message, true);
-            rv = _system("/usr/libexec/cydia/firmware.sh");
+            rv = system("/usr/libexec/cydia/firmware.sh");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             extractResources();
-            rv = _system("/usr/bin/dpkg --configure -a");
+            rv = system("/usr/bin/dpkg --configure -a");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             run_uicache = true;
             runCommand("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL);
@@ -2885,7 +2885,7 @@ void exploit(mach_port_t tfp0,
             // Install OpenSSH.
             LOG("Installing OpenSSH...");
             SETMESSAGE(NSLocalizedString(@"Failed to install OpenSSH.", nil));
-            rv = _system("/usr/bin/dpkg -i /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
+            rv = system("/usr/bin/dpkg -i /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             runCommand("/bin/rm", "-rf", "/jb/openssh.deb", "/jb/openssl.deb", "/jb/ca-certificates.deb", NULL);
             LOG("Successfully installed OpenSSH.");
@@ -2905,7 +2905,7 @@ void exploit(mach_port_t tfp0,
             // Remove Electra's Cydia.
             LOG("Removing Electra's Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to remove Electra's Cydia.", nil));
-            rv = _system("/usr/bin/dpkg --force-depends -r cydia-gui");
+            rv = system("/usr/bin/dpkg --force-depends -r cydia-gui");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             install_cydia = true;
             LOG("Successfully removed Electra's Cydia.");
@@ -2918,7 +2918,7 @@ void exploit(mach_port_t tfp0,
             _assert(installDeb("substrate-dummy.deb", true), message, false);
         }
         // This is not a stock file for iOS11+
-        _system("sed -ie '/^\\/sbin\\/fstyp/d' /Library/dpkg/info/firmware-sbin.list");
+        system("sed -ie '/^\\/sbin\\/fstyp/d' /Library/dpkg/info/firmware-sbin.list");
         // Unblock Saurik's repo if it is blocked.
         unblockDomainWithName("apt.saurik.com");
         if (install_cydia) {
@@ -2934,7 +2934,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Installing Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to install Cydia.", nil));
-            rv = _system("/usr/bin/dpkg -i /jb/cydia.deb /jb/cydia-lproj.deb");
+            rv = system("/usr/bin/dpkg -i /jb/cydia.deb /jb/cydia-lproj.deb");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             runCommand("/bin/rm", "-rf", "/jb/cydia.deb", "/jb/cydia-lproj.deb", NULL);
             LOG("Successfully installed Cydia.");
@@ -2967,13 +2967,13 @@ void exploit(mach_port_t tfp0,
             
             LOG("Loading Daemons...");
             SETMESSAGE(NSLocalizedString(@"Failed to load Daemons.", nil));
-            _system("echo 'really jailbroken';"
+            system("echo 'really jailbroken';"
                     "shopt -s nullglob;"
                     "for a in /Library/LaunchDaemons/*.plist;"
                         "do echo loading $a;"
                         "launchctl load \"$a\" ;"
                     "done; ");
-            _system("for file in /etc/rc.d/*; do "
+            system("for file in /etc/rc.d/*; do "
                         "if [[ -x \"$file\" ]]; then "
                             "\"$file\";"
                          "fi;"
@@ -3020,13 +3020,13 @@ void exploit(mach_port_t tfp0,
             LOG("Loading Tweaks...");
             SETMESSAGE(NSLocalizedString(@"Failed to run ldrestart", nil));
             if (reload_system_daemons) {
-                rv = _system("nohup bash -c \""
+                rv = system("nohup bash -c \""
                              "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
                              "ldrestart ;"
                              "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
                              "\" 2>&1 >/dev/null &");
             } else {
-                rv = _system("launchctl stop com.apple.backboardd");
+                rv = system("launchctl stop com.apple.backboardd");
             }
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             LOG("Successfully loaded Tweaks.");

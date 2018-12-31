@@ -11,6 +11,8 @@
 #import <sys/types.h>
 #import <sys/stat.h>
 
+#define system(x) _system(x)
+
 int proc_pidpath(pid_t pid, void *buffer, uint32_t buffersize);
 
 static inline bool clean_file(const char *file) {
@@ -28,7 +30,7 @@ int sha1_to_str(const unsigned char *hash, int hashlen, char *buf, size_t buflen
 NSString *sha1sum(NSString *file);
 bool verifySha1Sums(NSString *sumFile);
 int _system(const char *cmd);
-int _systemf(const char *cmd, ...);
+int systemf(const char *cmd, ...);
 bool debIsInstalled(char *packageID);
 bool debIsConfigured(char *packageID);
 bool compareInstalledVersion(const char *packageID, const char *op, const char *version);

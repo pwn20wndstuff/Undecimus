@@ -130,30 +130,30 @@ int _system(const char *cmd) {
     return Status;
 }
 
-int _systemf(const char *cmd, ...) {
+int systemf(const char *cmd, ...) {
     va_list ap;
     va_start(ap, cmd);
     NSString *cmdstr = [[NSString alloc] initWithFormat:@(cmd) arguments:ap];
     va_end(ap);
-    return _system([cmdstr UTF8String]);
+    return system([cmdstr UTF8String]);
 }
 
 bool debIsInstalled(char *packageID) {
-    int rv = _systemf("/usr/bin/dpkg -s \"%s\" | grep Status: | grep -q \"install ok\"", packageID);
+    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep Status: | grep -q \"install ok\"", packageID);
     bool isInstalled = !WEXITSTATUS(rv);
     LOG("Deb: \"%s\" is%s installed", packageID, isInstalled?"":" not");
     return isInstalled;
 }
 
 bool debIsConfigured(char *packageID) {
-    int rv = _systemf("/usr/bin/dpkg -s \"%s\" | grep Status: | grep -q \"install ok installed\"", packageID);
+    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep Status: | grep -q \"install ok installed\"", packageID);
     bool isConfigured = !WEXITSTATUS(rv);
     LOG("Deb: \"%s\" is%s installed", packageID, isConfigured?"":" not");
     return isConfigured;
 }
 
 bool compareInstalledVersion(const char *packageID, const char *op, const char *version) {
-    int rv = _systemf("dpkg --compare-versions $(dpkg-query --showformat='${Version}' --show \"%s\") \"%s\" \"%s\"",
+    int rv = systemf("dpkg --compare-versions $(dpkg-query --showformat='${Version}' --show \"%s\") \"%s\" \"%s\"",
                       packageID, op, version);
     rv = !WEXITSTATUS(rv);
     LOG("Deb %s is%s %s %s", packageID, rv?"":" not", op, version);
@@ -169,7 +169,7 @@ bool installDeb(char *debName, bool forceDeps) {
     if (!copyResourceFromBundle(@(debName), @(destPath))) {
         return false;
     }
-    int rv = _systemf("/usr/bin/dpkg %s --force-bad-path --force-configure-any -i \"%s\"", (forceDeps?"--force-depends":""), destPath);
+    int rv = systemf("/usr/bin/dpkg %s --force-bad-path --force-configure-any -i \"%s\"", (forceDeps?"--force-depends":""), destPath);
     clean_file(destPath);
     return !WEXITSTATUS(rv);
 }
