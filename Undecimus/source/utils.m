@@ -94,15 +94,10 @@ bool verifySha1Sums(NSString *sumFile) {
 int _system(const char *cmd) {
     posix_spawn_file_actions_t *actions = NULL;
     posix_spawn_file_actions_t actionsStruct;
-    pid_t Pid = 0;
-    int Status = 0;
+    pid_t pid = 0;
+    int status = 0;
     int out_pipe[2];
     bool valid_pipe = false;
-    char *myenviron[] = {
-        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/X11:/usr/games",
-        "PS1=\\h:\\w \\u\\$ ",
-        NULL
-    };
     char *argv[] = {"sh", "-c", (char *)cmd, NULL};
     valid_pipe = pipe(out_pipe) == ERR_SUCCESS;
     if (valid_pipe && posix_spawn_file_actions_init(&actionsStruct) == ERR_SUCCESS) {
@@ -112,22 +107,42 @@ int _system(const char *cmd) {
         posix_spawn_file_actions_addclose(actions, out_pipe[0]);
         posix_spawn_file_actions_addclose(actions, out_pipe[1]);
     }
-    Status = posix_spawn(&Pid, "/bin/sh", actions, NULL, argv, myenviron);
+    status = posix_spawn(&pid, "/bin/sh", actions, NULL, argv, environ);
     if (valid_pipe) {
         close(out_pipe[1]);
     }
-    if (Status == ERR_SUCCESS) {
-        waitpid(Pid, &Status, 0);
+    LOG("system(%d): command: %s", pid, cmd);
+    if (status == ERR_SUCCESS) {
         if (valid_pipe) {
-            NSData *outData = [[[NSFileHandle alloc] initWithFileDescriptor:out_pipe[0]] availableData];
-            LOG("system(\"%s\") [%d]: %s", cmd, WEXITSTATUS(Status), [outData bytes]);
-            lastSystemOutput = outData;
+            NSMutableData *outData = [NSMutableData new];
+            char c;
+            char s[2] = {0, 0};
+            NSMutableString *line = [NSMutableString new];
+            while (read(out_pipe[0], &c, 1) == 1) {
+                [outData appendBytes:&c length:1];
+                if (c == '\n') {
+                    LOG("system(%d): %@", pid, line);
+                    [line setString:@""];
+                } else {
+                    s[0] = c;
+                    [line appendString:@(s)];
+                }
+            }
+            if ([line length] > 0) {
+                LOG("system(%d): %@", pid, line);
+            }
+            lastSystemOutput = [outData copy];
         }
+        waitpid(pid, &status, 0);
+        LOG("system(%d) completed with exit status %d", pid, WEXITSTATUS(status));
+    } else {
+        LOG("system(%d): ERROR posix_spawn failed (%d): %s", pid, status, strerror(status));
     }
+    
     if (valid_pipe) {
         close(out_pipe[0]);
     }
-    return Status;
+    return status;
 }
 
 int systemf(const char *cmd, ...) {
@@ -139,14 +154,14 @@ int systemf(const char *cmd, ...) {
 }
 
 bool debIsInstalled(char *packageID) {
-    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep Status: | grep -q \"install ok\"", packageID);
+    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep status: | grep -q \"install ok\"", packageID);
     bool isInstalled = !WEXITSTATUS(rv);
     LOG("Deb: \"%s\" is%s installed", packageID, isInstalled?"":" not");
     return isInstalled;
 }
 
 bool debIsConfigured(char *packageID) {
-    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep Status: | grep -q \"install ok installed\"", packageID);
+    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep status: | grep -q \"install ok installed\"", packageID);
     bool isConfigured = !WEXITSTATUS(rv);
     LOG("Deb: \"%s\" is%s installed", packageID, isConfigured?"":" not");
     return isConfigured;
@@ -239,10 +254,12 @@ int runCommand(const char *cmd, ...) {
     }
     va_end(ap);
     
+    NSMutableString *cmdstr = [NSMutableString stringWithCString:cmd encoding:NSUTF8StringEncoding];
     const char *argv[argc+1];
     argv[0] = cmd;
     for (int i=1; i<argc; i++) {
         argv[i] = va_arg(ap2, const char *);
+        [cmdstr appendFormat:@" \"%s\"", argv[i]];
     }
     va_end(ap2);
     argv[argc] = NULL;
@@ -257,24 +274,42 @@ int runCommand(const char *cmd, ...) {
     }
 
     int rv = posix_spawn(&pid, cmd, actions, NULL, (char *const *)argv, environ);
+    LOG("runCommand(%d) command: %@", pid, cmdstr);
 
     if (valid_pipe) {
         close(out_pipe[1]);
     }
 
     if (rv == ERR_SUCCESS) {
+        if (valid_pipe) {
+            NSMutableData *outData = [NSMutableData new];
+            char c;
+            char s[2] = {0, 0};
+            NSMutableString *line = [NSMutableString new];
+            while (read(out_pipe[0], &c, 1) == 1) {
+                [outData appendBytes:&c length:1];
+                if (c == '\n') {
+                    LOG("runCommand(%d): %@", pid, line);
+                    [line setString:@""];
+                } else {
+                    s[0] = c;
+                    [line appendString:@(s)];
+                }
+            }
+            if ([line length] > 0) {
+                LOG("runCommand(%d): %@", pid, line);
+            }
+            lastSystemOutput = [outData copy];
+        }
         if (waitpid(pid, &rv, 0) == -1) {
             LOG("ERROR: Waitpid failed");
         } else {
             rv = WEXITSTATUS(rv);
-            if (valid_pipe) {
-                NSData *outData = [[[NSFileHandle alloc] initWithFileDescriptor:out_pipe[0]] availableData];
-                LOG("runCommand(\"%s\") [%d]: %s", cmd, rv, [outData bytes]);
-                lastSystemOutput = outData;
-            }
+            LOG("runCommand(%d) completed with exit status %d", pid, WEXITSTATUS(rv));
         }
+        
     } else {
-        LOG("ERROR: posix_spawn failed (%d): %s", rv, strerror(rv));
+        LOG("runCommand(%d): ERROR posix_spawn failed (%d): %s", pid, rv, strerror(rv));
     }
     if (valid_pipe) {
         close(out_pipe[0]);
