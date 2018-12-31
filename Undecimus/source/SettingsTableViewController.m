@@ -367,10 +367,10 @@
         NSString *Update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
         if (Update == nil) {
             NOTICE(NSLocalizedString(@"Failed to check for update.", nil), true, false);
-        } else if ([Update compare:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] options:NSNumericSearch] == NSOrderedAscending) {
-            NOTICE(NSLocalizedString(@"Already up to date.", nil), true, false);
-        } else if ([Update compare:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] options:NSNumericSearch] == NSOrderedDescending){
+        } else if ([Update compare:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] options:NSNumericSearch] == NSOrderedDescending) {
             NOTICE(NSLocalizedString(@"An update is available.", nil), true, false);
+        } else {
+            NOTICE(NSLocalizedString(@"Already up to date.", nil), true, false);
         }
     });
 }
