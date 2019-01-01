@@ -1899,7 +1899,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Cleaning up...");
             SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
-            cleanUpFileList = @[@"/var/cache", @"/var/lib", @"/var/stash", @"/var/db/stash", @"etc/alternatives", @"/etc/apt", @"/etc/default", @"/etc/dpkg", @"/etc/profile.d", @"/etc/ssh", @"/etc/ssl"];
+            cleanUpFileList = @[@"/var/cache", @"/var/lib", @"/var/stash", @"/var/db/stash", @"etc/alternatives", @"/etc/apt", @"/etc/default", @"/etc/dpkg", @"/etc/profile.d", @"/etc/ssh", @"/etc/ssl", @"/var/mobile/Library/Cydia", @"/var/mobile/Library/Caches/com.saurik.Cydia/sources.list"];
             _assert(cleanUpFileList != nil, message, true);
             for (NSString *fileName in cleanUpFileList) {
                 if (access([fileName UTF8String], F_OK) == ERR_SUCCESS) {
