@@ -2442,7 +2442,8 @@ void exploit(mach_port_t tfp0,
             
             LOG("Installing Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to install Cydia.", nil));
-            _assert(installDebs(@[@"cydia.deb", @"cydia-lproj.deb"], false), message, true);
+            // Force depends because Sileo breaks this with depending "newer" Cydia
+            _assert(installDebs(@[@"cydia.deb", @"cydia-lproj.deb"], true), message, true);
             LOG("Successfully installed Cydia.");
             
             // Disable Install Cydia.
