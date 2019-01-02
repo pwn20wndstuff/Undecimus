@@ -656,7 +656,7 @@ void blockDomainWithName(const char *name) {
         newHostsFile = [newHostsFile stringByAppendingString:newLine];
     }
     if (![newHostsFile isEqual:hostsFile]) {
-        _assert(([newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil]), message, true);
+        [newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil];
     }
 }
 
@@ -684,7 +684,7 @@ void unblockDomainWithName(const char *name) {
         newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
     }
     if (![newHostsFile isEqual:hostsFile]) {
-        _assert(([newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil]), message, true);
+        [newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil];
     }
 }
 
@@ -2487,7 +2487,6 @@ void exploit(mach_port_t tfp0,
             LOG("Successfully loaded Daemons.");
         }
     }
-
     
     UPSTAGE();
     
