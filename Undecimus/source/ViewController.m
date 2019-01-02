@@ -1410,6 +1410,12 @@ void exploit(mach_port_t tfp0,
     char link[0x100];
     const char *jbdPidFile = NULL;
     NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSArray *resources = nil;
+    NSString *payload = nil;
+    NSString *tar_tar = nil;
+    NSString *lzma_tar = nil;
+    NSString *rsync_tar = nil;
+    NSString *strap_tar = nil;
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
 #define kernel_slide           (kernel_base - KERNEL_SEARCH_ADDRESS)
@@ -1805,7 +1811,7 @@ void exploit(mach_port_t tfp0,
         
         if (needResources) {
             _assert(clean_file("/jb/amfid_payload.dylib"), message, true);
-            NSString *payload = pathForResource(@"amfid_payload.tar");
+            payload = pathForResource(@"amfid_payload.tar");
             a = fopen([payload UTF8String], "rb");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message, true);
@@ -1815,8 +1821,7 @@ void exploit(mach_port_t tfp0,
         }
         
         if (needStrap) {
-            NSString *tar_tar = pathForResource(@"tar.tar");
-            NSString *lzma_tar = pathForResource(@"tar.tar");
+            tar_tar = pathForResource(@"tar.tar");
             _assert(clean_file("/jb/tar"), message, true);
             a = fopen([tar_tar UTF8String], "rb");
             LOG("a: " "%p" "\n", a);
@@ -1825,6 +1830,7 @@ void exploit(mach_port_t tfp0,
             _assert(fclose(a) == ERR_SUCCESS, message, true);
             _assert(init_file("/jb/tar", 0, 0755), message, true);
             
+            lzma_tar = pathForResource(@"lzma.tar");
             _assert(clean_file("/jb/lzma"), message, true);
             a = fopen([lzma_tar UTF8String], "rb");
             LOG("a: " "%p" "\n", a);
@@ -1872,7 +1878,7 @@ void exploit(mach_port_t tfp0,
             if (kCFCoreFoundationVersionNumber < 1452.23) {
                 _assert(waitForFile("/var/MobileSoftwareUpdate/mnt1/sbin/launchd") == ERR_SUCCESS, message, true);
                 
-                NSString *rsync_tar = pathForResource(@"rsync.tar");
+                rsync_tar = pathForResource(@"rsync.tar");
                 _assert(clean_file("/jb/rsync"), message, true);
                 a = fopen([rsync_tar UTF8String], "rb");
                 LOG("a: " "%p" "\n", a);
@@ -1937,7 +1943,6 @@ void exploit(mach_port_t tfp0,
         LOG("Injecting trust cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
         LOG("trust_chain = 0x%llx\n", GETOFFSET(trust_chain));
-        NSArray *resources = nil;
         if (needResources) {
             resources = @[@(amfid_payload)];
         } else {
@@ -2105,7 +2110,7 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to extract bootstrap.", nil));
         if (needStrap) {
             _assert(chdir("/") == ERR_SUCCESS, message, true);
-            NSString *strap_tar = pathForResource(@"strap.tar.lzma");
+            strap_tar = pathForResource(@"strap.tar.lzma");
             rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", [strap_tar UTF8String], NULL);
             _assert(rv == ENOENT || rv == ERR_SUCCESS, message, true);
             rv = system("/usr/libexec/cydia/firmware.sh");
