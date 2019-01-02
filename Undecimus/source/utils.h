@@ -35,13 +35,14 @@ bool debIsInstalled(char *packageID);
 bool debIsConfigured(char *packageID);
 bool compareInstalledVersion(const char *packageID, const char *op, const char *version);
 bool installDeb(char *debName, bool forceDeps);
+bool installDebs(NSArray <NSString*> *debs, bool forceDeps);
 bool pidFileIsValid(NSString *pidfile);
 bool pspawnHookLoaded(void);
 bool is_symlink(const char *filename);
 bool is_directory(const char *filename);
 bool mode_is(const char *filename, mode_t mode);
 int runCommand(const char *cmd, ...);
-bool copyResourceFromBundle(NSString *resource, NSString *to);
+NSString *pathForResource(NSString *resource);
 pid_t pidOfProcess(const char *name);
 
 extern NSData *lastSystemOutput;

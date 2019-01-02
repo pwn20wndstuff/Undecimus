@@ -1804,10 +1804,9 @@ void exploit(mach_port_t tfp0,
         }
         
         if (needResources) {
-            _assert(clean_file("/jb/amfid_payload.tar"), message, true);
             _assert(clean_file("/jb/amfid_payload.dylib"), message, true);
-            _assert(copyResourceFromBundle(@"amfid_payload.tar", @"/jb/amfid_payload.tar"), message, true);
-            a = fopen("/jb/amfid_payload.tar", "rb");
+            NSString *payload = pathForResource(@"amfid_payload.tar");
+            a = fopen([payload UTF8String], "rb");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message, true);
             untar(a, "amfid_payload");
@@ -1816,24 +1815,18 @@ void exploit(mach_port_t tfp0,
         }
         
         if (needStrap) {
-            _assert(clean_file("/jb/strap.tar.lzma"), message, true);
-            _assert(copyResourceFromBundle(@"strap.tar.lzma", @"/jb/strap.tar.lzma"), message, true);
-            _assert(init_file("/jb/strap.tar.lzma", 0, 0644), message, true);
-            
-            _assert(clean_file("/jb/tar.tar"), message, true);
+            NSString *tar_tar = pathForResource(@"tar.tar");
+            NSString *lzma_tar = pathForResource(@"tar.tar");
             _assert(clean_file("/jb/tar"), message, true);
-            _assert(copyResourceFromBundle(@"tar.tar", @"/jb/tar.tar"), message, true);
-            a = fopen("/jb/tar.tar", "rb");
+            a = fopen([tar_tar UTF8String], "rb");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message, true);
             untar(a, "tar");
             _assert(fclose(a) == ERR_SUCCESS, message, true);
             _assert(init_file("/jb/tar", 0, 0755), message, true);
             
-            _assert(clean_file("/jb/lzma.tar"), message, true);
             _assert(clean_file("/jb/lzma"), message, true);
-            _assert(copyResourceFromBundle(@"lzma.tar", @"/jb/lzma.tar"), message, true);
-            a = fopen("/jb/lzma.tar", "rb");
+            a = fopen([lzma_tar UTF8String], "rb");
             LOG("a: " "%p" "\n", a);
             _assert(a != NULL, message, true);
             untar(a, "lzma");
@@ -1879,10 +1872,9 @@ void exploit(mach_port_t tfp0,
             if (kCFCoreFoundationVersionNumber < 1452.23) {
                 _assert(waitForFile("/var/MobileSoftwareUpdate/mnt1/sbin/launchd") == ERR_SUCCESS, message, true);
                 
-                _assert(clean_file("/jb/rsync.tar"), message, true);
+                NSString *rsync_tar = pathForResource(@"rsync.tar");
                 _assert(clean_file("/jb/rsync"), message, true);
-                _assert(copyResourceFromBundle(@"rsync.tar", @"/jb/rsync.tar"), message, true);
-                a = fopen("/jb/rsync.tar", "rb");
+                a = fopen([rsync_tar UTF8String], "rb");
                 LOG("a: " "%p" "\n", a);
                 _assert(a != NULL, message, true);
                 untar(a, "rsync");
@@ -2113,7 +2105,8 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to extract bootstrap.", nil));
         if (needStrap) {
             _assert(chdir("/") == ERR_SUCCESS, message, true);
-            rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", "/jb/strap.tar.lzma", NULL);
+            NSString *strap_tar = pathForResource(@"strap.tar.lzma");
+            rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", [strap_tar UTF8String], NULL);
             _assert(rv == ENOENT || rv == ERR_SUCCESS, message, true);
             rv = system("/usr/libexec/cydia/firmware.sh");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
@@ -2121,19 +2114,14 @@ void exploit(mach_port_t tfp0,
             rv = system("/usr/bin/dpkg --configure -a");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             run_uicache = true;
-            runCommand("/bin/rm", "-rf", "/jb/strap.tar.lzma", NULL);
-            runCommand("/bin/rm", "-rf", "/jb/tar.tar", NULL);
             runCommand("/bin/rm", "-rf", "/jb/tar", NULL);
-            runCommand("/bin/rm", "-rf", "/jb/lzma.tar", NULL);
             runCommand("/bin/rm", "-rf", "/jb/lzma", NULL);
-            runCommand("/bin/rm", "-rf", "/jb/amfid_payload.tar", NULL);
         } else {
             if (!needResources) {
                 updatedResources = compareInstalledVersion("science.xnu.undecimus.resources", "lt", [BUNDLEDRESOURCES UTF8String]);
             }
             if (needResources || updatedResources) {
                 extractResources();
-                _assert(clean_file("/jb/amfid_payload.tar"), message, true);
             }
         }
         if (access("/.installed_unc0ver", F_OK) != ERR_SUCCESS) {
@@ -2407,21 +2395,10 @@ void exploit(mach_port_t tfp0,
     
     {
         if (install_openssh) {
-            // Extract OpenSSH.
-            LOG("Extracting OpenSSH...");
-            SETMESSAGE(NSLocalizedString(@"Failed to extract OpenSSH.", nil));
-            runCommand("/bin/rm", "-rf", "/jb/openssh.deb", "/jb/openssl.deb", "/jb/ca-certificates.deb", NULL);
-            _assert(copyResourceFromBundle(@"openssh.deb", @"/jb/openssh.deb"), message, true);
-            _assert(copyResourceFromBundle(@"openssl.deb", @"/jb/openssl.deb"), message, true);
-            _assert(copyResourceFromBundle(@"ca-certificates.deb", @"/jb/ca-certificates.deb"), message, true);
-            LOG("Successfully extracted OpenSSH.");
-            
             // Install OpenSSH.
             LOG("Installing OpenSSH...");
             SETMESSAGE(NSLocalizedString(@"Failed to install OpenSSH.", nil));
-            rv = system("/usr/bin/dpkg -i /jb/openssh.deb /jb/openssl.deb /jb/ca-certificates.deb");
-            _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
-            runCommand("/bin/rm", "-rf", "/jb/openssh.deb", "/jb/openssl.deb", "/jb/ca-certificates.deb", NULL);
+            _assert(installDebs(@[@"openssh.deb", @"openssl.deb", @"ca-certificates.deb"], false), message, true);
             LOG("Successfully installed OpenSSH.");
             
             // Disable Install OpenSSH.
@@ -2456,21 +2433,11 @@ void exploit(mach_port_t tfp0,
         // Unblock Saurik's repo if it is blocked.
         unblockDomainWithName("apt.saurik.com");
         if (install_cydia) {
-            // Extract Cydia.
-            LOG("Extracting Cydia...");
-            SETMESSAGE(NSLocalizedString(@"Failed to extract Cydia.", nil));
-            runCommand("/bin/rm", "-rf", "/jb/cydia.deb", "/jb/cydia-lproj.deb", NULL);
-            _assert(copyResourceFromBundle(@"cydia.deb", @"/jb/cydia.deb"), message, true);
-            _assert(copyResourceFromBundle(@"cydia-lproj.deb", @"/jb/cydia-lproj.deb"), message, true);
-            LOG("Successfully extracted Cydia.");
-            
             // Install Cydia.
             
             LOG("Installing Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to install Cydia.", nil));
-            rv = system("/usr/bin/dpkg -i /jb/cydia.deb /jb/cydia-lproj.deb");
-            _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
-            runCommand("/bin/rm", "-rf", "/jb/cydia.deb", "/jb/cydia-lproj.deb", NULL);
+            _assert(installDebs(@[@"cydia.deb", @"cydia-lproj.deb"], false), message, true);
             LOG("Successfully installed Cydia.");
             
             // Disable Install Cydia.

@@ -19,6 +19,7 @@
 
 extern char **environ;
 
+static NSString *sourcePath=nil;
 NSData *lastSystemOutput=nil;
 
 int sha1_to_str(const unsigned char *hash, int hashlen, char *buf, size_t buflen)
@@ -176,16 +177,29 @@ bool compareInstalledVersion(const char *packageID, const char *op, const char *
 }
 
 bool installDeb(char *debName, bool forceDeps) {
-    NSString *destPathStr = [NSString stringWithFormat:@"/jb/%s", debName];
-    const char *destPath = [destPathStr UTF8String];
-    if (!clean_file(destPath)) {
+    NSString *path = pathForResource(@(debName));
+    if (path == nil || ![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        LOG("installDeb: Nothing to install");
         return false;
     }
-    if (!copyResourceFromBundle(@(debName), @(destPath))) {
+    int rv = systemf("/usr/bin/dpkg %s --force-bad-path --force-configure-any -i \"%s\"", (forceDeps?"--force-depends":""), path.UTF8String);
+    return !WEXITSTATUS(rv);
+}
+
+bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
+    NSMutableArray <NSString*> *debPaths = [NSMutableArray new];
+    for (NSString *deb in debs) {
+        NSString *path = pathForResource(deb);
+        if (path == nil || ![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+            return false;
+        }
+        [debPaths addObject:pathForResource(deb)];
+    }
+    if ([debPaths count] < 1) {
+        LOG("installDebs: Nothing to install");
         return false;
     }
-    int rv = systemf("/usr/bin/dpkg %s --force-bad-path --force-configure-any -i \"%s\"", (forceDeps?"--force-depends":""), destPath);
-    clean_file(destPath);
+    int rv = systemf("/usr/bin/dpkg %s --force-bad-path --force-configure-any -i \"%s\"", (forceDeps?"--force-depends":""), [[debPaths componentsJoinedByString:@"\" \""] UTF8String]);
     return !WEXITSTATUS(rv);
 }
 
@@ -318,20 +332,8 @@ int runCommand(const char *cmd, ...) {
     return rv;
 }
 
-bool copyResourceFromBundle(NSString *resource, NSString *to) {
-    NSBundle *bundle = [NSBundle mainBundle];
-    NSString *bundlePath = [bundle bundlePath];
-    NSString *pathForResource = [bundlePath stringByAppendingPathComponent:resource];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if (![fileManager fileExistsAtPath:pathForResource]) {
-        LOG(@"Unable to find \"%@\" in bundle at path \"%@\"", resource, pathForResource);
-        return false;
-    }
-    if (![fileManager copyItemAtPath:pathForResource toPath:to error:nil]) {
-        LOG(@"Unable to copy \"%@\" in bundle at path \"%@\" to \"%@\"", resource, pathForResource, to);
-        return false;
-    }
-    return true;
+NSString *pathForResource(NSString *resource) {
+    return [sourcePath stringByAppendingPathComponent:resource];
 }
 
 pid_t pidOfProcess(const char *name) {
@@ -351,4 +353,9 @@ pid_t pidOfProcess(const char *name) {
         }
     }
     return 0;
+}
+
+__attribute__((constructor))
+static void ctor() {
+    sourcePath = [[NSBundle mainBundle] bundlePath];
 }
