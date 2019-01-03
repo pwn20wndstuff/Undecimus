@@ -2088,8 +2088,8 @@ void exploit(mach_port_t tfp0,
             rv = runCommand("/usr/bin/dpkg", "--configure", "-a", NULL);
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             prefs.run_uicache = true;
-            runCommand("/bin/rm", "-rf", "/jb/tar", NULL);
-            runCommand("/bin/rm", "-rf", "/jb/lzma", NULL);
+            clean_file("/jb/tar");
+            clean_file("/jb/lzma");
         } else {
             if (!needResources) {
                 updatedResources = compareInstalledVersion("science.xnu.undecimus.resources", "lt", [BUNDLEDRESOURCES UTF8String]);
@@ -2106,18 +2106,18 @@ void exploit(mach_port_t tfp0,
         bzero(link, sizeof(link));
         if ((readlink("/electra", link, 0x9f) == -1) ||
             (strcmp(link, "/jb") != ERR_SUCCESS)) {
-            runCommand("/bin/rm", "-rf", "/electra", NULL);
-            runCommand("/bin/ln", "-s", "/jb", "/electra", NULL);
+            clean_file("/electra");
+            symlink("/jb", "/electra");
         }
         if ((readlink("/.bootstrapped_electra", link, 0x9f) == -1) ||
             (strcmp(link, "/.installed_unc0ver") != ERR_SUCCESS)) {
-            runCommand("/bin/rm", "-rf", "/.bootstrapped_electra", NULL);
-            runCommand("/bin/ln", "-s", "/.installed_unc0ver", "/.bootstrapped_electra", NULL);
+            clean_file("/.bootstrapped_electra");
+            symlink("/.installed_unc0ver", "/.bootstrapped_electra");
         }
         if ((readlink("/electra/libjailbreak.dylib", link, 0x9f) == -1) ||
             (strcmp(link, "/usr/lib/libjailbreak.dylib") != ERR_SUCCESS)) {
-            runCommand("/bin/rm", "-rf", "/electra/libjailbreak.dylib", NULL);
-            runCommand("/bin/ln", "-s", "/usr/lib/libjailbreak.dylib", "/electra/libjailbreak.dylib", NULL);
+            clean_file("/electra/libjailbreak.dylib");
+            symlink("/usr/lib/libjailbreak.dylib", "/electra/libjailbreak.dylib");
         }
         LOG("Successfully extracted bootstrap.");
     }
@@ -2243,12 +2243,12 @@ void exploit(mach_port_t tfp0,
             LOG("Disabling app revokes...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable app revokes.", nil));
             blockDomainWithName("ocsp.apple.com");
-            runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3", NULL);
-            runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3", NULL);
-            runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3-shm", NULL);
-            runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3-shm", NULL);
-            runCommand("/bin/rm", "-rf", "/var/Keychains/ocspcache.sqlite3-wal", NULL);
-            runCommand("/bin/ln", "-s", "/dev/null", "/var/Keychains/ocspcache.sqlite3-wal", NULL);
+            clean_file("/var/Keychains/ocspcache.sqlite3");
+            symlink("/dev/null", "/var/Keychains/ocspcache.sqlite3");
+            clean_file("/var/Keychains/ocspcache.sqlite3-shm");
+            symlink("/dev/null", "/var/Keychains/ocspcache.sqlite3-shm");
+            clean_file("/var/Keychains/ocspcache.sqlite3-wal");
+            symlink("/dev/null", "/var/Keychains/ocspcache.sqlite3-wal");
             LOG("Successfully disabled app revokes.");
         } else {
             // Enable app revokes.
@@ -2312,30 +2312,30 @@ void exploit(mach_port_t tfp0,
             
             LOG("Disabling Auto Updates...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable auto updates.", nil));
-            runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL);
-            runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL);
-            runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
-            runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
-            runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL);
-            runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL);
-            runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
-            runCommand("/bin/ln", "-s", "/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
+            clean_file("/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate");
+            symlink("/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate");
+            clean_file("/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation");
+            symlink("/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation");
+            clean_file("/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate");
+            symlink("/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate");
+            clean_file("/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation");
+            symlink("/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation");
             LOG("Successfully disabled Auto Updates.");
         } else {
             // Enable Auto Updates.
             
             LOG("Enabling Auto Updates...");
             SETMESSAGE(NSLocalizedString(@"Failed to enable auto updates.", nil));
-            runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            clean_file("/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate");
             runCommand("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL);
             runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL);
-            runCommand("/bin/rm", "-rf", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
+            clean_file("/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation");
             runCommand("/bin/mkdir", "-p", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
             runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
-            runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL);
+            clean_file("/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate");
             runCommand("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL);
             runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", NULL);
-            runCommand("/bin/rm", "-rf", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
+            clean_file("/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation");
             runCommand("/bin/mkdir", "-p", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
             runCommand("/usr/sbin/chown", "root:wheel", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", NULL);
         }
@@ -2405,7 +2405,7 @@ void exploit(mach_port_t tfp0,
             _assert(installDeb("substrate-dummy.deb", true), message, false);
         }
         // This is not a stock file for iOS11+
-        system("sed -ie '/^\\/sbin\\/fstyp/d' /Library/dpkg/info/firmware-sbin.list");
+        runCommand("/bin/sed", "-ie", "/^\\/sbin\\/fstyp/d", "/Library/dpkg/info/firmware-sbin.list", NULL);
         // Unblock Saurik's repo if it is blocked.
         unblockDomainWithName("apt.saurik.com");
         if (prefs.install_cydia) {
