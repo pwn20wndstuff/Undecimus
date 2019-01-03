@@ -273,6 +273,7 @@ int runCommandv(const char *cmd, int argc, const char * const* argv) {
         
     } else {
         LOG("runCommand(%d): ERROR posix_spawn failed (%d): %s", pid, rv, strerror(rv));
+        rv <<= 8; // Put error into WEXITSTATUS
     }
     if (valid_pipe) {
         close(out_pipe[0]);
