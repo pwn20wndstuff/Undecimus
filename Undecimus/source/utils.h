@@ -15,15 +15,33 @@
 
 int proc_pidpath(pid_t pid, void *buffer, uint32_t buffersize);
 
+static inline bool create_file_data(const char *file, int owner, mode_t mode, NSData *data) {
+    return [[NSFileManager defaultManager] createFileAtPath:@(file) contents:data attributes:@{
+               NSFileOwnerAccountID: @(owner),
+               NSFileGroupOwnerAccountID: @(owner),
+               NSFilePosixPermissions: @(mode)
+            }
+        ];
+}
+
+static inline bool create_file(const char *file, int owner, mode_t mode) {
+    return create_file_data(file, owner, mode, nil);
+}
+
 static inline bool clean_file(const char *file) {
-    return (access(file, F_OK) != ERR_SUCCESS ||
-            unlink(file) == ERR_SUCCESS);
+    NSString *path = @(file);
+    return (![[NSFileManager defaultManager] fileExistsAtPath:path] ||
+            [[NSFileManager defaultManager] removeItemAtPath:path error:nil]);
 }
 
 static inline bool init_file(const char *file, int owner, mode_t mode) {
-    return (access(file, F_OK) == ERR_SUCCESS &&
-            chmod(file, mode) == ERR_SUCCESS &&
-            chown(file, owner, owner) == ERR_SUCCESS);
+    NSString *path = @(file);
+    return ([[NSFileManager defaultManager] fileExistsAtPath:path] &&
+            [[NSFileManager defaultManager] setAttributes:@{
+                    NSFileOwnerAccountID: @(owner),
+                    NSFileGroupOwnerAccountID: @(owner),
+                    NSFilePosixPermissions: @(mode)
+                } ofItemAtPath:path error:nil]);
 }
 
 int sha1_to_str(const unsigned char *hash, int hashlen, char *buf, size_t buflen);
@@ -41,6 +59,7 @@ bool pspawnHookLoaded(void);
 bool is_symlink(const char *filename);
 bool is_directory(const char *filename);
 bool mode_is(const char *filename, mode_t mode);
+int runCommandv(const char *cmd, int argc, const char * const*argv);
 int runCommand(const char *cmd, ...);
 NSString *pathForResource(NSString *resource);
 pid_t pidOfProcess(const char *name);

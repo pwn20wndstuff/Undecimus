@@ -110,6 +110,7 @@ create_file(char *pathname, int mode, int owner, int group)
 {
 	int f;
 	if (unlink(pathname) && errno != ENOENT) {
+	LOG("untar unable to remove file %s: %s", pathname, strerror(errno));
 		return -1;
 	}
 	f = creat(pathname, mode);
@@ -144,30 +145,36 @@ verify_checksum(const char *p)
 }
 
 /* Extract a tar archive. */
-void
-untar(FILE *a, const char *path)
+bool untar(const char *file)
 {
+	bool status = false;
 	char buff[512];
 	int f = -1;
 	size_t bytes_read;
 	int filesize;
 
-	LOG("Extracting from %s\n", path);
+	FILE *a = fopen(file, "rb");
+	if (a == NULL) {
+		LOG("untar unable to open \"%s\" for reading: %s", file, strerror(errno));
+		return status;
+	}
+
+	LOG("Extracting from %s\n", file);
 	for (;;) {
 		bytes_read = fread(buff, 1, 512, a);
 		if (bytes_read < 512) {
-			LOG(
-			    "Short read on %s: expected 512, got %zd\n",
-			    path, bytes_read);
-			return;
+			LOG("Short read on %s: expected 512, got %zd\n",
+				file, bytes_read);
+			goto end;
 		}
 		if (is_end_of_archive(buff)) {
-			LOG("End of %s\n", path);
-			return;
+			LOG("End of %s\n", file);
+			status = true;
+			goto end;
 		}
 		if (!verify_checksum(buff)) {
 			LOG("Checksum failure\n");
-			return;
+			goto end;
 		}
 		filesize = parseoct(buff + 124, 12);
 		switch (buff[156]) {
@@ -198,21 +205,22 @@ untar(FILE *a, const char *path)
 		default:
 			LOG(" Extracting file %s\n", buff);
 			f = create_file(buff, parseoct(buff + 100, 8), parseoct(buff + 108, 8), parseoct(buff + 116, 8));
+			if (f<0) {
+				goto end;
+			}
 			break;
 		}
 		while (filesize > 0) {
 			bytes_read = fread(buff, 1, 512, a);
 			if (bytes_read < 512) {
-				LOG(
-				    "Short read on %s: Expected 512, got %zd\n",
-				    path, bytes_read);
-				return;
+				LOG("Short read on %s: Expected 512, got %zd\n",
+					file, bytes_read);
+				goto end;
 			}
 			if (filesize < 512)
 				bytes_read = filesize;
 			if (f >= 0) {
-				if (write(f, buff, bytes_read)
-				    != bytes_read)
+				if (write(f, buff, bytes_read) != bytes_read)
 				{
 					LOG("Failed write\n");
 					close(f);
@@ -226,6 +234,9 @@ untar(FILE *a, const char *path)
 			f = -1;
 		}
 	}
+end:
+	fclose(a);
+	return status;
 }
 
 #ifdef HAVE_MAIN
@@ -236,13 +247,7 @@ main(int argc, char **argv)
 
 	++argv; /* Skip program name */
 	for ( ;*argv != NULL; ++argv) {
-		a = fopen(*argv, "r");
-		if (a == NULL)
-			LOG("Unable to open %s\n", *argv);
-		else {
-			untar(a, *argv);
-			fclose(a);
-		}
+	untar(argv);
 	}
 	return (0);
 }

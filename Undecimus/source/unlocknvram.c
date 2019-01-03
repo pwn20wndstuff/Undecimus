@@ -42,7 +42,7 @@ uint64_t get_iodtnvram_obj(void) {
             return 0;
         }
         uint64_t nvram_up = getAddressOfPort(getpid(), IODTNVRAMSrv);
-        IODTNVRAMObj = ReadAnywhere64(nvram_up + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+        IODTNVRAMObj = ReadKernel64(nvram_up + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
 
         INFO("IODTNVRAM obj at 0x%llx", IODTNVRAMObj);
     }
@@ -59,14 +59,14 @@ int unlocknvram(void) {
         return 1;
     }
 
-    uint64_t vtable_start = ReadAnywhere64(obj);
+    uint64_t vtable_start = ReadKernel64(obj);
 
     orig_vtable = vtable_start;
 
     uint64_t vtable_end = vtable_start;
     // Is vtable really guaranteed to end with 0 or was it just a coincidence?..
     // should we just use some max value instead?
-    while (ReadAnywhere64(vtable_end) != 0) vtable_end += sizeof(uint64_t);
+    while (ReadKernel64(vtable_end) != 0) vtable_end += sizeof(uint64_t);
 
     uint32_t vtable_len = (uint32_t) (vtable_end - vtable_start);
 
@@ -89,7 +89,7 @@ int unlocknvram(void) {
     wkbuffer(fake_vtable, buf, vtable_len);
 
     // replace vtable on IODTNVRAM object
-    WriteAnywhere64(obj, fake_vtable);
+    WriteKernel64(obj, fake_vtable);
 
     free(buf);
     INFO("Unlocked nvram");
@@ -108,7 +108,7 @@ int locknvram(void) {
         return 1;
     }
     
-    WriteAnywhere64(obj, orig_vtable);
+    WriteKernel64(obj, orig_vtable);
 
     INFO("Locked nvram");
     return 0;

@@ -1,6 +1,7 @@
 #ifndef kmem_h
 #define kmem_h
 
+#include <stdbool.h>
 #include <mach/mach.h>
 
 /***** mach_vm.h *****/
@@ -47,14 +48,18 @@ extern mach_port_t tfp0;
 size_t kread(uint64_t where, void *p, size_t size);
 size_t kwrite(uint64_t where, const void *p, size_t size);
 
-uint32_t ReadAnywhere32(uint64_t kaddr);
-uint64_t ReadAnywhere64(uint64_t kaddr);
+#define rk32(kaddr) ReadKernel32(kaddr)
+#define rk64(kaddr) ReadKernel64(kaddr)
+uint32_t ReadKernel32(uint64_t kaddr);
+uint64_t ReadKernel64(uint64_t kaddr);
 
-void WriteAnywhere32(uint64_t kaddr, uint32_t val);
-void WriteAnywhere64(uint64_t kaddr, uint64_t val);
+#define wk32(kaddr, val) WriteKernel32(kaddr, val)
+#define wk64(kaddr, val) WriteKernel64(kaddr, val)
+void WriteKernel32(uint64_t kaddr, uint32_t val);
+void WriteKernel64(uint64_t kaddr, uint64_t val);
 
-void wkbuffer(uint64_t kaddr, void* buffer, uint32_t length);
-void rkbuffer(uint64_t kaddr, void* buffer, uint32_t length);
+bool wkbuffer(uint64_t kaddr, void* buffer, size_t length);
+bool rkbuffer(uint64_t kaddr, void* buffer, size_t length);
 
 void kmemcpy(uint64_t dest, uint64_t src, uint32_t length);
 

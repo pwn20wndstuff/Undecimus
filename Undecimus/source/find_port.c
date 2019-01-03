@@ -233,16 +233,16 @@ uint64_t find_port_via_proc_pidlistuptrs_bug(mach_port_t port, int disposition) 
 uint64_t find_port_via_kmem_read(mach_port_name_t port) {
   uint64_t task_port_addr = task_self_addr();
   
-  uint64_t task_addr = ReadAnywhere64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+  uint64_t task_addr = ReadKernel64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
   
-  uint64_t itk_space = ReadAnywhere64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+  uint64_t itk_space = ReadKernel64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
   
-  uint64_t is_table = ReadAnywhere64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+  uint64_t is_table = ReadKernel64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
   
   uint32_t port_index = port >> 8;
   const int sizeof_ipc_entry_t = 0x18;
   
-  uint64_t port_addr = ReadAnywhere64(is_table + (port_index * sizeof_ipc_entry_t));
+  uint64_t port_addr = ReadKernel64(is_table + (port_index * sizeof_ipc_entry_t));
   return port_addr;
 }
 

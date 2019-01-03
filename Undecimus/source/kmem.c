@@ -40,7 +40,11 @@ size_t kread(uint64_t where, void *p, size_t size) {
         if (chunk > size - offset) {
             chunk = size - offset;
         }
-        rv = mach_vm_read_overwrite(tfp0, where + offset, chunk, (mach_vm_address_t)p + offset, &sz);
+        rv = mach_vm_read_overwrite(tfp0,
+                                    where + offset,
+                                    chunk,
+                                    (mach_vm_address_t)p + offset,
+                                    &sz);
         if (rv || sz == 0) {
             LOG("[e] error reading kernel @%p\n", (void *)(offset + where));
             break;
@@ -58,7 +62,10 @@ size_t kwrite(uint64_t where, const void *p, size_t size) {
         if (chunk > size - offset) {
             chunk = size - offset;
         }
-        rv = mach_vm_write(tfp0, where + offset, (mach_vm_offset_t)p + offset, (mach_msg_type_number_t)chunk);
+        rv = mach_vm_write(tfp0,
+                           where + offset,
+                           (mach_vm_offset_t)p + offset,
+                           (mach_msg_type_number_t)chunk);
         if (rv) {
             LOG("[e] error writing kernel @%p\n", (void *)(offset + where));
             break;
@@ -68,30 +75,37 @@ size_t kwrite(uint64_t where, const void *p, size_t size) {
     return offset;
 }
 
-void WriteAnywhere32(uint64_t kaddr, uint32_t val) {
-  if (tfp0 == MACH_PORT_NULL) {
-    LOG("attempt to write to kernel memory before any kernel memory write primitives available\n");
-    sleep(3);
-    return;
-  }
-  
-  kern_return_t err;
-  err = mach_vm_write(tfp0,
-                      (mach_vm_address_t)kaddr,
-                      (vm_offset_t)&val,
-                      (mach_msg_type_number_t)sizeof(uint32_t));
-  
-  if (err != KERN_SUCCESS) {
-    LOG("tfp0 write failed: %s %x\n", mach_error_string(err), err);
-    return;
-  }
+
+bool wkbuffer(uint64_t kaddr, void* buffer, size_t length) {
+    if (tfp0 == MACH_PORT_NULL) {
+        LOG("attempt to write to kernel memory before any kernel memory write primitives available\n");
+        sleep(3);
+        return false;
+    }
+    
+    return (kwrite(kaddr, buffer, length) == length);
 }
 
-void WriteAnywhere64(uint64_t kaddr, uint64_t val) {
-  uint32_t lower = (uint32_t)(val & 0xffffffff);
-  uint32_t higher = (uint32_t)(val >> 32);
-  WriteAnywhere32(kaddr, lower);
-  WriteAnywhere32(kaddr+4, higher);
+bool rkbuffer(uint64_t kaddr, void* buffer, size_t length) {
+    return (kread(kaddr, buffer, length) == length);
+}
+
+void WriteKernel32(uint64_t kaddr, uint32_t val) {
+    if (tfp0 == MACH_PORT_NULL) {
+        LOG("attempt to write to kernel memory before any kernel memory write primitives available\n");
+        sleep(3);
+        return;
+    }
+    wkbuffer(kaddr, &val, sizeof(val));
+}
+
+void WriteKernel64(uint64_t kaddr, uint64_t val) {
+    if (tfp0 == MACH_PORT_NULL) {
+        LOG("attempt to write to kernel memory before any kernel memory write primitives available\n");
+        sleep(3);
+        return;
+    }
+    wkbuffer(kaddr, &val, sizeof(val));
 }
 
 uint32_t rk32_via_kmem_read_port(uint64_t kaddr) {
@@ -123,29 +137,25 @@ uint32_t rk32_via_kmem_read_port(uint64_t kaddr) {
 }
 
 uint32_t rk32_via_tfp0(uint64_t kaddr) {
-    kern_return_t err;
     uint32_t val = 0;
-    mach_vm_size_t outsize = 0;
-    err = mach_vm_read_overwrite(tfp0,
-                                 (mach_vm_address_t)kaddr,
-                                 (mach_vm_size_t)sizeof(uint32_t),
-                                 (mach_vm_address_t)&val,
-                                 &outsize);
-    if (err != KERN_SUCCESS){
-        LOG("tfp0 read failed %s addr: 0x%llx err:%x port:%x\n", mach_error_string(err), kaddr, err, tfp0);
-        sleep(3);
-        return 0;
-    }
-    
-    if (outsize != sizeof(uint32_t)){
-        LOG("tfp0 read was short (expected %lx, got %llx\n", sizeof(uint32_t), outsize);
-        sleep(3);
-        return 0;
-    }
+    rkbuffer(kaddr, &val, sizeof(val));
     return val;
 }
 
-uint32_t ReadAnywhere32(uint64_t kaddr) {
+uint64_t rk64_via_kmem_read_port(uint64_t kaddr) {
+    uint64_t lower = rk32_via_kmem_read_port(kaddr);
+    uint64_t higher = rk32_via_kmem_read_port(kaddr+4);
+    uint64_t full = ((higher<<32) | lower);
+    return full;
+}
+
+uint64_t rk64_via_tfp0(uint64_t kaddr) {
+    uint64_t val = 0;
+    rkbuffer(kaddr, &val, sizeof(val));
+    return val;
+}
+
+uint32_t ReadKernel32(uint64_t kaddr) {
     if (tfp0 != MACH_PORT_NULL) {
         return rk32_via_tfp0(kaddr);
     }
@@ -160,51 +170,19 @@ uint32_t ReadAnywhere32(uint64_t kaddr) {
     return 0;
 }
 
-uint64_t ReadAnywhere64(uint64_t kaddr) {
-  uint64_t lower = ReadAnywhere32(kaddr);
-  uint64_t higher = ReadAnywhere32(kaddr+4);
-  uint64_t full = ((higher<<32) | lower);
-  return full;
-}
-
-void wkbuffer(uint64_t kaddr, void* buffer, uint32_t length) {
-    if (tfp0 == MACH_PORT_NULL) {
-        LOG("attempt to write to kernel memory before any kernel memory write primitives available\n");
-        sleep(3);
-        return;
+uint64_t ReadKernel64(uint64_t kaddr) {
+    if (tfp0 != MACH_PORT_NULL) {
+        return rk64_via_tfp0(kaddr);
     }
     
-    kern_return_t err;
-    err = mach_vm_write(tfp0,
-                        (mach_vm_address_t)kaddr,
-                        (vm_offset_t)buffer,
-                        (mach_msg_type_number_t)length);
-    
-    if (err != KERN_SUCCESS) {
-        LOG("tfp0 write failed: %s %x\n", mach_error_string(err), err);
-        return;
-    }
-}
-
-void rkbuffer(uint64_t kaddr, void* buffer, uint32_t length) {
-    kern_return_t err;
-    mach_vm_size_t outsize = 0;
-    err = mach_vm_read_overwrite(tfp0,
-                                 (mach_vm_address_t)kaddr,
-                                 (mach_vm_size_t)length,
-                                 (mach_vm_address_t)buffer,
-                                 &outsize);
-    if (err != KERN_SUCCESS){
-        LOG("tfp0 read failed %s addr: 0x%llx err:%x port:%x\n", mach_error_string(err), kaddr, err, tfp0);
-        sleep(3);
-        return;
+    if (kmem_read_port != MACH_PORT_NULL) {
+        return rk64_via_kmem_read_port(kaddr);
     }
     
-    if (outsize != length){
-        LOG("tfp0 read was short (expected %lx, got %llx\n", sizeof(uint32_t), outsize);
-        sleep(3);
-        return;
-    }
+    LOG("attempt to read kernel memory but no kernel memory read primitives available\n");
+    sleep(3);
+    
+    return 0;
 }
 
 const uint64_t kernel_address_space_base = 0xffff000000000000;

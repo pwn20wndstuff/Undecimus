@@ -58,12 +58,12 @@ uint64_t early_kalloc(int size) {
   
   // find the message buffer:
   
-  uint64_t message_buffer = ReadAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE));
+  uint64_t message_buffer = ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE));
   LOG("message buffer: %llx\n", message_buffer);
   
   // leak the message buffer:
-  WriteAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE), 0);
-  WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_MSG_COUNT), 0x50000); // this is two uint16_ts, msg_count and qlimit
+  WriteKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE), 0);
+  WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_MSG_COUNT), 0x50000); // this is two uint16_ts, msg_count and qlimit
   
   
   return message_buffer;

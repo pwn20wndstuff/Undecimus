@@ -93,57 +93,8 @@ bool verifySha1Sums(NSString *sumFile) {
 }
 
 int _system(const char *cmd) {
-    posix_spawn_file_actions_t *actions = NULL;
-    posix_spawn_file_actions_t actionsStruct;
-    pid_t pid = 0;
-    int status = 0;
-    int out_pipe[2];
-    bool valid_pipe = false;
-    char *argv[] = {"sh", "-c", (char *)cmd, NULL};
-    valid_pipe = pipe(out_pipe) == ERR_SUCCESS;
-    if (valid_pipe && posix_spawn_file_actions_init(&actionsStruct) == ERR_SUCCESS) {
-        actions = &actionsStruct;
-        posix_spawn_file_actions_adddup2(actions, out_pipe[1], 1);
-        posix_spawn_file_actions_adddup2(actions, out_pipe[1], 2);
-        posix_spawn_file_actions_addclose(actions, out_pipe[0]);
-        posix_spawn_file_actions_addclose(actions, out_pipe[1]);
-    }
-    status = posix_spawn(&pid, "/bin/sh", actions, NULL, argv, environ);
-    if (valid_pipe) {
-        close(out_pipe[1]);
-    }
-    LOG("system(%d): command: %s", pid, cmd);
-    if (status == ERR_SUCCESS) {
-        if (valid_pipe) {
-            NSMutableData *outData = [NSMutableData new];
-            char c;
-            char s[2] = {0, 0};
-            NSMutableString *line = [NSMutableString new];
-            while (read(out_pipe[0], &c, 1) == 1) {
-                [outData appendBytes:&c length:1];
-                if (c == '\n') {
-                    LOG("system(%d): %@", pid, line);
-                    [line setString:@""];
-                } else {
-                    s[0] = c;
-                    [line appendString:@(s)];
-                }
-            }
-            if ([line length] > 0) {
-                LOG("system(%d): %@", pid, line);
-            }
-            lastSystemOutput = [outData copy];
-        }
-        waitpid(pid, &status, 0);
-        LOG("system(%d) completed with exit status %d", pid, WEXITSTATUS(status));
-    } else {
-        LOG("system(%d): ERROR posix_spawn failed (%d): %s", pid, status, strerror(status));
-    }
-    
-    if (valid_pipe) {
-        close(out_pipe[0]);
-    }
-    return status;
+    const char *argv[] = {"sh", "-c", (char *)cmd, NULL};
+    return runCommandv("/bin/sh", 3, argv);
 }
 
 int systemf(const char *cmd, ...) {
@@ -178,7 +129,7 @@ bool compareInstalledVersion(const char *packageID, const char *op, const char *
 
 bool installDeb(char *debName, bool forceDeps) {
     NSString *path = pathForResource(@(debName));
-    if (path == nil || ![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+    if (path == nil) {
         LOG("installDeb: Nothing to install");
         return false;
     }
@@ -187,19 +138,33 @@ bool installDeb(char *debName, bool forceDeps) {
 }
 
 bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
-    NSMutableArray <NSString*> *debPaths = [NSMutableArray new];
-    for (NSString *deb in debs) {
-        NSString *path = pathForResource(deb);
-        if (path == nil || ![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-            return false;
-        }
-        [debPaths addObject:pathForResource(deb)];
-    }
-    if ([debPaths count] < 1) {
+    if ([debs count] < 1) {
         LOG("installDebs: Nothing to install");
         return false;
     }
-    int rv = systemf("/usr/bin/dpkg %s --force-bad-path --force-configure-any -i \"%s\"", (forceDeps?"--force-depends":""), [[debPaths componentsJoinedByString:@"\" \""] UTF8String]);
+    NSMutableArray <NSString*> *command = [NSMutableArray
+                arrayWithArray:@[
+                        @"dpkg",
+                        @"--force-bad-path",
+                        @"--force-configure-any",
+                     ]];
+    
+    if (forceDeps) {
+        [command addObject:@"--force-depends"];
+    }
+    [command addObject:@"-i"];
+    for (NSString *deb in debs) {
+        NSString *path = pathForResource(deb);
+        if (path == nil) {
+            return false;
+        }
+        [command addObject:path];
+    }
+    const char *argv[command.count];
+    for (int i=0; i<[command count]; i++) {
+        argv[i] = [command[i] UTF8String];
+    }
+    int rv = runCommandv("/usr/bin/dpkg", (int)[command count], argv);
     return !WEXITSTATUS(rv);
 }
 
@@ -251,33 +216,18 @@ bool mode_is(const char *filename, mode_t mode) {
     return buf.st_mode == mode;
 }
 
-int runCommand(const char *cmd, ...) {
+int runCommandv(const char *cmd, int argc, const char * const* argv) {
+    pid_t pid;
     posix_spawn_file_actions_t *actions = NULL;
     posix_spawn_file_actions_t actionsStruct;
-    va_list ap, ap2;
-    pid_t pid;
-    int argc = 1;
     int out_pipe[2];
     bool valid_pipe = false;
-
-    va_start(ap, cmd);
-    va_copy(ap2, ap);
-
-    while (va_arg(ap, const char *) != NULL) {
-        argc++;
-    }
-    va_end(ap);
     
     NSMutableString *cmdstr = [NSMutableString stringWithCString:cmd encoding:NSUTF8StringEncoding];
-    const char *argv[argc+1];
-    argv[0] = cmd;
     for (int i=1; i<argc; i++) {
-        argv[i] = va_arg(ap2, const char *);
         [cmdstr appendFormat:@" \"%s\"", argv[i]];
     }
-    va_end(ap2);
-    argv[argc] = NULL;
-    
+
     valid_pipe = pipe(out_pipe) == ERR_SUCCESS;
     if (valid_pipe && posix_spawn_file_actions_init(&actionsStruct) == ERR_SUCCESS) {
         actions = &actionsStruct;
@@ -286,14 +236,14 @@ int runCommand(const char *cmd, ...) {
         posix_spawn_file_actions_addclose(actions, out_pipe[0]);
         posix_spawn_file_actions_addclose(actions, out_pipe[1]);
     }
-
+    
     int rv = posix_spawn(&pid, cmd, actions, NULL, (char *const *)argv, environ);
     LOG("runCommand(%d) command: %@", pid, cmdstr);
-
+    
     if (valid_pipe) {
         close(out_pipe[1]);
     }
-
+    
     if (rv == ERR_SUCCESS) {
         if (valid_pipe) {
             NSMutableData *outData = [NSMutableData new];
@@ -318,7 +268,6 @@ int runCommand(const char *cmd, ...) {
         if (waitpid(pid, &rv, 0) == -1) {
             LOG("ERROR: Waitpid failed");
         } else {
-            rv = WEXITSTATUS(rv);
             LOG("runCommand(%d) completed with exit status %d", pid, WEXITSTATUS(rv));
         }
         
@@ -328,12 +277,39 @@ int runCommand(const char *cmd, ...) {
     if (valid_pipe) {
         close(out_pipe[0]);
     }
-
     return rv;
 }
 
+int runCommand(const char *cmd, ...) {
+    va_list ap, ap2;
+    int argc = 1;
+
+    va_start(ap, cmd);
+    va_copy(ap2, ap);
+
+    while (va_arg(ap, const char *) != NULL) {
+        argc++;
+    }
+    va_end(ap);
+    
+    const char *argv[argc+1];
+    argv[0] = cmd;
+    for (int i=1; i<argc; i++) {
+        argv[i] = va_arg(ap2, const char *);
+    }
+    va_end(ap2);
+    argv[argc] = NULL;
+
+    int rv = runCommandv(cmd, argc, argv);
+    return WEXITSTATUS(rv);
+}
+
 NSString *pathForResource(NSString *resource) {
-    return [sourcePath stringByAppendingPathComponent:resource];
+    NSString *path = [sourcePath stringByAppendingPathComponent:resource];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        return nil;
+    }
+    return path;
 }
 
 pid_t pidOfProcess(const char *name) {

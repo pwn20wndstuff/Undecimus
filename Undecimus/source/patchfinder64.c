@@ -1409,7 +1409,7 @@ addr_t find_OSBoolean_True(void) {
         return 0;
     }
     
-    return ReadAnywhere64(val + kerndumpbase);
+    return ReadKernel64(val + kerndumpbase);
 }
 
 addr_t find_OSBoolean_False(void) {

@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 
-void
-untar(FILE *a, const char *path);
+bool untar(const char *file);
 
 #endif /* untar_h */
