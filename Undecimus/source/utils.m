@@ -22,7 +22,7 @@ extern char **environ;
 static NSString *sourcePath=nil;
 NSData *lastSystemOutput=nil;
 
-int sha1_to_str(const unsigned char *hash, int hashlen, char *buf, size_t buflen)
+int sha1_to_str(const unsigned char *hash, size_t hashlen, char *buf, size_t buflen)
 {
     if (buflen < (hashlen*2+1)) {
         return -1;

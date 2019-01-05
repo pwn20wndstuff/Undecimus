@@ -48,8 +48,9 @@
 		22C546CA21A8D8AC00EFC09C /* openssh.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C221A8D7FA00EFC09C /* openssh.deb */; };
 		22C546CB21A8D8AC00EFC09C /* openssl.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C421A8D7FA00EFC09C /* openssl.deb */; };
 		22C546CC21A8D8AC00EFC09C /* resources.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C121A8D7DA00EFC09C /* resources.deb */; };
-		22CFED9021CDF5C900A216BE /* inject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFED8E21CDF5C900A216BE /* inject.m */; };
 		22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 22CFED9121CDFE6B00A216BE /* libmis.tbd */; };
+		22F91CDB21E02CF300B2FCAE /* inject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CD921E02CF200B2FCAE /* inject.m */; };
+		22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CE221E033A500B2FCAE /* libsnappy.c */; };
 		8D592A68218E47F60035D2BC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D592A67218E47F60035D2BC /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -127,9 +128,11 @@
 		22C546C421A8D7FA00EFC09C /* openssl.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = openssl.deb; sourceTree = "<group>"; };
 		22C546C521A8D7FA00EFC09C /* cydia.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = cydia.deb; sourceTree = "<group>"; };
 		22C546C621A8D7FA00EFC09C /* cydia-lproj.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "cydia-lproj.deb"; sourceTree = "<group>"; };
-		22CFED8E21CDF5C900A216BE /* inject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = inject.m; path = Injector/inject.m; sourceTree = SOURCE_ROOT; };
-		22CFED8F21CDF5C900A216BE /* inject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inject.h; path = Injector/inject.h; sourceTree = SOURCE_ROOT; };
 		22CFED9121CDFE6B00A216BE /* libmis.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libmis.tbd; path = usr/lib/libmis.tbd; sourceTree = SDKROOT; };
+		22F91CD921E02CF200B2FCAE /* inject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = inject.m; path = Injector/inject.m; sourceTree = SOURCE_ROOT; };
+		22F91CDA21E02CF300B2FCAE /* inject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inject.h; path = Injector/inject.h; sourceTree = SOURCE_ROOT; };
+		22F91CDE21E02EB000B2FCAE /* snappy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = snappy.h; path = snappy/snappy.h; sourceTree = SOURCE_ROOT; };
+		22F91CE221E033A500B2FCAE /* libsnappy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libsnappy.c; path = snappy/libsnappy.c; sourceTree = SOURCE_ROOT; };
 		8D592A67218E47F60035D2BC /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -223,8 +226,8 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
-				22CFED8F21CDF5C900A216BE /* inject.h */,
-				22CFED8E21CDF5C900A216BE /* inject.m */,
+				22F91CDC21E02D0B00B2FCAE /* snappy */,
+				22F91CD821E02CC700B2FCAE /* injector */,
 				2101395321A09BB700F9C5F2 /* hideventsystem.c */,
 				2101395421A09BB700F9C5F2 /* hideventsystem.h */,
 				21C130FC214C1EC00021AA9D /* untar.h */,
@@ -310,6 +313,24 @@
 				21C0FC7821369EB800849420 /* Info.plist */,
 			);
 			path = Undecimus;
+			sourceTree = "<group>";
+		};
+		22F91CD821E02CC700B2FCAE /* injector */ = {
+			isa = PBXGroup;
+			children = (
+				22F91CDA21E02CF300B2FCAE /* inject.h */,
+				22F91CD921E02CF200B2FCAE /* inject.m */,
+			);
+			name = injector;
+			sourceTree = "<group>";
+		};
+		22F91CDC21E02D0B00B2FCAE /* snappy */ = {
+			isa = PBXGroup;
+			children = (
+				22F91CE221E033A500B2FCAE /* libsnappy.c */,
+				22F91CDE21E02EB000B2FCAE /* snappy.h */,
+			);
+			name = snappy;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -420,13 +441,14 @@
 				21A97FD12148103C00DC0023 /* kexecute.m in Sources */,
 				212D8844216E4C4800A36DA5 /* find_port.c in Sources */,
 				22C546AB21A8A8FD00EFC09C /* utils.m in Sources */,
+				22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */,
 				212D8841216B9FB400A36DA5 /* patchfinder64.c in Sources */,
 				21A97FD42148103C00DC0023 /* remote_call.c in Sources */,
 				21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */,
 				21C130FB214C1EBA0021AA9D /* untar.c in Sources */,
 				21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */,
 				2116449A21737F9500250744 /* ViewController.m in Sources */,
-				22CFED9021CDF5C900A216BE /* inject.m in Sources */,
+				22F91CDB21E02CF300B2FCAE /* inject.m in Sources */,
 				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* kmem.c in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
@@ -584,6 +606,8 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus/include",
+					"$(PROJECT_DIR)/snappy",
+					"$(PROJECT_DIR)/Injector",
 				);
 				INFOPLIST_FILE = Undecimus/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -625,6 +649,8 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus/include",
+					"$(PROJECT_DIR)/snappy",
+					"$(PROJECT_DIR)/Injector",
 				);
 				INFOPLIST_FILE = Undecimus/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;

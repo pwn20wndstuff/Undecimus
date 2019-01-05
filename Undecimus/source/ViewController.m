@@ -30,6 +30,8 @@
 #include <MobileGestalt.h>
 #include <netdb.h>
 #include <reboot.h>
+#import <snappy.h>
+#import <inject.h>
 #import "ViewController.h"
 #include "offsets.h"
 #include "empty_list_sploit.h"
@@ -45,7 +47,6 @@
 #include "multi_path_sploit.h"
 #include "async_wake.h"
 #include "utils.h"
-#import "../../Injector/inject.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -327,60 +328,6 @@ static vm_address_t get_kernel_base(mach_port_t tfp0)
     next:
         addr -= 0x200000;
     }
-}
-
-char *copyBootHash(void)
-{
-    io_registry_entry_t chosen = IORegistryEntryFromPath(kIOMasterPortDefault, "IODeviceTree:/chosen");
-    
-    if (!MACH_PORT_VALID(chosen)) {
-        LOG("Unable to get IODeviceTree:/chosen port\n");
-        return NULL;
-    }
-    
-    CFDataRef hash = (CFDataRef)IORegistryEntryCreateCFProperty(chosen, CFSTR("boot-manifest-hash"), kCFAllocatorDefault, 0);
-    
-    IOObjectRelease(chosen);
-    
-    if (hash == nil) {
-        LOG("Unable to read boot-manifest-hash\n");
-        return NULL;
-    }
-    
-    if (CFGetTypeID(hash) != CFDataGetTypeID()) {
-        LOG("Error hash is not data type\n");
-        CFRelease(hash);
-        return NULL;
-    }
-    
-    // Make a hex string out of the hash
-    
-    CFIndex length = CFDataGetLength(hash) * 2 + 1;
-    char *manifestHash = (char*)calloc(length, sizeof(char));
-    
-    int ret = sha1_to_str(CFDataGetBytePtr(hash), (int)CFDataGetLength(hash), manifestHash, length);
-    
-    CFRelease(hash);
-    
-    if (ret != ERR_SUCCESS) {
-        LOG("Unable to generate bootHash string\n");
-        free(manifestHash);
-        return NULL;
-    }
-    
-    return manifestHash;
-}
-
-#define APPLESNAP "com.apple.os.update-"
-
-const char *systemSnapshot()
-{
-    SETMESSAGE(NSLocalizedString(@"Failed to find systemSnapshot", nil));
-    char *BootHash = copyBootHash();
-    _assert(BootHash != NULL, message, true);
-    const char *SystemSnapshot = [[NSString stringWithFormat:@APPLESNAP @"%s", BootHash] UTF8String];
-    free(BootHash);
-    return SystemSnapshot;
 }
 
 uint64_t
@@ -854,72 +801,6 @@ typedef struct val_attrs {
     attrreference_t   name_info;
 } val_attrs_t;
 
-int snapshot_list(const char *vol)
-{
-    struct attrlist attr_list = { 0 };
-    int total=0;
-    
-    attr_list.commonattr = ATTR_BULK_REQUIRED;
-    
-    char *buf = (char*)calloc(2048, sizeof(char));
-    int retcount;
-    int fd = open(vol, O_RDONLY, 0);
-    while ((retcount = fs_snapshot_list(fd, &attr_list, buf, 2048, 0))>0) {
-        total += retcount;
-        char *bufref = buf;
-        
-        for (int i=0; i<retcount; i++) {
-            val_attrs_t *entry = (val_attrs_t *)bufref;
-            if (entry->returned.commonattr & ATTR_CMN_NAME) {
-                LOG("%s\n", (char*)(&entry->name_info) + entry->name_info.attr_dataoffset);
-            }
-            bufref += entry->length;
-        }
-    }
-    free(buf);
-    close(fd);
-    
-    if (retcount < 0) {
-        perror("fs_snapshot_list");
-        return -1;
-    }
-    
-    return total;
-}
-
-bool snapshot_check(const char *vol, const char *name)
-{
-    struct attrlist attr_list = { 0 };
-    
-    attr_list.commonattr = ATTR_BULK_REQUIRED;
-    
-    char *buf = (char*)calloc(2048, sizeof(char));
-    int retcount;
-    int fd = open(vol, O_RDONLY, 0);
-    while ((retcount = fs_snapshot_list(fd, &attr_list, buf, 2048, 0))>0) {
-        char *bufref = buf;
-        
-        for (int i=0; i<retcount; i++) {
-            val_attrs_t *entry = (val_attrs_t *)bufref;
-            if (entry->returned.commonattr & ATTR_CMN_NAME) {
-                LOG("%s\n", (char*)(&entry->name_info) + entry->name_info.attr_dataoffset);
-                if (strstr((char*)(&entry->name_info) + entry->name_info.attr_dataoffset, name))
-                    return true;
-            }
-            bufref += entry->length;
-        }
-    }
-    free(buf);
-    close(fd);
-    
-    if (retcount < 0) {
-        perror("fs_snapshot_list");
-        return false;
-    }
-    
-    return false;
-}
-
 int message_size_for_kalloc_size(int kalloc_size) {
     return ((3*kalloc_size)/4) - 0x74;
 }
@@ -1109,51 +990,6 @@ mach_port_t try_restore_port() {
     }
     LOG("unable to retrieve persisted port\n");
     return MACH_PORT_NULL;
-}
-
-int snapshot_rename(const char *vol, const char *from, const char *to) {
-    int rv = 0;
-    int fd = 0;
-    fd = open(vol, O_RDONLY, 0);
-    rv = fs_snapshot_rename(fd, from, to, 0);
-    close(fd);
-    return rv;
-}
-
-int snapshot_create(const char *vol, const char *name) {
-    int rv = 0;
-    int fd = 0;
-    fd = open(vol, O_RDONLY, 0);
-    rv = fs_snapshot_create(fd, name, 0);
-    close(fd);
-    return rv;
-}
-
-int snapshot_delete(const char *vol, const char *name) {
-    int rv = 0;
-    int fd = 0;
-    fd = open(vol, O_RDONLY, 0);
-    rv = fs_snapshot_delete(fd, name, 0);
-    close(fd);
-    return rv;
-}
-
-int snapshot_revert(const char *vol, const char *name) {
-    int rv = 0;
-    int fd = 0;
-    fd = open(vol, O_RDONLY, 0);
-    rv = fs_snapshot_revert(fd, name, 0);
-    close(fd);
-    return rv;
-}
-
-int snapshot_mount(const char *vol, const char *name, const char *dir) {
-    int rv = 0;
-    int fd = 0;
-    fd = open(vol, O_RDONLY, 0);
-    rv = fs_snapshot_mount(fd, dir, name, 0);
-    close(fd);
-    return rv;
 }
 
 double uptime() {
@@ -1644,8 +1480,12 @@ void exploit(mach_port_t tfp0,
         
         LOG("Remounting RootFS...");
         SETMESSAGE(NSLocalizedString(@"Failed to remount RootFS.", nil));
-        rv = snapshot_list("/");
-        if (rv == -1) {
+        int rootfd = open("/", O_RDONLY);
+        _assert(rootfd != -1, message, true);
+        const char **snapshots = snapshot_list(rootfd);
+        bool has_origfs = false;
+        if (snapshots == NULL) {
+            close(rootfd);
             // Initialize kexecute.
             
             LOG("Initializing kexecute...");
@@ -1716,12 +1556,20 @@ void exploit(mach_port_t tfp0,
             
             LOG("Renaming system snapshot...");
             SETMESSAGE(NSLocalizedString(@"Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present", nil));
-            rv = snapshot_list("/var/MobileSoftwareUpdate/mnt1");
-            _assert(rv != -1, message, true);
-            _assert(snapshot_rename("/var/MobileSoftwareUpdate/mnt1", systemSnapshot(), "orig-fs") == ERR_SUCCESS, message, true);
+            
+            rootfd = open("/var/MobileSoftwareUpdate/mnt1", O_RDONLY);
+            _assert(rootfd != -1, message, true);
+            snapshots = snapshot_list(rootfd);
+            _assert(snapshots != NULL, message, true);
+            if (snapshots != NULL) {
+                free(snapshots);
+                snapshots = NULL;
+            }
+            _assert(fs_snapshot_rename(rootfd, copySystemSnapshot(), "orig-fs", 0) == ERR_SUCCESS, message, true);
             LOG("Successfully renamed system snapshot.");
             
             // Reboot.
+            close(rootfd);
             
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
@@ -1729,6 +1577,14 @@ void exploit(mach_port_t tfp0,
             unmount("/var/MobileSoftwareUpdate/mnt1", 0);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
+        } else {
+            LOG("APFS Snapshots:");
+            for (const char **snapshot = snapshots; *snapshot; snapshot++) {
+                if (strcmp("orig-fs", *snapshot)==0) {
+                    has_origfs = true;
+                }
+                LOG("%s", *snapshot);
+            }
         }
         uint64_t rootfs_vnode = ReadKernel64(GETOFFSET(rootvnode));
 
@@ -1742,17 +1598,17 @@ void exploit(mach_port_t tfp0,
             v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
             WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag);
         }
-        rv = snapshot_list("/");
         needStrap = access("/.installed_unc0ver", F_OK) != ERR_SUCCESS && access("/electra", F_OK) != ERR_SUCCESS;
-        if (rv == 0 && needStrap) {
+        if (snapshots != NULL && needStrap && !has_origfs) {
             // Create system snapshot.
             
             LOG("Create system snapshot...");
             SETMESSAGE(NSLocalizedString(@"Unable to create system snapshot.  Delete OTA file from Settings - Storage if present", nil));
-            _assert(snapshot_create("/", "orig-fs") == ERR_SUCCESS, message, true);
-            _assert(snapshot_check("/", "orig-fs"), message, true);
+            _assert(fs_snapshot_create(rootfd, "orig-fs", 0) == ERR_SUCCESS, message, true);
+            _assert(snapshot_check(rootfd, "orig-fs"), message, true);
             LOG("Successfully created system snapshot.");
         }
+        close(rootfd);
         LOG("Successfully remounted RootFS.");
     }
     
@@ -1827,21 +1683,27 @@ void exploit(mach_port_t tfp0,
                     _assert(chown("/var/MobileSoftwareUpdate/mnt1", 0, 0) == ERR_SUCCESS, message, true);
                 }
             }
-            if (snapshot_check("/", "electra-prejailbreak")) {
+            char *systemSnapshot = copySystemSnapshot();
+            _assert(systemSnapshot != NULL, message, true);
+            int rootfd = open("/", O_RDONLY);
+            if (snapshot_check(rootfd, "electra-prejailbreak")) {
                 if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    _assert(snapshot_mount("/", "electra-prejailbreak", "/var/MobileSoftwareUpdate/mnt1") == ERR_SUCCESS, message, true);
+                    _assert(fs_snapshot_mount(rootfd, "electra-prejailbreak", "/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
                 } else {
-                    _assert(snapshot_rename("/", "electra-prejailbreak", systemSnapshot()) == ERR_SUCCESS, message, true);
+                    _assert(fs_snapshot_rename(rootfd, "electra-prejailbreak", systemSnapshot, 0) == ERR_SUCCESS, message, true);
                 }
-            } else if (snapshot_check("/", "orig-fs")) {
+            } else if (snapshot_check(rootfd, "orig-fs")) {
                 if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    _assert(snapshot_mount("/", "orig-fs", "/var/MobileSoftwareUpdate/mnt1") == ERR_SUCCESS, message, true);
+                    _assert(fs_snapshot_mount(rootfd, "orig-fs", "/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
                 } else {
-                    _assert(snapshot_rename("/", "orig-fs", systemSnapshot()) == ERR_SUCCESS, message, true);
+                    _assert(fs_snapshot_rename(rootfd, "orig-fs", systemSnapshot, 0) == ERR_SUCCESS, message, true);
                 }
             } else {
-                _assert(snapshot_mount("/", systemSnapshot(), "/var/MobileSoftwareUpdate/mnt1") == ERR_SUCCESS, message, true);
+                _assert(fs_snapshot_mount(rootfd, systemSnapshot, "/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
             }
+            free(systemSnapshot);
+            close(rootfd);
+            systemSnapshot = NULL;
             if (kCFCoreFoundationVersionNumber < 1452.23) {
                 _assert(waitForFile("/var/MobileSoftwareUpdate/mnt1/sbin/launchd") == ERR_SUCCESS, message, true);
                 

@@ -44,7 +44,7 @@ static inline bool init_file(const char *file, int owner, mode_t mode) {
                 } ofItemAtPath:path error:nil]);
 }
 
-int sha1_to_str(const unsigned char *hash, int hashlen, char *buf, size_t buflen);
+int sha1_to_str(const unsigned char *hash, size_t hashlen, char *buf, size_t buflen);
 NSString *sha1sum(NSString *file);
 bool verifySha1Sums(NSString *sumFile);
 int _system(const char *cmd);

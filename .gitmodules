@@ -1,3 +1,6 @@
 [submodule "Injector"]
 	path = Injector
 	url = https://github.com/pwn20wndstuff/Injector.git
+[submodule "snappy"]
+	path = snappy
+	url = https://github.com/sbingner/snappy.git
