@@ -1719,7 +1719,7 @@ void exploit(mach_port_t tfp0,
                 "/etc/ssh",
                 "/etc/ssl",
                 "/var/mobile/Library/Cydia",
-                "/var/mobile/Library/Caches/com.saurik.Cydia/sources.list",
+                "/var/mobile/Library/Caches/com.saurik.Cydia",
                 NULL
             };
             for (const char **file = cleanUpFileList; *file != NULL; file++) {
