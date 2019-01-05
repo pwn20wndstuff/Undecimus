@@ -1686,24 +1686,22 @@ void exploit(mach_port_t tfp0,
             char *systemSnapshot = copySystemSnapshot();
             _assert(systemSnapshot != NULL, message, true);
             int rootfd = open("/", O_RDONLY);
-            if (snapshot_check(rootfd, "electra-prejailbreak")) {
-                if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    _assert(fs_snapshot_mount(rootfd, "electra-prejailbreak", "/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
-                } else {
-                    _assert(fs_snapshot_rename(rootfd, "electra-prejailbreak", systemSnapshot, 0) == ERR_SUCCESS, message, true);
-                }
-            } else if (snapshot_check(rootfd, "orig-fs")) {
-                if (kCFCoreFoundationVersionNumber < 1452.23) {
-                    _assert(fs_snapshot_mount(rootfd, "orig-fs", "/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
-                } else {
-                    _assert(fs_snapshot_rename(rootfd, "orig-fs", systemSnapshot, 0) == ERR_SUCCESS, message, true);
-                }
+            _assert(rootfd != -1, message, true);
+            const char **snapshots = snapshot_list(rootfd);
+            _assert(snapshots != NULL, message, true);
+            const char *snapshot = *snapshots;
+            LOG("%s", snapshot);
+            _assert(snapshot != NULL, message, true);
+            if (kCFCoreFoundationVersionNumber < 1452.23) {
+                _assert(fs_snapshot_mount(rootfd, snapshot, "/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
             } else {
-                _assert(fs_snapshot_mount(rootfd, systemSnapshot, "/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
+                _assert(fs_snapshot_rename(rootfd, snapshot, systemSnapshot, 0) == ERR_SUCCESS, message, true);
             }
             free(systemSnapshot);
             close(rootfd);
             systemSnapshot = NULL;
+            free(snapshots);
+            snapshots = NULL;
             if (kCFCoreFoundationVersionNumber < 1452.23) {
                 _assert(waitForFile("/var/MobileSoftwareUpdate/mnt1/sbin/launchd") == ERR_SUCCESS, message, true);
                 
