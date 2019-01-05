@@ -65,7 +65,37 @@ NSString *sha1sum(NSString *file)
     return [NSString stringWithUTF8String:checksum];
 }
 
+NSString *md5sum(NSString *file)
+{
+    uint8_t buffer[0x1000];
+    unsigned char md[CC_SHA1_DIGEST_LENGTH];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:file])
+        return nil;
+    
+    NSInputStream *fileStream = [NSInputStream inputStreamWithFileAtPath:file];
+    [fileStream open];
+    
+    CC_MD5_CTX c;
+    CC_MD5_Init(&c);
+    while ([fileStream hasBytesAvailable]) {
+        NSInteger read = [fileStream read:buffer maxLength:0x1000];
+        CC_MD5_Update(&c, buffer, (CC_LONG)read);
+    }
+    
+    CC_MD5_Final(md, &c);
+    
+    char checksum[CC_MD5_DIGEST_LENGTH * 2 + 1];
+    if (sha1_to_str(md, CC_MD5_DIGEST_LENGTH, checksum, sizeof(checksum)) != ERR_SUCCESS)
+        return nil;
+    return [NSString stringWithUTF8String:checksum];
+}
+
 bool verifySha1Sums(NSString *sumFile) {
+    return verifySums(sumFile, HASHTYPE_SHA1);
+}
+
+bool verifySums(NSString *sumFile, enum hashtype hash) {
     if (![[NSFileManager defaultManager] fileExistsAtPath:sumFile])
         return false;
     
@@ -84,7 +114,15 @@ bool verifySha1Sums(NSString *sumFile) {
             LOG("Invalid line \"%s\"", checksum.UTF8String);
             return false;
         }
-        NSString *fileSum = sha1sum(suminfo[1]);
+        NSString *fileSum;
+        switch (hash) {
+            case HASHTYPE_SHA1:
+                fileSum = sha1sum(suminfo[1]);
+                break;
+            case HASHTYPE_MD5:
+                fileSum = md5sum(suminfo[1]);
+                break;
+        }
         if (![fileSum.lowercaseString isEqualToString:suminfo[0]]) {
             LOG("Corrupted \"%s\"", [suminfo[1] UTF8String]);
             return false;

@@ -39,6 +39,8 @@
 		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */; };
 		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		225D142221E052960045493D /* unar.m in Sources */ = {isa = PBXBuildFile; fileRef = 225D142121E052960045493D /* unar.m */; };
+		225D142521E0593E0045493D /* mobilesubstrate.deb in Resources */ = {isa = PBXBuildFile; fileRef = 225D142421E0593E0045493D /* mobilesubstrate.deb */; };
 		227629A521C64E640060080A /* substrate-dummy.deb in Resources */ = {isa = PBXBuildFile; fileRef = 227629A421C64E630060080A /* substrate-dummy.deb */; };
 		22C546AB21A8A8FD00EFC09C /* utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C546AA21A8A8FD00EFC09C /* utils.m */; };
 		22C546BA21A8D59C00EFC09C /* amfid_payload.tar in Resources */ = {isa = PBXBuildFile; fileRef = 22C546B921A8D59C00EFC09C /* amfid_payload.tar */; };
@@ -118,6 +120,9 @@
 		21C1312E214D5A710021AA9D /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
 		21E9642421A1DD6F000625F7 /* NSTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSTask.h; sourceTree = "<group>"; };
 		21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Painting_With_Chocolate.ttf; sourceTree = "<group>"; };
+		225D142121E052960045493D /* unar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = unar.m; sourceTree = "<group>"; };
+		225D142321E055E90045493D /* unar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = unar.h; sourceTree = "<group>"; };
+		225D142421E0593E0045493D /* mobilesubstrate.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = mobilesubstrate.deb; sourceTree = "<group>"; };
 		227629A421C64E630060080A /* substrate-dummy.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "substrate-dummy.deb"; sourceTree = "<group>"; };
 		22C546AA21A8A8FD00EFC09C /* utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = utils.m; sourceTree = "<group>"; };
 		22C546AC21A8A91A00EFC09C /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
@@ -203,6 +208,7 @@
 		2170BD3621B192B90059BD10 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				225D142421E0593E0045493D /* mobilesubstrate.deb */,
 				227629A421C64E630060080A /* substrate-dummy.deb */,
 				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
 				21466CDD21AEEC9200B99B4C /* spawn.deb */,
@@ -269,6 +275,8 @@
 				21C130EA214C03690021AA9D /* CreditsTableViewController.m */,
 				22C546AC21A8A91A00EFC09C /* utils.h */,
 				22C546AA21A8A8FD00EFC09C /* utils.m */,
+				225D142321E055E90045493D /* unar.h */,
+				225D142121E052960045493D /* unar.m */,
 			);
 			path = source;
 			sourceTree = "<group>";
@@ -392,6 +400,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				225D142521E0593E0045493D /* mobilesubstrate.deb in Resources */,
 				227629A521C64E640060080A /* substrate-dummy.deb in Resources */,
 				21466CDE21AEEC9200B99B4C /* spawn.deb in Resources */,
 				21466CDC21AEEA3A00B99B4C /* injector.deb in Resources */,
@@ -460,6 +469,7 @@
 				2101395521A09BB700F9C5F2 /* hideventsystem.c in Sources */,
 				21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */,
 				21C0FC6C21369EB700849420 /* AppDelegate.m in Sources */,
+				225D142221E052960045493D /* unar.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

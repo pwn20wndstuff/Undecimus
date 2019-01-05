@@ -21,6 +21,10 @@
 #define deja_xnu 3
 #define necp 4
 
+enum hashtype {
+    HASHTYPE_MD5 = 0,
+    HASHTYPE_SHA1
+};
 int proc_pidpath(pid_t pid, void *buffer, uint32_t buffersize);
 
 static inline bool create_file_data(const char *file, int owner, mode_t mode, NSData *data) {
@@ -57,6 +61,7 @@ static inline bool init_file(const char *file, int owner, mode_t mode) {
 int sha1_to_str(const unsigned char *hash, size_t hashlen, char *buf, size_t buflen);
 NSString *sha1sum(NSString *file);
 bool verifySha1Sums(NSString *sumFile);
+bool verifySums(NSString *sumFile, enum hashtype hash);
 int _system(const char *cmd);
 int systemf(const char *cmd, ...);
 bool debIsInstalled(char *packageID);
