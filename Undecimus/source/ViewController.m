@@ -1712,6 +1712,8 @@ void exploit(mach_port_t tfp0,
                 _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
                 
                 _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "/var/MobileSoftwareUpdate/mnt1/.", "/", NULL) == 0, message, true);
+                
+                unmount("/var/MobileSoftwareUpdate/mnt1", 0);
             }
             LOG("Successfully renamed system snapshot back.");
             
@@ -1763,7 +1765,6 @@ void exploit(mach_port_t tfp0,
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
             NOTICE(NSLocalizedString(@"RootFS has successfully been restored. The device will be restarted.", nil), true, false);
-            unmount("/var/MobileSoftwareUpdate/mnt1", 0);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         }
