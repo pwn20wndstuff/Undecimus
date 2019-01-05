@@ -1153,21 +1153,6 @@ int waitForFile(const char *filename) {
     return rv;
 }
 
-void setPreference(NSString *key, id object) {
-    NSMutableDictionary *md = nil;
-    md = [NSMutableDictionary dictionaryWithContentsOfFile:PREFERENCES_FILE];
-    if (md == nil) {
-        md = [NSMutableDictionary dictionary];
-    }
-    _assert(md != nil, message, true);
-    if (![md[key] isEqual:object]) {
-        md[key] = object;
-        _assert(kill(pidOfProcess("/usr/sbin/cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
-        _assert(([md writeToFile:PREFERENCES_FILE atomically:YES]), message, true);
-        _assert(kill(pidOfProcess("/usr/sbin/cfprefsd"), SIGCONT) == ERR_SUCCESS, message, true);
-    }
-}
-
 NSString *hexFromInt(NSInteger val) {
     return [NSString stringWithFormat:@"0x%lX", (long)val];
 }
@@ -1747,17 +1732,23 @@ void exploit(mach_port_t tfp0,
             LOG("Disallowing SpringBoard to show non-default system apps...");
             SETMESSAGE(NSLocalizedString(@"Failed to disallow SpringBoard to show non-default system apps.", nil));
             NSMutableDictionary *md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
-            if (![md[@"SBShowNonDefaultSystemApps"] isEqual:@NO]) {
+            _assert(md != nil, message, true);
+            for (int i = 0; !(i >= 5 || [md[@"SBShowNonDefaultSystemApps"] isEqual:@NO]); i++) {
+                _assert(kill(pidOfProcess("/usr/sbin/cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
                 md[@"SBShowNonDefaultSystemApps"] = @NO;
                 _assert(([md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES]), message, true);
+                _assert(kill(pidOfProcess("/usr/sbin/cfprefsd"), SIGCONT) == ERR_SUCCESS, message, true);
+                md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
+                _assert(md != nil, message, true);
             }
+            _assert([md[@"SBShowNonDefaultSystemApps"] isEqual:@NO], message, true);
             LOG("Successfully disallowed SpringBoard to show non-default system apps.");
             
             // Disable RootFS Restore.
             
             LOG("Disabling RootFS Restore...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable RootFS Restore.", nil));
-            setPreference(@K_RESTORE_ROOTFS, @NO);
+            [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@NO forKey:@K_RESTORE_ROOTFS inDomain:PREFERENCES_FILE];
             LOG("Successfully disabled RootFS Restore.");
             
             // Reboot.
@@ -1813,7 +1804,7 @@ void exploit(mach_port_t tfp0,
         CFStringRef value = MGCopyAnswer(kMGUniqueChipID);
         LOG("ECID: " "%@" "\n", value);
         _assert(value != nil, message, true);
-        setPreference(@K_ECID, [NSString stringWithFormat:@"%@", value]);
+        [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:[NSString stringWithFormat:@"%@", value] forKey:@K_ECID inDomain:PREFERENCES_FILE];
         CFRelease(value);
         LOG("Successfully logged ECID.");
     }
@@ -2235,7 +2226,7 @@ void exploit(mach_port_t tfp0,
             // Disable Install OpenSSH.
             LOG("Disabling Install OpenSSH...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable Install OpenSSH.", nil));
-            setPreference(@K_INSTALL_OPENSSH, @NO);
+            [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@NO forKey:@K_INSTALL_OPENSSH inDomain:PREFERENCES_FILE];
             LOG("Successfully disabled Install OpenSSH.");
         }
     }
@@ -2251,14 +2242,14 @@ void exploit(mach_port_t tfp0,
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
-                setPreference(@K_INSTALL_CYDIA, @YES);
+                [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@YES forKey:@K_INSTALL_CYDIA inDomain:PREFERENCES_FILE];
             }
             LOG("Successfully removed Electra's Cydia.");
         }
         if (access("/etc/apt/sources.list.d/electra.list", F_OK) == ERR_SUCCESS) {
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
-                setPreference(@K_INSTALL_CYDIA, @YES);
+                [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@YES forKey:@K_INSTALL_CYDIA inDomain:PREFERENCES_FILE];
             }
         }
         if (compareInstalledVersion("mobilesubstrate", "eq", "99.0")) {
@@ -2281,7 +2272,7 @@ void exploit(mach_port_t tfp0,
             // Disable Install Cydia.
             LOG("Disabling Install Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable Install Cydia.", nil));
-            setPreference(@K_INSTALL_CYDIA, @NO);
+            [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@NO forKey:@K_INSTALL_CYDIA inDomain:PREFERENCES_FILE];
             LOG("Successfully disabled Install Cydia.");
         }
     }
@@ -2330,7 +2321,7 @@ void exploit(mach_port_t tfp0,
             LOG("Running uicache...");
             SETMESSAGE(NSLocalizedString(@"Failed to run uicache.", nil));
             _assert(runCommand("/usr/bin/uicache", NULL) == ERR_SUCCESS, message, true);
-            setPreference(@K_REFRESH_ICON_CACHE, @NO);
+            [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@NO forKey:@K_REFRESH_ICON_CACHE inDomain:PREFERENCES_FILE];
             LOG("Successfully ran uicache.");
         }
     }
