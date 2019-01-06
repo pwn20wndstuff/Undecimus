@@ -1586,6 +1586,54 @@ addr_t find_kernproc(void) {
     return kernproc + kerndumpbase;
 }
 
+addr_t find_vnode_recycle(void) {
+    addr_t error_str = find_strref("\"vnode_put(%p): iocount < 1\"", 1, 0);
+    error_str -= kerndumpbase;
+    
+    addr_t call_to_lck_mtx_unlock = step64(kernel, error_str + 4, 40*4, INSN_CALL);
+    addr_t call_to_unknown1 = step64(kernel, call_to_lck_mtx_unlock + 4, 40*4, INSN_CALL);
+    addr_t offset_to_unknown1 = follow_call64(kernel, call_to_unknown1);
+    
+    addr_t call_to_target = step64(kernel, offset_to_unknown1 + 4, 40*4, INSN_CALL);
+    addr_t offset_to_target = follow_call64(kernel, call_to_target);
+    
+    return offset_to_target + kerndumpbase;
+}
+
+addr_t find_lck_mtx_lock(void) {
+    addr_t details_str = find_strref("Details", 1, 0);
+    details_str -= kerndumpbase;
+    
+    addr_t call_to_target = step64(kernel, details_str + 4, 40*4, INSN_CALL);
+    addr_t offset_to_target = follow_call64(kernel, call_to_target);
+    
+    return offset_to_target + kerndumpbase;
+}
+
+addr_t find_lck_mtx_unlock(void) {
+    addr_t details_str = find_strref("Details", 1, 0);
+    details_str -= kerndumpbase;
+    
+    addr_t call_to_lck_mtx_lock = step64(kernel, details_str + 4, 40*4, INSN_CALL);
+    addr_t call_to_sysctl_register_oid = step64(kernel, call_to_lck_mtx_lock+4, 40*4, INSN_CALL);
+    addr_t call_to_strlcat1 = step64(kernel, call_to_sysctl_register_oid + 4, 40*4, INSN_CALL);
+    addr_t call_to_strlcat2 = step64(kernel, call_to_strlcat1+4, 40*4, INSN_CALL);
+    
+    addr_t call_to_target = step64(kernel, call_to_strlcat2 + 4, 40*4, INSN_CALL);
+    addr_t offset_to_target = follow_call64(kernel, call_to_target);
+    
+    return offset_to_target + kerndumpbase;
+}
+
+addr_t find_strlen(void) {
+    addr_t xnu_str = find_strref("AP-xnu", 1, 0);
+    xnu_str -= kerndumpbase;
+    
+    addr_t call_to_target = step64(kernel, xnu_str, 40*4, INSN_CALL);
+    addr_t offset_to_target = follow_call64(kernel, call_to_target);
+    
+    return offset_to_target + kerndumpbase;
+}
 addr_t find_shenanigans(void) {
     addr_t ref = find_strref("\"shenanigans!", 1, 1);
     ref -= kerndumpbase;

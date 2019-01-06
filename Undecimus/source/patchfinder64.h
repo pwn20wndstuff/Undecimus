@@ -50,6 +50,10 @@ uint64_t find_SHA1Final(void);
 uint64_t find_csblob_entitlements_dictionary_set(void);
 uint64_t find_kernel_task(void);
 uint64_t find_kernproc(void);
+uint64_t find_vnode_recycle(void);
+uint64_t find_lck_mtx_lock(void);
+uint64_t find_lck_mtx_unlock(void);
+uint64_t find_strlen(void);
 uint64_t find_shenanigans(void);
 
 #endif
