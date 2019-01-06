@@ -1795,6 +1795,7 @@ void exploit(mach_port_t tfp0,
         md[@"VnodeLookup"] = ADDRSTRING(GETOFFSET(vnode_lookup));
         md[@"VnodePut"] = ADDRSTRING(GETOFFSET(vnode_put));
         md[@"KernProc"] = ADDRSTRING(GETOFFSET(kernproc));
+        md[@"KernelTask"] = ADDRSTRING(GETOFFSET(kernel_task));
         md[@"Shenanigans"] = ADDRSTRING(GETOFFSET(shenanigans));
         _assert(([md writeToFile:@"/jb/offsets.plist" atomically:YES]), message, true);
         _assert(init_file("/jb/offsets.plist", 0, 0644), message, true);
