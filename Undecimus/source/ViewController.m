@@ -1396,6 +1396,7 @@ void exploit(mach_port_t tfp0,
             _assert([substrate_deb extract:@"data.tar.lzma" toPath:@"/jb/substrate.tar.lzma"], message, true);
             int rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvC", "/", "-f", "/jb/substrate.tar.lzma", NULL);
             _assert(rv == ERR_SUCCESS, message, true);
+            _assert(injectTrustCache(@[@"/usr/libexec/substrate"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
         }
         // Run substrate
         LOG("Starting Substrate...");
