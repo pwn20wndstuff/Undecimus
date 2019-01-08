@@ -1639,7 +1639,7 @@ void exploit(mach_port_t tfp0,
             LOG("%s", snapshot);
             _assert(snapshot != NULL, message, true);
             if (kCFCoreFoundationVersionNumber < 1452.23) {
-                _assert(fs_snapshot_mount(rootfd, snapshot, "/var/MobileSoftwareUpdate/mnt1", 0) == ERR_SUCCESS, message, true);
+                _assert(fs_snapshot_mount(rootfd, "/var/MobileSoftwareUpdate/mnt1", snapshot, 0) == ERR_SUCCESS, message, true);
             } else {
                 _assert(fs_snapshot_rename(rootfd, snapshot, systemSnapshot, 0) == ERR_SUCCESS, message, true);
             }
