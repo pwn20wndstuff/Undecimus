@@ -106,14 +106,14 @@ int systemf(const char *cmd, ...) {
 }
 
 bool debIsInstalled(char *packageID) {
-    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep status: | grep -q \"install ok\"", packageID);
+    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep -i ^Status: | grep -q \"install ok\"", packageID);
     bool isInstalled = !WEXITSTATUS(rv);
     LOG("Deb: \"%s\" is%s installed", packageID, isInstalled?"":" not");
     return isInstalled;
 }
 
 bool debIsConfigured(char *packageID) {
-    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep status: | grep -q \"install ok installed\"", packageID);
+    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep -i ^Status: | grep -q \"install ok installed\"", packageID);
     bool isConfigured = !WEXITSTATUS(rv);
     LOG("Deb: \"%s\" is%s installed", packageID, isConfigured?"":" not");
     return isConfigured;
