@@ -41,9 +41,10 @@
 		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		225D142221E052960045493D /* unar.m in Sources */ = {isa = PBXBuildFile; fileRef = 225D142121E052960045493D /* unar.m */; };
 		225D142521E0593E0045493D /* mobilesubstrate.deb in Resources */ = {isa = PBXBuildFile; fileRef = 225D142421E0593E0045493D /* mobilesubstrate.deb */; };
-		227629A521C64E640060080A /* substrate-dummy.deb in Resources */ = {isa = PBXBuildFile; fileRef = 227629A421C64E630060080A /* substrate-dummy.deb */; };
+		229F753421E688B50024E44B /* substrate-safemode.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229F753321E688B50024E44B /* substrate-safemode.deb */; };
+		229F753621E68B520024E44B /* lzma.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229F753521E68B520024E44B /* lzma.deb */; };
+		229F753821E68B7C0024E44B /* xz.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229F753721E68B7B0024E44B /* xz.deb */; };
 		22C546AB21A8A8FD00EFC09C /* utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C546AA21A8A8FD00EFC09C /* utils.m */; };
-		22C546BA21A8D59C00EFC09C /* amfid_payload.tar in Resources */ = {isa = PBXBuildFile; fileRef = 22C546B921A8D59C00EFC09C /* amfid_payload.tar */; };
 		22C546C721A8D8AC00EFC09C /* ca-certificates.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C321A8D7FA00EFC09C /* ca-certificates.deb */; };
 		22C546C821A8D8AC00EFC09C /* cydia-lproj.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C621A8D7FA00EFC09C /* cydia-lproj.deb */; };
 		22C546C921A8D8AC00EFC09C /* cydia.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C521A8D7FA00EFC09C /* cydia.deb */; };
@@ -123,10 +124,11 @@
 		225D142121E052960045493D /* unar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = unar.m; sourceTree = "<group>"; };
 		225D142321E055E90045493D /* unar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = unar.h; sourceTree = "<group>"; };
 		225D142421E0593E0045493D /* mobilesubstrate.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = mobilesubstrate.deb; sourceTree = "<group>"; };
-		227629A421C64E630060080A /* substrate-dummy.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "substrate-dummy.deb"; sourceTree = "<group>"; };
+		229F753321E688B50024E44B /* substrate-safemode.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "substrate-safemode.deb"; sourceTree = "<group>"; };
+		229F753521E68B520024E44B /* lzma.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = lzma.deb; sourceTree = "<group>"; };
+		229F753721E68B7B0024E44B /* xz.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = xz.deb; sourceTree = "<group>"; };
 		22C546AA21A8A8FD00EFC09C /* utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = utils.m; sourceTree = "<group>"; };
 		22C546AC21A8A91A00EFC09C /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
-		22C546B921A8D59C00EFC09C /* amfid_payload.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = amfid_payload.tar; sourceTree = "<group>"; };
 		22C546C121A8D7DA00EFC09C /* resources.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = resources.deb; sourceTree = "<group>"; };
 		22C546C221A8D7FA00EFC09C /* openssh.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = openssh.deb; sourceTree = "<group>"; };
 		22C546C321A8D7FA00EFC09C /* ca-certificates.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "ca-certificates.deb"; sourceTree = "<group>"; };
@@ -208,8 +210,10 @@
 		2170BD3621B192B90059BD10 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				229F753721E68B7B0024E44B /* xz.deb */,
+				229F753521E68B520024E44B /* lzma.deb */,
+				229F753321E688B50024E44B /* substrate-safemode.deb */,
 				225D142421E0593E0045493D /* mobilesubstrate.deb */,
-				227629A421C64E630060080A /* substrate-dummy.deb */,
 				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
 				21466CDD21AEEC9200B99B4C /* spawn.deb */,
 				21466CDB21AEEA3A00B99B4C /* injector.deb */,
@@ -219,7 +223,6 @@
 				22C546C221A8D7FA00EFC09C /* openssh.deb */,
 				22C546C421A8D7FA00EFC09C /* openssl.deb */,
 				22C546C121A8D7DA00EFC09C /* resources.deb */,
-				22C546B921A8D59C00EFC09C /* amfid_payload.tar */,
 				2139534B21763A0B00B17F8D /* rsync.tar */,
 				21C13115214C510F0021AA9D /* lzma.tar */,
 				21C1310F214C2E570021AA9D /* strap.tar.lzma */,
@@ -400,8 +403,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				229F753821E68B7C0024E44B /* xz.deb in Resources */,
+				229F753621E68B520024E44B /* lzma.deb in Resources */,
+				229F753421E688B50024E44B /* substrate-safemode.deb in Resources */,
 				225D142521E0593E0045493D /* mobilesubstrate.deb in Resources */,
-				227629A521C64E640060080A /* substrate-dummy.deb in Resources */,
 				21466CDE21AEEC9200B99B4C /* spawn.deb in Resources */,
 				21466CDC21AEEA3A00B99B4C /* injector.deb in Resources */,
 				22C546C721A8D8AC00EFC09C /* ca-certificates.deb in Resources */,
@@ -417,7 +422,6 @@
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
 				21C13116214C51100021AA9D /* lzma.tar in Resources */,
 				2139534C21763A0C00B17F8D /* rsync.tar in Resources */,
-				22C546BA21A8D59C00EFC09C /* amfid_payload.tar in Resources */,
 				21C13105214C20950021AA9D /* tar.tar in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

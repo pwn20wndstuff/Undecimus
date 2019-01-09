@@ -670,10 +670,13 @@ NSString *hexFromInt(NSInteger val) {
 }
 
 void extractResources() {
-    if (!debIsInstalled("com.bingner.spawn")) {
-        _assert(installDeb("spawn.deb", false), message, true);
+    if (debIsInstalled("science.xnu.injector")) {
+        _assert(removeDeb("science.xnu.injector", true), message, true);
     }
-    if (!debIsConfigured("science.xnu.injector")) {
+    if (debIsInstalled("science.xnu.undecimus.resources")) {
+        _assert(removeDeb("science.xnu.undecimus.resources", true), message, true);
+    }
+    if (!debIsConfigured("trustinjector")) {
         _assert(installDeb("injector.deb", false), message, true);
     }
     _assert(installDeb("resources.deb", false), message, true);
@@ -715,7 +718,6 @@ void exploit(mach_port_t tfp0,
     bool needResources = false;
     bool needStrap = false;
     bool needSubstrate = false;
-    const char *amfid_payload = NULL;
     bool updatedResources = false;
     NSUserDefaults *userDefaults = nil;
     NSDictionary *userDefaultsDictionary = nil;
@@ -1117,9 +1119,9 @@ void exploit(mach_port_t tfp0,
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
         
         _assert(chdir("/") == ERR_SUCCESS, message, true);
-        needResources = needStrap || !verifySums(@"/usr/share/undecimus/resources.txt", HASHTYPE_SHA1);
+        needResources = needStrap || !verifySums(@"/var/lib/dpkg/info/jailbreak-resources.md5sums", HASHTYPE_MD5);
         if (needResources)
-            LOG(@"We need bootstrap");
+            LOG(@"We need resources");
 
         needSubstrate = ( needStrap ||
                          (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) ||
@@ -1128,20 +1130,7 @@ void exploit(mach_port_t tfp0,
         if (needSubstrate)
             LOG(@"We need substrate");
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
-        
-        if (needResources) {
-            amfid_payload = "/jb/amfid_payload.dylib";
-        } else {
-            amfid_payload = "/Library/MobileSubstrate/DynamicLibraries/amfid_payload.dylib";
-        }
-        
-        if (needResources) {
-            NSString *payload_tar = pathForResource(@"amfid_payload.tar");
-            _assert(payload_tar != nil, message, true);
-            _assert(untar(payload_tar.UTF8String), message, true);
-            _assert(init_file("/jb/amfid_payload.dylib", 0, 0644), message, true);
-        }
-        
+                
         if (needStrap || needSubstrate) {
             NSString *tar_tar = pathForResource(@"tar.tar");
             _assert(tar_tar != nil, message, true);
@@ -1268,17 +1257,14 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
         LOG("trust_chain = 0x%llx\n", GETOFFSET(trust_chain));
         NSArray *resources = nil;
-        if (needResources) {
-            resources = @[@(amfid_payload)];
-        } else {
+        if (!needResources) {
             resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
         }
         if (needStrap || needSubstrate) {
             resources = [resources arrayByAddingObjectsFromArray:@[@"/jb/tar", @"/jb/lzma"]];
         }
-        if (cdhashFor(@"/usr/libexec/substrate") != nil) {
-            resources = [resources arrayByAddingObject:@"/usr/libexec/substrate"];
-        }
+        _assert(cdhashFor(@"/usr/libexec/substrate") != nil, message, true);
+        resources = [resources arrayByAddingObject:@"/usr/libexec/substrate"];
         _assert(injectTrustCache(resources, GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
     }
@@ -1433,47 +1419,24 @@ void exploit(mach_port_t tfp0,
                 extractResources();
             }
         }
-        // Now that things are running, let's install the deb for the files we just extracted
-        if (needSubstrate) {
-            installDeb("mobilesubstrate.deb", true);
-        }
         if (access("/.installed_unc0ver", F_OK) != ERR_SUCCESS) {
             _assert(create_file("/.installed_unc0ver", 0, 0644), message, true);
+        }
+        // Now that things are running, let's install the deb for the files we just extracted
+        if (needSubstrate) {
+            installDebs(@[ @"substrate-safemode.deb", @"mobilesubstrate.deb" ], true);
+        }
+        if (!debIsInstalled("lzma") || compareInstalledVersion("lzma", "lt", "2:0")) {
+            installDeb("lzma.deb", false);
+        }
+        if (!debIsInstalled("xz")) {
+            installDeb("xz.deb", false);
         }
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
         ensure_symlink("/jb", "/electra");
         ensure_symlink("/.installed_unc0ver", "/.bootstrapped_electra");
         ensure_symlink("/usr/lib/libjailbreak.dylib", "/electra/libjailbreak.dylib");
         LOG("Successfully extracted bootstrap.");
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Patch amfid.
-        LOG("Testing amfid...");
-        if (runCommand("/bin/true", NULL) != ERR_SUCCESS) {
-            LOG("Patching amfid...");
-            SETMESSAGE(NSLocalizedString(@"Failed to patch amfid.", nil));
-            _assert(clean_file("/var/tmp/amfid_payload.alive"), message, true);
-            
-            pid_t amfidPid = pidOfProcess("/usr/libexec/amfid");
-            LOG("amfidPid: " "0x%x" "\n", amfidPid);
-            _assert(amfidPid > 1, message, true);
-            uint64_t amfidProcAddr = getProcStructForPid(amfidPid);
-            LOG("amfidProcAddr: " ADDR "\n", amfidProcAddr);
-            _assert(ISADDR(amfidProcAddr), message, true);
-            _assert(platformizeProcAtAddr(amfidProcAddr) == ERR_SUCCESS, message, true);
-            task_t amfidTaskPort = proc_to_task_port(amfidProcAddr, myProcAddr);
-            LOG("amfidTaskPort: " "0x%x" "\n", amfidTaskPort);
-            _assert(MACH_PORT_VALID(amfidTaskPort), message, true);
-            call_remote(amfidTaskPort, dlopen, 2, REMOTE_CSTRING(amfid_payload), REMOTE_LITERAL(RTLD_NOW));
-            _assert(call_remote(amfidTaskPort, dlerror, 0) == ERR_SUCCESS, message, true);
-            _assert(waitForFile("/var/tmp/amfid_payload.alive") == ERR_SUCCESS, message, true);
-            LOG("Successfully patched amfid.");
-        } else {
-            LOG("Amfid already patched.");
-        }
     }
     
     UPSTAGE();
@@ -1497,85 +1460,6 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to verify filesystem.", nil));
         _assert(ensure_directory("/Library/Caches", 0, S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO), message, true);
         LOG("Successfully verified filesystem.");
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Spawn jailbreakd.
-        
-        if (access("/usr/libexec/jailbreakd", F_OK) == ERR_SUCCESS && // jailbreakd must exist
-            access("/.disable_jailbreakd", F_OK) != ERR_SUCCESS && // we've not been told to disable it
-            access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) { // substrate must not be installed
-            LOG("Spawning jailbreakd...");
-            SETMESSAGE(NSLocalizedString(@"Failed to spawn jailbreakd.", nil));
-            const char *jbdPidFile = "/var/tmp/jailbreakd.pid";
-            if (!pidFileIsValid(@(jbdPidFile))) {
-                NSMutableDictionary *md = [NSMutableDictionary new];
-                md[@"Label"] = @"jailbreakd";
-                md[@"Program"] = @"/usr/libexec/jailbreakd";
-                md[@"EnvironmentVariables"] = [NSMutableDictionary new];
-                md[@"EnvironmentVariables"][@"KernelBase"] = ADDRSTRING(kernel_base);
-                md[@"EnvironmentVariables"][@"KernProcAddr"] = ADDRSTRING(ReadKernel64(GETOFFSET(kernproc)));
-                md[@"EnvironmentVariables"][@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref) - kernel_slide);
-                md[@"EnvironmentVariables"][@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
-                md[@"EnvironmentVariables"][@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
-                md[@"EnvironmentVariables"][@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
-                md[@"EnvironmentVariables"][@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
-                md[@"EnvironmentVariables"][@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
-                md[@"UserName"] = @"root";
-                md[@"MachServices"] = [NSMutableDictionary new];
-                md[@"MachServices"][@"zone.sparkes.jailbreakd"] = [NSMutableDictionary new];
-                md[@"MachServices"][@"zone.sparkes.jailbreakd"][@"HostSpecialPort"] = @15;
-                md[@"RunAtLoad"] = @YES;
-                md[@"KeepAlive"] = @YES;
-                md[@"StandardErrorPath"] = @"/var/log/jailbreakd-stderr.log";
-                md[@"StandardOutPath"] = @"/var/log/jailbreakd-stdout.log";
-                _assert(([md writeToFile:@"/jb/jailbreakd.plist" atomically:YES]), message, true);
-                _assert(init_file("/jb/jailbreakd.plist", 0, 0644), message, true);
-                _assert(clean_file("/var/log/jailbreakd-stderr.log"), message, true);
-                _assert(clean_file("/var/log/jailbreakd-stdout.log"), message, true);
-                _assert(clean_file(jbdPidFile), message, true);
-                // Stop first in case it was already running
-                runCommand("/bin/launchctl", "stop", "jailbreakd", NULL);
-                _assert(runCommand("/bin/launchctl", "load", "/jb/jailbreakd.plist", NULL) == ERR_SUCCESS, message, true);
-                _assert(waitForFile(jbdPidFile) == ERR_SUCCESS, message, true);
-                _assert(pidFileIsValid(@(jbdPidFile)), message, true);
-                LOG("Successfully spawned jailbreakd.");
-            } else {
-                LOG("Jailbreakd already running.");
-            }
-        } else {
-            _assert(clean_file("/jb/jailbreakd.plist"), message, true);
-        }
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Patch launchd.
-        const pid_t launchdPid = 1;
-
-        if (prefs.load_tweaks && (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) && !pspawnHookLoaded()) {
-            LOG("Patching launchd...");
-            SETMESSAGE(NSLocalizedString(@"Failed to patch launchd.", nil));
-            _assert(clean_file("/var/log/pspawn_hook_launchd.log"), message, true);
-            _assert(clean_file("/var/log/pspawn_hook_xpcproxy.log"), message, true);
-            _assert(clean_file("/var/log/pspawn_hook_other.log"), message, true);
-
-            uint64_t launchdProcAddr = getProcStructForPid(launchdPid);
-            LOG("launchdProcAddr = "ADDR"", launchdProcAddr);
-            _assert(ISADDR(launchdProcAddr), message, true);
-            _assert(platformizeProcAtAddr(launchdProcAddr) == ERR_SUCCESS, message, true);
-            task_t launchdTaskPort = proc_to_task_port(launchdProcAddr, myProcAddr);
-            LOG("launchdTaskPort = 0x%x", launchdTaskPort);
-            _assert(MACH_PORT_VALID(launchdTaskPort), message, true);
-            call_remote(launchdTaskPort, dlopen, 2, REMOTE_CSTRING("/usr/lib/pspawn_hook.dylib"), REMOTE_LITERAL(RTLD_NOW));
-            _assert(call_remote(launchdTaskPort, dlerror, 0) == ERR_SUCCESS, message, true);
-            LOG("Successfully patched launchd.");
-        } else {
-            LOG("Not injecting to launchd.");
-        }
     }
     
     UPSTAGE();
@@ -1743,10 +1627,6 @@ void exploit(mach_port_t tfp0,
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
             }
-        }
-        if (compareInstalledVersion("mobilesubstrate", "eq", "99.0")) {
-            LOG("Fixing version of Electra's mobilesubstrate dummy package.");
-            _assert(installDeb("substrate-dummy.deb", true), message, false);
         }
         // This is not a stock file for iOS11+
         runCommand("/bin/sed", "-ie", "/^\\/sbin\\/fstyp/d", "/Library/dpkg/info/firmware-sbin.list", NULL);

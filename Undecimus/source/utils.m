@@ -210,28 +210,9 @@ bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
     return !WEXITSTATUS(rv);
 }
 
-bool pidFileIsValid(NSString *pidfile) {
-    NSString *jbdpid = [NSString stringWithContentsOfFile:pidfile encoding:NSUTF8StringEncoding error:NULL];
-    if (jbdpid != nil && pidOfProcess("/usr/libexec/jailbreakd") == jbdpid.integerValue) {
-        return true;
-    }
-    return false;
-}
-
-bool pspawnHookLoaded() {
-    static int request[2] = { CTL_KERN, KERN_BOOTTIME };
-    struct timeval result;
-    size_t result_len = sizeof result;
-
-    if (access("/var/run/pspawn_hook.ts", F_OK) == ERR_SUCCESS) {
-        NSString *stamp = [NSString stringWithContentsOfFile:@"/var/run/pspawn_hook.ts" encoding:NSUTF8StringEncoding error:NULL];
-        if (stamp != nil && sysctl(request, 2, &result, &result_len, NULL, 0) >= 0) {
-            if ([stamp integerValue] > result.tv_sec) {
-                return true;
-            }
-        }
-    }
-    return false;
+bool removeDeb(char *packageID, bool forceDeps) {
+    int rv = systemf("/usr/bin/dpkg %s -r \"%s\"", (forceDeps?"--force-depends":""), packageID);
+    return !WEXITSTATUS(rv);
 }
 
 bool is_symlink(const char *filename) {
