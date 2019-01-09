@@ -1142,6 +1142,11 @@ void exploit(mach_port_t tfp0,
             _assert(untar(lzma_tar.UTF8String), message, true);
             _assert(init_file("/jb/lzma", 0, 0755), message, true);
         }
+
+        // These don't need to lay around
+        clean_file("/Library/LaunchDaemons/jailbreakd.plist");
+        clean_file("/jb/jailbreakd.plist");
+
         LOG("Successfully copied over our resources to RootFS.");
     }
     
