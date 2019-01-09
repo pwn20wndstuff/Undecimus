@@ -1597,16 +1597,19 @@ void exploit(mach_port_t tfp0,
         
         if (needResources) {
             NSString *payload_tar = pathForResource(@"amfid_payload.tar");
-            untar([payload_tar UTF8String]);
+            _assert(payload_tar != nil, message, true);
+            _assert(untar([payload_tar UTF8String]), message, true);
             _assert(init_file("/jb/amfid_payload.dylib", 0, 0644), message, true);
         }
         
         if (needStrap) {
             NSString *tar_tar = pathForResource(@"tar.tar");
-            untar([tar_tar UTF8String]);
+            _assert(tar_tar != nil, message, true);
+            _assert(untar([tar_tar UTF8String]), message, true);
             _assert(init_file("/jb/tar", 0, 0755), message, true);
             
             NSString *lzma_tar = pathForResource(@"lzma.tar");
+            _assert(lzma_tar != nil, message, true);
             _assert(untar([lzma_tar UTF8String]), message, true);
             _assert(init_file("/jb/lzma", 0, 0755), message, true);
         }
@@ -1654,6 +1657,7 @@ void exploit(mach_port_t tfp0,
                 _assert(waitForFile("/var/MobileSoftwareUpdate/mnt1/sbin/launchd") == ERR_SUCCESS, message, true);
                 
                 NSString *rsync_tar = pathForResource(@"rsync.tar");
+                _assert(rsync_tar != nil, message, true);
                 _assert(untar([rsync_tar UTF8String]), message, true);
                 _assert(init_file("/jb/rsync", 0, 0755), message, true);
                 
@@ -1697,10 +1701,8 @@ void exploit(mach_port_t tfp0,
             NSMutableDictionary *md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
             _assert(md != nil, message, true);
             for (int i = 0; !(i >= 5 || [md[@"SBShowNonDefaultSystemApps"] isEqual:@NO]); i++) {
-                _assert(kill(pidOfProcess("/usr/sbin/cfprefsd"), SIGSTOP) == ERR_SUCCESS, message, true);
                 md[@"SBShowNonDefaultSystemApps"] = @NO;
                 _assert(([md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES]), message, true);
-                _assert(kill(pidOfProcess("/usr/sbin/cfprefsd"), SIGCONT) == ERR_SUCCESS, message, true);
                 md = [NSMutableDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
                 _assert(md != nil, message, true);
             }
