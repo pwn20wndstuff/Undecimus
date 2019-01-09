@@ -1305,13 +1305,15 @@ void exploit(mach_port_t tfp0,
         LOG("Initializing QiLin...");
         SETMESSAGE(NSLocalizedString(@"Failed to initialize QiLin.", nil));
         _assert(initQiLin(tfp0, kernel_base) == ERR_SUCCESS, message, true);
-        if (ISADDR(findKernelSymbol("_kernproc"))) {
-            SETOFFSET(kernproc, findKernelSymbol("_kernproc"));
+        uint64_t symbol = findKernelSymbol("_kernproc");
+        if (ISADDR(symbol)) {
+            SETOFFSET(kernproc, symbol);
         } else {
             setKernelSymbol("_kernproc", GETOFFSET(kernproc) - kernel_slide);
         }
-        if (ISADDR(findKernelSymbol("_rootvnode"))) {
-            SETOFFSET(rootvnode, findKernelSymbol("_rootvnode"));
+        symbol = findKernelSymbol("_rootvnode");
+        if (ISADDR(symbol)) {
+            SETOFFSET(rootvnode, symbol);
         } else {
             setKernelSymbol("_rootvnode", GETOFFSET(rootvnode) - kernel_slide);
         }
