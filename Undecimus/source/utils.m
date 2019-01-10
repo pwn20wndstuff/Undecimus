@@ -15,6 +15,9 @@
 #include <copyfile.h>
 #include <common.h>
 #include <libproc.h>
+#include <sys/utsname.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #import "utils.h"
 
 extern char **environ;
@@ -330,6 +333,261 @@ pid_t pidOfProcess(const char *name) {
         }
     }
     return 0;
+}
+
+bool kernelVersionContains(const char *string) {
+    struct utsname u = { 0 };
+    uname(&u);
+    return (strstr(u.version, string) != NULL);
+}
+
+#define AF_MULTIPATH 39
+
+bool multi_path_tcp_enabled() {
+    bool rv = false;
+    int sock = socket(AF_MULTIPATH, SOCK_STREAM, 0);
+    if (sock < 0) {
+        return rv;
+    }
+    struct sockaddr* sockaddr_src = malloc(sizeof(struct sockaddr));
+    memset(sockaddr_src, 'A', sizeof(struct sockaddr));
+    sockaddr_src->sa_len = sizeof(struct sockaddr);
+    sockaddr_src->sa_family = AF_INET6;
+    struct sockaddr* sockaddr_dst = malloc(sizeof(struct sockaddr));
+    memset(sockaddr_dst, 'A', sizeof(struct sockaddr));
+    sockaddr_dst->sa_len = sizeof(struct sockaddr);
+    sockaddr_dst->sa_family = AF_INET;
+    sa_endpoints_t eps = {0};
+    eps.sae_srcif = 0;
+    eps.sae_srcaddr = sockaddr_src;
+    eps.sae_srcaddrlen = sizeof(struct sockaddr);
+    eps.sae_dstaddr = sockaddr_dst;
+    eps.sae_dstaddrlen = sizeof(struct sockaddr);
+    connectx(sock, &eps, SAE_ASSOCID_ANY, 0, NULL, 0, NULL, NULL);
+    rv = (errno != EPERM);
+    free(sockaddr_src);
+    free(sockaddr_dst);
+    close(sock);
+    return rv;
+}
+
+bool jailbreakEnabled() {
+    return kernelVersionContains(DEFAULT_VERSION_STRING);
+}
+
+bool supportsExploit(NSInteger exploit) {
+    switch (exploit) {
+        case empty_list: {
+            NSArray *list =
+            @[@"4397.0.0.2.4~1",
+              @"4481.0.0.2.1~1",
+              @"4532.0.0.0.1~30",
+              @"4556.0.0.2.5~1",
+              @"4570.1.24.2.3~1",
+              @"4570.2.3~8",
+              @"4570.2.5~84",
+              @"4570.2.5~167",
+              @"4570.7.2~3",
+              @"4570.20.55~10",
+              @"4570.20.62~9",
+              @"4570.20.62~4",
+              @"4570.30.79~22",
+              @"4570.30.85~18",
+              @"4570.32.1~2",
+              @"4570.32.1~1",
+              @"4570.40.6~8",
+              @"4570.40.9~7",
+              @"4570.40.9~1",
+              @"4570.50.243~9",
+              @"4570.50.257~6",
+              @"4570.50.279~9",
+              @"4570.50.294~5",
+              @"4570.52.2~3",
+              @"4570.52.2~8",
+              @"4570.60.10.0.1~16",
+              @"4570.60.16~9",
+              @"4570.60.19~25"];
+            for (NSString *string in list) {
+                if (kernelVersionContains(string.UTF8String)) {
+                    return true;
+                }
+            }
+            break;
+        }
+        case multi_path: {
+            NSArray *list =
+            @[@"4397.0.0.2.4~1",
+              @"4481.0.0.2.1~1",
+              @"4532.0.0.0.1~30",
+              @"4556.0.0.2.5~1",
+              @"4570.1.24.2.3~1",
+              @"4570.2.3~8",
+              @"4570.2.5~84",
+              @"4570.2.5~167",
+              @"4570.7.2~3",
+              @"4570.20.55~10",
+              @"4570.20.62~9",
+              @"4570.20.62~4",
+              @"4570.30.79~22",
+              @"4570.30.85~18",
+              @"4570.32.1~2",
+              @"4570.32.1~1",
+              @"4570.40.6~8",
+              @"4570.40.9~7",
+              @"4570.40.9~1",
+              @"4570.50.243~9",
+              @"4570.50.257~6",
+              @"4570.50.279~9",
+              @"4570.50.294~5",
+              @"4570.52.2~3",
+              @"4570.52.2~8",];
+            for (NSString *string in list) {
+                if (kernelVersionContains(string.UTF8String) &&
+                    multi_path_tcp_enabled()) {
+                    return true;
+                }
+            }
+            break;
+        }
+        case async_wake: {
+            NSArray *list =
+            @[@"4397.0.0.2.4~1",
+              @"4481.0.0.2.1~1",
+              @"4532.0.0.0.1~30",
+              @"4556.0.0.2.5~1",
+              @"4570.1.24.2.3~1",
+              @"4570.2.3~8",
+              @"4570.2.5~84",
+              @"4570.2.5~167",
+              @"4570.7.2~3",
+              @"4570.20.55~10",
+              @"4570.20.62~9",
+              @"4570.20.62~4"];
+            for (NSString *string in list) {
+                if (kernelVersionContains(string.UTF8String)) {
+                    return true;
+                }
+            }
+            break;
+        }
+        case deja_xnu: {
+            NSArray *list =
+            @[@"4397.0.0.2.4~1",
+              @"4481.0.0.2.1~1",
+              @"4532.0.0.0.1~30",
+              @"4556.0.0.2.5~1",
+              @"4570.1.24.2.3~1",
+              @"4570.2.3~8",
+              @"4570.2.5~84",
+              @"4570.2.5~167",
+              @"4570.7.2~3",
+              @"4570.20.55~10",
+              @"4570.20.62~9",
+              @"4570.20.62~4",
+              @"4570.30.79~22",
+              @"4570.30.85~18",
+              @"4570.32.1~2",
+              @"4570.32.1~1",
+              @"4570.40.6~8",
+              @"4570.40.9~7",
+              @"4570.40.9~1",
+              @"4570.50.243~9",
+              @"4570.50.257~6",
+              @"4570.50.279~9",
+              @"4570.50.294~5",
+              @"4570.52.2~3",
+              @"4570.52.2~8",
+              @"4570.60.10.0.1~16",
+              @"4570.60.16~9",
+              @"4570.60.19~25"];
+            for (NSString *string in list) {
+                if (kernelVersionContains(string.UTF8String) &&
+                    !jailbreakEnabled()) {
+                    return true;
+                }
+            }
+            break;
+        }
+        case necp: {
+            NSArray *list =
+            @[@"4397.0.0.2.4~1",
+              @"4481.0.0.2.1~1",
+              @"4532.0.0.0.1~30",
+              @"4556.0.0.2.5~1",
+              @"4570.1.24.2.3~1",
+              @"4570.2.3~8",
+              @"4570.2.5~84",
+              @"4570.2.5~167",
+              @"4570.7.2~3",
+              @"4570.20.55~10",
+              @"4570.20.62~9",
+              @"4570.20.62~4",
+              @"4570.30.79~22",
+              @"4570.30.85~18",
+              @"4570.32.1~2",
+              @"4570.32.1~1",
+              @"4570.40.6~8",
+              @"4570.40.9~7",
+              @"4570.40.9~1",
+              @"4570.50.243~9",
+              @"4570.50.257~6",
+              @"4570.50.279~9",
+              @"4570.50.294~5",
+              @"4570.52.2~3",
+              @"4570.52.2~8",
+              @"4570.60.10.0.1~16",
+              @"4570.60.16~9",
+              @"4570.60.19~25"];
+            for (NSString *string in list) {
+                if (kernelVersionContains(string.UTF8String)) {
+                    return true;
+                }
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    return false;
+}
+
+bool jailbreakSupported() {
+    return supportsExploit(empty_list) ||
+    supportsExploit(multi_path) ||
+    supportsExploit(async_wake);
+}
+
+bool respringSupported() {
+    return supportsExploit(deja_xnu);
+}
+
+bool restartSupported() {
+    return supportsExploit(necp);
+}
+
+NSInteger recommendedJailbreakSupport() {
+    if (supportsExploit(async_wake))
+        return async_wake;
+    else if (supportsExploit(multi_path))
+        return multi_path;
+    else if (supportsExploit(empty_list))
+        return empty_list;
+    else
+        return -1;
+}
+
+NSInteger recommendedRestartSupport() {
+    if (supportsExploit(necp))
+        return necp;
+    else
+        return -1;
+}
+
+NSInteger recommendedRespringSupport() {
+    if (supportsExploit(deja_xnu))
+        return deja_xnu;
+    else
+        return -1;
 }
 
 __attribute__((constructor))

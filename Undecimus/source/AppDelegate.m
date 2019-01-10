@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #include "ViewController.h"
 #include "SettingsTableViewController.h"
+#include "utils.h"
 
 @interface AppDelegate ()
 
@@ -38,12 +39,13 @@
         [[NSUserDefaults standardUserDefaults] setObject:@"0xbd34a880be0b53f3" forKey:@K_BOOT_NONCE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
-    if ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT] == MULTI_PATH && !hasMPTCP()) {
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPLOIT] != nil &&
+        !supportsExploit([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT])) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@K_EXPLOIT];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPLOIT] == nil) {
-        [[NSUserDefaults standardUserDefaults] setInteger:selectJailbreakExploit() forKey:@K_EXPLOIT];
+        [[NSUserDefaults standardUserDefaults] setInteger:recommendedJailbreakSupport() forKey:@K_EXPLOIT];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@K_DISABLE_AUTO_UPDATES] == nil) {

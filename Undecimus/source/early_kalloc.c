@@ -16,8 +16,7 @@
 #include "kmem.h"
 #include "offsets.h"
 #include <common.h>
-
-extern int message_size_for_kalloc_size(int kalloc_size);
+#include "kutils.h"
 
 // get a kalloc allocation before we've got a kcall interface to just call it
 uint64_t early_kalloc(int size) {

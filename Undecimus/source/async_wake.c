@@ -260,9 +260,6 @@ mach_port_t send_kalloc_message(uint8_t* replacer_message_body, uint32_t replace
  
  When the message is actually written into this buffer it's aligned to the end
  */
-static int message_size_for_kalloc_size(int kalloc_size) {
-  return ((3*kalloc_size)/4) - 0x74;
-}
 
 
 /*

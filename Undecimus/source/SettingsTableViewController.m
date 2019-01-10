@@ -13,6 +13,7 @@
 #include "hideventsystem.h"
 #include "remote_call.h"
 #include "ViewController.h"
+#include "utils.h"
 
 @interface SettingsTableViewController ()
 
@@ -233,9 +234,9 @@
     [self.KernelExploitSegmentedControl setSelectedSegmentIndex:[[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]];
     [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]];
     [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]];
-    [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(EMPTY_LIST) forSegmentAtIndex:0];
-    [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(MULTI_PATH) && hasMPTCP() forSegmentAtIndex:1];
-    [self.KernelExploitSegmentedControl setEnabled:isSupportedByExploit(ASYNC_WAKE) forSegmentAtIndex:2];
+    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(empty_list) forSegmentAtIndex:0];
+    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(multi_path) forSegmentAtIndex:1];
+    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(async_wake) forSegmentAtIndex:2];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
     [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[SettingsTableViewController _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, NSLocalizedString(@"Days", nil)]];
     [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE]];
@@ -247,8 +248,8 @@
     [self.installCydiaSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_CYDIA]];
     [self.ECIDLabel setPlaceholder:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
     [self.ReloadSystemDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RELOAD_SYSTEM_DAEMONS]];
-    [self.RestartSpringBoardButton setEnabled:isSupportedByRespring()];
-    [self.restartButton setEnabled:isSupportedByRestart()];
+    [self.RestartSpringBoardButton setEnabled:respringSupported()];
+    [self.restartButton setEnabled:restartSupported()];
     [self.tableView reloadData];
 }
 
@@ -302,7 +303,17 @@
 - (IBAction)tappedOnRestart:(id)sender {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         NOTICE(NSLocalizedString(@"The device will be restarted.", nil), true, false);
-        crashKernel();
+        NSInteger support = recommendedRestartSupport();
+        _assert(support != -1, message, true);
+        switch (support) {
+            case necp: {
+                necp_die();
+                break;
+            }
+            default:
+                break;
+        }
+        exit(EXIT_FAILURE);
     });
 }
 
@@ -409,7 +420,7 @@
 }
 
 - (IBAction)tappedOnAutomaticallySelectExploit:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setInteger:selectJailbreakExploit() forKey:@K_EXPLOIT];
+    [[NSUserDefaults standardUserDefaults] setInteger:recommendedJailbreakSupport() forKey:@K_EXPLOIT];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
@@ -424,8 +435,10 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         SETMESSAGE(NSLocalizedString(@"Failed to restart SpringBoard.", nil));
         NOTICE(NSLocalizedString(@"SpringBoard will be restarted.", nil), true, false);
-        switch (selectRespringExploit()) {
-            case DEJA_XNU: {
+        NSInteger support = recommendedRespringSupport();
+        _assert(support != -1, message, true);
+        switch (support) {
+            case deja_xnu: {
                 mach_port_t bb_tp = hid_event_queue_exploit();
                 _assert(MACH_PORT_VALID(bb_tp), message, true);
                 _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0)) == 0, message, true);
@@ -434,6 +447,7 @@
             default:
                 break;
         }
+        exit(EXIT_FAILURE);
     });
 }
 

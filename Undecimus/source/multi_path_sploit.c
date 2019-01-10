@@ -16,6 +16,7 @@
 #include "offsets.h"
 #include "kmem.h"
 #include <common.h>
+#include "kutils.h"
 
 kern_return_t mach_vm_read(
                            vm_map_t target_task,
@@ -178,12 +179,6 @@ int find_replacer_pipe(void** contents) {
         }
     }
     return -1;
-}
-
-
-
-static int message_size_for_kalloc_size(int kalloc_size) {
-    return ((3*kalloc_size)/4) - 0x74;
 }
 
 mach_port_t fake_kalloc(int size) {

@@ -13,6 +13,14 @@
 
 #define system(x) _system(x)
 
+#define DEFAULT_VERSION_STRING "Hacked"
+
+#define empty_list 0
+#define multi_path 1
+#define async_wake 2
+#define deja_xnu 3
+#define necp 4
+
 int proc_pidpath(pid_t pid, void *buffer, uint32_t buffersize);
 
 static inline bool create_file_data(const char *file, int owner, mode_t mode, NSData *data) {
@@ -63,6 +71,16 @@ int runCommandv(const char *cmd, int argc, const char * const*argv);
 int runCommand(const char *cmd, ...);
 NSString *pathForResource(NSString *resource);
 pid_t pidOfProcess(const char *name);
+bool kernelVersionContains(const char *string);
+bool multi_path_tcp_enabled(void);
+bool jailbreakEnabled(void);
+bool supportsExploit(NSInteger exploit);
+bool jailbreakSupported(void);
+bool respringSupported(void);
+bool restartSupported(void);
+NSInteger recommendedJailbreakSupport(void);
+NSInteger recommendedRestartSupport(void);
+NSInteger recommendedRespringSupport(void);
 
 extern NSData *lastSystemOutput;
 
