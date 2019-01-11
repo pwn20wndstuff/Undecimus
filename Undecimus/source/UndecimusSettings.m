@@ -453,9 +453,7 @@
 }
 
 - (IBAction)tappedOnCleanDiagnosticsData:(id)sender {
-    disableLogging();
     cleanLogs();
-    enableLogging();
     NOTICE(@"Cleaned diagnostics data.", false, false);
 }
 

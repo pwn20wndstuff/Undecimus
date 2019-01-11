@@ -6,6 +6,7 @@
 //  Copyright © 2018 - 2019 Pwn20wnd. All rights reserved.
 //
 
+#include <sys/time.h>
 #import "AppDelegate.h"
 #include "Undecimus.h"
 #include "UndecimusSettings.h"
@@ -16,6 +17,67 @@
 @end
 
 @implementation AppDelegate
+
+-(AppDelegate*)init {
+    self = [super init];
+    enableLogging();
+    _stdoutPipe = [NSPipe pipe];
+    _stderrPipe = [NSPipe pipe];
+    _orig_stdout = dup(STDOUT_FILENO);
+    _orig_stderr = dup(STDERR_FILENO);
+    dup2(_stderrPipe.fileHandleForWriting.fileDescriptor, STDERR_FILENO);
+    dup2(_stdoutPipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO);
+    [self performSelectorInBackground:@selector(handlePipe) withObject:nil];
+    return self;
+}
+
+-(NSString*)readDataFromFD:(int)infd toFD:(int)outfd {
+    char s[0x1000];
+
+    ssize_t nread = read(infd, s, sizeof(s));
+    if (nread > 0) {
+        write(outfd, s, nread);
+    }
+    if (logfd > 0) {
+        if (write(logfd, s, nread) != nread) {
+            write(_orig_stderr, "error writing to logfile\n", 26);
+        }
+    }
+    return [[NSString alloc] initWithBytes:s length:nread encoding:NSUTF8StringEncoding];
+}
+
+- (void)handlePipe {
+    fd_set fds;
+    NSMutableString *outline = [NSMutableString new];
+    NSMutableString *errline = [NSMutableString new];
+
+    int stdout_fd = _stdoutPipe.fileHandleForReading.fileDescriptor;
+    int stderr_fd = _stderrPipe.fileHandleForReading.fileDescriptor;
+    int rv;
+    
+    do {
+        FD_ZERO(&fds);
+        FD_SET(stdout_fd, &fds);
+        FD_SET(stderr_fd, &fds);
+        rv = select(FD_SETSIZE, &fds, NULL, NULL, NULL);
+        if (FD_ISSET(stdout_fd, &fds)) {
+            NSString *read = [self readDataFromFD:stdout_fd toFD:_orig_stdout];
+            [outline appendString:read];
+            if ([read containsString:@"\n"]) {
+                [Undecimus.sharedController performSelectorOnMainThread:@selector(appendTextToOutput:) withObject:outline waitUntilDone:YES];
+                [outline setString:@""];
+            }
+        }
+        if (FD_ISSET(stderr_fd, &fds)) {
+            NSString *read = [self readDataFromFD:stderr_fd toFD:_orig_stderr];
+            [errline appendString:read];
+            if ([read containsString:@"\n"]) {
+                [Undecimus.sharedController performSelectorOnMainThread:@selector(appendTextToOutput:) withObject:errline waitUntilDone:YES];
+                [errline setString:@""];
+            }
+        }
+    } while (rv > 0);
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.

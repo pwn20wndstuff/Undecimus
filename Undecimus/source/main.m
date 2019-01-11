@@ -9,12 +9,9 @@
 #include <dlfcn.h>
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
-#include "utils.h"
 
 int main(int argc, char * argv[]) {
     @autoreleasepool {
-        enableLogging();
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
 }
-

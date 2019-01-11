@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "common.h"
+#import "utils.h"
 
 #define K_TWEAK_INJECTION          @"TweakInjection"
 #define K_LOAD_DAEMONS             @"LoadDaemons"

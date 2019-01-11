@@ -11,7 +11,10 @@
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-
+@property (strong, atomic) NSPipe *stdoutPipe;
+@property (strong, atomic) NSPipe *stderrPipe;
+@property (assign) int orig_stderr;
+@property (assign) int orig_stdout;
 
 @end
 

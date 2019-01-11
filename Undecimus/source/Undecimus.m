@@ -59,6 +59,7 @@
 
 @implementation Undecimus
 static Undecimus *sharedController = nil;
+static NSMutableString *output = nil;
 
 #define PROGRESS(msg, btnenbld, tbenbld) do { \
         LOG("PROGRESS: %@", msg); \
@@ -1941,6 +1942,14 @@ void exploit(mach_port_t tfp0,
 // This intentionally returns nil if called before it's been created by a proper init
 +(Undecimus *)sharedController {
     return sharedController;
+}
+
+-(void)appendTextToOutput:(NSString *)text {
+    if (output == nil)
+        output = [NSMutableString new];
+    [output appendString:text];
+    _outputView.text = output;
+    [_outputView scrollRangeToVisible:NSMakeRange(output.length - 1, 1)];
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {

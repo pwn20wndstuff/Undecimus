@@ -21,6 +21,7 @@
 #import "utils.h"
 
 extern char **environ;
+int logfd=-1;
 
 static NSString *sourcePath=nil;
 NSData *lastSystemOutput=nil;
@@ -694,42 +695,40 @@ bool debuggerEnabled() {
 }
 
 const char *getLogFile() {
-    NSString *homeDirectory = NSHomeDirectory();
-    return [NSString stringWithFormat:@"%@/Documents/log_file.txt", homeDirectory].UTF8String;
+    static const char *logfile = NULL;
+    if (logfile == NULL) {
+        NSString *homeDirectory = NSHomeDirectory();
+        logfile = [NSString stringWithFormat:@"%@/Documents/log_file.txt", homeDirectory].UTF8String;
+    }
+    return logfile;
 }
 
-static bool logging_enabled = false;
-static int orig_stdout = 0;
-static int orig_stderr = 0;
-
 void enableLogging() {
-    if (!debuggerEnabled() && !logging_enabled) {
-        const char *logFile = getLogFile();
-        orig_stdout = dup(STDOUT_FILENO);
-        freopen(logFile, "a+", stdout);
-        orig_stderr = dup(STDERR_FILENO);
-        freopen(logFile, "a+", stderr);
-        logging_enabled = true;
+    if (!debuggerEnabled()) {
+        int old_logfd = logfd;
+        int newfd = open(getLogFile(), O_WRONLY|O_CREAT);
+        if (newfd > 0) {
+            init_file(getLogFile(), 501, 0644);
+        }
+        logfd = newfd;
+        if (old_logfd > 0)
+            close(old_logfd);
     }
 }
 
 void disableLogging() {
-    if (!debuggerEnabled() && logging_enabled) {
-        fflush(stdout);
-        dup2(orig_stdout, STDOUT_FILENO);
-        close(orig_stdout);
-        orig_stdout = 0;
-        fflush(stderr);
-        dup2(orig_stderr, STDERR_FILENO);
-        close(orig_stderr);
-        orig_stderr = 0;
-        logging_enabled = false;
+    if (!debuggerEnabled()) {
+        int old_logfd = logfd;
+        logfd = -1;
+        if (old_logfd > 0)
+            close(old_logfd);
     }
 }
 
 void cleanLogs() {
     const char *logFile = getLogFile();
     clean_file(logFile);
+    enableLogging();
 }
 
 bool modifyPlist(NSString *filename, void (^function)(id)) {

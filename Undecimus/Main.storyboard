@@ -138,16 +138,27 @@
                                             </button>
                                         </subviews>
                                     </stackView>
+                                    <textView opaque="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bvv-3a-l9y">
+                                        <rect key="frame" x="21" y="457" width="278" height="54"/>
+                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="textColor" white="0.75" alpha="1" colorSpace="calibratedWhite"/>
+                                        <fontDescription key="fontDescription" name="Menlo-Bold" family="Menlo" pointSize="10"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textView>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="0.83999999999999997" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="bvv-3a-l9y" secondAttribute="bottom" constant="57" id="6e3-OM-ydz"/>
                                     <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="Lbx-lz-4J4" secondAttribute="bottom" constant="93" id="AsG-6D-gAm"/>
                                     <constraint firstItem="Kgp-ib-vpD" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="Ccd-dV-Dxh"/>
                                     <constraint firstItem="ABT-w0-L5M" firstAttribute="top" secondItem="Kgp-ib-vpD" secondAttribute="bottom" constant="-6" id="KDr-Mj-86u"/>
                                     <constraint firstItem="Lbx-lz-4J4" firstAttribute="top" secondItem="Kgp-ib-vpD" secondAttribute="bottom" constant="7" id="LGY-em-Xcn"/>
                                     <constraint firstItem="9BH-Zb-878" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="LmD-Z2-XJF"/>
+                                    <constraint firstItem="bvv-3a-l9y" firstAttribute="leading" secondItem="82c-Je-J4x" secondAttribute="leading" constant="21" id="UsM-LU-3dM"/>
+                                    <constraint firstAttribute="trailing" secondItem="bvv-3a-l9y" secondAttribute="trailing" constant="21" id="bHA-u0-xfl"/>
                                     <constraint firstItem="A1X-qf-Qzr" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="beZ-bl-No1"/>
                                     <constraint firstItem="Lbx-lz-4J4" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="dx7-kd-hLw"/>
+                                    <constraint firstItem="bvv-3a-l9y" firstAttribute="top" secondItem="ELb-9J-7YK" secondAttribute="bottom" constant="8" id="jsU-Oe-Z6g"/>
                                     <constraint firstItem="Kgp-ib-vpD" firstAttribute="top" secondItem="A1X-qf-Qzr" secondAttribute="bottom" constant="1" id="lpk-2f-HwR"/>
                                     <constraint firstItem="ABT-w0-L5M" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="nqw-HT-9zC"/>
                                     <constraint firstItem="A1X-qf-Qzr" firstAttribute="top" secondItem="82c-Je-J4x" secondAttribute="top" constant="104" id="sL7-Do-4dg"/>
@@ -170,6 +181,7 @@
                     <tabBarItem key="tabBarItem" title="Jailbreak" image="maintenance" id="W8d-XC-the"/>
                     <connections>
                         <outlet property="goButton" destination="ELb-9J-7YK" id="NQQ-PZ-dgH"/>
+                        <outlet property="outputView" destination="bvv-3a-l9y" id="AVx-ZY-19D"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DwP-nN-m9x" userLabel="First Responder" sceneMemberID="firstResponder"/>
