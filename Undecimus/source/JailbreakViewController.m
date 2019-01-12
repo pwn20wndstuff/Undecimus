@@ -47,6 +47,7 @@
 #include "ArchiveFile.h"
 #include "../../patchfinder64/patchfinder64.h" // Work around Xcode 9
 #include "CreditsTableViewController.h"
+#include "FakeApt.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -665,29 +666,6 @@ NSString *hexFromInt(NSInteger val) {
     return [NSString stringWithFormat:@"0x%lX", (long)val];
 }
 
-void extractResources() {
-    NSMutableArray *debsToInstall = [NSMutableArray arrayWithObject:@"resources.deb"];
-    NSMutableArray *pkgsToRemove = [NSMutableArray new];
-    
-    if (debIsInstalled("science.xnu.injector")) {
-        [pkgsToRemove addObject:@"science.xnu.injector"];
-    }
-    if (debIsInstalled("science.xnu.undecimus.resources")) {
-        [pkgsToRemove addObject:@"science.xnu.undecimus.resources"];
-    }
-    if (!debIsConfigured("trustinjector")) {
-        [debsToInstall addObject:@"injector.deb"];
-    }
-    if (!debIsConfigured("mobilesubstrate")) {
-        [debsToInstall addObject:@"substrate-safemode.deb"];
-        [debsToInstall addObject:@"mobilesubstrate.deb"];
-    }
-    if ([pkgsToRemove count] > 0)
-        _assert(removePkgs(pkgsToRemove, true), message, true);
-    
-    _assert(installDebs(debsToInstall, true), message, true);
-}
-
 bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
     if (prefs == NULL) {
         return false;
@@ -720,7 +698,6 @@ void exploit()
     uint64_t kernelCredAddr = 0;
     uint64_t Shenanigans = 0;
     prefs_t prefs;
-    bool needResources = false;
     bool needStrap = false;
     bool needSubstrate = false;
     bool updatedResources = false;
@@ -728,6 +705,7 @@ void exploit()
     NSDictionary *userDefaultsDictionary = nil;
     NSString *prefsFile = nil;
     NSString *homeDirectory = NSHomeDirectory();
+    NSMutableArray *debsToInstall = [NSMutableArray new];
 
     UPSTAGE();
     
@@ -842,6 +820,17 @@ void exploit()
         _assert(getuid() == 0, message, true);
         set_platform_binary(myProcAddr);
         LOG("Successfully escaped Sandbox.");
+    }
+    
+    UPSTAGE();
+    
+    {
+        // Set HSP4.
+        
+        LOG("Setting HSP4...");
+        SETMESSAGE(NSLocalizedString(@"Failed to set HSP4.", nil));
+        remap_tfp0_set_hsp4(&tfp0);
+        LOG("Successfully set HSP4.");
     }
     
     UPSTAGE();
@@ -1010,6 +999,7 @@ void exploit()
                 LOG("%s", *snapshot);
             }
         }
+        
         uint64_t rootfs_vnode = vnodeFor("/");
         LOG("rootfs_vnode = "ADDR"", rootfs_vnode);
         _assert(ISADDR(rootfs_vnode), message, true);
@@ -1054,7 +1044,7 @@ void exploit()
         term_kexecute();
         LOG("Successfully deinitialized kexecute.");
     }
-    
+
     UPSTAGE();
     
     {
@@ -1078,16 +1068,46 @@ void exploit()
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
         
         _assert(chdir("/") == ERR_SUCCESS, message, true);
-        needResources = needStrap || !verifySums(@"/var/lib/dpkg/info/jailbreak-resources.md5sums", HASHTYPE_MD5);
-        if (needResources)
-            LOG(@"We need resources");
 
         needSubstrate = ( needStrap ||
                          (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) ||
                          !verifySums(@"/var/lib/dpkg/info/mobilesubstrate.md5sums", HASHTYPE_MD5)
                          );
-        if (needSubstrate)
+        if (needSubstrate) {
             LOG(@"We need substrate");
+            NSString *substrateDeb = debForPkg(@"mobilesubstrate");
+            _assert(substrateDeb != nil, message, true);
+            if (pidOfProcess("/usr/libexec/substrated") == 0) {
+                _assert(extractDeb(substrateDeb), message, true);
+            } else {
+                LOG("Substrate is running, not extracting again for now");
+            }
+            [debsToInstall addObject:substrateDeb];
+        }
+        
+        NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
+        _assert(resourcesPkgs != nil, message, true);
+        NSMutableArray *pkgsToRepair = [NSMutableArray new];
+        LOG("Resource Pkgs: %@", resourcesPkgs);
+        for (NSString *pkg in resourcesPkgs) {
+            // Ignore mobilesubstrate because we just handled that separately.
+            if ([pkg isEqualToString:@"mobilesubstrate"] || [pkg isEqualToString:@"firmware"])
+                continue;
+            if (verifySums([NSString stringWithFormat:@"/var/lib/dpkg/info/%@.md5sums", pkg], HASHTYPE_MD5)) {
+                LOG("Pkg %@ verified", pkg);
+            } else {
+                LOG(@"Need to repair %@", pkg);
+                [pkgsToRepair addObject:pkg];
+            }
+        }
+        if (pkgsToRepair.count > 0) {
+            LOG(@"(Re-)Extracting %@", pkgsToRepair);
+            NSArray *debsToRepair = debsForPkgs(pkgsToRepair);
+            _assert(debsToRepair.count == pkgsToRepair.count, message, true);
+            _assert(extractDebs(debsToRepair), message, true);
+            [debsToInstall addObjectsFromArray:debsToRepair];
+        }
+
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
                 
         // These don't need to lay around
@@ -1127,13 +1147,9 @@ void exploit()
                 _assert(fs_snapshot_mount(rootfd, systemSnapshotMountPoint, snapshot, 0) == ERR_SUCCESS, message, true);
                 const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
                 _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
-                NSString *rsync_tar = pathForResource(@"rsync.tar");
-                _assert(rsync_tar != nil, message, true);
-                ArchiveFile *rsync = [ArchiveFile archiveWithFile:rsync_tar];
-                _assert(rsync != nil, message, true);
-                _assert([rsync extractToPath:@"/jb"], message, true);
-                _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
-                _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, message, true);
+                _assert(extractDebsForPkg(@"rsync", nil, false), message, true);
+                _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
+                _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, message, true);
                 unmount(systemSnapshotMountPoint, MNT_FORCE);
             } else {
                 char *systemSnapshot = copySystemSnapshot();
@@ -1201,13 +1217,8 @@ void exploit()
         
         LOG("Injecting trust cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
-        NSArray *resources = nil;
-        if (!needResources) {
-            resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
-        }
-        if (!needSubstrate) {
-            resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
-        }
+        NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
+        resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
         _assert(injectTrustCache(resources, GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
     }
@@ -1278,17 +1289,6 @@ void exploit()
     UPSTAGE();
     
     {
-        // Set HSP4.
-        
-        LOG("Setting HSP4...");
-        SETMESSAGE(NSLocalizedString(@"Failed to set HSP4.", nil));
-        remap_tfp0_set_hsp4(&tfp0);
-        LOG("Successfully set HSP4.");
-    }
-    
-    UPSTAGE();
-    
-    {
         // Update version string.
         
         if (!jailbreakEnabled()) {
@@ -1309,6 +1309,51 @@ void exploit()
     UPSTAGE();
     
     {
+        // Repair filesystem.
+        
+        LOG("Repairing filesystem...");
+        SETMESSAGE(NSLocalizedString(@"Failed to repair filesystem.", nil));
+        
+        _assert(ensure_directory("/var/lib", 0, 0755), message, true);
+
+        // Make sure dpkg is not corrupted
+        NSFileManager *fm = [NSFileManager defaultManager];
+        BOOL isDir;
+        if ([fm fileExistsAtPath:@"/var/lib/dpkg" isDirectory:&isDir] && isDir) {
+            if ([fm fileExistsAtPath:@"/Library/dpkg" isDirectory:&isDir] && isDir) {
+                LOG(@"Removing /var/lib/dpkg");
+                _assert([fm removeItemAtPath:@"/var/lib/dpkg" error:nil], message, true);
+            } else {
+                LOG(@"Moving /var/lib/dpkg to /Library/dpkg");
+                _assert([fm moveItemAtPath:@"/var/lib/dpkg" toPath:@"/Library/dpkg" error:nil], message, true);
+            }
+        }
+        
+        _assert(ensure_symlink("/Library/dpkg", "/var/lib/dpkg"), message, true);
+        _assert(ensure_directory("/Library/dpkg", 0, 0755), message, true);
+        _assert(ensure_file("/var/lib/dpkg/status", 0, 0644), message, true);
+        _assert(ensure_file("/var/lib/dpkg/available", 0, 0644), message, true);
+        
+        // Make sure firmware-sbin package is not corrupted.
+        NSString *file = [NSString stringWithContentsOfFile:@"/var/lib/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil];
+        if ([file rangeOfString:@"/sbin/fstyp"].location != NSNotFound || [file rangeOfString:@"\n\n"].location != NSNotFound) {
+            // This is not a stock file for iOS11+
+            file = [file stringByReplacingOccurrencesOfString:@"/sbin/fstyp\n" withString:@""];
+            file = [file stringByReplacingOccurrencesOfString:@"\n\n" withString:@"\n"];
+            [file writeToFile:@"/var/lib/dpkg/info/firmware-sbin.list" atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        }
+        
+        // Make sure this is a symlink - usually handled by ncurses pre-inst
+        _assert(ensure_symlink("/usr/lib", "/usr/lib/_ncurses"), message, true);
+        
+        // This needs to be there for Substrate to work properly
+        _assert(ensure_directory("/Library/Caches", 0, S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO), message, true);
+        LOG("Successfully repaired filesystem.");
+    }
+    
+    UPSTAGE();
+    
+    {
         // Load Substrate
         
         // Set Disable Loader.
@@ -1321,35 +1366,6 @@ void exploit()
         }
         LOG("Successfully set Disable Loader.");
 
-        // Extract Substrate if necessary
-        if (needSubstrate) {
-            LOG("Extracting substrate from deb...");
-            SETMESSAGE(NSLocalizedString(@"Failed to extract Substrate from deb.", nil));
-            NSString *substrate_deb = pathForResource(@"mobilesubstrate.deb");
-            _assert(substrate_deb != nil, message, true);
-            ArchiveFile *substrate = [ArchiveFile archiveWithFile:substrate_deb];
-            _assert(substrate != nil, message, true);
-            _assert([substrate extract:@"data.tar.lzma" toPath:@"/jb/substrate.tar.lzma"], message, true);
-            ArchiveFile *substrate_data = [ArchiveFile archiveWithFile:@"/jb/substrate.tar.lzma"];
-            _assert(substrate_data != nil, message, true);
-            _assert([substrate_data extractToPath:@"/"], message, true);
-            _assert(injectTrustCache(@[@"/usr/libexec/substrate"], GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
-            LOG("Successfully extracted substrate");
-        }
-        // We don't trust server plugins from resources if they aren't valid
-        if (needResources) {
-            LOG("Cleaning out un-trusted resources...");
-            SETMESSAGE(NSLocalizedString(@"Failed to clean out un-trusted resources.", nil));
-            NSString *list = [NSString stringWithContentsOfFile:@"/usr/lib/dpkg/info/jailbreak-resources.list" encoding:NSUTF8StringEncoding error:nil];
-            if (list) {
-                for (NSString *file in [list componentsSeparatedByString:@"\n"]) {
-                    if ([[file stringByDeletingPathExtension] isEqualToString:@"/Library/MobileSubstrate/ServerPlugins"]) {
-                        clean_file(file.UTF8String);
-                    }
-                }
-            }
-            LOG("Successfully cleaned out un-trusted resources.");
-        }
         // Run substrate
         LOG("Starting Substrate...");
         SETMESSAGE(NSLocalizedString(@"Failed to start Substrate.", nil));
@@ -1360,96 +1376,101 @@ void exploit()
     UPSTAGE();
     
     {
-        // Make sure firmware-sbin package is not corrupted.
-        NSString *file = [NSString stringWithContentsOfFile:@"/var/lib/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil];
-        if ([file rangeOfString:@"/sbin/fstyp"].location != NSNotFound || [file rangeOfString:@"\n\n"].location != NSNotFound) {
-            // This is not a stock file for iOS11+
-            file = [file stringByReplacingOccurrencesOfString:@"/sbin/fstyp\n" withString:@""];
-            file = [file stringByReplacingOccurrencesOfString:@"\n\n" withString:@"\n"];
-            [file writeToFile:@"/var/lib/dpkg/info/firmware-sbin.list" atomically:YES encoding:NSUTF8StringEncoding error:nil];
-        }
-
         // Extract bootstrap.
         LOG("Extracting bootstrap...");
         SETMESSAGE(NSLocalizedString(@"Failed to extract bootstrap.", nil));
+
+        if (pkgIsBy("CoolStar", "lzma")) {
+            removePkg("lzma", true);
+            extractDebsForPkg(@"lzma", debsToInstall, false);
+        }
+        // Test dpkg
+        if (!pkgIsConfigured("dpkg") || pkgIsBy("CoolStar", "dpkg")) {
+            LOG("Extracting dpkg");
+            _assert(extractDebsForPkg(@"dpkg", debsToInstall, false), message, true);
+            NSString *dpkg_deb = debForPkg(@"dpkg");
+            _assert(installDeb(dpkg_deb.UTF8String, true), message, true);
+            [debsToInstall removeObject:dpkg_deb];
+        }
+        
+        if (needStrap || !pkgIsConfigured("firmware")) {
+            LOG("Extracting cydia");
+            if (![[NSFileManager defaultManager] fileExistsAtPath:@"/usr/libexec/cydia/firmware.sh"] || !pkgIsConfigured("cydia")) {
+                NSArray *fwDebs = debsForPkgs(@[@"cydia", @"cydia-lproj", @"darwintools", @"uikittools", @"system-cmds"]);
+                _assert(fwDebs != nil, message, true);
+                _assert(installDebs(fwDebs, true), message, true);
+                rv = _system("/usr/libexec/cydia/firmware.sh");
+                _assert(WEXITSTATUS(rv) == 0, message, true);
+            }
+        }
+        
+        // Dpkg better work now
+        if (debsToInstall.count > 0) {
+            LOG("Installing manually exctracted debs");
+            _assert(installDebs(debsToInstall, true), message, true);
+        }
+
+        const char *listPath = "/etc/apt/sources.list.d/undecimus.list";
+        NSString *listContents = @"deb file:///var/lib/undecimus/apt ./\n";
+        NSString *existingList = [NSString stringWithContentsOfFile:@(listPath) encoding:NSUTF8StringEncoding error:nil];
+        if (![listContents isEqualToString:existingList]) {
+            clean_file(listPath);
+            [listContents writeToFile:@(listPath) atomically:NO encoding:NSUTF8StringEncoding error:nil];
+        }
+        init_file("/etc/apt/sources.list.d/undecimus.list", 0, 0644);
+        NSString *repoPath = pathForResource(@"apt");
+        _assert(repoPath != nil, message, true);
+        ensure_directory("/var/lib/undecimus", 0, 0755);
+        ensure_symlink([repoPath UTF8String], "/var/lib/undecimus/apt");
+        if (!pkgIsConfigured("apt1.4") || !aptUpdate()) {
+            NSArray *aptNeeded = resolveDepsForPkg(@"apt1.4", false);
+            _assert(aptNeeded != nil && aptNeeded.count > 0, message, true);
+            NSArray *aptDebs = debsForPkgs(aptNeeded);
+            _assert(installDebs(aptDebs, true), message, true);
+            _assert(aptUpdate(), message, true);
+        }
+        
+        // Workaround for what appears to be an apt bug
+        ensure_symlink("/var/lib/undecimus/apt/./Packages", "/var/lib/apt/lists/_var_lib_undecimus_apt_._Packages");
+        
+        if (debsToInstall.count > 0) {
+            // Install any depends we may have ignored earlier
+            _assert(aptInstall(@[@"-f"]), message, true);
+            debsToInstall = nil;
+        }
+
+        // Dpkg and apt both work now
+        
         if (needStrap) {
-            NSString *strap_tar = pathForResource(@"strap.tar.lzma");
-            _assert(strap_tar != nil, message, true);
-            ArchiveFile *strap = [ArchiveFile archiveWithFile:strap_tar];
-            _assert(strap != nil, message, true);
-            _assert([strap extractToPath:@"/" overWriteDirectories:NO], message, true);
-            rv = system("/usr/libexec/cydia/firmware.sh");
-            _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
-            extractResources();
-            rv = runCommand("/usr/bin/dpkg", "--configure", "-a", NULL);
-            _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             if (!prefs.run_uicache) {
                 prefs.run_uicache = true;
                 _assert(modifyPlist(prefsFile, ^(id plist) {
                     plist[K_REFRESH_ICON_CACHE] = @YES;
                 }), message, true);
             }
-        } else {
-            if (!needResources) {
-                updatedResources = compareInstalledVersion("jailbreak-resources", "lt", bundledResources.UTF8String);
+        }
+        // Now that things are running, let's install the deb for the files we just extracted
+        if (needSubstrate) {
+            if (pkgIsInstalled("com.ex.substitute")) {
+                _assert(removePkg("com.ex.substitute", true), message, true);
             }
-            bool xz_installed = debIsInstalled("xz");
-            if (access("/usr/local/lib/liblzma.5.dylib", F_OK) != ERR_SUCCESS) {
-                LOG("Extracting XZ");
-                xz_installed = false;
-                ArchiveFile *xz_deb = [ArchiveFile archiveWithFile:pathForResource(@"xz.deb")];
-                _assert(xz_deb != nil, message, true);
-                _assert([xz_deb extract:@"data.tar.lzma" toPath:@"/jb/xz.tar.lzma"], message, true);
-                ArchiveFile *xz = [ArchiveFile archiveWithFile:@"/jb/xz.tar.lzma"];
-                _assert(xz != nil, message, true);
-                _assert([xz extractToPath:@"/"], message, true);
-                clean_file("/jb/xz.tar.lzma");
-            } else {
-                LOG("Not extracting XZ");
-            }
-            // Now that things are running, let's install the deb for the files we just extracted
-            if (needResources || updatedResources) {
-                extractResources();
-            } else if (needSubstrate) {
-                if (debIsInstalled("com.ex.substitute")) {
-                    _assert(removePkg("com.ex.substitute", true), message, true);
-                }
-                _assert(installDebs(@[@"substrate-safemode.deb", @"mobilesubstrate.deb"], true), message, true);
-            }
-            if (!xz_installed || !debIsInstalled("lzma") || compareInstalledVersion("lzma", "lt", "2:0")) {
-                installDebs(@[@"lzma.deb", @"xz.deb"], false);
-            }
-            if (!debIsConfigured("libapt-pkg5.0") || !debIsConfigured("libapt") || !debIsConfigured("apt-key") || !debIsConfigured("lz4")) {
-                NSMutableArray *toRemove = [NSMutableArray new];
-                if (debIsInstalled("apt7-lib")) {
-                    [toRemove addObject:@"apt7-lib"];
-                }
-                if (debIsInstalled("apt7")) {
-                    [toRemove addObject:@"apt7"];
-                }
-                if (debIsInstalled("apt7-key")) {
-                    [toRemove addObject:@"apt7-key"];
-                }
-                if (toRemove.count > 0) {
-                    _assert(removePkgs(toRemove, true), message, true);
-                }
-                _assert(installDebs(@[@"libapt.deb", @"libapt-pkg.deb", @"apt-key.deb", @"lz4.deb"], true), message, true);
-            }
-            if (pkgIsBy("CoolStar", "dpkg")) {
-                _assert(installDeb("dpkg.deb", true), message, true);
-            }
+            _assert(aptInstall(@[@"mobilesubstrate"]), message, true);
         }
         NSData *file_data = [[NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber] dataUsingEncoding:NSUTF8StringEncoding];
         if (![[NSData dataWithContentsOfFile:@"/.installed_unc0ver"] isEqual:file_data]) {
             _assert(clean_file("/.installed_unc0ver"), message, true);
             _assert(create_file_data("/.installed_unc0ver", 0, 0644, file_data), message, true);
         }
+        
+        // Make sure everything's at least as new as what we bundled
+        _assert(aptUpgrade(), message, true);
         clean_file("/jb/tar");
         clean_file("/jb/lzma");
         clean_file("/jb/substrate.tar.lzma");
         clean_file("/electra");
         clean_file("/.bootstrapped_electra");
         clean_file("/usr/lib/libjailbreak.dylib");
+
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
         LOG("Successfully extracted bootstrap.");
     }
@@ -1465,17 +1486,6 @@ void exploit()
             _assert(create_file("/.cydia_no_stash", 0, 0644), message, true);
             LOG("Successfully disabled stashing.");
         }
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Repair filesystem.
-        
-        LOG("Repairing filesystem...");
-        SETMESSAGE(NSLocalizedString(@"Failed to repair filesystem.", nil));
-        _assert(ensure_directory("/Library/Caches", 0, S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO), message, true);
-        LOG("Successfully repaired filesystem.");
     }
     
     UPSTAGE();
@@ -1608,11 +1618,7 @@ void exploit()
             // Install OpenSSH.
             LOG("Installing OpenSSH...");
             SETMESSAGE(NSLocalizedString(@"Failed to install OpenSSH.", nil));
-            if (debIsConfigured("openssl") &&
-                compareInstalledVersion("openssl", "lt", "1.0.2q")) {
-                _assert(removePkg("openssl", true), message, false);
-            }
-            _assert(installDebs(@[@"openssh.deb", @"openssl.deb", @"ca-certificates.deb"], false), message, false);
+            _assert(aptInstall(@[@"openssh"]), message, true);
             LOG("Successfully installed OpenSSH.");
             
             // Disable Install OpenSSH.
@@ -1629,7 +1635,7 @@ void exploit()
     UPSTAGE();
     
     {
-        if (debIsInstalled("cydia-gui")) {
+        if (pkgIsInstalled("cydia-gui")) {
             // Remove Electra's Cydia.
             LOG("Removing Electra's Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to remove Electra's Cydia.", nil));
@@ -1653,7 +1659,7 @@ void exploit()
             LOG("Removing Incompatible Sileo...");
             SETMESSAGE(NSLocalizedString(@"Failed to remove incompatible Sileo.", nil));
 
-            if (debIsInstalled("org.coolstar.sileo")) {
+            if (pkgIsInstalled("org.coolstar.sileo")) {
                 _assert(removePkg("org.coolstar.sileo", true), message, true);
                 prefs.run_uicache = true;
                 _assert(modifyPlist(prefsFile, ^(id plist) {
@@ -1662,7 +1668,7 @@ void exploit()
             }
             clean_file("/etc/apt/sources.list.d/sileo.sources");
         }
-        if (debIsInstalled("cydia-upgrade-helper")) {
+        if (pkgIsInstalled("cydia-upgrade-helper")) {
             // Remove Electra's Cydia Upgrade Helper.
             LOG("Removing Electra's Cydia Upgrade Helper...");
             SETMESSAGE(NSLocalizedString(@"Failed to remove Electra's Cydia Upgrade Helper.", nil));
@@ -1702,8 +1708,9 @@ void exploit()
             
             LOG("Installing Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to install Cydia.", nil));
-            // Force depends because Sileo breaks this with depending "newer" Cydia
-            _assert(installDebs(@[@"cydia.deb", @"cydia-lproj.deb"], true), message, true);
+            NSString *cydiaVer = versionOfPkg(@"cydia");
+            _assert(cydiaVer!=nil, message, true);
+            _assert(aptInstall(@[@"--reinstall", [@"cydia" stringByAppendingFormat:@"=%@", cydiaVer]]), message, true);
             LOG("Successfully installed Cydia.");
             
             // Disable Install Cydia.
@@ -1737,8 +1744,9 @@ void exploit()
                         "do echo loading $a;"
                         "launchctl load \"$a\" ;"
                     "done; ");
+            // Substrate is already running, no need to run it again
             system("for file in /etc/rc.d/*; do "
-                        "if [[ -x \"$file\" ]]; then "
+                        "if [[ -x \"$file\" && \"$file\" != \"/etc/rc.d/substrate\" ]]; then "
                             "\"$file\";"
                          "fi;"
                     "done");

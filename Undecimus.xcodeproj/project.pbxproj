@@ -12,9 +12,6 @@
 		212D8844216E4C4800A36DA5 /* find_port.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8842216E4C4700A36DA5 /* find_port.c */; };
 		212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8846216E4DF600A36DA5 /* early_kalloc.c */; };
 		212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8849216E4EBE00A36DA5 /* async_wake.c */; };
-		2139534C21763A0C00B17F8D /* rsync.tar in Resources */ = {isa = PBXBuildFile; fileRef = 2139534B21763A0B00B17F8D /* rsync.tar */; };
-		21466CDC21AEEA3A00B99B4C /* injector.deb in Resources */ = {isa = PBXBuildFile; fileRef = 21466CDB21AEEA3A00B99B4C /* injector.deb */; };
-		21466CDE21AEEC9200B99B4C /* spawn.deb in Resources */ = {isa = PBXBuildFile; fileRef = 21466CDD21AEEC9200B99B4C /* spawn.deb */; };
 		2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */; };
 		2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
@@ -29,30 +26,15 @@
 		21C0FC8A21369EE900849420 /* KernelStructureOffsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8621369EE900849420 /* KernelStructureOffsets.m */; };
 		21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C130DE214BC2880021AA9D /* unlocknvram.c */; };
 		21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130EA214C03690021AA9D /* CreditsTableViewController.m */; };
-		21C13110214C2E570021AA9D /* strap.tar.lzma in Resources */ = {isa = PBXBuildFile; fileRef = 21C1310F214C2E570021AA9D /* strap.tar.lzma */; };
 		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		21F4D70E21FC7A590070D5E0 /* patchfinder64.c in Sources */ = {isa = PBXBuildFile; fileRef = 21F4D70C21FC7A590070D5E0 /* patchfinder64.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */; };
 		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		222AD59321FA731800DCBA2A /* FakeApt.m in Sources */ = {isa = PBXBuildFile; fileRef = 222AD59221FA731800DCBA2A /* FakeApt.m */; };
 		225D142221E052960045493D /* ArchiveFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 225D142121E052960045493D /* ArchiveFile.m */; };
-		225D142521E0593E0045493D /* mobilesubstrate.deb in Resources */ = {isa = PBXBuildFile; fileRef = 225D142421E0593E0045493D /* mobilesubstrate.deb */; };
 		226689DD21EC1C5A00262F66 /* libarchive.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 226689DC21EC1C5A00262F66 /* libarchive.2.tbd */; };
-		229BC6C721F85D6C0061D89D /* libapt-pkg.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229BC6C621F85D6C0061D89D /* libapt-pkg.deb */; };
-		229BC6C921F860830061D89D /* libapt.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229BC6C821F860830061D89D /* libapt.deb */; };
-		229BC6CB21F860EF0061D89D /* lz4.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229BC6CA21F860EF0061D89D /* lz4.deb */; };
-		229BC6CD21F861CD0061D89D /* apt-key.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229BC6CC21F861CD0061D89D /* apt-key.deb */; };
-		229BC6CF21F869920061D89D /* dpkg.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229BC6CE21F869910061D89D /* dpkg.deb */; };
-		229F753421E688B50024E44B /* substrate-safemode.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229F753321E688B50024E44B /* substrate-safemode.deb */; };
-		229F753621E68B520024E44B /* lzma.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229F753521E68B520024E44B /* lzma.deb */; };
-		229F753821E68B7C0024E44B /* xz.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229F753721E68B7B0024E44B /* xz.deb */; };
 		22C546AB21A8A8FD00EFC09C /* utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C546AA21A8A8FD00EFC09C /* utils.m */; };
-		22C546C721A8D8AC00EFC09C /* ca-certificates.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C321A8D7FA00EFC09C /* ca-certificates.deb */; };
-		22C546C821A8D8AC00EFC09C /* cydia-lproj.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C621A8D7FA00EFC09C /* cydia-lproj.deb */; };
-		22C546C921A8D8AC00EFC09C /* cydia.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C521A8D7FA00EFC09C /* cydia.deb */; };
-		22C546CA21A8D8AC00EFC09C /* openssh.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C221A8D7FA00EFC09C /* openssh.deb */; };
-		22C546CB21A8D8AC00EFC09C /* openssl.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C421A8D7FA00EFC09C /* openssl.deb */; };
-		22C546CC21A8D8AC00EFC09C /* resources.deb in Resources */ = {isa = PBXBuildFile; fileRef = 22C546C121A8D7DA00EFC09C /* resources.deb */; };
 		22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 22CFED9121CDFE6B00A216BE /* libmis.tbd */; };
 		22F91CDB21E02CF300B2FCAE /* inject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CD921E02CF200B2FCAE /* inject.m */; };
 		22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CE221E033A500B2FCAE /* libsnappy.c */; };
@@ -73,10 +55,7 @@
 		212D8846216E4DF600A36DA5 /* early_kalloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = early_kalloc.c; sourceTree = "<group>"; };
 		212D8848216E4EBE00A36DA5 /* async_wake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = async_wake.h; sourceTree = "<group>"; };
 		212D8849216E4EBE00A36DA5 /* async_wake.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = async_wake.c; sourceTree = "<group>"; };
-		2139534B21763A0B00B17F8D /* rsync.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = rsync.tar; sourceTree = "<group>"; };
 		21395357217CBA1000B17F8D /* MobileGestalt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileGestalt.h; sourceTree = "<group>"; };
-		21466CDB21AEEA3A00B99B4C /* injector.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = injector.deb; sourceTree = "<group>"; };
-		21466CDD21AEEC9200B99B4C /* spawn.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = spawn.deb; sourceTree = "<group>"; };
 		21A97FC42148103A00DC0023 /* KernelExecution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KernelExecution.h; sourceTree = "<group>"; };
 		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
 		21A97FC62148103B00DC0023 /* remote_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_memory.c; sourceTree = "<group>"; };
@@ -109,7 +88,6 @@
 		21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsTableViewController.m; sourceTree = "<group>"; };
 		21C130E9214C03690021AA9D /* CreditsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CreditsTableViewController.h; sourceTree = "<group>"; };
 		21C130EA214C03690021AA9D /* CreditsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CreditsTableViewController.m; sourceTree = "<group>"; };
-		21C1310F214C2E570021AA9D /* strap.tar.lzma */ = {isa = PBXFileReference; lastKnownFileType = file; path = strap.tar.lzma; sourceTree = "<group>"; };
 		21C13117214D268F0021AA9D /* multi_path_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = multi_path_sploit.c; sourceTree = "<group>"; };
 		21C13118214D268F0021AA9D /* multi_path_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multi_path_sploit.h; sourceTree = "<group>"; };
 		21C1312E214D5A710021AA9D /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
@@ -117,28 +95,15 @@
 		21F4D70C21FC7A590070D5E0 /* patchfinder64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = patchfinder64.c; path = patchfinder64/patchfinder64.c; sourceTree = SOURCE_ROOT; };
 		21F4D70D21FC7A590070D5E0 /* patchfinder64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = patchfinder64.h; path = patchfinder64/patchfinder64.h; sourceTree = SOURCE_ROOT; };
 		21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Painting_With_Chocolate.ttf; sourceTree = "<group>"; };
+		222AD59221FA731800DCBA2A /* FakeApt.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FakeApt.m; sourceTree = "<group>"; };
+		222AD59421FA732A00DCBA2A /* FakeApt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FakeApt.h; sourceTree = "<group>"; };
 		225D142121E052960045493D /* ArchiveFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ArchiveFile.m; sourceTree = "<group>"; };
 		225D142321E055E90045493D /* ArchiveFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArchiveFile.h; sourceTree = "<group>"; };
-		225D142421E0593E0045493D /* mobilesubstrate.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = mobilesubstrate.deb; sourceTree = "<group>"; };
 		226689DA21EC145000262F66 /* archive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = archive.h; sourceTree = "<group>"; };
 		226689DB21EC145000262F66 /* libproc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libproc.h; sourceTree = "<group>"; };
 		226689DC21EC1C5A00262F66 /* libarchive.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libarchive.2.tbd; path = usr/lib/libarchive.2.tbd; sourceTree = SDKROOT; };
-		229BC6C621F85D6C0061D89D /* libapt-pkg.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libapt-pkg.deb"; sourceTree = "<group>"; };
-		229BC6C821F860830061D89D /* libapt.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapt.deb; sourceTree = "<group>"; };
-		229BC6CA21F860EF0061D89D /* lz4.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = lz4.deb; sourceTree = "<group>"; };
-		229BC6CC21F861CD0061D89D /* apt-key.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "apt-key.deb"; sourceTree = "<group>"; };
-		229BC6CE21F869910061D89D /* dpkg.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = dpkg.deb; sourceTree = "<group>"; };
-		229F753321E688B50024E44B /* substrate-safemode.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "substrate-safemode.deb"; sourceTree = "<group>"; };
-		229F753521E68B520024E44B /* lzma.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = lzma.deb; sourceTree = "<group>"; };
-		229F753721E68B7B0024E44B /* xz.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = xz.deb; sourceTree = "<group>"; };
 		22C546AA21A8A8FD00EFC09C /* utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = utils.m; sourceTree = "<group>"; wrapsLines = 1; };
 		22C546AC21A8A91A00EFC09C /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
-		22C546C121A8D7DA00EFC09C /* resources.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = resources.deb; sourceTree = "<group>"; };
-		22C546C221A8D7FA00EFC09C /* openssh.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = openssh.deb; sourceTree = "<group>"; };
-		22C546C321A8D7FA00EFC09C /* ca-certificates.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "ca-certificates.deb"; sourceTree = "<group>"; };
-		22C546C421A8D7FA00EFC09C /* openssl.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = openssl.deb; sourceTree = "<group>"; };
-		22C546C521A8D7FA00EFC09C /* cydia.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = cydia.deb; sourceTree = "<group>"; };
-		22C546C621A8D7FA00EFC09C /* cydia-lproj.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "cydia-lproj.deb"; sourceTree = "<group>"; };
 		22CFED9121CDFE6B00A216BE /* libmis.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libmis.tbd; path = usr/lib/libmis.tbd; sourceTree = SDKROOT; };
 		22F91CD921E02CF200B2FCAE /* inject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = inject.m; path = Injector/inject.m; sourceTree = SOURCE_ROOT; };
 		22F91CDA21E02CF300B2FCAE /* inject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inject.h; path = Injector/inject.h; sourceTree = SOURCE_ROOT; };
@@ -208,26 +173,7 @@
 		2170BD3621B192B90059BD10 /* resources */ = {
 			isa = PBXGroup;
 			children = (
-				229BC6CC21F861CD0061D89D /* apt-key.deb */,
-				229BC6CE21F869910061D89D /* dpkg.deb */,
-				229F753721E68B7B0024E44B /* xz.deb */,
-				229BC6C821F860830061D89D /* libapt.deb */,
-				229BC6C621F85D6C0061D89D /* libapt-pkg.deb */,
-				229BC6CA21F860EF0061D89D /* lz4.deb */,
-				229F753521E68B520024E44B /* lzma.deb */,
-				229F753321E688B50024E44B /* substrate-safemode.deb */,
-				225D142421E0593E0045493D /* mobilesubstrate.deb */,
 				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
-				21466CDD21AEEC9200B99B4C /* spawn.deb */,
-				21466CDB21AEEA3A00B99B4C /* injector.deb */,
-				22C546C321A8D7FA00EFC09C /* ca-certificates.deb */,
-				22C546C621A8D7FA00EFC09C /* cydia-lproj.deb */,
-				22C546C521A8D7FA00EFC09C /* cydia.deb */,
-				22C546C221A8D7FA00EFC09C /* openssh.deb */,
-				22C546C421A8D7FA00EFC09C /* openssl.deb */,
-				22C546C121A8D7DA00EFC09C /* resources.deb */,
-				2139534B21763A0B00B17F8D /* rsync.tar */,
-				21C1310F214C2E570021AA9D /* strap.tar.lzma */,
 				21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */,
 			);
 			path = resources;
@@ -278,6 +224,8 @@
 				21C130DF214BC2880021AA9D /* unlocknvram.h */,
 				22C546AC21A8A91A00EFC09C /* utils.h */,
 				22C546AA21A8A8FD00EFC09C /* utils.m */,
+				222AD59421FA732A00DCBA2A /* FakeApt.h */,
+				222AD59221FA731800DCBA2A /* FakeApt.m */,
 			);
 			path = source;
 			sourceTree = "<group>";
@@ -409,29 +357,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				229BC6CF21F869920061D89D /* dpkg.deb in Resources */,
-				229BC6CD21F861CD0061D89D /* apt-key.deb in Resources */,
-				229BC6CB21F860EF0061D89D /* lz4.deb in Resources */,
-				229BC6C921F860830061D89D /* libapt.deb in Resources */,
-				229BC6C721F85D6C0061D89D /* libapt-pkg.deb in Resources */,
-				229F753821E68B7C0024E44B /* xz.deb in Resources */,
-				229F753621E68B520024E44B /* lzma.deb in Resources */,
-				229F753421E688B50024E44B /* substrate-safemode.deb in Resources */,
-				225D142521E0593E0045493D /* mobilesubstrate.deb in Resources */,
-				21466CDE21AEEC9200B99B4C /* spawn.deb in Resources */,
-				21466CDC21AEEA3A00B99B4C /* injector.deb in Resources */,
-				22C546C721A8D8AC00EFC09C /* ca-certificates.deb in Resources */,
-				22C546C821A8D8AC00EFC09C /* cydia-lproj.deb in Resources */,
-				22C546C921A8D8AC00EFC09C /* cydia.deb in Resources */,
-				22C546CA21A8D8AC00EFC09C /* openssh.deb in Resources */,
-				22C546CB21A8D8AC00EFC09C /* openssl.deb in Resources */,
-				22C546CC21A8D8AC00EFC09C /* resources.deb in Resources */,
-				21C13110214C2E570021AA9D /* strap.tar.lzma in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
 				8D592A68218E47F60035D2BC /* Main.storyboard in Resources */,
 				21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */,
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
-				2139534C21763A0C00B17F8D /* rsync.tar in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -475,6 +404,7 @@
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
 				212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */,
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
+				222AD59321FA731800DCBA2A /* FakeApt.m in Sources */,
 				21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */,
 				21C0FC8A21369EE900849420 /* KernelStructureOffsets.m in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,

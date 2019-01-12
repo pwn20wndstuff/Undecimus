@@ -14,12 +14,15 @@
 @property (strong,readonly) NSArray <NSString*> *files;
 
 +(ArchiveFile*)archiveWithFile:(NSString*)filename;
++(ArchiveFile*)archiveWithFd:(int)fd;
 -(ArchiveFile*)initWithFile:(NSString*)filename;
+-(ArchiveFile*)initWithFd:(int)fd;
 -(BOOL)contains:(NSString*)file;
 -(NSArray <NSString*> *)files;
 -(BOOL)extract;
--(BOOL)extractWithFlags:(int)flags;
+-(BOOL)extractFileNum:(int)fileNum toFd:(int)fd;
 -(BOOL)extract:(NSString*)file toPath:(NSString*)path;
+-(BOOL)extractWithFlags:(int)flags;
 -(BOOL)extractToPath:(NSString*)path;
 -(BOOL)extractToPath:(NSString*)path overWriteDirectories:(BOOL)overwrite_dirs;
 -(BOOL)extractToPath:(NSString*)path withFlags:(int)flags;

@@ -17,6 +17,7 @@
 #include <sys/utsname.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#import "ArchiveFile.h"
 #import "utils.h"
 
 extern char **environ;
@@ -146,22 +147,22 @@ int systemf(const char *cmd, ...) {
     return system([cmdstr UTF8String]);
 }
 
-bool debIsInstalled(char *packageID) {
-    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep -i ^Status: | grep -q \"install ok\"", packageID);
+bool pkgIsInstalled(char *packageID) {
+    int rv = systemf("/usr/bin/dpkg -s \"%s\" 2>/dev/null | grep -i ^Status: | grep -q \"install ok\"", packageID);
     bool isInstalled = !WEXITSTATUS(rv);
     LOG("Deb: \"%s\" is%s installed", packageID, isInstalled?"":" not");
     return isInstalled;
 }
 
-bool debIsConfigured(char *packageID) {
-    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep -i ^Status: | grep -q \"install ok installed\"", packageID);
+bool pkgIsConfigured(char *packageID) {
+    int rv = systemf("/usr/bin/dpkg -s \"%s\" 2>/dev/null | grep -i ^Status: | grep -q \"install ok installed\"", packageID);
     bool isConfigured = !WEXITSTATUS(rv);
     LOG("Deb: \"%s\" is%s installed", packageID, isConfigured?"":" not");
     return isConfigured;
 }
 
 bool pkgIsBy(const char *maintainer, const char *packageID) {
-    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep -i ^Maintainer: | grep -qi \"%s\"", packageID, maintainer);
+    int rv = systemf("/usr/bin/dpkg -s \"%s\" 2>/dev/null | grep -i ^Maintainer: | grep -qi \"%s\"", packageID, maintainer);
     bool isBy = !WEXITSTATUS(rv);
     LOG("Deb: \"%s\" is%s by %s", packageID, isBy?"":" not", maintainer);
     return isBy;
@@ -192,15 +193,7 @@ bool runDpkg(NSArray <NSString*> *args, bool forceDeps) {
         [command addObjectsFromArray:@[@"--force-depends", @"--force-remove-essential"]];
     }
     for (NSString *arg in args) {
-        if ([arg hasSuffix:@".deb"]) {
-            NSString *path = pathForResource(arg);
-            if (path == nil) {
-                return false;
-            }
-            [command addObject:path];
-        } else {
-            [command addObject:arg];
-        }
+        [command addObject:arg];
     }
     const char *argv[command.count];
     for (int i=0; i<[command count]; i++) {
@@ -211,7 +204,49 @@ bool runDpkg(NSArray <NSString*> *args, bool forceDeps) {
     return !WEXITSTATUS(rv);
 }
 
-bool installDeb(char *debName, bool forceDeps) {
+bool extractDeb(NSString *debPath) {
+    if (![debPath hasSuffix:@".deb"]) {
+        LOG(@"%@: not a deb", debPath);
+        return NO;
+    }
+    if ([debPath containsString:@"firmware-sbin"]) {
+        // No, just no.
+        return YES;
+    }
+    NSPipe *pipe = [NSPipe pipe];
+    if (pipe == nil) {
+        LOG(@"Unable to make a pipe!");
+        return NO;
+    }
+    ArchiveFile *deb = [ArchiveFile archiveWithFile:debPath];
+    if (deb == nil) {
+        return NO;
+    }
+    ArchiveFile *tar = [ArchiveFile archiveWithFd:pipe.fileHandleForReading.fileDescriptor];
+    if (tar == nil) {
+        return NO;
+    }
+    LOG("Extracting %@", debPath);
+    dispatch_queue_t extractionQueue = dispatch_queue_create(NULL, NULL);
+    dispatch_async(extractionQueue, ^{
+        [deb extractFileNum:3 toFd:pipe.fileHandleForWriting.fileDescriptor];
+    });
+    return [tar extractToPath:@"/"];
+}
+
+bool extractDebs(NSArray <NSString *> *debPaths) {
+    if ([debPaths count] < 1) {
+        LOG("%s: Nothing to install", __FUNCTION__);
+        return false;
+    }
+    for (NSString *debPath in debPaths) {
+        if (!extractDeb(debPath))
+            return NO;
+    }
+    return YES;
+}
+
+bool installDeb(const char *debName, bool forceDeps) {
     return runDpkg(@[@"-i", @(debName)], forceDeps);
 }
 
@@ -233,6 +268,41 @@ bool removePkgs(NSArray <NSString*> *pkgs, bool forceDeps) {
         return false;
     }
     return runDpkg([@[@"-r"] arrayByAddingObjectsFromArray:pkgs], forceDeps);
+}
+
+bool runApt(NSArray <NSString*> *args) {
+    if ([args count] < 1) {
+        LOG("%s: Nothing to do", __FUNCTION__);
+        return false;
+    }
+    NSMutableArray <NSString*> *command = [NSMutableArray arrayWithArray:@[
+                        @"/usr/bin/apt-get",
+                        @"-o", @"Dir::Etc::sourcelist=sources.list.d/undecimus.list",
+                        @"-o", @"Dir::Etc::sourceparts=-",
+                        @"-o", @"APT::Get::List-Cleanup=0"
+                        ]];
+    [command addObjectsFromArray:args];
+    
+    const char *argv[command.count];
+    for (int i=0; i<[command count]; i++) {
+        argv[i] = [command[i] UTF8String];
+    }
+    argv[command.count] = NULL;
+    int rv = runCommandv(argv[0], (int)[command count], argv, NULL);
+    return !WEXITSTATUS(rv);
+}
+
+bool aptUpdate() {
+    return runApt(@[@"update"]);
+}
+
+bool aptInstall(NSArray <NSString*> *pkgs) {
+    return runApt([@[@"-y", @"--allow-unauthenticated", @"--allow-downgrades", @"install"]
+                     arrayByAddingObjectsFromArray:pkgs]);
+}
+
+bool aptUpgrade() {
+    return runApt(@[@"-y", @"--allow-unauthenticated", @"--allow-downgrades", @"-f", @"dist-upgrade"]);
 }
 
 bool is_symlink(const char *filename) {
@@ -323,6 +393,40 @@ bool ensure_symlink(const char *to, const char *from) {
         }
     }
     return true;
+}
+
+bool ensure_file(const char *file, int owner, mode_t mode) {
+    NSString *path = @(file);
+    NSFileManager *fm = [NSFileManager defaultManager];
+    id attributes = [fm attributesOfItemAtPath:path error:nil];
+    if (attributes &&
+        [attributes[NSFileType] isEqual:NSFileTypeDirectory] &&
+        [attributes[NSFileOwnerAccountID] isEqual:@(owner)] &&
+        [attributes[NSFileGroupOwnerAccountID] isEqual:@(owner)] &&
+        [attributes[NSFilePosixPermissions] isEqual:@(mode)]
+        ) {
+        // Directory exists and matches arguments
+        return true;
+    }
+    if (attributes) {
+        if ([attributes[NSFileType] isEqual:NSFileTypeRegular]) {
+            // Item exists and is a file
+            return [fm setAttributes:@{
+                                       NSFileOwnerAccountID: @(owner),
+                                       NSFileGroupOwnerAccountID: @(owner),
+                                       NSFilePosixPermissions: @(mode)
+                                       } ofItemAtPath:path error:nil];
+        } else if (![fm removeItemAtPath:path error:nil]) {
+            // Item exists and is not a file but could not be removed
+            return false;
+        }
+    }
+    // Item does not exist at this point
+    return [fm createFileAtPath:path contents:nil attributes:@{
+                               NSFileOwnerAccountID: @(owner),
+                               NSFileGroupOwnerAccountID: @(owner),
+                               NSFilePosixPermissions: @(mode)
+                               }];
 }
 
 bool mode_is(const char *filename, mode_t mode) {
@@ -435,7 +539,7 @@ int runCommand(const char *cmd, ...) {
 }
 
 NSString *pathForResource(NSString *resource) {
-    NSString *path = [sourcePath stringByAppendingPathComponent:resource];
+    NSString *path = [[sourcePath stringByAppendingPathComponent:resource] stringByStandardizingPath];
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         return nil;
     }

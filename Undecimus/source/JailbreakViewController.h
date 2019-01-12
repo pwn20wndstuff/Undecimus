@@ -28,26 +28,6 @@ while (false)
 
 #define NOTICE(msg, wait, destructive) showAlert(@"Notice", msg, wait, destructive)
 
-static inline void showAlert(NSString *title, NSString *message, Boolean wait, Boolean destructive) {
-    dispatch_semaphore_t semaphore;
-    if (wait)
-        semaphore = dispatch_semaphore_create(0);
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[[[[UIApplication sharedApplication] delegate] window] rootViewController] dismissViewControllerAnimated:YES completion:nil];
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:destructive ? UIAlertActionStyleDestructive : UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (wait)
-                dispatch_semaphore_signal(semaphore);
-        }];
-        [alertController addAction:OK];
-        [alertController setPreferredAction:OK];
-        [[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentViewController:alertController animated:YES completion:nil];
-    });
-    if (wait)
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-}
-
 @interface JailbreakViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UIButton *goButton;
 @property (weak, nonatomic) IBOutlet UITextView *outputView;
@@ -65,3 +45,23 @@ NSString *hexFromInt(NSInteger val);
 
 @end
 
+static inline void showAlert(NSString *title, NSString *message, Boolean wait, Boolean destructive) {
+    dispatch_semaphore_t semaphore;
+    if (wait)
+        semaphore = dispatch_semaphore_create(0);
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        JailbreakViewController *controller = [JailbreakViewController sharedController];
+        [controller dismissViewControllerAnimated:YES completion:nil];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:destructive ? UIAlertActionStyleDestructive : UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            if (wait)
+                dispatch_semaphore_signal(semaphore);
+        }];
+        [alertController addAction:OK];
+        [alertController setPreferredAction:OK];
+        [controller presentViewController:alertController animated:YES completion:nil];
+    });
+    if (wait)
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+}

@@ -31,7 +31,7 @@
 }
 
 -(NSString*)readDataFromFD:(int)infd toFD:(int)outfd {
-    char s[0x1000];
+    char s[0x10000];
 
     ssize_t nread = read(infd, s, sizeof(s));
     if (nread > 0) {

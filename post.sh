@@ -5,6 +5,17 @@ if [ -f ~/.profile ]; then
     . ~/.profile
 fi
 
+rm -rf "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/apt"
+rm -f "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/"*.deb
+rsync -a "${SOURCE_ROOT}/apt" "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/"
+
+pushd "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/apt"
+dpkg-scanpackages . > Packages
+cd ..
+# Make sure these files exist and there is only one of them
+ln -s apt/jailbreak-resources_*.deb resources.deb
+popd
+
 RESOURCES_VERSION="$(dpkg --info ${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/resources.deb | grep Version: | awk '{print $2}')"
 if [ -z "${RESOURCES_VERSION}" ]; then
     echo "dpkg not found or resources.deb missing"
