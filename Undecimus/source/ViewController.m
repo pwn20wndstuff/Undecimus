@@ -1183,7 +1183,11 @@ void exploit(mach_port_t tfp0,
                 free(snapshots);
                 snapshots = NULL;
             }
-            _assert(fs_snapshot_rename(rootfd, copySystemSnapshot(), origfs, 0) == ERR_SUCCESS, message, true);
+            char *systemSnapshot = copySystemSnapshot();
+            _assert(systemSnapshot != NULL, message, true);
+            _assert(fs_snapshot_rename(rootfd, systemSnapshot, origfs, 0) == ERR_SUCCESS, message, true);
+            free(systemSnapshot);
+            systemSnapshot = NULL;
             LOG("Successfully renamed system snapshot.");
             
             // Reboot.
