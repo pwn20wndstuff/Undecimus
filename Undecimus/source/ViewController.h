@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#include <common.h>
+#import "common.h"
 
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
