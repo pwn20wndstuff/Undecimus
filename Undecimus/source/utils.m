@@ -123,7 +123,7 @@ bool debIsConfigured(char *packageID) {
 }
 
 bool compareInstalledVersion(const char *packageID, const char *op, const char *version) {
-    int rv = systemf("dpkg --compare-versions $(dpkg-query --showformat='${Version}' --show \"%s\") \"%s\" \"%s\"",
+    int rv = systemf("/usr/bin/dpkg --compare-versions $(dpkg-query --showformat='${Version}' --show \"%s\") \"%s\" \"%s\"",
                       packageID, op, version);
     rv = !WEXITSTATUS(rv);
     LOG("Deb %s is%s %s %s", packageID, rv?"":" not", op, version);
@@ -147,7 +147,7 @@ bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
     }
     NSMutableArray <NSString*> *command = [NSMutableArray
                 arrayWithArray:@[
-                        @"dpkg",
+                        @"/usr/bin/dpkg",
                         @"--force-bad-path",
                         @"--force-configure-any",
                      ]];
@@ -167,6 +167,7 @@ bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
     for (int i=0; i<[command count]; i++) {
         argv[i] = [command[i] UTF8String];
     }
+    argv[command.count] = NULL;
     int rv = runCommandv("/usr/bin/dpkg", (int)[command count], argv);
     return !WEXITSTATUS(rv);
 }
@@ -209,6 +210,51 @@ bool is_directory(const char *filename) {
         return false;
     }
     return S_ISDIR(buf.st_mode);
+}
+
+bool ensure_directory(const char *directory, int owner, mode_t mode) {
+    NSString *path = @(directory);
+    NSFileManager *fm = [NSFileManager defaultManager];
+    id attributes = [fm attributesOfItemAtPath:path error:nil];
+    if (!attributes ||
+        ![attributes[NSFileType] isEqual:NSFileTypeDirectory] ||
+        ![attributes[NSFileOwnerAccountID] isEqual:@(owner)] ||
+        ![attributes[NSFileGroupOwnerAccountID] isEqual:@(owner)] ||
+        ![attributes[NSFilePosixPermissions] isEqual:@(mode)]
+        ) {
+        if (attributes) {
+            return [fm setAttributes:@{
+                                NSFileOwnerAccountID: @(owner),
+                                NSFileGroupOwnerAccountID: @(owner),
+                                NSFilePosixPermissions: @(mode)
+                            } ofItemAtPath:path error:nil];
+        } else {
+            return [fm createDirectoryAtPath:path withIntermediateDirectories:YES attributes:@{
+                               NSFileOwnerAccountID: @(owner),
+                               NSFileGroupOwnerAccountID: @(owner),
+                               NSFilePosixPermissions: @(mode)
+                           } error:nil];
+        }
+    }
+    return true;
+}
+
+bool ensure_symlink(const char *to, const char *from) {
+    ssize_t wantedLength = strlen(to);
+    ssize_t maxLen = wantedLength + 1;
+    char link[maxLen];
+    ssize_t linkLength = readlink(from, link, sizeof(link));
+    if (linkLength != wantedLength ||
+        strncmp(link, to, maxLen) != ERR_SUCCESS
+        ) {
+        if (!clean_file(from)) {
+            return false;
+        }
+        if (symlink(to, from) != ERR_SUCCESS) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool mode_is(const char *filename, mode_t mode) {

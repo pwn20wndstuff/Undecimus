@@ -38,8 +38,10 @@ static inline bool create_file(const char *file, int owner, mode_t mode) {
 
 static inline bool clean_file(const char *file) {
     NSString *path = @(file);
-    return (![[NSFileManager defaultManager] fileExistsAtPath:path] ||
-            [[NSFileManager defaultManager] removeItemAtPath:path error:nil]);
+    if ([[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil]) {
+        return [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    }
+    return YES;
 }
 
 static inline bool init_file(const char *file, int owner, mode_t mode) {
@@ -66,6 +68,8 @@ bool pidFileIsValid(NSString *pidfile);
 bool pspawnHookLoaded(void);
 bool is_symlink(const char *filename);
 bool is_directory(const char *filename);
+bool ensure_directory(const char *directory, int owner, mode_t mode);
+bool ensure_symlink(const char *to, const char *from);
 bool mode_is(const char *filename, mode_t mode);
 int runCommandv(const char *cmd, int argc, const char * const*argv);
 int runCommand(const char *cmd, ...);
