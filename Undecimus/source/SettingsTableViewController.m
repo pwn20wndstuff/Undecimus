@@ -177,20 +177,20 @@
     md[@"Sources"] = [SettingsTableViewController sourcesFromFile:CYDIA_LIST];
     md[@"Packages"] = [SettingsTableViewController parsedPackageArray];
     md[@"Preferences"] = [[NSMutableDictionary alloc] init];
-    md[@"Preferences"][@"TweakInjection"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_TWEAK_INJECTION];
-    md[@"Preferences"][@"LoadDaemons"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_LOAD_DAEMONS];
-    md[@"Preferences"][@"DumpAPTicket"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_DUMP_APTICKET];
-    md[@"Preferences"][@"RefreshIconCache"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_REFRESH_ICON_CACHE];
-    md[@"Preferences"][@"BootNonce"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE];
-    md[@"Preferences"][@"Exploit"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPLOIT];
-    md[@"Preferences"][@"DisableAutoUpdates"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_DISABLE_AUTO_UPDATES];
-    md[@"Preferences"][@"DisableAppRevokes"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_DISABLE_APP_REVOKES];
-    md[@"Preferences"][@"OverwriteBootNonce"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_OVERWRITE_BOOT_NONCE];
-    md[@"Preferences"][@"ExportKernelTaskPort"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_EXPORT_KERNEL_TASK_PORT];
-    md[@"Preferences"][@"RestoreRootFS"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_RESTORE_ROOTFS];
-    md[@"Preferences"][@"IncreaseMemoryLimit"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_INCREASE_MEMORY_LIMIT];
-    md[@"Preferences"][@"InstallCydia"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_INSTALL_CYDIA];
-    md[@"Preferences"][@"InstallOpenSSH"] = [[NSUserDefaults standardUserDefaults] objectForKey:@K_INSTALL_OPENSSH];
+    md[@"Preferences"][@"TweakInjection"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_TWEAK_INJECTION];
+    md[@"Preferences"][@"LoadDaemons"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_LOAD_DAEMONS];
+    md[@"Preferences"][@"DumpAPTicket"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_DUMP_APTICKET];
+    md[@"Preferences"][@"RefreshIconCache"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_REFRESH_ICON_CACHE];
+    md[@"Preferences"][@"BootNonce"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_BOOT_NONCE];
+    md[@"Preferences"][@"Exploit"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_EXPLOIT];
+    md[@"Preferences"][@"DisableAutoUpdates"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_DISABLE_AUTO_UPDATES];
+    md[@"Preferences"][@"DisableAppRevokes"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_DISABLE_APP_REVOKES];
+    md[@"Preferences"][@"OverwriteBootNonce"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_OVERWRITE_BOOT_NONCE];
+    md[@"Preferences"][@"ExportKernelTaskPort"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_EXPORT_KERNEL_TASK_PORT];
+    md[@"Preferences"][@"RestoreRootFS"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_RESTORE_ROOTFS];
+    md[@"Preferences"][@"IncreaseMemoryLimit"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_INCREASE_MEMORY_LIMIT];
+    md[@"Preferences"][@"InstallCydia"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_INSTALL_CYDIA];
+    md[@"Preferences"][@"InstallOpenSSH"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_INSTALL_OPENSSH];
     md[@"AppVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     md[@"LogFile"] = [NSString stringWithContentsOfFile:[NSString stringWithUTF8String:LOG_FILE] encoding:NSUTF8StringEncoding error:nil];
     return md;
@@ -225,46 +225,46 @@
 }
 
 - (void)reloadData {
-    [self.TweakInjectionSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_TWEAK_INJECTION]];
-    [self.LoadDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_LOAD_DAEMONS]];
-    [self.DumpAPTicketSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DUMP_APTICKET]];
-    [self.BootNonceTextField setPlaceholder:[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE]];
+    [self.TweakInjectionSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_TWEAK_INJECTION]];
+    [self.LoadDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_LOAD_DAEMONS]];
+    [self.DumpAPTicketSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_DUMP_APTICKET]];
+    [self.BootNonceTextField setPlaceholder:[[NSUserDefaults standardUserDefaults] objectForKey:K_BOOT_NONCE]];
     [self.BootNonceTextField setText:nil];
-    [self.RefreshIconCacheSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_REFRESH_ICON_CACHE]];
-    [self.KernelExploitSegmentedControl setSelectedSegmentIndex:[[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]];
-    [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_AUTO_UPDATES]];
-    [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_DISABLE_APP_REVOKES]];
+    [self.RefreshIconCacheSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_REFRESH_ICON_CACHE]];
+    [self.KernelExploitSegmentedControl setSelectedSegmentIndex:[[NSUserDefaults standardUserDefaults] integerForKey:K_EXPLOIT]];
+    [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_DISABLE_AUTO_UPDATES]];
+    [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_DISABLE_APP_REVOKES]];
     [self.KernelExploitSegmentedControl setEnabled:supportsExploit(empty_list) forSegmentAtIndex:0];
     [self.KernelExploitSegmentedControl setEnabled:supportsExploit(multi_path) forSegmentAtIndex:1];
     [self.KernelExploitSegmentedControl setEnabled:supportsExploit(async_wake) forSegmentAtIndex:2];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
     [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[SettingsTableViewController _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, NSLocalizedString(@"Days", nil)]];
-    [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_OVERWRITE_BOOT_NONCE]];
-    [self.ExportKernelTaskPortSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_EXPORT_KERNEL_TASK_PORT]];
-    [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RESTORE_ROOTFS]];
+    [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_OVERWRITE_BOOT_NONCE]];
+    [self.ExportKernelTaskPortSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_EXPORT_KERNEL_TASK_PORT]];
+    [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_RESTORE_ROOTFS]];
     [self.UptimeLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)uptime() / 86400, NSLocalizedString(@"Days", nil)]];
-    [self.IncreaseMemoryLimitSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INCREASE_MEMORY_LIMIT]];
-    [self.installSSHSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_OPENSSH]];
-    [self.installCydiaSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_INSTALL_CYDIA]];
-    [self.ECIDLabel setPlaceholder:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
-    [self.ReloadSystemDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@K_RELOAD_SYSTEM_DAEMONS]];
+    [self.IncreaseMemoryLimitSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_INCREASE_MEMORY_LIMIT]];
+    [self.installSSHSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_INSTALL_OPENSSH]];
+    [self.installCydiaSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_INSTALL_CYDIA]];
+    [self.ECIDLabel setPlaceholder:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:K_ECID] integerValue])];
+    [self.ReloadSystemDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_RELOAD_SYSTEM_DAEMONS]];
     [self.RestartSpringBoardButton setEnabled:respringSupported()];
     [self.restartButton setEnabled:restartSupported()];
     [self.tableView reloadData];
 }
 
 - (IBAction)TweakInjectionSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.TweakInjectionSwitch isOn] forKey:@K_TWEAK_INJECTION];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.TweakInjectionSwitch isOn] forKey:K_TWEAK_INJECTION];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
 - (IBAction)LoadDaemonsSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.LoadDaemonsSwitch isOn] forKey:@K_LOAD_DAEMONS];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.LoadDaemonsSwitch isOn] forKey:K_LOAD_DAEMONS];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
 - (IBAction)DumpAPTicketSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.DumpAPTicketSwitch isOn] forKey:@K_DUMP_APTICKET];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.DumpAPTicketSwitch isOn] forKey:K_DUMP_APTICKET];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
@@ -272,7 +272,7 @@
 - (IBAction)BootNonceTextFieldTriggered:(id)sender {
     uint64_t val = 0;
     if ([[NSScanner scannerWithString:[self.BootNonceTextField text]] scanHexLongLong:&val] && val != HUGE_VAL && val != -HUGE_VAL) {
-        [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@ADDR, val] forKey:@K_BOOT_NONCE];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@ADDR, val] forKey:K_BOOT_NONCE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     } else {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Invalid Entry", nil) message:NSLocalizedString(@"The boot nonce entered could not be parsed", nil) preferredStyle:UIAlertControllerStyleAlert];
@@ -284,18 +284,18 @@
 }
 
 - (IBAction)RefreshIconCacheSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.RefreshIconCacheSwitch isOn] forKey:@K_REFRESH_ICON_CACHE];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.RefreshIconCacheSwitch isOn] forKey:K_REFRESH_ICON_CACHE];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
 - (IBAction)KernelExploitSegmentedControl:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setInteger:self.KernelExploitSegmentedControl.selectedSegmentIndex forKey:@K_EXPLOIT];
+    [[NSUserDefaults standardUserDefaults] setInteger:self.KernelExploitSegmentedControl.selectedSegmentIndex forKey:K_EXPLOIT];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
 
 - (IBAction)DisableAppRevokesSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.DisableAppRevokesSwitch isOn] forKey:@K_DISABLE_APP_REVOKES];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.DisableAppRevokesSwitch isOn] forKey:K_DISABLE_APP_REVOKES];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
@@ -318,7 +318,7 @@
 }
 
 - (IBAction)DisableAutoUpdatesSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.DisableAutoUpdatesSwitch isOn] forKey:@K_DISABLE_AUTO_UPDATES];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.DisableAutoUpdatesSwitch isOn] forKey:K_DISABLE_AUTO_UPDATES];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
@@ -342,7 +342,7 @@
 }
 
 - (IBAction)OverwriteBootNonceSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.OverwriteBootNonceSwitch isOn] forKey:@K_OVERWRITE_BOOT_NONCE];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.OverwriteBootNonceSwitch isOn] forKey:K_OVERWRITE_BOOT_NONCE];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
@@ -350,7 +350,7 @@
 - (IBAction)tappedOnCopyNonce:(id)sender{
     UIAlertController *copyBootNonceAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Copy boot nonce?", nil) message:NSLocalizedString(@"Would you like to copy nonce generator to clipboard?", nil) preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *copyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [[UIPasteboard generalPasteboard] setString:[[NSUserDefaults standardUserDefaults] objectForKey:@K_BOOT_NONCE]];
+        [[UIPasteboard generalPasteboard] setString:[[NSUserDefaults standardUserDefaults] objectForKey:K_BOOT_NONCE]];
     }];
     UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil) style:UIAlertActionStyleCancel handler:nil];
     [copyBootNonceAlert addAction:copyAction];
@@ -361,7 +361,7 @@
 - (IBAction)tappedOnCopyECID:(id)sender {
     UIAlertController *copyBootNonceAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Copy ECID?", nil) message:NSLocalizedString(@"Would you like to ECID to clipboard?", nil) preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *copyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [[UIPasteboard generalPasteboard] setString:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:@K_ECID] integerValue])];
+        [[UIPasteboard generalPasteboard] setString:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:K_ECID] integerValue])];
     }];
     UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil) style:UIAlertActionStyleCancel handler:nil];
     [copyBootNonceAlert addAction:copyAction];
@@ -387,24 +387,24 @@
 }
 
 - (IBAction)exportKernelTaskPortSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.ExportKernelTaskPortSwitch isOn] forKey:@K_EXPORT_KERNEL_TASK_PORT];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.ExportKernelTaskPortSwitch isOn] forKey:K_EXPORT_KERNEL_TASK_PORT];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
 - (IBAction)RestoreRootFSSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.RestoreRootFSSwitch isOn] forKey:@K_RESTORE_ROOTFS];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.RestoreRootFSSwitch isOn] forKey:K_RESTORE_ROOTFS];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
 
 - (IBAction)installCydiaSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.installCydiaSwitch isOn] forKey:@K_INSTALL_CYDIA];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.installCydiaSwitch isOn] forKey:K_INSTALL_CYDIA];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
 
 - (IBAction)installSSHSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.installSSHSwitch isOn] forKey:@K_INSTALL_OPENSSH];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.installSSHSwitch isOn] forKey:K_INSTALL_OPENSSH];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
@@ -414,19 +414,19 @@
 }
 
 - (IBAction)IncreaseMemoryLimitSwitch:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.IncreaseMemoryLimitSwitch isOn] forKey:@K_INCREASE_MEMORY_LIMIT];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.IncreaseMemoryLimitSwitch isOn] forKey:K_INCREASE_MEMORY_LIMIT];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
 
 - (IBAction)tappedOnAutomaticallySelectExploit:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setInteger:recommendedJailbreakSupport() forKey:@K_EXPLOIT];
+    [[NSUserDefaults standardUserDefaults] setInteger:recommendedJailbreakSupport() forKey:K_EXPLOIT];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }
 
 - (IBAction)reloadSystemDaemonsSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.ReloadSystemDaemonsSwitch isOn] forKey:@K_RELOAD_SYSTEM_DAEMONS];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.ReloadSystemDaemonsSwitch isOn] forKey:K_RELOAD_SYSTEM_DAEMONS];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }

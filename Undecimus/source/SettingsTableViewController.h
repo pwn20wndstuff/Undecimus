@@ -8,26 +8,24 @@
 
 #import <UIKit/UIKit.h>
 
-#define K_TWEAK_INJECTION           "TweakInjection"
-#define K_LOAD_DAEMONS              "LoadDaemons"
-#define K_DUMP_APTICKET             "DumpAPTicket"
-#define K_REFRESH_ICON_CACHE        "RefreshIconCache"
-#define K_BOOT_NONCE                "BootNonce"
-#define K_EXPLOIT                   "Exploit"
-#define K_DISABLE_AUTO_UPDATES      "DisableAutoUpdates"
-#define K_DISABLE_APP_REVOKES       "DisableAppRevokes"
-#define K_OVERWRITE_BOOT_NONCE      "OverwriteBootNonce"
-#define K_EXPORT_KERNEL_TASK_PORT   "ExportKernelTaskPort"
-#define K_RESTORE_ROOTFS            "RestoreRootFS"
-#define K_INCREASE_MEMORY_LIMIT     "IncreaseMemoryLimit"
-#define K_ECID                      "Ecid"
-#define K_INSTALL_OPENSSH           "InstallOpenSSH"
-#define K_INSTALL_CYDIA             "InstallCydia"
-#define K_RELOAD_SYSTEM_DAEMONS     "ReloadSystemDaemons"
+#define K_TWEAK_INJECTION          @"TweakInjection"
+#define K_LOAD_DAEMONS             @"LoadDaemons"
+#define K_DUMP_APTICKET            @"DumpAPTicket"
+#define K_REFRESH_ICON_CACHE       @"RefreshIconCache"
+#define K_BOOT_NONCE               @"BootNonce"
+#define K_EXPLOIT                  @"Exploit"
+#define K_DISABLE_AUTO_UPDATES     @"DisableAutoUpdates"
+#define K_DISABLE_APP_REVOKES      @"DisableAppRevokes"
+#define K_OVERWRITE_BOOT_NONCE     @"OverwriteBootNonce"
+#define K_EXPORT_KERNEL_TASK_PORT  @"ExportKernelTaskPort"
+#define K_RESTORE_ROOTFS           @"RestoreRootFS"
+#define K_INCREASE_MEMORY_LIMIT    @"IncreaseMemoryLimit"
+#define K_ECID                     @"Ecid"
+#define K_INSTALL_OPENSSH          @"InstallOpenSSH"
+#define K_INSTALL_CYDIA            @"InstallCydia"
+#define K_RELOAD_SYSTEM_DAEMONS    @"ReloadSystemDaemons"
 
 #define LOG_FILE                    [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
-#define BUNDLE_IDENTIFIER           [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]
-#define PREFERENCES_FILE            [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", NSHomeDirectory(), BUNDLE_IDENTIFIER]
 
 #define ISDEBUGGERATTACHED()        (!(getppid() == 1))
 

@@ -85,6 +85,8 @@ bool restartSupported(void);
 NSInteger recommendedJailbreakSupport(void);
 NSInteger recommendedRestartSupport(void);
 NSInteger recommendedRespringSupport(void);
+bool daemonIsLoaded(char *daemonID);
+NSString *getBundledResources(void);
 
 extern NSData *lastSystemOutput;
 

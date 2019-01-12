@@ -54,7 +54,6 @@ static inline void showAlert(NSString *title, NSString *message, Boolean wait, B
 double uptime(void);
 int necp_die(void);
 
-void setPreference(NSString *key, id object);
 NSString *hexFromInt(NSInteger val);
 
 - (IBAction)tappedOnJailbreak:(id)sender;

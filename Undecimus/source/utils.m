@@ -643,6 +643,21 @@ NSInteger recommendedRespringSupport() {
         return -1;
 }
 
+bool daemonIsLoaded(char *daemonID) {
+    int rv = systemf("/bin/launchctl list | grep %s", daemonID);
+    bool isLoaded = !WEXITSTATUS(rv);
+    LOG("Daemon: \"%s\" is%s loaded", daemonID, isLoaded?"":" not");
+    return isLoaded;
+}
+
+NSString *getBundledResources() {
+    NSBundle *bundle = [NSBundle mainBundle];
+    NSDictionary *infoDictionary = [bundle infoDictionary];
+    NSString *bundledResourcesKey = @"BundledResources";
+    NSString *bundledResources = [infoDictionary objectForKey:bundledResourcesKey];
+    return bundledResources;
+}
+
 __attribute__((constructor))
 static void ctor() {
     sourcePath = [[NSBundle mainBundle] bundlePath];

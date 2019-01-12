@@ -15,6 +15,7 @@ typedef io_object_t io_connect_t;
 typedef io_object_t io_iterator_t;
 
 #define IO_OBJECT_NULL  (0)
+#define kIONVRAMForceSyncNowPropertyKey        "IONVRAM-FORCESYNCNOW-PROPERTY"
 
 enum
 {

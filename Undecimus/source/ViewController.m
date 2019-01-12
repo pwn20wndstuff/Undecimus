@@ -118,164 +118,10 @@ typedef struct {
     bool reload_system_daemons;
 } prefs_t;
 
-const char *empty_list_supported_versions[] = {
-    "4397.0.0.2.4~1",
-    "4481.0.0.2.1~1",
-    "4532.0.0.0.1~30",
-    "4556.0.0.2.5~1",
-    "4570.1.24.2.3~1",
-    "4570.2.3~8",
-    "4570.2.5~84",
-    "4570.2.5~167",
-    "4570.7.2~3",
-    "4570.20.55~10",
-    "4570.20.62~9",
-    "4570.20.62~4",
-    "4570.30.79~22",
-    "4570.30.85~18",
-    "4570.32.1~2",
-    "4570.32.1~1",
-    "4570.40.6~8",
-    "4570.40.9~7",
-    "4570.40.9~1",
-    "4570.50.243~9",
-    "4570.50.257~6",
-    "4570.50.279~9",
-    "4570.50.294~5",
-    "4570.52.2~3",
-    "4570.52.2~8",
-    "4570.60.10.0.1~16",
-    "4570.60.16~9",
-    "4570.60.19~25",
-    NULL
-};
-
-const char *multi_path_supported_versions[] = {
-    "4397.0.0.2.4~1",
-    "4481.0.0.2.1~1",
-    "4532.0.0.0.1~30",
-    "4556.0.0.2.5~1",
-    "4570.1.24.2.3~1",
-    "4570.2.3~8",
-    "4570.2.5~84",
-    "4570.2.5~167",
-    "4570.7.2~3",
-    "4570.20.55~10",
-    "4570.20.62~9",
-    "4570.20.62~4",
-    "4570.30.79~22",
-    "4570.30.85~18",
-    "4570.32.1~2",
-    "4570.32.1~1",
-    "4570.40.6~8",
-    "4570.40.9~7",
-    "4570.40.9~1",
-    "4570.50.243~9",
-    "4570.50.257~6",
-    "4570.50.279~9",
-    "4570.50.294~5",
-    "4570.52.2~3",
-    "4570.52.2~8",
-    NULL
-};
-
-const char *async_wake_supported_versions[] = {
-    "4397.0.0.2.4~1",
-    "4481.0.0.2.1~1",
-    "4532.0.0.0.1~30",
-    "4556.0.0.2.5~1",
-    "4570.1.24.2.3~1",
-    "4570.2.3~8",
-    "4570.2.5~84",
-    "4570.2.5~167",
-    "4570.7.2~3",
-    "4570.20.55~10",
-    "4570.20.62~9",
-    "4570.20.62~4",
-    NULL
-};
-
-const char *deja_xnu_supported_versions[] = {
-    "4397.0.0.2.4~1",
-    "4481.0.0.2.1~1",
-    "4532.0.0.0.1~30",
-    "4556.0.0.2.5~1",
-    "4570.1.24.2.3~1",
-    "4570.2.3~8",
-    "4570.2.5~84",
-    "4570.2.5~167",
-    "4570.7.2~3",
-    "4570.20.55~10",
-    "4570.20.62~9",
-    "4570.20.62~4",
-    "4570.30.79~22",
-    "4570.30.85~18",
-    "4570.32.1~2",
-    "4570.32.1~1",
-    "4570.40.6~8",
-    "4570.40.9~7",
-    "4570.40.9~1",
-    "4570.50.243~9",
-    "4570.50.257~6",
-    "4570.50.279~9",
-    "4570.50.294~5",
-    "4570.52.2~3",
-    "4570.52.2~8",
-    "4570.60.10.0.1~16",
-    "4570.60.16~9",
-    "4570.60.19~25",
-    "4570.60.21~7",
-    "4570.60.21~3",
-    "4570.70.14~16",
-    "4570.70.19~13",
-    "4570.70.24~9",
-    "4570.70.24~3",
-    NULL
-};
-
-const char *necp_supported_versions[] = {
-    "4397.0.0.2.4~1",
-    "4481.0.0.2.1~1",
-    "4532.0.0.0.1~30",
-    "4556.0.0.2.5~1",
-    "4570.1.24.2.3~1",
-    "4570.2.3~8",
-    "4570.2.5~84",
-    "4570.2.5~167",
-    "4570.7.2~3",
-    "4570.20.55~10",
-    "4570.20.62~9",
-    "4570.20.62~4",
-    "4570.30.79~22",
-    "4570.30.85~18",
-    "4570.32.1~2",
-    "4570.32.1~1",
-    "4570.40.6~8",
-    "4570.40.9~7",
-    "4570.40.9~1",
-    "4570.50.243~9",
-    "4570.50.257~6",
-    "4570.50.279~9",
-    "4570.50.294~5",
-    "4570.52.2~3",
-    "4570.52.2~8",
-    "4570.60.10.0.1~16",
-    "4570.60.16~9",
-    "4570.60.19~25",
-    "4570.60.21~7",
-    "4570.60.21~3",
-    "4570.70.14~16",
-    "4570.70.19~13",
-    "4570.70.24~9",
-    "4570.70.24~3",
-    NULL
-};
-
 #define ISADDR(val)            (val != 0 && val != HUGE_VAL && val != -HUGE_VAL)
 #define ADDRSTRING(val)        [NSString stringWithFormat:@ADDR, val]
-#define VSHARED_DYLD           0x000200
 
-#define BUNDLEDRESOURCES [[[NSBundle mainBundle] infoDictionary] objectForKey:@"BundledResources"]
+static NSString *bundledResources = nil;
 
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
 
@@ -836,26 +682,25 @@ bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
     if (prefs == NULL) {
         return false;
     }
-    prefs->load_tweaks = [defaults[@K_TWEAK_INJECTION] boolValue];
-    prefs->load_daemons = [defaults[@K_LOAD_DAEMONS] boolValue];
-    prefs->dump_apticket = [defaults[@K_DUMP_APTICKET] boolValue];
-    prefs->run_uicache = [defaults[@K_REFRESH_ICON_CACHE] boolValue];
-    prefs->boot_nonce = [defaults[@K_BOOT_NONCE] UTF8String];
-    prefs->disable_auto_updates = [defaults[@K_DISABLE_AUTO_UPDATES] boolValue];
-    prefs->disable_app_revokes = [defaults[@K_DISABLE_APP_REVOKES] boolValue];
-    prefs->overwrite_boot_nonce = [defaults[@K_OVERWRITE_BOOT_NONCE] boolValue];
-    prefs->export_kernel_task_port = [defaults[@K_EXPORT_KERNEL_TASK_PORT] boolValue];
-    prefs->restore_rootfs = [defaults[@K_RESTORE_ROOTFS] boolValue];
-    prefs->increase_memory_limit = [defaults[@K_INCREASE_MEMORY_LIMIT] boolValue];
-    prefs->install_cydia = [defaults[@K_INSTALL_CYDIA] boolValue];
-    prefs->install_openssh = [defaults[@K_INSTALL_OPENSSH] boolValue];
-    prefs->reload_system_daemons = [defaults[@K_RELOAD_SYSTEM_DAEMONS] boolValue];
+    prefs->load_tweaks = [defaults[K_TWEAK_INJECTION] boolValue];
+    prefs->load_daemons = [defaults[K_LOAD_DAEMONS] boolValue];
+    prefs->dump_apticket = [defaults[K_DUMP_APTICKET] boolValue];
+    prefs->run_uicache = [defaults[K_REFRESH_ICON_CACHE] boolValue];
+    prefs->boot_nonce = [defaults[K_BOOT_NONCE] UTF8String];
+    prefs->disable_auto_updates = [defaults[K_DISABLE_AUTO_UPDATES] boolValue];
+    prefs->disable_app_revokes = [defaults[K_DISABLE_APP_REVOKES] boolValue];
+    prefs->overwrite_boot_nonce = [defaults[K_OVERWRITE_BOOT_NONCE] boolValue];
+    prefs->export_kernel_task_port = [defaults[K_EXPORT_KERNEL_TASK_PORT] boolValue];
+    prefs->restore_rootfs = [defaults[K_RESTORE_ROOTFS] boolValue];
+    prefs->increase_memory_limit = [defaults[K_INCREASE_MEMORY_LIMIT] boolValue];
+    prefs->install_cydia = [defaults[K_INSTALL_CYDIA] boolValue];
+    prefs->install_openssh = [defaults[K_INSTALL_OPENSSH] boolValue];
+    prefs->reload_system_daemons = [defaults[K_RELOAD_SYSTEM_DAEMONS] boolValue];
     return true;
 }
 
 void exploit(mach_port_t tfp0,
-             uint64_t kernel_base,
-             NSDictionary *defaults)
+             uint64_t kernel_base)
 {
     int rv = 0;
     offsets_t offsets = { 0 };
@@ -870,6 +715,9 @@ void exploit(mach_port_t tfp0,
     bool needStrap = false;
     const char *amfid_payload = NULL;
     bool updatedResources = false;
+    NSUserDefaults *userDefaults = nil;
+    NSDictionary *userDefaultsDictionary = nil;
+    NSString *prefsFile = nil;
 
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
@@ -881,8 +729,16 @@ void exploit(mach_port_t tfp0,
         // Load preferences.
         LOG("Loading preferences...");
         SETMESSAGE(NSLocalizedString(@"Failed to load preferences.", nil));
+        NSString *user = @"mobile";
+        userDefaults = [[NSUserDefaults alloc] initWithUser:user];
+        userDefaultsDictionary = [userDefaults dictionaryRepresentation];
+        NSBundle *bundle = [NSBundle mainBundle];
+        NSDictionary *infoDictionary = [bundle infoDictionary];
+        NSString *bundleIdentifierKey = @"CFBundleIdentifier";
+        NSString *bundleIdentifier = [infoDictionary objectForKey:bundleIdentifierKey];
+        prefsFile = [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", NSHomeDirectory(), bundleIdentifier];
         bzero(&prefs, sizeof(prefs));
-        _assert(load_prefs(&prefs, defaults) == true, message, true);
+        _assert(load_prefs(&prefs, userDefaultsDictionary), message, true);
         LOG("Successfully loaded preferences.");
     }
     
@@ -989,20 +845,22 @@ void exploit(mach_port_t tfp0,
         LOG("Initializing QiLin...");
         SETMESSAGE(NSLocalizedString(@"Failed to initialize QiLin.", nil));
         _assert(initQiLin(tfp0, kernel_base) == ERR_SUCCESS, message, true);
-        uint64_t symbol = findKernelSymbol("_kernproc");
-        if (ISADDR(symbol)) {
-            SETOFFSET(kernproc, symbol);
+        const char *kernproc_name = "_kernproc";
+        uint64_t kernproc_symbol = findKernelSymbol((char *)kernproc_name);
+        if (ISADDR(kernproc_symbol)) {
+            SETOFFSET(kernproc, kernproc_symbol);
         } else {
-            setKernelSymbol("_kernproc", GETOFFSET(kernproc) - kernel_slide);
+            setKernelSymbol((char *)kernproc_name, GETOFFSET(kernproc) - kernel_slide);
         }
-        symbol = findKernelSymbol("_rootvnode");
-        if (ISADDR(symbol)) {
-            SETOFFSET(rootvnode, symbol);
+        _assert(ISADDR(findKernelSymbol((char *)kernproc_name)), message, true);
+        const char *rootvnode_name = "_rootvnode";
+        uint64_t rootvnode_symbol = findKernelSymbol((char *)rootvnode_name);
+        if (ISADDR(rootvnode_symbol)) {
+            SETOFFSET(rootvnode, rootvnode_symbol);
         } else {
-            setKernelSymbol("_rootvnode", GETOFFSET(rootvnode) - kernel_slide);
+            setKernelSymbol((char *)rootvnode_name, GETOFFSET(rootvnode) - kernel_slide);
         }
-        _assert(ISADDR(findKernelSymbol("_kernproc")), message, true);
-        _assert(ISADDR(findKernelSymbol("_rootvnode")), message, true);
+        _assert(ISADDR(findKernelSymbol((char *)rootvnode_name)), message, true);
         LOG("Successfully initialized QiLin.");
     }
     
@@ -1066,15 +924,15 @@ void exploit(mach_port_t tfp0,
     
     {
         if (prefs.dump_apticket) {
-            NSString *filePath = @"/System/Library/Caches/apticket.der";
-            NSString *dumpPath = [NSString stringWithFormat:@"%@/Documents/apticket.der", NSHomeDirectory()];
-            if (![sha1sum(filePath) isEqualToString:sha1sum(dumpPath)]) {
+            NSString *originalFile = @"/System/Library/Caches/apticket.der";
+            NSString *dumpFile = [NSString stringWithFormat:@"%@/Documents/apticket.der", NSHomeDirectory()];
+            if (![sha1sum(originalFile) isEqualToString:sha1sum(dumpFile)]) {
                 // Dump APTicket.
                 
                 LOG("Dumping APTicket...");
                 SETMESSAGE(NSLocalizedString(@"Failed to dump APTicket.", nil));
-                NSData *fileData = [NSData dataWithContentsOfFile:filePath];
-                _assert(([fileData writeToFile:dumpPath atomically:YES]), message, true);
+                NSData *fileData = [NSData dataWithContentsOfFile:originalFile];
+                _assert(([fileData writeToFile:dumpFile atomically:YES]), message, true);
                 LOG("Successfully dumped APTicket.");
             }
         }
@@ -1091,14 +949,15 @@ void exploit(mach_port_t tfp0,
             _assert(unlocknvram() == ERR_SUCCESS, message, true);
             LOG("Successfully unlocked nvram.");
             
-            if (runCommand("/usr/sbin/nvram", "com.apple.System.boot-nonce", NULL) != ERR_SUCCESS ||
+            const char *bootNonceKey = "com.apple.System.boot-nonce";
+            if (runCommand("/usr/sbin/nvram", bootNonceKey, NULL) != ERR_SUCCESS ||
                 strstr(lastSystemOutput.bytes, prefs.boot_nonce) == NULL) {
                 // Set boot-nonce.
                 
                 LOG("Setting boot-nonce...");
                 SETMESSAGE(NSLocalizedString(@"Failed to set boot-nonce.", nil));
-                _assert(runCommand("/usr/sbin/nvram", [[NSString stringWithFormat:@"com.apple.System.boot-nonce=%s", prefs.boot_nonce] UTF8String], NULL) == ERR_SUCCESS, message, true);
-                _assert(runCommand("/usr/sbin/nvram", "IONVRAM-FORCESYNCNOW-PROPERTY=com.apple.System.boot-nonce", NULL) == ERR_SUCCESS, message, true);
+                _assert(runCommand("/usr/sbin/nvram", [NSString stringWithFormat:@"%s=%s", bootNonceKey, prefs.boot_nonce].UTF8String, NULL) == ERR_SUCCESS, message, true);
+                _assert(runCommand("/usr/sbin/nvram", [NSString stringWithFormat:@"%s=%s", kIONVRAMForceSyncNowPropertyKey, bootNonceKey].UTF8String, NULL) == ERR_SUCCESS, message, true);
                 LOG("Successfully set boot-nonce.");
             }
             
@@ -1164,10 +1023,10 @@ void exploit(mach_port_t tfp0,
             
             LOG("Mounting system snapshot...");
             SETMESSAGE(NSLocalizedString(@"Unable to mount system snapshot.  Delete OTA file from Settings - Storage if present", nil));
-            const char *systemSnapshotMountPath = "/var/MobileSoftwareUpdate/mnt1";
-            _assert(ensure_directory(systemSnapshotMountPath, 0, 0755), message, true);
-            _assert(runCommand("/sbin/mount_apfs", thedisk, systemSnapshotMountPath, NULL) == ERR_SUCCESS, message, true);
-            const char *systemSnapshotlaunchdPath = [NSString stringWithFormat:@"%s/sbin/launchd", systemSnapshotMountPath].UTF8String;
+            const char *systemSnapshotMountPoint = "/var/MobileSoftwareUpdate/mnt1";
+            _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
+            _assert(runCommand("/sbin/mount_apfs", thedisk, systemSnapshotMountPoint, NULL) == ERR_SUCCESS, message, true);
+            const char *systemSnapshotlaunchdPath = [NSString stringWithFormat:@"%s/sbin/launchd", systemSnapshotMountPoint].UTF8String;
             _assert(waitForFile(systemSnapshotlaunchdPath) == ERR_SUCCESS, message, true);
             LOG("Successfully mounted system snapshot.");
             
@@ -1175,7 +1034,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Renaming system snapshot...");
             SETMESSAGE(NSLocalizedString(@"Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present", nil));
-            rootfd = open(systemSnapshotMountPath, O_RDONLY);
+            rootfd = open(systemSnapshotMountPoint, O_RDONLY);
             _assert(rootfd != -1, message, true);
             snapshots = snapshot_list(rootfd);
             _assert(snapshots != NULL, message, true);
@@ -1196,7 +1055,7 @@ void exploit(mach_port_t tfp0,
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
             NOTICE(NSLocalizedString(@"The system snapshot has been successfully renamed. The device will be rebooted now.", nil), true, false);
-            unmount(systemSnapshotMountPath, 0);
+            unmount(systemSnapshotMountPoint, 0);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         } else {
@@ -1267,19 +1126,19 @@ void exploit(mach_port_t tfp0,
         if (needResources) {
             NSString *payload_tar = pathForResource(@"amfid_payload.tar");
             _assert(payload_tar != nil, message, true);
-            _assert(untar([payload_tar UTF8String]), message, true);
+            _assert(untar(payload_tar.UTF8String), message, true);
             _assert(init_file("/jb/amfid_payload.dylib", 0, 0644), message, true);
         }
         
         if (needStrap) {
             NSString *tar_tar = pathForResource(@"tar.tar");
             _assert(tar_tar != nil, message, true);
-            _assert(untar([tar_tar UTF8String]), message, true);
+            _assert(untar(tar_tar.UTF8String), message, true);
             _assert(init_file("/jb/tar", 0, 0755), message, true);
             
             NSString *lzma_tar = pathForResource(@"lzma.tar");
             _assert(lzma_tar != nil, message, true);
-            _assert(untar([lzma_tar UTF8String]), message, true);
+            _assert(untar(lzma_tar.UTF8String), message, true);
             _assert(init_file("/jb/lzma", 0, 0755), message, true);
         }
         LOG("Successfully copied over our resources to RootFS.");
@@ -1304,18 +1163,18 @@ void exploit(mach_port_t tfp0,
             LOG("%s", snapshot);
             _assert(snapshot != NULL, message, true);
             if (kCFCoreFoundationVersionNumber < 1452.23) {
-                const char *systemSnapshotMountPath = "/var/MobileSoftwareUpdate/mnt1";
-                _assert(ensure_directory(systemSnapshotMountPath, 0, 0755), message, true);
-                _assert(fs_snapshot_mount(rootfd, systemSnapshotMountPath, snapshot, 0) == ERR_SUCCESS, message, true);
-                const char *systemSnapshotLaunchdPath = [NSString stringWithFormat:@"%s/sbin/launchd", systemSnapshotMountPath].UTF8String;
+                const char *systemSnapshotMountPoint = "/var/MobileSoftwareUpdate/mnt1";
+                _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
+                _assert(fs_snapshot_mount(rootfd, systemSnapshotMountPoint, snapshot, 0) == ERR_SUCCESS, message, true);
+                const char *systemSnapshotLaunchdPath = [NSString stringWithFormat:@"%s/sbin/launchd", systemSnapshotMountPoint].UTF8String;
                 _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
                 NSString *rsync_tar = pathForResource(@"rsync.tar");
                 _assert(rsync_tar != nil, message, true);
-                _assert(untar([rsync_tar UTF8String]), message, true);
+                _assert(untar(rsync_tar.UTF8String), message, true);
                 _assert(init_file("/jb/rsync", 0, 0755), message, true);
                 _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
                 _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "/var/MobileSoftwareUpdate/mnt1/.", "/", NULL) == 0, message, true);
-                unmount(systemSnapshotMountPath, 0);
+                unmount(systemSnapshotMountPoint, 0);
             } else {
                 char *systemSnapshot = copySystemSnapshot();
                 _assert(systemSnapshot != NULL, message, true);
@@ -1362,7 +1221,7 @@ void exploit(mach_port_t tfp0,
             NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithContentsOfFile:SpringBoardPreferencesFile];
             _assert(dictionary != nil, message, true);
             for (int i = 0; !(i >= 5 || [dictionary[SpringBoardShowNonDefaultSystemAppsKey] isEqual:@NO]); i++) {
-                dictionary[@"SBShowNonDefaultSystemApps"] = @NO;
+                dictionary[SpringBoardShowNonDefaultSystemAppsKey] = @NO;
                 _assert(([dictionary writeToFile:SpringBoardPreferencesFile atomically:YES]), message, true);
                 dictionary = [NSMutableDictionary dictionaryWithContentsOfFile:SpringBoardPreferencesFile];
                 _assert(dictionary != nil, message, true);
@@ -1373,7 +1232,7 @@ void exploit(mach_port_t tfp0,
             
             LOG("Disabling RootFS Restore...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable RootFS Restore.", nil));
-            [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@NO forKey:@K_RESTORE_ROOTFS inDomain:PREFERENCES_FILE];
+            [userDefaults setObject:@NO forKey:K_RESTORE_ROOTFS inDomain:prefsFile];
             LOG("Successfully disabled RootFS Restore.");
             
             // Reboot.
@@ -1429,7 +1288,7 @@ void exploit(mach_port_t tfp0,
         CFStringRef value = MGCopyAnswer(kMGUniqueChipID);
         LOG("ECID = %@", value);
         _assert(value != nil, message, true);
-        [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:[NSString stringWithFormat:@"%@", value] forKey:@K_ECID inDomain:PREFERENCES_FILE];
+        [userDefaults setObject:[NSString stringWithFormat:@"%@", value] forKey:K_ECID inDomain:prefsFile];
         CFRelease(value);
         LOG("Successfully logged ECID.");
     }
@@ -1441,7 +1300,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Logging offsets...");
         SETMESSAGE(NSLocalizedString(@"Failed to log offsets.", nil));
-        NSMutableDictionary *md = [NSMutableDictionary dictionary];
+        NSMutableDictionary *md = [NSMutableDictionary new];
         md[@"KernelBase"] = ADDRSTRING(kernel_base);
         md[@"KernelSlide"] = ADDRSTRING(kernel_slide);
         md[@"TrustChain"] = ADDRSTRING(GETOFFSET(trust_chain));
@@ -1537,7 +1396,7 @@ void exploit(mach_port_t tfp0,
             SETMESSAGE(NSLocalizedString(@"Failed to update version string.", nil));
             struct utsname u;
             _assert(uname(&u) == ERR_SUCCESS, message, true);
-            const char *kernelVersionString = [[NSString stringWithFormat:@"%s %s", u.version, DEFAULT_VERSION_STRING] UTF8String];
+            const char *kernelVersionString = [NSString stringWithFormat:@"%s %s", u.version, DEFAULT_VERSION_STRING].UTF8String;
             for (int i = 0; !(i >= 5 || strstr(u.version, kernelVersionString) != NULL); i++) {
                 _assert(updateVersionString(kernelVersionString, tfp0, kernel_base) == ERR_SUCCESS, message, true);
                 _assert(uname(&u) == ERR_SUCCESS, message, true);
@@ -1558,7 +1417,7 @@ void exploit(mach_port_t tfp0,
             NSString *strap_tar = pathForResource(@"strap.tar.lzma");
             _assert(strap_tar != nil, message, true);
             _assert(chdir("/") == ERR_SUCCESS, message, true);
-            rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", [strap_tar UTF8String], NULL);
+            rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", strap_tar.UTF8String, NULL);
             _assert(rv == ENOENT || rv == ERR_SUCCESS, message, true);
             rv = system("/usr/libexec/cydia/firmware.sh");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
@@ -1570,7 +1429,7 @@ void exploit(mach_port_t tfp0,
             clean_file("/jb/lzma");
         } else {
             if (!needResources) {
-                updatedResources = compareInstalledVersion("science.xnu.undecimus.resources", "lt", [BUNDLEDRESOURCES UTF8String]);
+                updatedResources = compareInstalledVersion("science.xnu.undecimus.resources", "lt", bundledResources.UTF8String);
             }
             if (needResources || updatedResources) {
                 extractResources();
@@ -1621,10 +1480,10 @@ void exploit(mach_port_t tfp0,
             SETMESSAGE(NSLocalizedString(@"Failed to spawn jailbreakd.", nil));
             const char *jbdPidFile = "/var/tmp/jailbreakd.pid";
             if (!pidFileIsValid(@(jbdPidFile))) {
-                NSMutableDictionary *md = [NSMutableDictionary dictionary];
+                NSMutableDictionary *md = [NSMutableDictionary new];
                 md[@"Label"] = @"jailbreakd";
                 md[@"Program"] = @"/usr/libexec/jailbreakd";
-                md[@"EnvironmentVariables"] = [NSMutableDictionary dictionary];
+                md[@"EnvironmentVariables"] = [NSMutableDictionary new];
                 md[@"EnvironmentVariables"][@"KernelBase"] = ADDRSTRING(kernel_base);
                 md[@"EnvironmentVariables"][@"KernProcAddr"] = ADDRSTRING(ReadKernel64(GETOFFSET(kernproc)));
                 md[@"EnvironmentVariables"][@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref) - kernel_slide);
@@ -1634,8 +1493,8 @@ void exploit(mach_port_t tfp0,
                 md[@"EnvironmentVariables"][@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
                 md[@"EnvironmentVariables"][@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
                 md[@"UserName"] = @"root";
-                md[@"MachServices"] = [NSMutableDictionary dictionary];
-                md[@"MachServices"][@"zone.sparkes.jailbreakd"] = [NSMutableDictionary dictionary];
+                md[@"MachServices"] = [NSMutableDictionary new];
+                md[@"MachServices"][@"zone.sparkes.jailbreakd"] = [NSMutableDictionary new];
                 md[@"MachServices"][@"zone.sparkes.jailbreakd"][@"HostSpecialPort"] = @15;
                 md[@"RunAtLoad"] = @YES;
                 md[@"KeepAlive"] = @YES;
@@ -1721,7 +1580,7 @@ void exploit(mach_port_t tfp0,
         NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithContentsOfFile:SpringBoardPreferencesFile];
         _assert(dictionary != nil, message, true);
         for (int i = 0; !(i >= 5 || [dictionary[SpringBoardShowNonDefaultSystemAppsKey] isEqual:@YES]); i++) {
-            dictionary[@"SBShowNonDefaultSystemApps"] = @YES;
+            dictionary[SpringBoardShowNonDefaultSystemAppsKey] = @YES;
             _assert(([dictionary writeToFile:SpringBoardPreferencesFile atomically:YES]), message, true);
             dictionary = [NSMutableDictionary dictionaryWithContentsOfFile:SpringBoardPreferencesFile];
             _assert(dictionary != nil, message, true);
@@ -1757,25 +1616,27 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
+        NSArray <NSString *> *array = @[@"/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate",
+                           @"/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation",
+                           @"/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate",
+                           @"/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation"];
         if (prefs.disable_auto_updates) {
             // Disable Auto Updates.
             
             LOG("Disabling Auto Updates...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable auto updates.", nil));
-            ensure_symlink("/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate");
-            ensure_symlink("/dev/null", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation");
-            ensure_symlink("/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate");
-            ensure_symlink("/dev/null", "/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation");
+            for (NSString *path in array) {
+                ensure_symlink("/dev/null", path.UTF8String);
+            }
             LOG("Successfully disabled Auto Updates.");
         } else {
             // Enable Auto Updates.
             
             LOG("Enabling Auto Updates...");
             SETMESSAGE(NSLocalizedString(@"Failed to enable auto updates.", nil));
-            ensure_directory("/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", 0, 755);
-            ensure_directory("/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation", 0, 755);
-            ensure_directory("/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate", 0, 755);
-            ensure_directory("/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation", 0, 755);
+            for (NSString *path in array) {
+                ensure_directory(path.UTF8String, 0, 0755);
+            }
         }
     }
     
@@ -1787,14 +1648,19 @@ void exploit(mach_port_t tfp0,
             
             LOG("Increasing memory limit...");
             SETMESSAGE(NSLocalizedString(@"Failed to increase memory limit.", nil));
-            char buf_targettype[256];
-            bzero(buf_targettype, sizeof(buf_targettype));
-            size_t size = sizeof(buf_targettype);
-            _assert(sysctlbyname("hw.targettype", buf_targettype, &size, NULL, 0) == ERR_SUCCESS, message, true);
-            NSMutableDictionary *md = [NSMutableDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype]];
-            _assert(md != nil, message, true);
-            md[@"Version4"][@"System"][@"Override"][@"Global"][@"UserHighWaterMark"] = [NSNumber numberWithInteger:[md[@"Version4"][@"PListDevice"][@"MemoryCapacity"] integerValue]];
-            _assert(([md writeToFile:[NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", buf_targettype] atomically:YES]), message, true);
+            char *targettype = NULL;
+            size_t size = 0;
+            _assert(sysctlbyname("hw.targettype", NULL, &size, NULL, 0) == ERR_SUCCESS, message, true);
+            targettype = malloc(size);
+            _assert(targettype != NULL, message, true);
+            _assert(sysctlbyname("hw.targettype", targettype, &size, NULL, 0) == ERR_SUCCESS, message, true);
+            NSString *jetsamFile = [NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", targettype];
+            free(targettype);
+            targettype = NULL;
+            NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithContentsOfFile:jetsamFile];
+            _assert(dictionary != nil, message, true);
+            dictionary[@"Version4"][@"System"][@"Override"][@"Global"][@"UserHighWaterMark"] = [NSNumber numberWithInteger:[dictionary[@"Version4"][@"PListDevice"][@"MemoryCapacity"] integerValue]];
+            _assert(([dictionary writeToFile:jetsamFile atomically:YES]), message, true);
             LOG("Successfully increased memory limit.");
         }
     }
@@ -1812,8 +1678,8 @@ void exploit(mach_port_t tfp0,
             // Disable Install OpenSSH.
             LOG("Disabling Install OpenSSH...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable Install OpenSSH.", nil));
-            [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@NO forKey:@K_INSTALL_OPENSSH inDomain:PREFERENCES_FILE];
-            [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@YES forKey:@K_REFRESH_ICON_CACHE inDomain:PREFERENCES_FILE];
+            [userDefaults setObject:@NO forKey:K_INSTALL_OPENSSH inDomain:prefsFile];
+            [userDefaults setObject:@YES forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
             prefs.run_uicache = true;
             LOG("Successfully disabled Install OpenSSH.");
         }
@@ -1830,7 +1696,7 @@ void exploit(mach_port_t tfp0,
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
-                [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@YES forKey:@K_INSTALL_CYDIA inDomain:PREFERENCES_FILE];
+                [userDefaults setObject:@YES forKey:K_INSTALL_CYDIA inDomain:prefsFile];
                 prefs.run_uicache = true;
             }
             LOG("Successfully removed Electra's Cydia.");
@@ -1838,7 +1704,7 @@ void exploit(mach_port_t tfp0,
         if (access("/etc/apt/sources.list.d/electra.list", F_OK) == ERR_SUCCESS) {
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
-                [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@YES forKey:@K_INSTALL_CYDIA inDomain:PREFERENCES_FILE];
+                [userDefaults setObject:@YES forKey:K_INSTALL_CYDIA inDomain:prefsFile];
             }
         }
         if (compareInstalledVersion("mobilesubstrate", "eq", "99.0")) {
@@ -1861,7 +1727,7 @@ void exploit(mach_port_t tfp0,
             // Disable Install Cydia.
             LOG("Disabling Install Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable Install Cydia.", nil));
-            [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@NO forKey:@K_INSTALL_CYDIA inDomain:PREFERENCES_FILE];
+            [userDefaults setObject:@NO forKey:K_INSTALL_CYDIA inDomain:prefsFile];
             LOG("Successfully disabled Install Cydia.");
         }
     }
@@ -1898,7 +1764,7 @@ void exploit(mach_port_t tfp0,
             LOG("Running uicache...");
             SETMESSAGE(NSLocalizedString(@"Failed to run uicache.", nil));
             _assert(runCommand("/usr/bin/uicache", NULL) == ERR_SUCCESS, message, true);
-            [[[NSUserDefaults alloc] initWithUser:@"mobile"] setObject:@NO forKey:@K_REFRESH_ICON_CACHE inDomain:PREFERENCES_FILE];
+            [userDefaults setObject:@NO forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
             LOG("Successfully ran uicache.");
         }
     }
@@ -1954,7 +1820,7 @@ void exploit(mach_port_t tfp0,
 - (IBAction)tappedOnJailbreak:(id)sender
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-        _assert(BUNDLEDRESOURCES != nil, NSLocalizedString(@"Bundled Resources version missing.", nil), true);
+        _assert(bundledResources != nil, NSLocalizedString(@"Bundled Resources version missing.", nil), true);
         if (!jailbreakSupported()) {
             PROGRESS(NSLocalizedString(@"Unsupported", nil), false, true);
             return;
@@ -1967,7 +1833,7 @@ void exploit(mach_port_t tfp0,
             offsets_init();
             prepare_for_rw_with_fake_tfp0(persisted_port);
         } else {
-            switch ([[NSUserDefaults standardUserDefaults] integerForKey:@K_EXPLOIT]) {
+            switch ([[NSUserDefaults standardUserDefaults] integerForKey:K_EXPLOIT]) {
                 case empty_list: {
                     vfs_sploit();
                     break;
@@ -2015,7 +1881,7 @@ void exploit(mach_port_t tfp0,
         LOG("kernel_magic = 0x%x", kernel_magic);
         _assert(kernel_magic == MACH_HEADER_MAGIC, message, true);
         // NOTICE(@"Jailbreak succeeded, but still needs a few minutes to respring.", false, false);
-        exploit(tfp0, kernel_base, [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
+        exploit(tfp0, kernel_base);
         PROGRESS(NSLocalizedString(@"Jailbroken", nil), false, false);
     });
 }
@@ -2043,8 +1909,9 @@ void exploit(mach_port_t tfp0,
     } else if (!jailbreakSupported()) {
         PROGRESS(NSLocalizedString(@"Unsupported", nil), false, true);
     }
-    LOG("Bundled Resources Version: %@", BUNDLEDRESOURCES);
-    if (BUNDLEDRESOURCES == nil) {
+    bundledResources = getBundledResources();
+    LOG("Bundled Resources Version: %@", bundledResources);
+    if (bundledResources == nil) {
         showAlert(NSLocalizedString(@"Error", nil), NSLocalizedString(@"Bundled Resources version is missing. This build is invalid.", nil), false, false);
     }
 }
