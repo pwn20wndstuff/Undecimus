@@ -216,27 +216,34 @@ bool ensure_directory(const char *directory, int owner, mode_t mode) {
     NSString *path = @(directory);
     NSFileManager *fm = [NSFileManager defaultManager];
     id attributes = [fm attributesOfItemAtPath:path error:nil];
-    if (!attributes ||
-        ![attributes[NSFileType] isEqual:NSFileTypeDirectory] ||
-        ![attributes[NSFileOwnerAccountID] isEqual:@(owner)] ||
-        ![attributes[NSFileGroupOwnerAccountID] isEqual:@(owner)] ||
-        ![attributes[NSFilePosixPermissions] isEqual:@(mode)]
+    if (attributes &&
+        [attributes[NSFileType] isEqual:NSFileTypeDirectory] &&
+        [attributes[NSFileOwnerAccountID] isEqual:@(owner)] &&
+        [attributes[NSFileGroupOwnerAccountID] isEqual:@(owner)] &&
+        [attributes[NSFilePosixPermissions] isEqual:@(mode)]
         ) {
-        if (attributes) {
+        // Directory exists and matches arguments
+        return true;
+    }
+    if (attributes) {
+        if ([attributes[NSFileType] isEqual:NSFileTypeDirectory]) {
+            // Item exists and is a directory
             return [fm setAttributes:@{
-                                NSFileOwnerAccountID: @(owner),
-                                NSFileGroupOwnerAccountID: @(owner),
-                                NSFilePosixPermissions: @(mode)
-                            } ofItemAtPath:path error:nil];
-        } else {
-            return [fm createDirectoryAtPath:path withIntermediateDirectories:YES attributes:@{
-                               NSFileOwnerAccountID: @(owner),
-                               NSFileGroupOwnerAccountID: @(owner),
-                               NSFilePosixPermissions: @(mode)
-                           } error:nil];
+                           NSFileOwnerAccountID: @(owner),
+                           NSFileGroupOwnerAccountID: @(owner),
+                           NSFilePosixPermissions: @(mode)
+                           } ofItemAtPath:path error:nil];
+        } else if (![fm removeItemAtPath:path error:nil]) {
+            // Item exists and is not a directory but could not be removed
+            return false;
         }
     }
-    return true;
+    // Item does not exist at this point
+    return [fm createDirectoryAtPath:path withIntermediateDirectories:YES attributes:@{
+                   NSFileOwnerAccountID: @(owner),
+                   NSFileGroupOwnerAccountID: @(owner),
+                   NSFilePosixPermissions: @(mode)
+               } error:nil];
 }
 
 bool ensure_symlink(const char *to, const char *from) {
