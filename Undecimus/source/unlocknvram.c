@@ -14,6 +14,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <QiLin.h>
 #include <iokit.h>
+#include <common.h>
 #include "kutils.h"
 #include "offsets.h"
 #include "kmem.h"
@@ -21,10 +22,6 @@
 // from vtable start in bytes
 unsigned VTB_IODTNVRAM__SEARCHNVRAMPROPERTY = 0x590;
 unsigned VTB_IODTNVRAM__GETOFVARIABLEPERM   = 0x558;
-
-#define RAWLOG(fmt, args...) fprintf(stderr, fmt, ##args)
-#define INFO(fmt, args...) RAWLOG("[INF]" fmt "\n", ##args)
-#define ERROR(fmt, args...) RAWLOG("[ERR] " fmt "\n", ##args)
 
 // convertPropToObject calls getOFVariableType
 // open convertPropToObject, look for first vtable call -- that'd be getOFVariableType
@@ -38,13 +35,13 @@ uint64_t get_iodtnvram_obj(void) {
     if (IODTNVRAMObj == 0) {
         io_service_t IODTNVRAMSrv = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IODTNVRAM"));
         if (!MACH_PORT_VALID(IODTNVRAMSrv)) {
-            ERROR("Failed to get IODTNVRAM service");
+            LOG("Failed to get IODTNVRAM service");
             return 0;
         }
         uint64_t nvram_up = getAddressOfPort(getpid(), IODTNVRAMSrv);
         IODTNVRAMObj = ReadKernel64(nvram_up + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
 
-        INFO("IODTNVRAM obj at 0x%llx", IODTNVRAMObj);
+        LOG("IODTNVRAM obj at 0x%llx", IODTNVRAMObj);
     }
 
     return IODTNVRAMObj;
@@ -55,7 +52,7 @@ uint64_t orig_vtable = -1;
 int unlocknvram(void) {
     uint64_t obj = get_iodtnvram_obj();
     if (obj == 0) {
-        ERROR("get_iodtnvram_obj failed!");
+        LOG("get_iodtnvram_obj failed!");
         return 1;
     }
 
@@ -74,10 +71,10 @@ int unlocknvram(void) {
     uint64_t *buf = calloc(1, vtable_len);
     rkbuffer(vtable_start, buf, vtable_len);
 
-    INFO("IODTNVRAM vtable: 0x%llx - 0x%llx", vtable_start, vtable_end);
+    LOG("IODTNVRAM vtable: 0x%llx - 0x%llx", vtable_start, vtable_end);
 
     for (int i = 0; i != vtable_len; i += sizeof(uint64_t)) {
-        INFO("\t[0x%03x]: 0x%llx", i, buf[i/sizeof(uint64_t)]);
+        LOG("\t[0x%03x]: 0x%llx", i, buf[i/sizeof(uint64_t)]);
     }
 
     // alter it
@@ -92,24 +89,24 @@ int unlocknvram(void) {
     WriteKernel64(obj, fake_vtable);
 
     free(buf);
-    INFO("Unlocked nvram");
+    LOG("Unlocked nvram");
     return 0;
 }
 
 int locknvram(void) {
     if (orig_vtable == -1) {
-        ERROR("Trying to lock nvram, but didnt unlock first");
+        LOG("Trying to lock nvram, but didnt unlock first");
         return -1;
     }
 
     uint64_t obj = get_iodtnvram_obj();
     if (obj == 0) { // would never happen but meh
-        ERROR("get_iodtnvram_obj failed!");
+        LOG("get_iodtnvram_obj failed!");
         return 1;
     }
     
     WriteKernel64(obj, orig_vtable);
 
-    INFO("Locked nvram");
+    LOG("Locked nvram");
     return 0;
 }

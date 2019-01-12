@@ -3,7 +3,7 @@
 //  Undecimus
 //
 //  Created by Pwn20wnd on 9/14/18.
-//  Copyright © 2018 Pwn20wnd. All rights reserved.
+//  Copyright © 2018 - 2019 Pwn20wnd. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -26,7 +26,8 @@
 #define K_RELOAD_SYSTEM_DAEMONS     "ReloadSystemDaemons"
 
 #define LOG_FILE                    [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
-#define PREFERENCES_FILE            [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", NSHomeDirectory(), [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]]
+#define BUNDLE_IDENTIFIER           [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]
+#define PREFERENCES_FILE            [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", NSHomeDirectory(), BUNDLE_IDENTIFIER]
 
 #define ISDEBUGGERATTACHED()        (!(getppid() == 1))
 

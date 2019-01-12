@@ -219,7 +219,7 @@ mach_port_t hold_kallocs(uint32_t kalloc_size, int allocs_per_message, int messa
                                        (mach_port_info_t)&limits,
                                        MACH_PORT_LIMITS_INFO_COUNT);
         if (err != KERN_SUCCESS) {
-            LOG(" [-] failed to increase queue limit\n");
+            LOG("failed to increase queue limit\n");
             exit(EXIT_FAILURE);
         }
     } else {

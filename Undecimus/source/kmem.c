@@ -46,7 +46,7 @@ size_t kread(uint64_t where, void *p, size_t size) {
                                     (mach_vm_address_t)p + offset,
                                     &sz);
         if (rv || sz == 0) {
-            LOG("[e] error reading kernel @%p\n", (void *)(offset + where));
+            LOG("error reading kernel @%p\n", (void *)(offset + where));
             break;
         }
         offset += sz;
@@ -67,7 +67,7 @@ size_t kwrite(uint64_t where, const void *p, size_t size) {
                            (mach_vm_offset_t)p + offset,
                            (mach_msg_type_number_t)chunk);
         if (rv) {
-            LOG("[e] error writing kernel @%p\n", (void *)(offset + where));
+            LOG("error writing kernel @%p\n", (void *)(offset + where));
             break;
         }
         offset += chunk;

