@@ -441,7 +441,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Get path for dpkg\nset -e\nif [ -f ~/.profile ]; then\n    . ~/.profile\nfi\nRESOURCES_VERSION=\"$(dpkg --info Undecimus/resources/resources.deb | grep Version: | awk '{print $2}')\"\nif [ -z \"${RESOURCES_VERSION}\" ]; then\n    echo \"dpkg not found or resources.deb missing\"\n    exit 1\nfi\ndefaults write \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\" BundledResources \"${RESOURCES_VERSION}\"\n";
+			shellScript = "\"${SOURCE_ROOT}/post.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
