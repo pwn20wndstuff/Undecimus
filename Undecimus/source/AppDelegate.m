@@ -19,6 +19,13 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [self initPrefs];
+    [self initShortcuts];
+    return YES;
+}
+
+
+- (void)initPrefs {
     if ([[NSUserDefaults standardUserDefaults] objectForKey:K_TWEAK_INJECTION] == nil) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_TWEAK_INJECTION];
         [[NSUserDefaults standardUserDefaults] synchronize];
@@ -88,11 +95,9 @@
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_RELOAD_SYSTEM_DAEMONS];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
-    [self SetUpShortcuts];
-    return YES;
 }
 
-- (void)SetUpShortcuts {
+- (void)initShortcuts {
     NSMutableArray *ShortcutItems = [[NSMutableArray alloc] init];
     UIApplicationShortcutIcon *JailbreakIcon = [UIApplicationShortcutIcon iconWithTemplateImageName:@"maintenance"];
     UIApplicationShortcutItem *JailbreakShortcut = [[UIApplicationShortcutItem alloc] initWithType:@"1" localizedTitle:@"Jailbreak" localizedSubtitle:nil icon:JailbreakIcon userInfo:nil];

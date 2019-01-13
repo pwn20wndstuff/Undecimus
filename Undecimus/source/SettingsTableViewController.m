@@ -172,8 +172,8 @@
     md[@"Release"] = [NSString stringWithUTF8String:u.release];
     md[@"Version"] = [NSString stringWithUTF8String:u.version];
     md[@"Machine"] = [NSString stringWithUTF8String:u.machine];
-    md[@"ProductVersion"] = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductVersion"];
-    md[@"ProductBuildVersion"] = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"];
+    md[@"ProductVersion"] = [NSMutableDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductVersion"];
+    md[@"ProductBuildVersion"] = [NSMutableDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"];
     md[@"Sources"] = [SettingsTableViewController sourcesFromFile:CYDIA_LIST];
     md[@"Packages"] = [SettingsTableViewController parsedPackageArray];
     md[@"Preferences"] = [[NSMutableDictionary alloc] init];

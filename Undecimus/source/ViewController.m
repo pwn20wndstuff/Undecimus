@@ -718,6 +718,7 @@ void exploit(mach_port_t tfp0,
     NSUserDefaults *userDefaults = nil;
     NSDictionary *userDefaultsDictionary = nil;
     NSString *prefsFile = nil;
+    NSString *homeDirectory = NSHomeDirectory();
 
 #define SETOFFSET(offset, val) (offsets.offset = val)
 #define GETOFFSET(offset)      offsets.offset
@@ -736,7 +737,7 @@ void exploit(mach_port_t tfp0,
         NSDictionary *infoDictionary = [bundle infoDictionary];
         NSString *bundleIdentifierKey = @"CFBundleIdentifier";
         NSString *bundleIdentifier = [infoDictionary objectForKey:bundleIdentifierKey];
-        prefsFile = [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", NSHomeDirectory(), bundleIdentifier];
+        prefsFile = [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist", homeDirectory, bundleIdentifier];
         bzero(&prefs, sizeof(prefs));
         _assert(load_prefs(&prefs, userDefaultsDictionary), message, true);
         LOG("Successfully loaded preferences.");
@@ -925,7 +926,7 @@ void exploit(mach_port_t tfp0,
     {
         if (prefs.dump_apticket) {
             NSString *originalFile = @"/System/Library/Caches/apticket.der";
-            NSString *dumpFile = [NSString stringWithFormat:@"%@/Documents/apticket.der", NSHomeDirectory()];
+            NSString *dumpFile = [NSString stringWithFormat:@"%@/Documents/apticket.der", homeDirectory];
             if (![sha1sum(originalFile) isEqualToString:sha1sum(dumpFile)]) {
                 // Dump APTicket.
                 
@@ -1232,7 +1233,9 @@ void exploit(mach_port_t tfp0,
             
             LOG("Disabling RootFS Restore...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable RootFS Restore.", nil));
-            [userDefaults setObject:@NO forKey:K_RESTORE_ROOTFS inDomain:prefsFile];
+            if (![[userDefaults objectForKey:K_RESTORE_ROOTFS inDomain:prefsFile] isEqual:@NO]) {
+                [userDefaults setObject:@NO forKey:K_RESTORE_ROOTFS inDomain:prefsFile];
+            }
             LOG("Successfully disabled RootFS Restore.");
             
             // Reboot.
@@ -1288,7 +1291,9 @@ void exploit(mach_port_t tfp0,
         CFStringRef value = MGCopyAnswer(kMGUniqueChipID);
         LOG("ECID = %@", value);
         _assert(value != nil, message, true);
-        [userDefaults setObject:[NSString stringWithFormat:@"%@", value] forKey:K_ECID inDomain:prefsFile];
+        if (![[userDefaults objectForKey:K_ECID inDomain:prefsFile] isEqual:(__bridge id)(value)]) {
+            [userDefaults setObject:(__bridge id)(value) forKey:K_ECID inDomain:prefsFile];
+        }
         CFRelease(value);
         LOG("Successfully logged ECID.");
     }
@@ -1555,9 +1560,12 @@ void exploit(mach_port_t tfp0,
             LOG("Disabling app revokes...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable app revokes.", nil));
             blockDomainWithName("ocsp.apple.com");
-            ensure_symlink("/dev/null", "/var/Keychains/ocspcache.sqlite3");
-            ensure_symlink("/dev/null", "/var/Keychains/ocspcache.sqlite3-shm");
-            ensure_symlink("/dev/null", "/var/Keychains/ocspcache.sqlite3-wal");
+            NSArray <NSString *> *array = @[@"/var/Keychains/ocspcache.sqlite3",
+                                            @"/var/Keychains/ocspcache.sqlite3-shm",
+                                            @"/var/Keychains/ocspcache.sqlite3-wal"];
+            for (NSString *path in array) {
+                ensure_symlink("/dev/null", path.UTF8String);
+            }
             LOG("Successfully disabled app revokes.");
         } else {
             // Enable app revokes.
@@ -1678,9 +1686,9 @@ void exploit(mach_port_t tfp0,
             // Disable Install OpenSSH.
             LOG("Disabling Install OpenSSH...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable Install OpenSSH.", nil));
-            [userDefaults setObject:@NO forKey:K_INSTALL_OPENSSH inDomain:prefsFile];
-            [userDefaults setObject:@YES forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
-            prefs.run_uicache = true;
+            if (![[userDefaults objectForKey:K_INSTALL_OPENSSH inDomain:prefsFile] isEqual:@NO]) {
+                [userDefaults setObject:@NO forKey:K_INSTALL_OPENSSH inDomain:prefsFile];
+            }
             LOG("Successfully disabled Install OpenSSH.");
         }
     }
@@ -1694,17 +1702,20 @@ void exploit(mach_port_t tfp0,
             SETMESSAGE(NSLocalizedString(@"Failed to remove Electra's Cydia.", nil));
             rv = runCommand("/usr/bin/dpkg", "--force-depends", "-r", "cydia-gui", NULL);
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
+            if (![[userDefaults objectForKey:K_INSTALL_CYDIA inDomain:prefsFile] isEqual:@YES]) {
+                [userDefaults setObject:@YES forKey:K_INSTALL_CYDIA inDomain:prefsFile];
+            }
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
-                [userDefaults setObject:@YES forKey:K_INSTALL_CYDIA inDomain:prefsFile];
-                prefs.run_uicache = true;
             }
             LOG("Successfully removed Electra's Cydia.");
         }
         if (access("/etc/apt/sources.list.d/electra.list", F_OK) == ERR_SUCCESS) {
+            if (![[userDefaults objectForKey:K_INSTALL_CYDIA inDomain:prefsFile] isEqual:@YES]) {
+                [userDefaults setObject:@YES forKey:K_INSTALL_CYDIA inDomain:prefsFile];
+            }
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
-                [userDefaults setObject:@YES forKey:K_INSTALL_CYDIA inDomain:prefsFile];
             }
         }
         if (compareInstalledVersion("mobilesubstrate", "eq", "99.0")) {
@@ -1727,7 +1738,15 @@ void exploit(mach_port_t tfp0,
             // Disable Install Cydia.
             LOG("Disabling Install Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable Install Cydia.", nil));
-            [userDefaults setObject:@NO forKey:K_INSTALL_CYDIA inDomain:prefsFile];
+            if (![[userDefaults objectForKey:K_INSTALL_CYDIA inDomain:prefsFile] isEqual:@NO]) {
+                [userDefaults setObject:@NO forKey:K_INSTALL_CYDIA inDomain:prefsFile];
+            }
+            if (![[userDefaults objectForKey:K_REFRESH_ICON_CACHE inDomain:prefsFile] isEqual:@YES]) {
+                [userDefaults setObject:@YES forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
+            }
+            if (!prefs.run_uicache) {
+                prefs.run_uicache = true;
+            }
             LOG("Successfully disabled Install Cydia.");
         }
     }
@@ -1764,7 +1783,9 @@ void exploit(mach_port_t tfp0,
             LOG("Running uicache...");
             SETMESSAGE(NSLocalizedString(@"Failed to run uicache.", nil));
             _assert(runCommand("/usr/bin/uicache", NULL) == ERR_SUCCESS, message, true);
-            [userDefaults setObject:@NO forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
+            if (![[userDefaults objectForKey:K_REFRESH_ICON_CACHE inDomain:prefsFile] isEqual:@NO]) {
+                [userDefaults setObject:@NO forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
+            }
             LOG("Successfully ran uicache.");
         }
     }
