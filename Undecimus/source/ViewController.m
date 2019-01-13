@@ -300,7 +300,7 @@ void set_all_image_info_addr(uint64_t kernel_task_kaddr, uint64_t all_image_info
     struct task_dyld_info dyld_info = { 0 };
     mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
     _assert(task_info(tfp0, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS, message, true);
-    LOG("Will set all_image_info_addr to: " ADDR "\n", all_image_info_addr);
+    LOG("Will set all_image_info_addr to: "ADDR"", all_image_info_addr);
     if (dyld_info.all_image_info_addr != all_image_info_addr) {
         LOG("Setting all_image_info_addr...");
         WriteKernel64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_ALL_IMAGE_INFO_ADDR), all_image_info_addr);
@@ -315,7 +315,7 @@ void set_all_image_info_size(uint64_t kernel_task_kaddr, uint64_t all_image_info
     struct task_dyld_info dyld_info = { 0 };
     mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
     _assert(task_info(tfp0, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS, message, true);
-    LOG("Will set all_image_info_size to: " ADDR "\n", all_image_info_size);
+    LOG("Will set all_image_info_size to: "ADDR"", all_image_info_size);
     if (dyld_info.all_image_info_size != all_image_info_size) {
         LOG("Setting all_image_info_size...");
         WriteKernel64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_ALL_IMAGE_INFO_SIZE), all_image_info_size);
@@ -1026,8 +1026,8 @@ void exploit(mach_port_t tfp0,
             const char *systemSnapshotMountPoint = "/var/MobileSoftwareUpdate/mnt1";
             _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
             _assert(runCommand("/sbin/mount_apfs", thedisk, systemSnapshotMountPoint, NULL) == ERR_SUCCESS, message, true);
-            const char *systemSnapshotlaunchdPath = [NSString stringWithFormat:@"%s/sbin/launchd", systemSnapshotMountPoint].UTF8String;
-            _assert(waitForFile(systemSnapshotlaunchdPath) == ERR_SUCCESS, message, true);
+            const char *systemSnapshotLaunchdPath = [NSString stringWithFormat:@"%s/sbin/launchd", systemSnapshotMountPoint].UTF8String;
+            _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
             LOG("Successfully mounted system snapshot.");
             
             // Rename system snapshot.
