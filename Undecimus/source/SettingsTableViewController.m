@@ -410,6 +410,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayFooterView:(UITableViewHeaderFooterView *)footerView forSection:(NSInteger)section {
+    footerView.textLabel.text = [@"unc0ver " stringByAppendingString:[[[NSBundle mainBundle] infoDictionary] valueForKey:@"CFBundleShortVersionString"]];
     footerView.textLabel.textAlignment = NSTextAlignmentCenter;
 }
 
