@@ -47,7 +47,7 @@
 #include "multi_path_sploit.h"
 #include "async_wake.h"
 #include "utils.h"
-#include "unar.h"
+#include "ArchiveFile.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -679,6 +679,9 @@ void extractResources() {
     if (!debIsConfigured("trustinjector")) {
         _assert(installDeb("injector.deb", false), message, true);
     }
+    if (!debIsConfigured("mobilesubstrate")) {
+        installDebs(@[ @"substrate-safemode.deb", @"mobilesubstrate.deb" ], true);
+    }
     _assert(installDeb("resources.deb", false), message, true);
 }
 
@@ -1131,18 +1134,6 @@ void exploit(mach_port_t tfp0,
             LOG(@"We need substrate");
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
                 
-        if (needStrap || needSubstrate) {
-            NSString *tar_tar = pathForResource(@"tar.tar");
-            _assert(tar_tar != nil, message, true);
-            _assert(untar(tar_tar.UTF8String), message, true);
-            _assert(init_file("/jb/tar", 0, 0755), message, true);
-            
-            NSString *lzma_tar = pathForResource(@"lzma.tar");
-            _assert(lzma_tar != nil, message, true);
-            _assert(untar(lzma_tar.UTF8String), message, true);
-            _assert(init_file("/jb/lzma", 0, 0755), message, true);
-        }
-
         // These don't need to lay around
         clean_file("/Library/LaunchDaemons/jailbreakd.plist");
         clean_file("/jb/jailbreakd.plist");
@@ -1267,11 +1258,11 @@ void exploit(mach_port_t tfp0,
         if (!needResources) {
             resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
         }
-        if (needStrap || needSubstrate) {
-            resources = [@[@"/jb/tar", @"/jb/lzma"] arrayByAddingObjectsFromArray:resources];
+        if (!needSubstrate && cdhashFor(@"/usr/libexec/substrate") != nil) {
+            resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
+        } else {
+            needSubstrate = true;
         }
-        _assert(cdhashFor(@"/usr/libexec/substrate") != nil, message, true);
-        resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
         _assert(injectTrustCache(resources, GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
     }
@@ -1384,12 +1375,15 @@ void exploit(mach_port_t tfp0,
 
         // Extract Substrate if necessary
         if (needSubstrate) {
-            ARFile *substrate_deb = [ARFile arFileWithFile:pathForResource(@"mobilesubstrate.deb")];
+            LOG("Extracting substrate from deb...");
+            ArchiveFile *substrate_deb = [ArchiveFile archiveWithFile:pathForResource(@"mobilesubstrate.deb")];
             _assert(substrate_deb != nil, message, true);
             _assert([substrate_deb extract:@"data.tar.lzma" toPath:@"/jb/substrate.tar.lzma"], message, true);
-            int rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvC", "/", "-f", "/jb/substrate.tar.lzma", NULL);
-            _assert(rv == ERR_SUCCESS, message, true);
+            ArchiveFile *substrate_data = [ArchiveFile archiveWithFile:@"/jb/substrate.tar.lzma"];
+            _assert(substrate_data != nil, message, true);
+            _assert([substrate_data extractToPath:@"/"], message, true);
             _assert(injectTrustCache(@[@"/usr/libexec/substrate"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
+            LOG("Successfully extracted substrate");
         }
         // Run substrate
         LOG("Starting Substrate...");
@@ -1407,9 +1401,15 @@ void exploit(mach_port_t tfp0,
         if (needStrap) {
             NSString *strap_tar = pathForResource(@"strap.tar.lzma");
             _assert(strap_tar != nil, message, true);
-            _assert(chdir("/") == ERR_SUCCESS, message, true);
-            rv = runCommand("/jb/tar", "--use-compress-program=/jb/lzma", "-xvpkf", strap_tar.UTF8String, NULL);
-            _assert(rv == ENOENT || rv == ERR_SUCCESS, message, true);
+            ArchiveFile *strap = [ArchiveFile archiveWithFile:strap_tar];
+            _assert(strap != nil, message, true);
+            int flags = ARCHIVE_EXTRACT_TIME;
+            flags |= ARCHIVE_EXTRACT_PERM;
+            flags |= ARCHIVE_EXTRACT_ACL;
+            flags |= ARCHIVE_EXTRACT_FFLAGS;
+            flags |= ARCHIVE_EXTRACT_OWNER;
+            flags |= ARCHIVE_EXTRACT_NO_OVERWRITE;
+            _assert([strap extractToPath:@"/" withFlags:flags], message, true);
             rv = system("/usr/libexec/cydia/firmware.sh");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             extractResources();
@@ -1423,26 +1423,23 @@ void exploit(mach_port_t tfp0,
             }
             if (needResources || updatedResources) {
                 extractResources();
+            } else if (needSubstrate) {
+                installDebs(@[ @"substrate-safemode.deb", @"mobilesubstrate.deb" ], true);
+            }
+            // Now that things are running, let's install the deb for the files we just extracted
+            if (!debIsInstalled("lzma") || compareInstalledVersion("lzma", "lt", "2:0")) {
+                installDeb("lzma.deb", false);
+            }
+            if (!debIsInstalled("xz")) {
+                installDeb("xz.deb", false);
             }
         }
         if (access("/.installed_unc0ver", F_OK) != ERR_SUCCESS) {
             _assert(create_file("/.installed_unc0ver", 0, 0644), message, true);
         }
-        if (needStrap || needSubstrate) {
-            clean_file("/jb/tar");
-            clean_file("/jb/lzma");
-            clean_file("/jb/substrate.tar.lzma");
-        }
-        // Now that things are running, let's install the deb for the files we just extracted
-        if (!debIsInstalled("lzma") || compareInstalledVersion("lzma", "lt", "2:0")) {
-            installDeb("lzma.deb", false);
-        }
-        if (!debIsInstalled("xz")) {
-            installDeb("xz.deb", false);
-        }
-        if (needSubstrate) {
-            installDebs(@[ @"substrate-safemode.deb", @"mobilesubstrate.deb" ], true);
-        }
+        clean_file("/jb/tar");
+        clean_file("/jb/lzma");
+        clean_file("/jb/substrate.tar.lzma");
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
         
         ensure_symlink("/jb", "/electra");
@@ -1601,7 +1598,11 @@ void exploit(mach_port_t tfp0,
             // Install OpenSSH.
             LOG("Installing OpenSSH...");
             SETMESSAGE(NSLocalizedString(@"Failed to install OpenSSH.", nil));
-            _assert(installDebs(@[@"openssh.deb", @"openssl.deb", @"ca-certificates.deb"], false), message, true);
+            if (debIsConfigured("openssl") &&
+                compareInstalledVersion("openssl", "lt", "1.0.2q")) {
+                _assert(removeDeb("openssl", true), message, false);
+            }
+            _assert(installDebs(@[@"openssh.deb", @"openssl.deb", @"ca-certificates.deb"], false), message, false);
             LOG("Successfully installed OpenSSH.");
             
             // Disable Install OpenSSH.

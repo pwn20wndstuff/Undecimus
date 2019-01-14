@@ -3,7 +3,7 @@
 //  Undecimus
 //
 //  Created by Sam Bingner on 11/23/18.
-//  Copyright © 2018 - 2019 Pwn20wnd. All rights reserved.
+//  Copyright © 2018 - 2019 Sam Bingner. All rights reserved.
 //
 
 #import <mach/error.h>

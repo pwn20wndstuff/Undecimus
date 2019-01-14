@@ -3,11 +3,11 @@
 //  Undecimus
 //
 //  Created by Sam Bingner on 11/23/18.
-//  Copyright © 2018 - 2019 Pwn20wnd. All rights reserved.
+//  Copyright © 2018 - 2019 Sam Bingner. All rights reserved.
 //
 
-#ifndef utils_h
-#define utils_h
+#ifndef _UTILS_H
+#define _UTILS_H
 #import <sys/types.h>
 #import <sys/stat.h>
 
@@ -94,4 +94,4 @@ NSString *getBundledResources(void);
 
 extern NSData *lastSystemOutput;
 
-#endif /* utils_h */
+#endif /* _UTILS_H */
