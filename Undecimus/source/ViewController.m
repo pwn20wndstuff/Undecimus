@@ -43,7 +43,6 @@
 #include "remote_call.h"
 #include "unlocknvram.h"
 #include "SettingsTableViewController.h"
-#include "untar.h"
 #include "multi_path_sploit.h"
 #include "async_wake.h"
 #include "utils.h"
@@ -1169,8 +1168,9 @@ void exploit(mach_port_t tfp0,
                 _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
                 NSString *rsync_tar = pathForResource(@"rsync.tar");
                 _assert(rsync_tar != nil, message, true);
-                _assert(untar(rsync_tar.UTF8String), message, true);
-                _assert(init_file("/jb/rsync", 0, 0755), message, true);
+                ArchiveFile *rsync = [ArchiveFile archiveWithFile:rsync_tar];
+                _assert(rsync != nil, message, true);
+                _assert([rsync extractToPath:@"/jb"], message, true);
                 _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
                 _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "/var/MobileSoftwareUpdate/mnt1/.", "/", NULL) == 0, message, true);
                 unmount(systemSnapshotMountPoint, 0);

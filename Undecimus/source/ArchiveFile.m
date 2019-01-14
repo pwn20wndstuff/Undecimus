@@ -157,6 +157,16 @@ out:
     return result;
 }
 
+-(BOOL)extract
+{
+    return [self extractToPath:[[NSFileManager defaultManager] currentDirectoryPath]];
+}
+
+-(BOOL)extractWithFlags:(int)flags
+{
+    return [self extractToPath:[[NSFileManager defaultManager] currentDirectoryPath] withFlags:flags];
+}
+
 -(BOOL)extractToPath:(NSString*)path
 {
     /* Select which attributes we want to restore. */

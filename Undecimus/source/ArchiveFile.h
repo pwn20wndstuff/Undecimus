@@ -17,6 +17,8 @@
 -(ArchiveFile*)initWithFile:(NSString*)filename;
 -(BOOL)contains:(NSString*)file;
 -(NSArray <NSString*> *)files;
+-(BOOL)extract;
+-(BOOL)extractWithFlags:(int)flags;
 -(BOOL)extract:(NSString*)file toPath:(NSString*)path;
 -(BOOL)extractToPath:(NSString*)path;
 -(BOOL)extractToPath:(NSString*)path withFlags:(int)flags;
