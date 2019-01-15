@@ -571,7 +571,13 @@ bool supportsExploit(NSInteger exploit) {
               @"4570.52.2~8",
               @"4570.60.10.0.1~16",
               @"4570.60.16~9",
-              @"4570.60.19~25"];
+              @"4570.60.19~25",
+              @"4570.60.21~7",
+              @"4570.60.21~3",
+              @"4570.70.14~16",
+              @"4570.70.19~13",
+              @"4570.70.24~9",
+              @"4570.70.24~3"];
             for (NSString *string in list) {
                 if (kernelVersionContains(string.UTF8String) &&
                     !jailbreakEnabled()) {
@@ -609,7 +615,13 @@ bool supportsExploit(NSInteger exploit) {
               @"4570.52.2~8",
               @"4570.60.10.0.1~16",
               @"4570.60.16~9",
-              @"4570.60.19~25"];
+              @"4570.60.19~25",
+              @"4570.60.21~7",
+              @"4570.60.21~3",
+              @"4570.70.14~16",
+              @"4570.70.19~13",
+              @"4570.70.24~9",
+              @"4570.70.24~3"];
             for (NSString *string in list) {
                 if (kernelVersionContains(string.UTF8String)) {
                     return true;
