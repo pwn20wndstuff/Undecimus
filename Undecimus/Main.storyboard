@@ -138,7 +138,7 @@
                                             </button>
                                         </subviews>
                                     </stackView>
-                                    <textView opaque="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bvv-3a-l9y">
+                                    <textView hidden="YES" opaque="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bvv-3a-l9y">
                                         <rect key="frame" x="21" y="457" width="278" height="54"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <color key="textColor" white="0.75" alpha="1" colorSpace="calibratedWhite"/>

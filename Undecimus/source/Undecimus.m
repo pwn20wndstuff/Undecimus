@@ -1901,6 +1901,12 @@ void exploit(mach_port_t tfp0,
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        _outputView.hidden = NO;
+    } else {
+        // So we don't waste cycles if we aren't displaying it anyway
+        _outputView = nil;
+    }
     sharedController = self;
     if (jailbreakEnabled()) {
         PROGRESS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);
@@ -1945,11 +1951,13 @@ void exploit(mach_port_t tfp0,
 }
 
 -(void)appendTextToOutput:(NSString *)text {
-    if (output == nil)
-        output = [NSMutableString new];
-    [output appendString:text];
-    _outputView.text = output;
-    [_outputView scrollRangeToVisible:NSMakeRange(output.length - 1, 1)];
+    if (_outputView != nil) {
+        if (output == nil)
+            output = [NSMutableString new];
+        [output appendString:text];
+        _outputView.text = output;
+        [_outputView scrollRangeToVisible:NSMakeRange(output.length - 1, 1)];
+    }
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
