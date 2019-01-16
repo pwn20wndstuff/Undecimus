@@ -102,6 +102,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@iBSparkes](https://twitter.com/iBSparkes) for the original amfid_payload, jailbreakd and pspawn_hook
 * [@stek29](https://twitter.com/stek29) for the patchfinder64 additions, unlocknvram, host_get_special_port(4) patch and shenanigans bypass
 * [@theninjaprawn](https://twitter.com/theninjaprawn) for the patchfinder64 additions
+* [@saurik](https://twitter.com/saurik) for Cydia and Substrate
 * [@Cryptiiiic](https://twitter.com/Cryptiiiic) for testing
 * [@xanDesign_](https://twitter.com/xanDesign_) for testing
 * [@AppleDry05](https://twitter.com/AppleDry05) for testing
