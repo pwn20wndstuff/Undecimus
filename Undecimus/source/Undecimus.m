@@ -1691,10 +1691,10 @@ void exploit(mach_port_t tfp0,
                 }), message, true);
             }
         }
-        if ([[NSString stringWithContentsOfFile:@"/Library/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil]
+        if ([[NSString stringWithContentsOfFile:@"/var/lib/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil]
              rangeOfString:@"/sbin/fstyp"].location != NSNotFound) {
             // This is not a stock file for iOS11+
-            runCommand("/bin/sed", "-ie", "/^\\/sbin\\/fstyp/d", "/Library/dpkg/info/firmware-sbin.list", NULL);
+            runCommand("/bin/sed", "-ie", "/^\\/sbin\\/fstyp/d", "/var/lib/dpkg/info/firmware-sbin.list", NULL);
         }
         // Unblock Saurik's repo if it is blocked.
         unblockDomainWithName("apt.saurik.com");
