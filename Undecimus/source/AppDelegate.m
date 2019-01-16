@@ -7,8 +7,8 @@
 //
 
 #import "AppDelegate.h"
-#include "ViewController.h"
-#include "SettingsTableViewController.h"
+#include "Undecimus.h"
+#include "UndecimusSettings.h"
 #include "utils.h"
 
 @interface AppDelegate ()
@@ -108,7 +108,7 @@
 - (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
     switch ([[shortcutItem type] integerValue]) {
         case 1: {
-            [[ViewController sharedController] performSelectorOnMainThread:@selector(tappedOnJailbreak:) withObject:nil waitUntilDone:YES];
+            [[Undecimus sharedController] performSelectorOnMainThread:@selector(tappedOnJailbreak:) withObject:nil waitUntilDone:YES];
             break;
         }
         default:
@@ -118,7 +118,7 @@
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary <UIApplicationOpenURLOptionsKey, id> *)options {
     if ([[url scheme] isEqualToString:@"jailbreak"]) {
-        [[ViewController sharedController] performSelectorOnMainThread:@selector(tappedOnJailbreak:) withObject:nil waitUntilDone:YES];
+        [[Undecimus sharedController] performSelectorOnMainThread:@selector(tappedOnJailbreak:) withObject:nil waitUntilDone:YES];
         return YES;
     }
     return NO;

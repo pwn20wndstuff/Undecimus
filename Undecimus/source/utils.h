@@ -91,6 +91,12 @@ NSInteger recommendedRestartSupport(void);
 NSInteger recommendedRespringSupport(void);
 bool daemonIsLoaded(char *daemonID);
 NSString *getBundledResources(void);
+bool debuggerEnabled(void);
+const char *getLogFile(void);
+void enableLogging(void);
+void disableLogging(void);
+void cleanLogs(void);
+bool modifyPlist(NSString *filename, void (^function)(id));
 
 extern NSData *lastSystemOutput;
 

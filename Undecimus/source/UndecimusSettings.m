@@ -1,5 +1,5 @@
 //
-//  SettingsTableViewController.m
+//  UndecimusSettings.m
 //  Undecimus
 //
 //  Created by Pwn20wnd on 9/14/18.
@@ -8,18 +8,18 @@
 
 #include <sys/utsname.h>
 #include <sys/sysctl.h>
-#import "SettingsTableViewController.h"
+#import "UndecimusSettings.h"
 #include <common.h>
 #include "hideventsystem.h"
 #include "remote_call.h"
-#include "ViewController.h"
+#include "Undecimus.h"
 #include "utils.h"
 
-@interface SettingsTableViewController ()
+@interface UndecimusSettings ()
 
 @end
 
-@implementation SettingsTableViewController
+@implementation UndecimusSettings
 
 // https://github.com/Matchstic/ReProvision/blob/7b595c699335940f68702bb204c5aa55b8b1896f/Shared/Application%20Database/RPVApplication.m#L102
 
@@ -87,7 +87,7 @@
                 
                 if ([key isEqualToString:@"Depends"]) //process the array
                 {
-                    NSArray *dependsObject = [SettingsTableViewController dependencyArrayFromString:object];
+                    NSArray *dependsObject = [UndecimusSettings dependencyArrayFromString:object];
                     
                     [currentPackage setObject:dependsObject forKey:key];
                     
@@ -151,7 +151,7 @@
     id currentSource = nil;
     while (currentSource = [sourceEnum nextObject])
     {
-        NSString *theObject = [SettingsTableViewController domainFromRepoObject:currentSource];
+        NSString *theObject = [UndecimusSettings domainFromRepoObject:currentSource];
         if (theObject != nil)
         {
             if (![finalArray containsObject:theObject])
@@ -166,7 +166,7 @@
     struct utsname u = { 0 };
     NSMutableDictionary *md = nil;
     uname(&u);
-    md = [[NSMutableDictionary alloc] init];
+    md = [NSMutableDictionary new];
     md[@"Sysname"] = [NSString stringWithUTF8String:u.sysname];
     md[@"Nodename"] = [NSString stringWithUTF8String:u.nodename];
     md[@"Release"] = [NSString stringWithUTF8String:u.release];
@@ -174,9 +174,9 @@
     md[@"Machine"] = [NSString stringWithUTF8String:u.machine];
     md[@"ProductVersion"] = [NSMutableDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductVersion"];
     md[@"ProductBuildVersion"] = [NSMutableDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"];
-    md[@"Sources"] = [SettingsTableViewController sourcesFromFile:CYDIA_LIST];
-    md[@"Packages"] = [SettingsTableViewController parsedPackageArray];
-    md[@"Preferences"] = [[NSMutableDictionary alloc] init];
+    md[@"Sources"] = [UndecimusSettings sourcesFromFile:CYDIA_LIST];
+    md[@"Packages"] = [UndecimusSettings parsedPackageArray];
+    md[@"Preferences"] = [NSMutableDictionary new];
     md[@"Preferences"][@"TweakInjection"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_TWEAK_INJECTION];
     md[@"Preferences"][@"LoadDaemons"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_LOAD_DAEMONS];
     md[@"Preferences"][@"DumpAPTicket"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_DUMP_APTICKET];
@@ -192,7 +192,7 @@
     md[@"Preferences"][@"InstallCydia"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_INSTALL_CYDIA];
     md[@"Preferences"][@"InstallOpenSSH"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_INSTALL_OPENSSH];
     md[@"AppVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    md[@"LogFile"] = [NSString stringWithContentsOfFile:[NSString stringWithUTF8String:LOG_FILE] encoding:NSUTF8StringEncoding error:nil];
+    md[@"LogFile"] = [NSString stringWithContentsOfFile:[NSString stringWithUTF8String:getLogFile()] encoding:NSUTF8StringEncoding error:nil];
     return md;
 }
 
@@ -238,7 +238,7 @@
     [self.KernelExploitSegmentedControl setEnabled:supportsExploit(multi_path) forSegmentAtIndex:1];
     [self.KernelExploitSegmentedControl setEnabled:supportsExploit(async_wake) forSegmentAtIndex:2];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
-    [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[SettingsTableViewController _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, NSLocalizedString(@"Days", nil)]];
+    [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[UndecimusSettings _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, NSLocalizedString(@"Days", nil)]];
     [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_OVERWRITE_BOOT_NONCE]];
     [self.ExportKernelTaskPortSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_EXPORT_KERNEL_TASK_PORT]];
     [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_RESTORE_ROOTFS]];
@@ -325,7 +325,7 @@
 
 - (IBAction)tappedOnShareDiagnosticsData:(id)sender {
     NSURL *URL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Documents/diagnostics.plist", NSHomeDirectory()]];
-    [[SettingsTableViewController getDiagnostics] writeToURL:URL error:nil];
+    [[UndecimusSettings getDiagnostics] writeToURL:URL error:nil];
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[URL] applicationActivities:nil];
     if ([activityViewController respondsToSelector:@selector(popoverPresentationController)]) {
         [[activityViewController popoverPresentationController] setSourceView:self.ShareDiagnosticsDataButton];
@@ -453,8 +453,9 @@
 }
 
 - (IBAction)tappedOnCleanDiagnosticsData:(id)sender {
-    RESET_LOGS();
-    START_LOGGING();
+    disableLogging();
+    cleanLogs();
+    enableLogging();
     NOTICE(@"Cleaned diagnostics data.", false, false);
 }
 

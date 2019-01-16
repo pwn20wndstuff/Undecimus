@@ -1,5 +1,5 @@
-#ifndef offsets_h
-#define offsets_h
+#ifndef KernelOffsets_h
+#define KernelOffsets_h
 
 enum kstruct_offset {
   /* struct task */
@@ -52,6 +52,7 @@ enum kstruct_offset {
   /* struct vnode */
   KSTRUCT_OFFSET_VNODE_V_MOUNT,
   KSTRUCT_OFFSET_VNODE_VU_SPECINFO,
+  KSTRUCT_OFFSET_VNODE_V_LOCK,
     
   /* struct specinfo */
   KSTRUCT_OFFSET_SPECINFO_SI_FLAGS,

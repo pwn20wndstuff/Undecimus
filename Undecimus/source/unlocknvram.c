@@ -15,9 +15,9 @@
 #include <QiLin.h>
 #include <iokit.h>
 #include <common.h>
-#include "kutils.h"
-#include "offsets.h"
-#include "kmem.h"
+#include "KernelUtilities.h"
+#include "KernelStructureOffsets.h"
+#include "KernelMemory.h"
 
 // from vtable start in bytes
 unsigned VTB_IODTNVRAM__SEARCHNVRAMPROPERTY = 0x590;

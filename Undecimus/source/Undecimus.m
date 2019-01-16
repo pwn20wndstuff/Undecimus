@@ -1,5 +1,5 @@
 //
-//  ViewController.m
+//  Undecimus.m
 //  Undecimus
 //
 //  Created by pwn20wnd on 8/29/18.
@@ -32,17 +32,17 @@
 #include <reboot.h>
 #import <snappy.h>
 #import <inject.h>
-#import "ViewController.h"
-#include "offsets.h"
+#import "Undecimus.h"
+#include "KernelStructureOffsets.h"
 #include "empty_list_sploit.h"
-#include "kmem.h"
+#include "KernelMemory.h"
 #include "patchfinder64.h"
-#include "kexecute.h"
-#include "kutils.h"
+#include "KernelExecution.h"
+#include "KernelUtilities.h"
 #include "remote_memory.h"
 #include "remote_call.h"
 #include "unlocknvram.h"
-#include "SettingsTableViewController.h"
+#include "UndecimusSettings.h"
 #include "multi_path_sploit.h"
 #include "async_wake.h"
 #include "utils.h"
@@ -53,21 +53,21 @@
 - (void)setObject:(id)arg1 forKey:(id)arg2 inDomain:(id)arg3;
 @end
 
-@interface ViewController ()
+@interface Undecimus ()
 
 @end
 
-@implementation ViewController
-static ViewController *sharedController = nil;
+@implementation Undecimus
+static Undecimus *sharedController = nil;
 
 #define PROGRESS(msg, btnenbld, tbenbld) do { \
         LOG("PROGRESS: %@", msg); \
         dispatch_async(dispatch_get_main_queue(), ^{ \
             [UIView performWithoutAnimation:^{ \
-                [[[ViewController sharedController] goButton] setEnabled:btnenbld]; \
-                [[[[ViewController sharedController] tabBarController] tabBar] setUserInteractionEnabled:tbenbld]; \
-                [[[ViewController sharedController] goButton] setTitle:msg forState: btnenbld ? UIControlStateNormal : UIControlStateDisabled]; \
-                [[[ViewController sharedController] goButton] layoutIfNeeded]; \
+                [[[Undecimus sharedController] goButton] setEnabled:btnenbld]; \
+                [[[[Undecimus sharedController] tabBarController] tabBar] setUserInteractionEnabled:tbenbld]; \
+                [[[Undecimus sharedController] goButton] setTitle:msg forState: btnenbld ? UIControlStateNormal : UIControlStateDisabled]; \
+                [[[Undecimus sharedController] goButton] layoutIfNeeded]; \
             }]; \
         }); \
 } while (false)
@@ -99,6 +99,8 @@ typedef struct {
     kptr_t kernproc;
     kptr_t kernel_task;
     kptr_t shenanigans;
+    kptr_t lck_mtx_lock;
+    kptr_t lck_mtx_unlock;
 } offsets_t;
 
 typedef struct {
@@ -830,6 +832,14 @@ void exploit(mach_port_t tfp0,
         SETOFFSET(shenanigans, find_shenanigans());
         LOG("shenanigans = "ADDR"", GETOFFSET(shenanigans));
         _assert(ISADDR(GETOFFSET(shenanigans)), message, true);
+        SETMESSAGE(NSLocalizedString(@"Failed to find find_lck_mtx_lock offset.", nil));
+        SETOFFSET(lck_mtx_lock, find_lck_mtx_lock());
+        LOG("lck_mtx_lock = "ADDR"", GETOFFSET(lck_mtx_lock));
+        _assert(ISADDR(GETOFFSET(lck_mtx_lock)), message, true);
+        SETMESSAGE(NSLocalizedString(@"Failed to find lck_mtx_unlock offset.", nil));
+        SETOFFSET(lck_mtx_unlock, find_lck_mtx_unlock());
+        LOG("lck_mtx_unlock = "ADDR"", GETOFFSET(lck_mtx_unlock));
+        _assert(ISADDR(GETOFFSET(lck_mtx_unlock)), message, true);
         LOG("Successfully found offsets.");
     }
     
@@ -1085,7 +1095,14 @@ void exploit(mach_port_t tfp0,
             v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
             WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag);
         }
-        needStrap = access("/.installed_unc0ver", F_OK) != ERR_SUCCESS && access("/electra", F_OK) != ERR_SUCCESS;
+        needStrap = (access("/.installed_unc0ver", F_OK) != ERR_SUCCESS ||
+                     (![[NSString stringWithContentsOfFile:@"/.installed_unc0ver"] isEqualToString:@""] &&
+                    ![[NSString stringWithContentsOfFile:@"/.installed_unc0ver"] isEqualToString:
+                    [NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber]]))
+                    && access("/electra", F_OK) != ERR_SUCCESS;
+        if (needStrap) {
+            LOG("We need strap");
+        }
         if (snapshots != NULL && needStrap && !has_origfs) {
             // Create system snapshot.
             
@@ -1217,23 +1234,17 @@ void exploit(mach_port_t tfp0,
             SETMESSAGE(NSLocalizedString(@"Failed to disallow SpringBoard to show non-default system apps.", nil));
             NSString *SpringBoardPreferencesFile = @"/var/mobile/Library/Preferences/com.apple.springboard.plist";
             NSString *SpringBoardShowNonDefaultSystemAppsKey = @"SBShowNonDefaultSystemApps";
-            NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithContentsOfFile:SpringBoardPreferencesFile];
-            _assert(dictionary != nil, message, true);
-            for (int i = 0; !(i >= 5 || [dictionary[SpringBoardShowNonDefaultSystemAppsKey] isEqual:@NO]); i++) {
-                dictionary[SpringBoardShowNonDefaultSystemAppsKey] = @NO;
-                _assert(([dictionary writeToFile:SpringBoardPreferencesFile atomically:YES]), message, true);
-                dictionary = [NSMutableDictionary dictionaryWithContentsOfFile:SpringBoardPreferencesFile];
-                _assert(dictionary != nil, message, true);
-            }
-            _assert([dictionary[SpringBoardShowNonDefaultSystemAppsKey] isEqual:@NO], message, true);
+            _assert(modifyPlist(SpringBoardPreferencesFile, ^(id plist) {
+                plist[SpringBoardShowNonDefaultSystemAppsKey] = @NO;
+            }), message, true);
             
             // Disable RootFS Restore.
             
             LOG("Disabling RootFS Restore...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable RootFS Restore.", nil));
-            if (![[userDefaults objectForKey:K_RESTORE_ROOTFS inDomain:prefsFile] isEqual:@NO]) {
-                [userDefaults setObject:@NO forKey:K_RESTORE_ROOTFS inDomain:prefsFile];
-            }
+            _assert(modifyPlist(prefsFile, ^(id plist) {
+                plist[K_RESTORE_ROOTFS] = @NO;
+            }), message, true);
             LOG("Successfully disabled RootFS Restore.");
             
             // Reboot.
@@ -1266,6 +1277,7 @@ void exploit(mach_port_t tfp0,
         _assert(injectTrustCache(resources, GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
     }
+    
     UPSTAGE();
     
     {
@@ -1275,7 +1287,10 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to log slide.", nil));
         NSData *fileData = [[NSString stringWithFormat:@(ADDR "\n"), kernel_slide] dataUsingEncoding:NSUTF8StringEncoding];
         _assert(fileData != nil, message, false);
-        _assert(create_file_data("/var/tmp/slide.txt", 0, 0644, fileData), message, false);
+        if (![[NSData dataWithContentsOfFile:@"/var/tmp/slide.txt"] isEqual:fileData]) {
+            _assert(clean_file("/var/tmp/slide.txt"), message, true);
+            _assert(create_file_data("/var/tmp/slide.txt", 0, 0644, fileData), message, false);
+        }
         LOG("Successfully logged slide.");
     }
     
@@ -1289,10 +1304,9 @@ void exploit(mach_port_t tfp0,
         CFStringRef value = MGCopyAnswer(kMGUniqueChipID);
         LOG("ECID = %@", value);
         _assert(value != nil, message, true);
-        if (![[userDefaults objectForKey:K_ECID inDomain:prefsFile] isEqual:(__bridge id)(value)]) {
-            [userDefaults setObject:(__bridge id)(value) forKey:K_ECID inDomain:prefsFile];
-        }
-        CFRelease(value);
+        _assert(modifyPlist(prefsFile, ^(id plist) {
+            plist[K_ECID] = CFBridgingRelease(value);
+        }), message, true);
         LOG("Successfully logged ECID.");
     }
     
@@ -1303,27 +1317,31 @@ void exploit(mach_port_t tfp0,
         
         LOG("Logging offsets...");
         SETMESSAGE(NSLocalizedString(@"Failed to log offsets.", nil));
-        NSMutableDictionary *md = [NSMutableDictionary new];
-        md[@"KernelBase"] = ADDRSTRING(kernel_base);
-        md[@"KernelSlide"] = ADDRSTRING(kernel_slide);
-        md[@"TrustChain"] = ADDRSTRING(GETOFFSET(trust_chain));
-        md[@"AmfiCache"] = ADDRSTRING(GETOFFSET(amficache));
-        md[@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
-        md[@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
-        md[@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
-        md[@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
-        md[@"AllProc"] = ADDRSTRING(GETOFFSET(allproc));
-        md[@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
-        md[@"RootVnode"] = ADDRSTRING(GETOFFSET(rootvnode));
-        md[@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref));
-        md[@"VfsContextCurrent"] = ADDRSTRING(GETOFFSET(vfs_context_current));
-        md[@"VnodeLookup"] = ADDRSTRING(GETOFFSET(vnode_lookup));
-        md[@"VnodePut"] = ADDRSTRING(GETOFFSET(vnode_put));
-        md[@"KernProc"] = ADDRSTRING(GETOFFSET(kernproc));
-        md[@"KernelTask"] = ADDRSTRING(GETOFFSET(kernel_task));
-        md[@"Shenanigans"] = ADDRSTRING(GETOFFSET(shenanigans));
-        _assert(([md writeToFile:@"/jb/offsets.plist" atomically:YES]), message, true);
-        _assert(init_file("/jb/offsets.plist", 0, 0644), message, true);
+        NSMutableDictionary *dictionary = [NSMutableDictionary new];
+        dictionary[@"KernelBase"] = ADDRSTRING(kernel_base);
+        dictionary[@"KernelSlide"] = ADDRSTRING(kernel_slide);
+        dictionary[@"TrustChain"] = ADDRSTRING(GETOFFSET(trust_chain));
+        dictionary[@"AmfiCache"] = ADDRSTRING(GETOFFSET(amficache));
+        dictionary[@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
+        dictionary[@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
+        dictionary[@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
+        dictionary[@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
+        dictionary[@"AllProc"] = ADDRSTRING(GETOFFSET(allproc));
+        dictionary[@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
+        dictionary[@"RootVnode"] = ADDRSTRING(GETOFFSET(rootvnode));
+        dictionary[@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref));
+        dictionary[@"VfsContextCurrent"] = ADDRSTRING(GETOFFSET(vfs_context_current));
+        dictionary[@"VnodeLookup"] = ADDRSTRING(GETOFFSET(vnode_lookup));
+        dictionary[@"VnodePut"] = ADDRSTRING(GETOFFSET(vnode_put));
+        dictionary[@"KernProc"] = ADDRSTRING(GETOFFSET(kernproc));
+        dictionary[@"KernelTask"] = ADDRSTRING(GETOFFSET(kernel_task));
+        dictionary[@"Shenanigans"] = ADDRSTRING(GETOFFSET(shenanigans));
+        dictionary[@"LckMtxLock"] = ADDRSTRING(GETOFFSET(lck_mtx_lock));
+        dictionary[@"LckMtxUnlock"] = ADDRSTRING(GETOFFSET(lck_mtx_unlock));
+        if (![[NSMutableDictionary dictionaryWithContentsOfFile:@"/jb/offsets.plist"] isEqual:dictionary]) {
+            _assert(([dictionary writeToFile:@"/jb/offsets.plist" atomically:YES]), message, true);
+            _assert(init_file("/jb/offsets.plist", 0, 0644), message, true);
+        }
         LOG("Successfully logged offsets.");
     }
     
@@ -1415,8 +1433,12 @@ void exploit(mach_port_t tfp0,
             extractResources();
             rv = runCommand("/usr/bin/dpkg", "--configure", "-a", NULL);
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
-            prefs.run_uicache = true;
-            [userDefaults setObject:@YES forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
+            if (!prefs.run_uicache) {
+                prefs.run_uicache = true;
+                _assert(modifyPlist(prefsFile, ^(id plist) {
+                    plist[K_REFRESH_ICON_CACHE] = @YES;
+                }), message, true);
+            }
         } else {
             if (!needResources) {
                 updatedResources = compareInstalledVersion("jailbreak-resources", "lt", bundledResources.UTF8String);
@@ -1427,7 +1449,7 @@ void exploit(mach_port_t tfp0,
                 if (debIsInstalled("com.ex.substitute")) {
                     _assert(removeDeb("com.ex.substitute", true), message, true);
                 }
-                _assert(installDebs(@[ @"substrate-safemode.deb", @"mobilesubstrate.deb" ], true), message, true);
+                _assert(installDebs(@[@"substrate-safemode.deb", @"mobilesubstrate.deb"], true), message, true);
             }
             // Now that things are running, let's install the deb for the files we just extracted
             if (!debIsInstalled("lzma") || compareInstalledVersion("lzma", "lt", "2:0")) {
@@ -1437,16 +1459,17 @@ void exploit(mach_port_t tfp0,
                 installDeb("xz.deb", false);
             }
         }
-        if (access("/.installed_unc0ver", F_OK) != ERR_SUCCESS) {
-            _assert(create_file("/.installed_unc0ver", 0, 0644), message, true);
+        NSData *file_data = [[NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber] dataUsingEncoding:NSUTF8StringEncoding];
+        if (![[NSData dataWithContentsOfFile:@"/.installed_unc0ver"] isEqual:file_data]) {
+            _assert(clean_file("/.installed_unc0ver"), message, true);
+            _assert(create_file_data("/.installed_unc0ver", 0, 0644, file_data), message, true);
         }
         clean_file("/jb/tar");
         clean_file("/jb/lzma");
         clean_file("/jb/substrate.tar.lzma");
+        clean_file("/electra");
+        clean_file("/.bootstrapped_electra");
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
-        
-        ensure_symlink("/jb", "/electra");
-        ensure_symlink("/.installed_unc0ver", "/.bootstrapped_electra");
         LOG("Successfully extracted bootstrap.");
     }
     
@@ -1506,17 +1529,12 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to allow SpringBoard to show non-default system apps.", nil));
         NSString *SpringBoardPreferencesFile = @"/var/mobile/Library/Preferences/com.apple.springboard.plist";
         NSString *SpringBoardShowNonDefaultSystemAppsKey = @"SBShowNonDefaultSystemApps";
-        NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithContentsOfFile:SpringBoardPreferencesFile];
-        _assert(dictionary != nil, message, true);
-        for (int i = 0; !(i >= 5 || [dictionary[SpringBoardShowNonDefaultSystemAppsKey] isEqual:@YES]); i++) {
-            dictionary[SpringBoardShowNonDefaultSystemAppsKey] = @YES;
-            _assert(([dictionary writeToFile:SpringBoardPreferencesFile atomically:YES]), message, true);
-            dictionary = [NSMutableDictionary dictionaryWithContentsOfFile:SpringBoardPreferencesFile];
-            _assert(dictionary != nil, message, true);
-        }
-        _assert([dictionary[SpringBoardShowNonDefaultSystemAppsKey] isEqual:@YES], message, true);
+        _assert(modifyPlist(SpringBoardPreferencesFile, ^(id plist) {
+            plist[SpringBoardShowNonDefaultSystemAppsKey] = @YES;
+        }), message, true);
         LOG("Successfully allowed SpringBoard to show non-default system apps.");
     }
+    
     
     UPSTAGE();
     
@@ -1586,10 +1604,9 @@ void exploit(mach_port_t tfp0,
             NSString *jetsamFile = [NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", targettype];
             free(targettype);
             targettype = NULL;
-            NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithContentsOfFile:jetsamFile];
-            _assert(dictionary != nil, message, true);
-            dictionary[@"Version4"][@"System"][@"Override"][@"Global"][@"UserHighWaterMark"] = [NSNumber numberWithInteger:[dictionary[@"Version4"][@"PListDevice"][@"MemoryCapacity"] integerValue]];
-            _assert(([dictionary writeToFile:jetsamFile atomically:YES]), message, true);
+            _assert(modifyPlist(jetsamFile, ^(id plist) {
+                plist[@"Version4"][@"System"][@"Override"][@"Global"][@"UserHighWaterMark"] = [NSNumber numberWithInteger:[plist[@"Version4"][@"PListDevice"][@"MemoryCapacity"] integerValue]];
+            }), message, true);
             LOG("Successfully increased memory limit.");
         }
     }
@@ -1611,9 +1628,10 @@ void exploit(mach_port_t tfp0,
             // Disable Install OpenSSH.
             LOG("Disabling Install OpenSSH...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable Install OpenSSH.", nil));
-            if (![[userDefaults objectForKey:K_INSTALL_OPENSSH inDomain:prefsFile] isEqual:@NO]) {
-                [userDefaults setObject:@NO forKey:K_INSTALL_OPENSSH inDomain:prefsFile];
-            }
+            prefs.install_openssh = false;
+            _assert(modifyPlist(prefsFile, ^(id plist) {
+                plist[K_INSTALL_OPENSSH] = @NO;
+            }), message, true);
             LOG("Successfully disabled Install OpenSSH.");
         }
     }
@@ -1628,28 +1646,49 @@ void exploit(mach_port_t tfp0,
             _assert(removeDeb("cydia-gui", true), message, true);
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
-                [userDefaults setObject:@YES forKey:K_INSTALL_CYDIA inDomain:prefsFile];
+                _assert(modifyPlist(prefsFile, ^(id plist) {
+                    plist[K_INSTALL_CYDIA] = @YES;
+                }), message, true);
+            }
+            if (!prefs.run_uicache) {
                 prefs.run_uicache = true;
-                [userDefaults setObject:@YES forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
+                _assert(modifyPlist(prefsFile, ^(id plist) {
+                    plist[K_REFRESH_ICON_CACHE] = @YES;
+                }), message, true);
             }
             LOG("Successfully removed Electra's Cydia.");
         }
         if (debIsInstalled("cydia-upgrade-helper")) {
-            // Remove Electra's Cydia.
+            // Remove Electra's Cydia Upgrade Helper.
             LOG("Removing Electra's Cydia Upgrade Helper...");
             SETMESSAGE(NSLocalizedString(@"Failed to remove Electra's Cydia Upgrade Helper.", nil));
             _assert(removeDeb("cydia-upgrade-helper", true), message, false);
+            if (!prefs.install_cydia) {
+                prefs.install_cydia = true;
+                _assert(modifyPlist(prefsFile, ^(id plist) {
+                    plist[K_INSTALL_CYDIA] = @YES;
+                }), message, true);
+            }
             if (!prefs.run_uicache) {
                 prefs.run_uicache = true;
-                [userDefaults setObject:@YES forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
+                _assert(modifyPlist(prefsFile, ^(id plist) {
+                    plist[K_REFRESH_ICON_CACHE] = @YES;
+                }), message, true);
             }
+            LOG("Successfully removed Electra's Cydia Upgrade Helper.");
         }
         if (access("/etc/apt/sources.list.d/electra.list", F_OK) == ERR_SUCCESS) {
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
-                [userDefaults setObject:@YES forKey:K_INSTALL_CYDIA inDomain:prefsFile];
+                _assert(modifyPlist(prefsFile, ^(id plist) {
+                    plist[K_INSTALL_CYDIA] = @YES;
+                }), message, true);
+            }
+            if (!prefs.run_uicache) {
                 prefs.run_uicache = true;
-                [userDefaults setObject:@YES forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
+                _assert(modifyPlist(prefsFile, ^(id plist) {
+                    plist[K_REFRESH_ICON_CACHE] = @YES;
+                }), message, true);
             }
         }
         // This is not a stock file for iOS11+
@@ -1668,10 +1707,15 @@ void exploit(mach_port_t tfp0,
             // Disable Install Cydia.
             LOG("Disabling Install Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable Install Cydia.", nil));
-            [userDefaults setObject:@NO forKey:K_INSTALL_CYDIA inDomain:prefsFile];
+            prefs.install_cydia = false;
+            _assert(modifyPlist(prefsFile, ^(id plist) {
+                plist[K_INSTALL_CYDIA] = @NO;
+            }), message, true);
             if (!prefs.run_uicache) {
-                [userDefaults setObject:@YES forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
                 prefs.run_uicache = true;
+                _assert(modifyPlist(prefsFile, ^(id plist) {
+                    plist[K_REFRESH_ICON_CACHE] = @YES;
+                }), message, true);
             }
             LOG("Successfully disabled Install Cydia.");
         }
@@ -1709,9 +1753,10 @@ void exploit(mach_port_t tfp0,
             LOG("Running uicache...");
             SETMESSAGE(NSLocalizedString(@"Failed to run uicache.", nil));
             _assert(runCommand("/usr/bin/uicache", NULL) == ERR_SUCCESS, message, true);
-            if (![[userDefaults objectForKey:K_REFRESH_ICON_CACHE inDomain:prefsFile] isEqual:@NO]) {
-                [userDefaults setObject:@NO forKey:K_REFRESH_ICON_CACHE inDomain:prefsFile];
-            }
+            prefs.run_uicache = false;
+            _assert(modifyPlist(prefsFile, ^(id plist) {
+                plist[K_REFRESH_ICON_CACHE] = @NO;
+            }), message, true);
             LOG("Successfully ran uicache.");
         }
     }
@@ -1736,8 +1781,10 @@ void exploit(mach_port_t tfp0,
         SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
         ShaiHuludProcessAtAddr(myProcAddr, myOriginalCredAddr);
         WriteKernel64(GETOFFSET(shenanigans), Shenanigans);
-        setuidProcessAtAddr(0, myProcAddr);
-        ShaiHulud2ProcessAtAddr(myProcAddr);
+        if (prefs.load_tweaks) {
+            setuidProcessAtAddr(0, myProcAddr);
+            ShaiHulud2ProcessAtAddr(myProcAddr);
+        }
         LOG("Successfully dropped kernel credentials.");
     }
     
@@ -1873,15 +1920,15 @@ void exploit(mach_port_t tfp0,
 }
 
 - (IBAction)tappedOnPwn:(id)sender{
-    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[Undecimus getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnDennis:(id)sender{
-    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[Undecimus getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnSamB:(id)sender{
-    [[UIApplication sharedApplication] openURL:[ViewController getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[Undecimus getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnSamG:(id)sender{
@@ -1889,7 +1936,7 @@ void exploit(mach_port_t tfp0,
 }
 
 // This intentionally returns nil if called before it's been created by a proper init
-+(ViewController*)sharedController {
++(Undecimus *)sharedController {
     return sharedController;
 }
 

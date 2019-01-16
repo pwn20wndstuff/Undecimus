@@ -12,10 +12,10 @@
 #include <mach/mach.h>
 
 #include "empty_list_sploit.h"
-#include "offsets.h"
-#include "kmem.h"
+#include "KernelStructureOffsets.h"
+#include "KernelMemory.h"
 #include <common.h>
-#include "kutils.h"
+#include "KernelUtilities.h"
 
 static void increase_limits() {
     struct rlimit lim = {0};

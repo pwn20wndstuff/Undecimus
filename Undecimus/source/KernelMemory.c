@@ -3,8 +3,8 @@
 #include <unistd.h>
 #include <mach/mach.h>
 
-#include "kmem.h"
-#include "kutils.h"
+#include "KernelMemory.h"
+#include "KernelUtilities.h"
 #include <common.h>
 
 // the exploit bootstraps the full kernel memory read/write with a fake
@@ -24,11 +24,11 @@ void prepare_for_rw_with_fake_tfp0(mach_port_t fake_tfp0) {
   tfp0 = fake_tfp0;
 }
 
-int have_kmem_read() {
+bool have_kmem_read() {
     return (kmem_read_port != MACH_PORT_NULL) || (tfp0 != MACH_PORT_NULL);
 }
 
-int have_kmem_write() {
+bool have_kmem_write() {
     return (tfp0 != MACH_PORT_NULL);
 }
 

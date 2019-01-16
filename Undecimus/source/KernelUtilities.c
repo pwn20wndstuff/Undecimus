@@ -8,9 +8,9 @@
 #include <iokit.h>
 #include <common.h>
 
-#include "kutils.h"
-#include "kmem.h"
-#include "offsets.h"
+#include "KernelUtilities.h"
+#include "KernelMemory.h"
+#include "KernelStructureOffsets.h"
 #include "find_port.h"
 
 uint64_t the_realhost;

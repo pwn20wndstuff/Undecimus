@@ -1,5 +1,5 @@
-#ifndef kmem_h
-#define kmem_h
+#ifndef KernelMemory_h
+#define KernelMemory_h
 
 #include <stdbool.h>
 #include <mach/mach.h>
@@ -74,7 +74,7 @@ void prepare_rwk_via_tfp0(mach_port_t port);
 void prepare_for_rw_with_fake_tfp0(mach_port_t fake_tfp0);
 
 // query whether kmem read or write is present
-int have_kmem_read(void);
-int have_kmem_write(void);
+bool have_kmem_read(void);
+bool have_kmem_write(void);
 
 #endif

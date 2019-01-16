@@ -13,10 +13,10 @@
 #include <mach/mach.h>
 
 #include "find_port.h"
-#include "kmem.h"
-#include "offsets.h"
+#include "KernelMemory.h"
+#include "KernelStructureOffsets.h"
 #include <common.h>
-#include "kutils.h"
+#include "KernelUtilities.h"
 
 // get a kalloc allocation before we've got a kcall interface to just call it
 uint64_t early_kalloc(int size) {

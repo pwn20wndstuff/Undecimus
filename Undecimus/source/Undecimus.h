@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  Undecimus.h
 //  Undecimus
 //
 //  Created by pwn20wnd on 8/29/18.
@@ -48,7 +48,7 @@ static inline void showAlert(NSString *title, NSString *message, Boolean wait, B
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
 }
 
-@interface ViewController : UIViewController
+@interface Undecimus : UIViewController
 @property (weak, nonatomic) IBOutlet UIButton *goButton;
 
 double uptime(void);
@@ -57,7 +57,7 @@ int necp_die(void);
 NSString *hexFromInt(NSInteger val);
 
 - (IBAction)tappedOnJailbreak:(id)sender;
-+(ViewController*)sharedController;
++(Undecimus*)sharedController;
 
 @end
 

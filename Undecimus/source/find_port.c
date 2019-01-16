@@ -5,9 +5,9 @@
 #include <mach/mach.h>
 
 #include "find_port.h"
-#include "kmem.h"
-#include "offsets.h"
-#include "kutils.h"
+#include "KernelMemory.h"
+#include "KernelStructureOffsets.h"
+#include "KernelUtilities.h"
 #include <common.h>
 
 /*

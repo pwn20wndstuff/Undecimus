@@ -689,6 +689,80 @@ NSString *getBundledResources() {
     return bundledResources;
 }
 
+bool debuggerEnabled() {
+    return (getppid() != 1);
+}
+
+const char *getLogFile() {
+    NSString *homeDirectory = NSHomeDirectory();
+    return [NSString stringWithFormat:@"%@/Documents/log_file.txt", homeDirectory].UTF8String;
+}
+
+static bool logging_enabled = false;
+static int orig_stdout = 0;
+static int orig_stderr = 0;
+
+void enableLogging() {
+    if (!debuggerEnabled() && !logging_enabled) {
+        const char *logFile = getLogFile();
+        orig_stdout = dup(STDOUT_FILENO);
+        freopen(logFile, "a+", stdout);
+        orig_stderr = dup(STDERR_FILENO);
+        freopen(logFile, "a+", stderr);
+        logging_enabled = true;
+    }
+}
+
+void disableLogging() {
+    if (!debuggerEnabled() && logging_enabled) {
+        fflush(stdout);
+        dup2(orig_stdout, STDOUT_FILENO);
+        close(orig_stdout);
+        orig_stdout = 0;
+        fflush(stderr);
+        dup2(orig_stderr, STDERR_FILENO);
+        close(orig_stderr);
+        orig_stderr = 0;
+        logging_enabled = false;
+    }
+}
+
+void cleanLogs() {
+    const char *logFile = getLogFile();
+    clean_file(logFile);
+}
+
+bool modifyPlist(NSString *filename, void (^function)(id)) {
+    LOG("%s: Will modify plist: %@", __FUNCTION__, filename);
+    NSData *data = [NSData dataWithContentsOfFile:filename];
+    if (data == nil) {
+        LOG("%s: Failed to read file: %@", __FUNCTION__, filename);
+        return false;
+    }
+    NSPropertyListFormat format = 0;
+    NSError *error = nil;
+    id plist = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
+    if (plist == nil) {
+        LOG("%s: Failed to generate plist data: %@", __FUNCTION__, error);
+        return false;
+    }
+    function(plist);
+    NSData *newData = [NSPropertyListSerialization dataWithPropertyList:plist format:format options:0 error:&error];
+    if (newData == nil) {
+        LOG("%s: Failed to generate new plist data: %@", __FUNCTION__, error);
+        return false;
+    }
+    if (![data isEqual:newData]) {
+        LOG("%s: Writing to file: %@", __FUNCTION__, filename);
+        if (![newData writeToFile:filename atomically:YES]) {
+            LOG("%s: Failed to write to file: %@", __FUNCTION__, filename);
+            return false;
+        }
+    }
+    LOG("%s: Success", __FUNCTION__);
+    return true;
+}
+
 __attribute__((constructor))
 static void ctor() {
     sourcePath = [[NSBundle mainBundle] bundlePath];

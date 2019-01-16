@@ -1,18 +1,18 @@
 //
-//  CreditsTableViewController.m
+//  UndecimusCredits.m
 //  Undecimus
 //
 //  Created by Pwn20wnd on 9/14/18.
 //  Copyright © 2018 - 2019 Pwn20wnd. All rights reserved.
 //
 
-#import "CreditsTableViewController.h"
+#import "UndecimusCredits.h"
 
-@interface CreditsTableViewController ()
+@interface UndecimusCredits ()
 
 @end
 
-@implementation CreditsTableViewController
+@implementation UndecimusCredits
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -47,67 +47,71 @@
 }
 
 -(IBAction)tappedOnIanBeer:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"i41nbeer"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"i41nbeer"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnMorpheus:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"morpheus______"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"morpheus______"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnXerub:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"xerub"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"xerub"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnPsychoTea:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"ibsparkes"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"ibsparkes"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnStek:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"stek29"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"stek29"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnNinjaPrawn:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"theninjaprawn"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"theninjaprawn"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnCryptic:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Cryptiiiic"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"Cryptiiiic"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnXerusDesign:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"xerusdesign"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"xerusdesign"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnAppleDry:(id)sender{
-   [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"AppleDry05"] options:@{} completionHandler:nil];
+   [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"AppleDry05"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnRob:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Rob_Coleman123"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"Rob_Coleman123"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnMidnightChip:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"MidnightChip"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"MidnightChip"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnGeoSn0w:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"FCE365"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"FCE365"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnSwaggo:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Swag_iOS"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"Swag_iOS"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnJailbreakbuster:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"jailbreakbuster"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"jailbreakbuster"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnJakeashacks:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Jakeashacks"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"Jakeashacks"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnJonathanSeals:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"JonathanSeals"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"JonathanSeals"] options:@{} completionHandler:nil];
+}
+
+-(IBAction)tappedOnSaurik:(id)sender{
+    [[UIApplication sharedApplication] openURL:[UndecimusCredits getURLForUserName:@"saurik"] options:@{} completionHandler:nil];
 }
 
 @end

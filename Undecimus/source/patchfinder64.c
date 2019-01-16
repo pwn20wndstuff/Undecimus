@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
-#include "kmem.h"
+#include "KernelMemory.h"
 
 typedef unsigned long long addr_t;
 

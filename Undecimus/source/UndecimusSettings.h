@@ -1,5 +1,5 @@
 //
-//  SettingsTableViewController.h
+//  UndecimusSettings.h
 //  Undecimus
 //
 //  Created by Pwn20wnd on 9/14/18.
@@ -25,28 +25,7 @@
 #define K_INSTALL_CYDIA            @"InstallCydia"
 #define K_RELOAD_SYSTEM_DAEMONS    @"ReloadSystemDaemons"
 
-#define LOG_FILE                    [[NSString stringWithFormat:@"%@/Documents/log_file.txt", NSHomeDirectory()] UTF8String]
-
-#define ISDEBUGGERATTACHED()        (!(getppid() == 1))
-
-#define START_LOGGING() do { \
-    if (!ISDEBUGGERATTACHED()) { \
-        freopen(LOG_FILE, "a+", stderr); \
-        freopen(LOG_FILE, "a+", stdout); \
-        setbuf(stdout, NULL); \
-        setbuf(stderr, NULL);\
-    } \
-} while (false) \
-
-#define RESET_LOGS() do { \
-    if (!ISDEBUGGERATTACHED()) { \
-        if (!access(LOG_FILE, F_OK)) { \
-        unlink(LOG_FILE); \
-        } \
-    } \
-} while(false) \
-
-@interface SettingsTableViewController : UITableViewController <UITextFieldDelegate>
+@interface UndecimusSettings : UITableViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UISwitch *TweakInjectionSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *LoadDaemonsSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *DumpAPTicketSwitch;

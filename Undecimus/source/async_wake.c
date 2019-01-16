@@ -10,10 +10,10 @@
 #include <CoreFoundation/CoreFoundation.h>
 
 #include "async_wake.h"
-#include "kmem.h"
+#include "KernelMemory.h"
 #include "find_port.h"
-#include "kutils.h"
-#include "offsets.h"
+#include "KernelUtilities.h"
+#include "KernelStructureOffsets.h"
 #include "early_kalloc.h"
 
 #include <common.h>

@@ -9,11 +9,11 @@
 #include <dlfcn.h>
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
-#include "SettingsTableViewController.h"
+#include "utils.h"
 
 int main(int argc, char * argv[]) {
     @autoreleasepool {
-        START_LOGGING();
+        enableLogging();
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
 }

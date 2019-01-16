@@ -6,7 +6,7 @@
 #include <sys/sysctl.h>
 #include <sys/utsname.h>
 
-#include "offsets.h"
+#include "KernelStructureOffsets.h"
 #include <common.h>
 
 int* offsets = NULL;
@@ -52,6 +52,7 @@ int kstruct_offsets_11_0[] = {
     
   0xd8,  // KSTRUCT_OFFSET_VNODE_V_MOUNT
   0x78,  // KSTRUCT_OFFSET_VNODE_VU_SPECINFO
+  0x0,   // KSTRUCT_OFFSET_VNODE_V_LOCK
     
   0x10,  // KSTRUCT_OFFSET_SPECINFO_SI_FLAGS
     
@@ -102,7 +103,8 @@ int kstruct_offsets_11_3[] = {
   0x20,  // KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE
     
   0xd8,  // KSTRUCT_OFFSET_VNODE_V_MOUNT
-  0x78,  // KSTRUCT_OFFSET_VNODE_VU_SPECINFO    
+  0x78,  // KSTRUCT_OFFSET_VNODE_VU_SPECINFO
+  0x0,   // KSTRUCT_OFFSET_VNODE_V_LOCK
   
   0x10,  // KSTRUCT_OFFSET_SPECINFO_SI_FLAGS
     

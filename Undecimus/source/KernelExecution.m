@@ -2,9 +2,9 @@
 #include <QiLin.h>
 #include <common.h>
 #include <iokit.h>
-#include "kmem.h"
-#include "kexecute.h"
-#include "offsets.h"
+#include "KernelMemory.h"
+#include "KernelExecution.h"
+#include "KernelStructureOffsets.h"
 
 mach_port_t prepare_user_client() {
     kern_return_t err;

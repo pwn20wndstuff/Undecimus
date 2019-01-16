@@ -13,10 +13,10 @@
 #include <pthread.h>
 #include <mach/mach.h>
 
-#include "offsets.h"
-#include "kmem.h"
+#include "KernelStructureOffsets.h"
+#include "KernelMemory.h"
 #include <common.h>
-#include "kutils.h"
+#include "KernelUtilities.h"
 
 kern_return_t mach_vm_read(
                            vm_map_t target_task,
