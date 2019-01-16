@@ -1424,7 +1424,10 @@ void exploit(mach_port_t tfp0,
             if (needResources || updatedResources) {
                 extractResources();
             } else if (needSubstrate) {
-                installDebs(@[ @"substrate-safemode.deb", @"mobilesubstrate.deb" ], true);
+                if (debIsInstalled("com.ex.substitute")) {
+                    _assert(removeDeb("com.ex.substitute", true), message, true);
+                }
+                _assert(installDebs(@[ @"substrate-safemode.deb", @"mobilesubstrate.deb" ], true), message, true);
             }
             // Now that things are running, let's install the deb for the files we just extracted
             if (!debIsInstalled("lzma") || compareInstalledVersion("lzma", "lt", "2:0")) {
