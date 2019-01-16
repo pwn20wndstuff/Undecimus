@@ -33,6 +33,7 @@ copy_data(struct archive *ar, struct archive *aw)
 @implementation ArchiveFile {
     NSMutableDictionary *_files;
     int _fd;
+    BOOL _hasReadFiles;
 }
 
 +(ArchiveFile*)archiveWithFile:(NSString *)filename
@@ -44,22 +45,14 @@ copy_data(struct archive *ar, struct archive *aw)
 #endif
 }
 
--(ArchiveFile*)initWithFile:(NSString*)filename
+-(void)readContents
 {
-    self = [self init];
-
-    _fd = open(filename.UTF8String, O_RDONLY);
-    if (_fd < 0) {
-        perror("Open file");
-        return nil;
-    }
-    
     struct archive *a = archive_read_new();
     archive_read_support_compression_all(a);
     archive_read_support_format_all(a);
     if (archive_read_open_fd(a, _fd, 16384) != ARCHIVE_OK)
-        return nil;
-
+        return;
+    
     struct archive_entry *entry;
     _files = [NSMutableDictionary new];
     while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
@@ -74,11 +67,39 @@ copy_data(struct archive *ar, struct archive *aw)
         }
     }
     archive_read_close(a);
+    archive_read_finish(a);
     lseek(_fd, 0, SEEK_SET);
+}
+
+-(ArchiveFile*)initWithFile:(NSString*)filename
+{
+    self = [self init];
+    _files = nil;
+    _hasReadFiles = NO;
+
+    _fd = open(filename.UTF8String, O_RDONLY);
+    if (_fd < 0) {
+        perror("Open file");
+        return nil;
+    }
+    
+    struct archive *a = archive_read_new();
+    archive_read_support_compression_all(a);
+    archive_read_support_format_all(a);
+    if (archive_read_open_fd(a, _fd, 16384) != ARCHIVE_OK)
+        return nil;
+
+    archive_read_close(a);
+    archive_read_finish(a);
+    lseek(_fd, 0, SEEK_SET);
+
     return self;
 }
 
 -(NSArray*)files {
+    if (!_hasReadFiles) {
+        [self readContents];
+    }
     return [_files.allKeys copy];
 }
 
@@ -92,11 +113,6 @@ copy_data(struct archive *ar, struct archive *aw)
     flags |= ARCHIVE_EXTRACT_FFLAGS;
     flags |= ARCHIVE_EXTRACT_OWNER;
     
-    if (_files[file] == nil) {
-        NSLog(@"Archive: no such file \"%@\"", file);
-        return NO;
-    }
-
     int fd = dup(_fd);
     if (fd == -1) {
         NSLog(@"Archive: unable to dupe fd");
@@ -122,6 +138,11 @@ copy_data(struct archive *ar, struct archive *aw)
     while ((rv = archive_read_next_header(a, &entry)) == ARCHIVE_OK &&
            strcmp(archive_entry_pathname(entry), file.UTF8String) != 0
            );
+
+    if (rv == ARCHIVE_EOF) {
+        NSLog(@"Archive: no such file \"%@\"", file);
+        goto out;
+    }
 
     if (rv < ARCHIVE_OK) {
         NSLog(@"Archive: %s", archive_error_string(a));
@@ -152,7 +173,9 @@ copy_data(struct archive *ar, struct archive *aw)
     result = YES;
 out:
     archive_write_close(ext);
+    archive_write_finish(ext);
     archive_read_close(a);
+    archive_read_finish(a);
     close(fd);
     return result;
 }
@@ -244,12 +267,17 @@ out:
     out:
     [fm changeCurrentDirectoryPath:cwd];
     archive_write_close(ext);
+    archive_write_finish(ext);
     archive_read_close(a);
+    archive_read_finish(a);
     close(fd);
     return result;
 }
 
 -(BOOL)contains:(NSString*)file {
+    if (!_hasReadFiles) {
+        [self readContents];
+    }
     return (_files[file] != nil);
 }
 
