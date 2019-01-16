@@ -172,6 +172,11 @@ bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
     return !WEXITSTATUS(rv);
 }
 
+bool removeDeb(char *packageID, bool forceDeps) {
+    int rv = systemf("/usr/bin/dpkg %s -r \"%s\"", (forceDeps?"--force-depends":""), packageID);
+    return !WEXITSTATUS(rv);
+}
+
 bool pidFileIsValid(NSString *pidfile) {
     NSString *jbdpid = [NSString stringWithContentsOfFile:pidfile encoding:NSUTF8StringEncoding error:NULL];
     if (jbdpid != nil && pidOfProcess("/usr/libexec/jailbreakd") == jbdpid.integerValue) {

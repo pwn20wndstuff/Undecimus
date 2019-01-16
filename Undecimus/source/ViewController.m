@@ -672,8 +672,11 @@ void extractResources() {
     if (!debIsInstalled("com.bingner.spawn")) {
         _assert(installDeb("spawn.deb", false), message, true);
     }
-    if (!debIsConfigured("science.xnu.injector")) {
+    if (!debIsConfigured("science.xnu.injector") && !debIsConfigured("trustinjector")) {
         _assert(installDeb("injector.deb", false), message, true);
+    }
+    if (debIsInstalled("jailbreak-resources")) {
+        _assert(removeDeb("jailbreak-resources", true), message, true);
     }
     _assert(installDeb("resources.deb", false), message, true);
 }

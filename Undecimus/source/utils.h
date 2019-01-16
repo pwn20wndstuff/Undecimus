@@ -64,6 +64,7 @@ bool debIsConfigured(char *packageID);
 bool compareInstalledVersion(const char *packageID, const char *op, const char *version);
 bool installDeb(char *debName, bool forceDeps);
 bool installDebs(NSArray <NSString*> *debs, bool forceDeps);
+bool removeDeb(char *packageID, bool forceDeps);
 bool pidFileIsValid(NSString *pidfile);
 bool pspawnHookLoaded(void);
 bool is_symlink(const char *filename);
