@@ -1691,8 +1691,11 @@ void exploit(mach_port_t tfp0,
                 }), message, true);
             }
         }
-        // This is not a stock file for iOS11+
-        runCommand("/bin/sed", "-ie", "/^\\/sbin\\/fstyp/d", "/Library/dpkg/info/firmware-sbin.list", NULL);
+        if ([[NSString stringWithContentsOfFile:@"/Library/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil]
+             rangeOfString:@"/sbin/fstyp"].location != NSNotFound) {
+            // This is not a stock file for iOS11+
+            runCommand("/bin/sed", "-ie", "/^\\/sbin\\/fstyp/d", "/Library/dpkg/info/firmware-sbin.list", NULL);
+        }
         // Unblock Saurik's repo if it is blocked.
         unblockDomainWithName("apt.saurik.com");
         if (prefs.install_cydia) {
