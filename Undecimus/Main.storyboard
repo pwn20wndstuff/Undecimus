@@ -39,7 +39,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="9BH-Zb-878">
-                                        <rect key="frame" x="61.5" y="393" width="197" height="56"/>
+                                        <rect key="frame" x="61.5" y="313" width="197" height="56"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ELb-9J-7YK">
                                                 <rect key="frame" x="0.0" y="0.0" width="197" height="56"/>
@@ -138,8 +138,8 @@
                                             </button>
                                         </subviews>
                                     </stackView>
-                                    <textView hidden="YES" opaque="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bvv-3a-l9y">
-                                        <rect key="frame" x="21" y="457" width="278" height="54"/>
+                                    <textView opaque="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bvv-3a-l9y">
+                                        <rect key="frame" x="21" y="377" width="278" height="134"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <color key="textColor" white="0.75" alpha="1" colorSpace="calibratedWhite"/>
                                         <fontDescription key="fontDescription" name="Menlo-Bold" family="Menlo" pointSize="10"/>
@@ -149,7 +149,7 @@
                                 <color key="backgroundColor" white="1" alpha="0.83999999999999997" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="bvv-3a-l9y" secondAttribute="bottom" constant="57" id="6e3-OM-ydz"/>
-                                    <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="Lbx-lz-4J4" secondAttribute="bottom" constant="93" id="AsG-6D-gAm"/>
+                                    <constraint firstItem="9BH-Zb-878" firstAttribute="top" secondItem="Lbx-lz-4J4" secondAttribute="bottom" constant="13" id="AsG-6D-gAm"/>
                                     <constraint firstItem="Kgp-ib-vpD" firstAttribute="centerX" secondItem="82c-Je-J4x" secondAttribute="centerX" id="Ccd-dV-Dxh"/>
                                     <constraint firstItem="ABT-w0-L5M" firstAttribute="top" secondItem="Kgp-ib-vpD" secondAttribute="bottom" constant="-6" id="KDr-Mj-86u"/>
                                     <constraint firstItem="Lbx-lz-4J4" firstAttribute="top" secondItem="Kgp-ib-vpD" secondAttribute="bottom" constant="7" id="LGY-em-Xcn"/>

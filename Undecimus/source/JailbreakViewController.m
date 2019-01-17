@@ -1096,9 +1096,10 @@ void exploit(mach_port_t tfp0,
             v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
             WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag);
         }
-        needStrap = (access("/.installed_unc0ver", F_OK) != ERR_SUCCESS ||
-                     (![[NSString stringWithContentsOfFile:@"/.installed_unc0ver"] isEqualToString:@""] &&
-                    ![[NSString stringWithContentsOfFile:@"/.installed_unc0ver"] isEqualToString:
+        NSString *file = [NSString stringWithContentsOfFile:@"/.installed_unc0ver" encoding:NSUTF8StringEncoding error:nil];
+        needStrap = (file == nil ||
+                     (![file isEqualToString:@""] &&
+                    ![file isEqualToString:
                     [NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber]]))
                     && access("/electra", F_OK) != ERR_SUCCESS;
         if (needStrap) {
@@ -1270,7 +1271,7 @@ void exploit(mach_port_t tfp0,
         if (!needResources) {
             resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
         }
-        if (!needSubstrate && cdhashFor(@"/usr/libexec/substrate") != nil) {
+        if (!needSubstrate) {
             resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
         } else {
             needSubstrate = true;
@@ -1287,7 +1288,6 @@ void exploit(mach_port_t tfp0,
         LOG("Logging slide...");
         SETMESSAGE(NSLocalizedString(@"Failed to log slide.", nil));
         NSData *fileData = [[NSString stringWithFormat:@(ADDR "\n"), kernel_slide] dataUsingEncoding:NSUTF8StringEncoding];
-        _assert(fileData != nil, message, false);
         if (![[NSData dataWithContentsOfFile:@"/var/tmp/slide.txt"] isEqual:fileData]) {
             _assert(clean_file("/var/tmp/slide.txt"), message, true);
             _assert(create_file_data("/var/tmp/slide.txt", 0, 0644, fileData), message, false);
@@ -1536,7 +1536,6 @@ void exploit(mach_port_t tfp0,
         LOG("Successfully allowed SpringBoard to show non-default system apps.");
     }
     
-    
     UPSTAGE();
     
     {
@@ -1692,10 +1691,11 @@ void exploit(mach_port_t tfp0,
                 }), message, true);
             }
         }
-        if ([[NSString stringWithContentsOfFile:@"/var/lib/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil]
-             rangeOfString:@"/sbin/fstyp"].location != NSNotFound) {
+        NSString *file = [NSString stringWithContentsOfFile:@"/var/lib/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil];
+        if ([file rangeOfString:@"/sbin/fstyp"].location != NSNotFound) {
             // This is not a stock file for iOS11+
-            runCommand("/bin/sed", "-ie", "/^\\/sbin\\/fstyp/d", "/var/lib/dpkg/info/firmware-sbin.list", NULL);
+            file = [file stringByReplacingOccurrencesOfString:@"/sbin/fstyp" withString:@""];
+            [file writeToFile:@"/var/lib/dpkg/info/firmware-sbin.list" atomically:YES encoding:NSUTF8StringEncoding error:nil];
         }
         // Unblock Saurik's repo if it is blocked.
         unblockDomainWithName("apt.saurik.com");
@@ -1901,12 +1901,6 @@ void exploit(mach_port_t tfp0,
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-        _outputView.hidden = NO;
-    } else {
-        // So we don't waste cycles if we aren't displaying it anyway
-        _outputView = nil;
-    }
     sharedController = self;
     if (jailbreakEnabled()) {
         PROGRESS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);
@@ -1951,13 +1945,11 @@ void exploit(mach_port_t tfp0,
 }
 
 -(void)appendTextToOutput:(NSString *)text {
-    if (_outputView != nil) {
-        if (output == nil)
-            output = [NSMutableString new];
-        [output appendString:text];
-        _outputView.text = output;
-        [_outputView scrollRangeToVisible:NSMakeRange(output.length - 1, 1)];
-    }
+    if (output == nil)
+        output = [NSMutableString new];
+    [output appendString:text];
+    _outputView.text = output;
+    [_outputView scrollRangeToVisible:NSMakeRange(output.length - 1, 1)];
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
