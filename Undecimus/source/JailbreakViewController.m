@@ -1,5 +1,5 @@
 //
-//  Undecimus.m
+//  JailbreakViewController.m
 //  Undecimus
 //
 //  Created by pwn20wnd on 8/29/18.
@@ -32,7 +32,7 @@
 #include <reboot.h>
 #import <snappy.h>
 #import <inject.h>
-#import "Undecimus.h"
+#import "JailbreakViewController.h"
 #include "KernelStructureOffsets.h"
 #include "empty_list_sploit.h"
 #include "KernelMemory.h"
@@ -42,7 +42,7 @@
 #include "remote_memory.h"
 #include "remote_call.h"
 #include "unlocknvram.h"
-#include "UndecimusSettings.h"
+#include "SettingsTableViewController.h"
 #include "multi_path_sploit.h"
 #include "async_wake.h"
 #include "utils.h"
@@ -53,22 +53,22 @@
 - (void)setObject:(id)arg1 forKey:(id)arg2 inDomain:(id)arg3;
 @end
 
-@interface Undecimus ()
+@interface JailbreakViewController ()
 
 @end
 
-@implementation Undecimus
-static Undecimus *sharedController = nil;
+@implementation JailbreakViewController
+static JailbreakViewController *sharedController = nil;
 static NSMutableString *output = nil;
 
 #define PROGRESS(msg, btnenbld, tbenbld) do { \
         LOG("PROGRESS: %@", msg); \
         dispatch_async(dispatch_get_main_queue(), ^{ \
             [UIView performWithoutAnimation:^{ \
-                [[[Undecimus sharedController] goButton] setEnabled:btnenbld]; \
-                [[[[Undecimus sharedController] tabBarController] tabBar] setUserInteractionEnabled:tbenbld]; \
-                [[[Undecimus sharedController] goButton] setTitle:msg forState: btnenbld ? UIControlStateNormal : UIControlStateDisabled]; \
-                [[[Undecimus sharedController] goButton] layoutIfNeeded]; \
+                [[[JailbreakViewController sharedController] goButton] setEnabled:btnenbld]; \
+                [[[[JailbreakViewController sharedController] tabBarController] tabBar] setUserInteractionEnabled:tbenbld]; \
+                [[[JailbreakViewController sharedController] goButton] setTitle:msg forState: btnenbld ? UIControlStateNormal : UIControlStateDisabled]; \
+                [[[JailbreakViewController sharedController] goButton] layoutIfNeeded]; \
             }]; \
         }); \
 } while (false)
@@ -1930,15 +1930,15 @@ void exploit(mach_port_t tfp0,
 }
 
 - (IBAction)tappedOnPwn:(id)sender{
-    [[UIApplication sharedApplication] openURL:[Undecimus getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[JailbreakViewController getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnDennis:(id)sender{
-    [[UIApplication sharedApplication] openURL:[Undecimus getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[JailbreakViewController getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnSamB:(id)sender{
-    [[UIApplication sharedApplication] openURL:[Undecimus getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[JailbreakViewController getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnSamG:(id)sender{
@@ -1946,7 +1946,7 @@ void exploit(mach_port_t tfp0,
 }
 
 // This intentionally returns nil if called before it's been created by a proper init
-+(Undecimus *)sharedController {
++(JailbreakViewController *)sharedController {
     return sharedController;
 }
 

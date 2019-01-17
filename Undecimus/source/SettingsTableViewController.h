@@ -1,5 +1,5 @@
 //
-//  UndecimusSettings.h
+//  SettingsTableViewController.h
 //  Undecimus
 //
 //  Created by Pwn20wnd on 9/14/18.
@@ -27,7 +27,7 @@
 #define K_INSTALL_CYDIA            @"InstallCydia"
 #define K_RELOAD_SYSTEM_DAEMONS    @"ReloadSystemDaemons"
 
-@interface UndecimusSettings : UITableViewController <UITextFieldDelegate>
+@interface SettingsTableViewController : UITableViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UISwitch *TweakInjectionSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *LoadDaemonsSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *DumpAPTicketSwitch;

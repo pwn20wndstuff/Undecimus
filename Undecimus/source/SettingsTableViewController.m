@@ -1,5 +1,5 @@
 //
-//  UndecimusSettings.m
+//  SettingsTableViewController.m
 //  Undecimus
 //
 //  Created by Pwn20wnd on 9/14/18.
@@ -8,18 +8,18 @@
 
 #include <sys/utsname.h>
 #include <sys/sysctl.h>
-#import "UndecimusSettings.h"
+#import "SettingsTableViewController.h"
 #include <common.h>
 #include "hideventsystem.h"
 #include "remote_call.h"
-#include "Undecimus.h"
+#include "JailbreakViewController.h"
 #include "utils.h"
 
-@interface UndecimusSettings ()
+@interface SettingsTableViewController ()
 
 @end
 
-@implementation UndecimusSettings
+@implementation SettingsTableViewController
 
 // https://github.com/Matchstic/ReProvision/blob/7b595c699335940f68702bb204c5aa55b8b1896f/Shared/Application%20Database/RPVApplication.m#L102
 
@@ -87,7 +87,7 @@
                 
                 if ([key isEqualToString:@"Depends"]) //process the array
                 {
-                    NSArray *dependsObject = [UndecimusSettings dependencyArrayFromString:object];
+                    NSArray *dependsObject = [SettingsTableViewController dependencyArrayFromString:object];
                     
                     [currentPackage setObject:dependsObject forKey:key];
                     
@@ -151,7 +151,7 @@
     id currentSource = nil;
     while (currentSource = [sourceEnum nextObject])
     {
-        NSString *theObject = [UndecimusSettings domainFromRepoObject:currentSource];
+        NSString *theObject = [SettingsTableViewController domainFromRepoObject:currentSource];
         if (theObject != nil)
         {
             if (![finalArray containsObject:theObject])
@@ -174,8 +174,8 @@
     md[@"Machine"] = [NSString stringWithUTF8String:u.machine];
     md[@"ProductVersion"] = [NSMutableDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductVersion"];
     md[@"ProductBuildVersion"] = [NSMutableDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"];
-    md[@"Sources"] = [UndecimusSettings sourcesFromFile:CYDIA_LIST];
-    md[@"Packages"] = [UndecimusSettings parsedPackageArray];
+    md[@"Sources"] = [SettingsTableViewController sourcesFromFile:CYDIA_LIST];
+    md[@"Packages"] = [SettingsTableViewController parsedPackageArray];
     md[@"Preferences"] = [NSMutableDictionary new];
     md[@"Preferences"][@"TweakInjection"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_TWEAK_INJECTION];
     md[@"Preferences"][@"LoadDaemons"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_LOAD_DAEMONS];
@@ -238,7 +238,7 @@
     [self.KernelExploitSegmentedControl setEnabled:supportsExploit(multi_path) forSegmentAtIndex:1];
     [self.KernelExploitSegmentedControl setEnabled:supportsExploit(async_wake) forSegmentAtIndex:2];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
-    [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[UndecimusSettings _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, NSLocalizedString(@"Days", nil)]];
+    [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[SettingsTableViewController _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, NSLocalizedString(@"Days", nil)]];
     [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_OVERWRITE_BOOT_NONCE]];
     [self.ExportKernelTaskPortSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_EXPORT_KERNEL_TASK_PORT]];
     [self.RestoreRootFSSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_RESTORE_ROOTFS]];
@@ -325,7 +325,7 @@
 
 - (IBAction)tappedOnShareDiagnosticsData:(id)sender {
     NSURL *URL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Documents/diagnostics.plist", NSHomeDirectory()]];
-    [[UndecimusSettings getDiagnostics] writeToURL:URL error:nil];
+    [[SettingsTableViewController getDiagnostics] writeToURL:URL error:nil];
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[URL] applicationActivities:nil];
     if ([activityViewController respondsToSelector:@selector(popoverPresentationController)]) {
         [[activityViewController popoverPresentationController] setSourceView:self.ShareDiagnosticsDataButton];

@@ -8,8 +8,8 @@
 
 #include <sys/time.h>
 #import "AppDelegate.h"
-#include "Undecimus.h"
-#include "UndecimusSettings.h"
+#include "JailbreakViewController.h"
+#include "SettingsTableViewController.h"
 #include "utils.h"
 
 @interface AppDelegate ()
@@ -64,7 +64,7 @@
             NSString *read = [self readDataFromFD:stdout_fd toFD:_orig_stdout];
             [outline appendString:read];
             if ([read containsString:@"\n"]) {
-                [Undecimus.sharedController performSelectorOnMainThread:@selector(appendTextToOutput:) withObject:outline waitUntilDone:YES];
+                [JailbreakViewController.sharedController performSelectorOnMainThread:@selector(appendTextToOutput:) withObject:outline waitUntilDone:YES];
                 [outline setString:@""];
             }
         }
@@ -72,7 +72,7 @@
             NSString *read = [self readDataFromFD:stderr_fd toFD:_orig_stderr];
             [errline appendString:read];
             if ([read containsString:@"\n"]) {
-                [Undecimus.sharedController performSelectorOnMainThread:@selector(appendTextToOutput:) withObject:errline waitUntilDone:YES];
+                [JailbreakViewController.sharedController performSelectorOnMainThread:@selector(appendTextToOutput:) withObject:errline waitUntilDone:YES];
                 [errline setString:@""];
             }
         }
@@ -170,7 +170,7 @@
 - (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
     switch ([[shortcutItem type] integerValue]) {
         case 1: {
-            [[Undecimus sharedController] performSelectorOnMainThread:@selector(tappedOnJailbreak:) withObject:nil waitUntilDone:YES];
+            [[JailbreakViewController sharedController] performSelectorOnMainThread:@selector(tappedOnJailbreak:) withObject:nil waitUntilDone:YES];
             break;
         }
         default:
@@ -180,7 +180,7 @@
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary <UIApplicationOpenURLOptionsKey, id> *)options {
     if ([[url scheme] isEqualToString:@"jailbreak"]) {
-        [[Undecimus sharedController] performSelectorOnMainThread:@selector(tappedOnJailbreak:) withObject:nil waitUntilDone:YES];
+        [[JailbreakViewController sharedController] performSelectorOnMainThread:@selector(tappedOnJailbreak:) withObject:nil waitUntilDone:YES];
         return YES;
     }
     return NO;

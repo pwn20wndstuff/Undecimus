@@ -1,5 +1,5 @@
 //
-//  UndecimusCredits.h
+//  CreditsTableViewController.h
 //  Undecimus
 //
 //  Created by Pwn20wnd on 9/14/18.
@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UndecimusCredits : UITableViewController
+@interface CreditsTableViewController : UITableViewController
 
 @end
