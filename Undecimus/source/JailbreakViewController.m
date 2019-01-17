@@ -672,19 +672,26 @@ NSString *hexFromInt(NSInteger val) {
 }
 
 void extractResources() {
+    NSMutableArray *debsToInstall = [NSMutableArray arrayWithObject:@"resources.deb"];
+    NSMutableArray *pkgsToRemove = [NSMutableArray new];
+    
     if (debIsInstalled("science.xnu.injector")) {
-        _assert(removeDeb("science.xnu.injector", true), message, true);
+        [pkgsToRemove addObject:@"science.xnu.injector"];
     }
     if (debIsInstalled("science.xnu.undecimus.resources")) {
-        _assert(removeDeb("science.xnu.undecimus.resources", true), message, true);
+        [pkgsToRemove addObject:@"science.xnu.undecimus.resources"];
     }
     if (!debIsConfigured("trustinjector")) {
-        _assert(installDeb("injector.deb", false), message, true);
+        [debsToInstall addObject:@"injector.deb"];
     }
     if (!debIsConfigured("mobilesubstrate")) {
-        installDebs(@[ @"substrate-safemode.deb", @"mobilesubstrate.deb" ], true);
+        [debsToInstall addObject:@"substrate-safemode.deb"];
+        [debsToInstall addObject:@"mobilesubstrate.deb"];
     }
-    _assert(installDeb("resources.deb", false), message, true);
+    if ([pkgsToRemove count] > 0)
+        _assert(removePkgs(pkgsToRemove, true), message, true);
+    
+    _assert(installDebs(debsToInstall, true), message, true);
 }
 
 bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
@@ -1273,8 +1280,6 @@ void exploit(mach_port_t tfp0,
         }
         if (!needSubstrate) {
             resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
-        } else {
-            needSubstrate = true;
         }
         _assert(injectTrustCache(resources, GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
@@ -1404,6 +1409,18 @@ void exploit(mach_port_t tfp0,
             _assert(injectTrustCache(@[@"/usr/libexec/substrate"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
             LOG("Successfully extracted substrate");
         }
+        // We don't trust server plugins from resources if they aren't valid
+        if (needResources) {
+            LOG("Cleaning out un-trusted resources");
+            NSString *list = [NSString stringWithContentsOfFile:@"/usr/lib/dpkg/info/jailbreak-resources.list" encoding:NSUTF8StringEncoding error:nil];
+            if (list) {
+                for (NSString *file in [list componentsSeparatedByString:@"\n"]) {
+                    if ([[file stringByDeletingPathExtension] isEqualToString:@"/Library/MobileSubstrate/ServerPlugins"]) {
+                        clean_file(file.UTF8String);
+                    }
+                }
+            }
+        }
         // Run substrate
         LOG("Starting Substrate...");
         SETMESSAGE(NSLocalizedString(@"Failed to start Substrate.", nil));
@@ -1448,7 +1465,7 @@ void exploit(mach_port_t tfp0,
                 extractResources();
             } else if (needSubstrate) {
                 if (debIsInstalled("com.ex.substitute")) {
-                    _assert(removeDeb("com.ex.substitute", true), message, true);
+                    _assert(removePkg("com.ex.substitute", true), message, true);
                 }
                 _assert(installDebs(@[@"substrate-safemode.deb", @"mobilesubstrate.deb"], true), message, true);
             }
@@ -1620,7 +1637,7 @@ void exploit(mach_port_t tfp0,
             SETMESSAGE(NSLocalizedString(@"Failed to install OpenSSH.", nil));
             if (debIsConfigured("openssl") &&
                 compareInstalledVersion("openssl", "lt", "1.0.2q")) {
-                _assert(removeDeb("openssl", true), message, false);
+                _assert(removePkg("openssl", true), message, false);
             }
             _assert(installDebs(@[@"openssh.deb", @"openssl.deb", @"ca-certificates.deb"], false), message, false);
             LOG("Successfully installed OpenSSH.");
@@ -1643,7 +1660,7 @@ void exploit(mach_port_t tfp0,
             // Remove Electra's Cydia.
             LOG("Removing Electra's Cydia...");
             SETMESSAGE(NSLocalizedString(@"Failed to remove Electra's Cydia.", nil));
-            _assert(removeDeb("cydia-gui", true), message, true);
+            _assert(removePkg("cydia-gui", true), message, true);
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
                 _assert(modifyPlist(prefsFile, ^(id plist) {
@@ -1662,7 +1679,7 @@ void exploit(mach_port_t tfp0,
             // Remove Electra's Cydia Upgrade Helper.
             LOG("Removing Electra's Cydia Upgrade Helper...");
             SETMESSAGE(NSLocalizedString(@"Failed to remove Electra's Cydia Upgrade Helper.", nil));
-            _assert(removeDeb("cydia-upgrade-helper", true), message, false);
+            _assert(removePkg("cydia-upgrade-helper", true), message, false);
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
                 _assert(modifyPlist(prefsFile, ^(id plist) {

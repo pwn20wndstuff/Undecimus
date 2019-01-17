@@ -169,19 +169,9 @@ bool compareInstalledVersion(const char *packageID, const char *op, const char *
     return rv;
 }
 
-bool installDeb(char *debName, bool forceDeps) {
-    NSString *path = pathForResource(@(debName));
-    if (path == nil) {
-        LOG("%s: Nothing to install", __FUNCTION__);
-        return false;
-    }
-    int rv = systemf("/usr/bin/dpkg %s --force-bad-path --force-configure-any -i \"%s\"", (forceDeps?"--force-depends":""), path.UTF8String);
-    return !WEXITSTATUS(rv);
-}
-
-bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
-    if ([debs count] < 1) {
-        LOG("%s: Nothing to install", __FUNCTION__);
+bool runDpkg(NSArray <NSString*> *args, bool forceDeps) {
+    if ([args count] < 2) {
+        LOG("%s: Nothing to do", __FUNCTION__);
         return false;
     }
     NSMutableArray <NSString*> *command = [NSMutableArray
@@ -189,18 +179,22 @@ bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
                         @"/usr/bin/dpkg",
                         @"--force-bad-path",
                         @"--force-configure-any",
+                        @"--no-triggers",
                      ]];
     
     if (forceDeps) {
         [command addObject:@"--force-depends"];
     }
-    [command addObject:@"-i"];
-    for (NSString *deb in debs) {
-        NSString *path = pathForResource(deb);
-        if (path == nil) {
-            return false;
+    for (NSString *arg in args) {
+        if ([arg hasSuffix:@".deb"]) {
+            NSString *path = pathForResource(arg);
+            if (path == nil) {
+                return false;
+            }
+            [command addObject:path];
+        } else {
+            [command addObject:arg];
         }
-        [command addObject:path];
     }
     const char *argv[command.count];
     for (int i=0; i<[command count]; i++) {
@@ -211,9 +205,28 @@ bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
     return !WEXITSTATUS(rv);
 }
 
-bool removeDeb(char *packageID, bool forceDeps) {
-    int rv = systemf("/usr/bin/dpkg %s -r \"%s\"", (forceDeps?"--force-depends":""), packageID);
-    return !WEXITSTATUS(rv);
+bool installDeb(char *debName, bool forceDeps) {
+    return runDpkg(@[@"-i", @(debName)], forceDeps);
+}
+
+bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
+    if ([debs count] < 1) {
+        LOG("%s: Nothing to install", __FUNCTION__);
+        return false;
+    }
+    return runDpkg([@[@"-i"] arrayByAddingObjectsFromArray:debs], forceDeps);
+}
+
+bool removePkg(char *packageID, bool forceDeps) {
+    return runDpkg(@[@"-r", @(packageID)], forceDeps);
+}
+
+bool removePkgs(NSArray <NSString*> *pkgs, bool forceDeps) {
+    if ([pkgs count] < 1) {
+        LOG("%s: Nothing to remove", __FUNCTION__);
+        return false;
+    }
+    return runDpkg([@[@"-r"] arrayByAddingObjectsFromArray:pkgs], forceDeps);
 }
 
 bool is_symlink(const char *filename) {
