@@ -269,7 +269,10 @@ xref64(const uint8_t *buf, addr_t start, addr_t end, addr_t what)
     for (i = start & ~3; i < end; i += 4) {
         uint32_t op = *(uint32_t *)(buf + i);
         unsigned reg = op & 0x1F;
+        int op_is_adrp = 0;
+        
         if ((op & 0x9F000000) == 0x90000000) {
+            op_is_adrp = 1;
             signed adr = ((op & 0x60000000) >> 18) | ((op & 0xFFFFE0) << 8);
             //printf("%llx: ADRP X%d, 0x%llx\n", i, reg, ((long long)adr << 1) + (i & ~0xFFF));
             value[reg] = ((long long)adr << 1) + (i & ~0xFFF);
@@ -311,7 +314,7 @@ xref64(const uint8_t *buf, addr_t start, addr_t end, addr_t what)
             //printf("%llx: LDR X%d, =0x%llx\n", i, reg, adr + i);
             value[reg] = adr + i;		// XXX address, not actual value
         }
-        if (value[reg] == what) {
+        if (!op_is_adrp && value[reg] == what) {
             return i;
         }
     }
