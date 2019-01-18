@@ -1895,6 +1895,7 @@ void exploit(mach_port_t tfp0,
         uint32_t kernel_magic = ReadKernel32(kernel_base);
         LOG("kernel_magic = 0x%x", kernel_magic);
         _assert(kernel_magic == MACH_HEADER_MAGIC, message, true);
+        LOG("kernel_base = "ADDR"", kernel_slide);
         // NOTICE(@"Jailbreak succeeded, but still needs a few minutes to respring.", false, false);
         exploit(tfp0, kernel_base);
         PROGRESS(NSLocalizedString(@"Jailbroken", nil), false, false);
