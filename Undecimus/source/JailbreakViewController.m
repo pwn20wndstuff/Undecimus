@@ -1872,7 +1872,7 @@ void exploit(mach_port_t tfp0,
                     
                 default: {
                     NOTICE(NSLocalizedString(@"No exploit selected", nil), false, false);
-                    PROGRESS(NSLocalizedString(@"Jailbreak", nil), true, true);
+                    STATUS(NSLocalizedString(@"Jailbreak", nil), true, true);
                     return;
                     break;
                 }
@@ -1974,11 +1974,23 @@ void exploit(mach_port_t tfp0,
 }
 
 -(void)appendTextToOutput:(NSString *)text {
+    static NSRegularExpression *remove = nil;
+    if (remove == nil)
+        remove = [NSRegularExpression regularExpressionWithPattern:@"^\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}\\.\\d+-\\d+\\s\\S+\\[\\d+:\\d+\\]\\s+"
+                                      options:NSRegularExpressionAnchorsMatchLines error:nil];
+    
     if (output == nil)
         output = [NSMutableString new];
-    [output appendString:text];
-    _outputView.text = output;
-    [_outputView scrollRangeToVisible:NSMakeRange(output.length - 1, 1)];
+    
+    text = [remove stringByReplacingMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:@""];
+
+    @synchronized (output) {
+        [output appendString:text];
+        dispatch_async(dispatch_get_main_queue(), ^{
+                self.outputView.text = output;
+                [self.outputView scrollRangeToVisible:NSMakeRange(output.length - 1, 1)];
+        });
+    }
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {

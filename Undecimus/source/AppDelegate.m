@@ -21,12 +21,11 @@
 -(AppDelegate*)init {
     self = [super init];
     enableLogging();
-    _stdoutPipe = [NSPipe pipe];
-    _stderrPipe = [NSPipe pipe];
+    _combinedPipe = [NSPipe pipe];
     _orig_stdout = dup(STDOUT_FILENO);
     _orig_stderr = dup(STDERR_FILENO);
-    dup2(_stderrPipe.fileHandleForWriting.fileDescriptor, STDERR_FILENO);
-    dup2(_stdoutPipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO);
+    dup2(_combinedPipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO);
+    dup2(_combinedPipe.fileHandleForWriting.fileDescriptor, STDERR_FILENO);
     [self performSelectorInBackground:@selector(handlePipe) withObject:nil];
     return self;
 }
@@ -49,31 +48,23 @@
 - (void)handlePipe {
     fd_set fds;
     NSMutableString *outline = [NSMutableString new];
-    NSMutableString *errline = [NSMutableString new];
 
-    int stdout_fd = _stdoutPipe.fileHandleForReading.fileDescriptor;
-    int stderr_fd = _stderrPipe.fileHandleForReading.fileDescriptor;
+    int input_fd = _combinedPipe.fileHandleForReading.fileDescriptor;
     int rv;
     
     do {
         FD_ZERO(&fds);
-        FD_SET(stdout_fd, &fds);
-        FD_SET(stderr_fd, &fds);
+        FD_SET(input_fd, &fds);
         rv = select(FD_SETSIZE, &fds, NULL, NULL, NULL);
-        if (FD_ISSET(stdout_fd, &fds)) {
-            NSString *read = [self readDataFromFD:stdout_fd toFD:_orig_stdout];
+        if (FD_ISSET(input_fd, &fds)) {
+            NSString *read = [self readDataFromFD:input_fd toFD:_orig_stdout];
             [outline appendString:read];
-            if ([read containsString:@"\n"]) {
-                [JailbreakViewController.sharedController performSelectorOnMainThread:@selector(appendTextToOutput:) withObject:outline waitUntilDone:YES];
-                [outline setString:@""];
-            }
-        }
-        if (FD_ISSET(stderr_fd, &fds)) {
-            NSString *read = [self readDataFromFD:stderr_fd toFD:_orig_stderr];
-            [errline appendString:read];
-            if ([read containsString:@"\n"]) {
-                [JailbreakViewController.sharedController performSelectorOnMainThread:@selector(appendTextToOutput:) withObject:errline waitUntilDone:YES];
-                [errline setString:@""];
+            NSRange lastNewline = [read rangeOfString:@"\n" options:NSBackwardsSearch];
+            if (lastNewline.location != NSNotFound) {
+                lastNewline.location = outline.length - (read.length - lastNewline.location);
+                NSRange wanted = {0, lastNewline.location + 1};
+                [JailbreakViewController.sharedController appendTextToOutput:[outline substringWithRange:wanted]];
+                [outline deleteCharactersInRange:wanted];
             }
         }
     } while (rv > 0);
