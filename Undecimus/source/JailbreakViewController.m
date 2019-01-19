@@ -1840,6 +1840,7 @@ void exploit(mach_port_t tfp0,
 - (IBAction)tappedOnJailbreak:(id)sender
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+        bool exploit_success = false;
         _assert(bundledResources != nil, NSLocalizedString(@"Bundled Resources version missing.", nil), true);
         if (!jailbreakSupported()) {
             STATUS(NSLocalizedString(@"Unsupported", nil), false, true);
@@ -1852,31 +1853,38 @@ void exploit(mach_port_t tfp0,
         if (MACH_PORT_VALID(persisted_port)) {
             offsets_init();
             prepare_for_rw_with_fake_tfp0(persisted_port);
+            exploit_success = true;
         } else {
             switch ([[NSUserDefaults standardUserDefaults] integerForKey:K_EXPLOIT]) {
                 case empty_list: {
-                    vfs_sploit();
+                    exploit_success = vfs_sploit();
                     break;
                 }
                     
                 case multi_path: {
-                    mptcp_go();
+                    exploit_success = mptcp_go();
                     break;
                 }
                 case async_wake: {
-                    async_wake_go();
+                    exploit_success = async_wake_go();
                     break;
                 }
                     
                 default: {
+                    NOTICE(NSLocalizedString(@"No exploit selected", nil), false, false);
+                    PROGRESS(NSLocalizedString(@"Jailbreak", nil), true, true);
+                    return;
                     break;
                 }
             }
+            if (exploit_success && !MACH_PORT_VALID(tfp0)) {
+                LOG(@"Exploit returned success but tfp0 is invalid");
+                exploit_success = false;
+            }
         }
-        // Validate TFP0.
-        LOG("Validating TFP0...");
-        if (MACH_PORT_VALID(tfp0)) {
-            LOG("Successfully validated TFP0.");
+        
+        if (exploit_success) {
+            LOG("TFP0 Obtained");
         } else if (restartSupported()) {
             NOTICE(NSLocalizedString(@"Kernel exploit failed. This is not an error. Tap OK to reboot and try again.", nil), true, false);
             NSInteger support = recommendedRestartSupport();
@@ -1900,7 +1908,6 @@ void exploit(mach_port_t tfp0,
         uint32_t kernel_magic = ReadKernel32(kernel_base);
         LOG("kernel_magic = 0x%x", kernel_magic);
         _assert(kernel_magic == MACH_HEADER_MAGIC, message, true);
-        // NOTICE(@"Jailbreak succeeded, but still needs a few minutes to respring.", false, false);
         exploit(tfp0, kernel_base);
         STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     });
