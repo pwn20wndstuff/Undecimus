@@ -7,7 +7,7 @@
 //
 
 #include <sys/snapshot.h>
-#include <dlfcn.h>
+#include  <dlfcn.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
 #include <copyfile.h>
@@ -61,8 +61,8 @@
 static JailbreakViewController *sharedController = nil;
 static NSMutableString *output = nil;
 
-#define PROGRESS(msg, btnenbld, tbenbld) do { \
-        LOG("PROGRESS: %@", msg); \
+#define STATUS(msg, btnenbld, tbenbld) do { \
+        LOG("STATUS: %@", msg); \
         dispatch_async(dispatch_get_main_queue(), ^{ \
             [UIView performWithoutAnimation:^{ \
                 [[[JailbreakViewController sharedController] goButton] setEnabled:btnenbld]; \
@@ -76,11 +76,11 @@ static NSMutableString *output = nil;
 int stage = __COUNTER__;
 extern int maxStage;
 
-#define PROGRESSWITHSTAGE(Stage, MaxStage) PROGRESS(([NSString stringWithFormat:@"%@ (%d/%d)", NSLocalizedString(@"Exploiting", nil), Stage, MaxStage]), false, false)
+#define STATUSWITHSTAGE(Stage, MaxStage) STATUS(([NSString stringWithFormat:@"%@ (%d/%d)", NSLocalizedString(@"Exploiting", nil), Stage, MaxStage]), false, false)
 #define UPSTAGE() do { \
     __COUNTER__; \
     stage++; \
-    PROGRESSWITHSTAGE(stage, maxStage); \
+    STATUSWITHSTAGE(stage, maxStage); \
 } while (false)
 
 typedef struct {
@@ -1105,17 +1105,15 @@ void exploit(mach_port_t tfp0,
         }
         NSString *file = [NSString stringWithContentsOfFile:@"/.installed_unc0ver" encoding:NSUTF8StringEncoding error:nil];
         needStrap = (file == nil ||
-                     (![file isEqualToString:@""] &&
-                    ![file isEqualToString:
-                    [NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber]]))
+                    (![file isEqualToString:@""] &&
+                    ![file isEqualToString:[NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber]]))
                     && access("/electra", F_OK) != ERR_SUCCESS;
-        if (needStrap) {
+        if (needStrap)
             LOG("We need strap");
-        }
         if (snapshots != NULL && needStrap && !has_origfs) {
             // Create system snapshot.
             
-            LOG("Create system snapshot...");
+            LOG("Creating system snapshot...");
             SETMESSAGE(NSLocalizedString(@"Unable to create system snapshot.  Delete OTA file from Settings - Storage if present", nil));
             _assert(fs_snapshot_create(rootfd, origfs, 0) == ERR_SUCCESS, message, true);
             _assert(snapshot_check(rootfd, origfs), message, true);
@@ -1221,13 +1219,6 @@ void exploit(mach_port_t tfp0,
                 "/var/lib",
                 "/var/stash",
                 "/var/db/stash",
-                "/etc/alternatives",
-                "/etc/apt",
-                "/etc/default",
-                "/etc/dpkg",
-                "/etc/profile.d",
-                "/etc/ssh",
-                "/etc/ssl",
                 "/var/mobile/Library/Cydia",
                 "/var/mobile/Library/Caches/com.saurik.Cydia",
                 NULL
@@ -1400,9 +1391,11 @@ void exploit(mach_port_t tfp0,
         // Extract Substrate if necessary
         if (needSubstrate) {
             LOG("Extracting substrate from deb...");
-            ArchiveFile *substrate_deb = [ArchiveFile archiveWithFile:pathForResource(@"mobilesubstrate.deb")];
+            NSString *substrate_deb = pathForResource(@"mobilesubstrate.deb");
             _assert(substrate_deb != nil, message, true);
-            _assert([substrate_deb extract:@"data.tar.lzma" toPath:@"/jb/substrate.tar.lzma"], message, true);
+            ArchiveFile *substrate = [ArchiveFile archiveWithFile:substrate_deb];
+            _assert(substrate != nil, message, true);
+            _assert([substrate extract:@"data.tar.lzma" toPath:@"/jb/substrate.tar.lzma"], message, true);
             ArchiveFile *substrate_data = [ArchiveFile archiveWithFile:@"/jb/substrate.tar.lzma"];
             _assert(substrate_data != nil, message, true);
             _assert([substrate_data extractToPath:@"/"], message, true);
@@ -1607,24 +1600,33 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
+        char *targettype = NULL;
+        size_t size = 0;
+        _assert(sysctlbyname("hw.targettype", NULL, &size, NULL, 0) == ERR_SUCCESS, message, true);
+        targettype = malloc(size);
+        _assert(targettype != NULL, message, true);
+        _assert(sysctlbyname("hw.targettype", targettype, &size, NULL, 0) == ERR_SUCCESS, message, true);
+        NSString *jetsamFile = [NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", targettype];
+        free(targettype);
+        targettype = NULL;
         if (prefs.increase_memory_limit) {
             // Increase memory limit.
             
             LOG("Increasing memory limit...");
             SETMESSAGE(NSLocalizedString(@"Failed to increase memory limit.", nil));
-            char *targettype = NULL;
-            size_t size = 0;
-            _assert(sysctlbyname("hw.targettype", NULL, &size, NULL, 0) == ERR_SUCCESS, message, true);
-            targettype = malloc(size);
-            _assert(targettype != NULL, message, true);
-            _assert(sysctlbyname("hw.targettype", targettype, &size, NULL, 0) == ERR_SUCCESS, message, true);
-            NSString *jetsamFile = [NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", targettype];
-            free(targettype);
-            targettype = NULL;
             _assert(modifyPlist(jetsamFile, ^(id plist) {
                 plist[@"Version4"][@"System"][@"Override"][@"Global"][@"UserHighWaterMark"] = [NSNumber numberWithInteger:[plist[@"Version4"][@"PListDevice"][@"MemoryCapacity"] integerValue]];
             }), message, true);
             LOG("Successfully increased memory limit.");
+        } else {
+            // Restored memory limit.
+            
+            LOG("Restoring memory limit...");
+            SETMESSAGE(NSLocalizedString(@"Failed to restore memory limit.", nil));
+            _assert(modifyPlist(jetsamFile, ^(id plist) {
+                plist[@"Version4"][@"System"][@"Override"][@"Global"][@"UserHighWaterMark"] = nil;
+            }), message, true);
+            LOG("Successfully restored memory limit.");
         }
     }
     
@@ -1837,7 +1839,7 @@ void exploit(mach_port_t tfp0,
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         _assert(bundledResources != nil, NSLocalizedString(@"Bundled Resources version missing.", nil), true);
         if (!jailbreakSupported()) {
-            PROGRESS(NSLocalizedString(@"Unsupported", nil), false, true);
+            STATUS(NSLocalizedString(@"Unsupported", nil), false, true);
             return;
         }
         UPSTAGE();
@@ -1897,7 +1899,7 @@ void exploit(mach_port_t tfp0,
         _assert(kernel_magic == MACH_HEADER_MAGIC, message, true);
         // NOTICE(@"Jailbreak succeeded, but still needs a few minutes to respring.", false, false);
         exploit(tfp0, kernel_base);
-        PROGRESS(NSLocalizedString(@"Jailbroken", nil), false, false);
+        STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     });
 }
 
@@ -1920,9 +1922,9 @@ void exploit(mach_port_t tfp0,
     // Do any additional setup after loading the view, typically from a nib.
     sharedController = self;
     if (jailbreakEnabled()) {
-        PROGRESS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);
+        STATUS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);
     } else if (!jailbreakSupported()) {
-        PROGRESS(NSLocalizedString(@"Unsupported", nil), false, true);
+        STATUS(NSLocalizedString(@"Unsupported", nil), false, true);
     }
     bundledResources = getBundledResources();
     LOG("Bundled Resources Version: %@", bundledResources);
