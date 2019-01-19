@@ -869,7 +869,10 @@ void exploit(mach_port_t tfp0,
         
         LOG("Initializing QiLin...");
         SETMESSAGE(NSLocalizedString(@"Failed to initialize QiLin.", nil));
-        _assert(initQiLin(tfp0, kernel_base) == ERR_SUCCESS, message, true);
+        if (initQiLin(tfp0, kernel_base) != ERR_SUCCESS) {
+            LOG("QiLin failed to initialize... trying anyway");
+            setMachine();
+        }
         const char *kernproc_name = "_kernproc";
         uint64_t kernproc_symbol = findKernelSymbol((char *)kernproc_name);
         if (ISADDR(kernproc_symbol)) {

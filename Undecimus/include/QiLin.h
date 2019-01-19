@@ -246,6 +246,6 @@ void dumpARMThreadState64(_STRUCT_ARM_THREAD_STATE64 *old_state);
 // Even more Internal/advanced use:
 uint64_t findKernelTask (void);
 uint64_t findMyProcStructInKernelMemory(void);  // For other advanced uses I haven't provided already
-
+void setMachine(void);
 
 #endif /* qilin_h */
