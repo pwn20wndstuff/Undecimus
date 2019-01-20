@@ -114,7 +114,7 @@ static NSString *bundledResources = nil;
 
 static void writeTestFile(const char *file) {
     _assert(create_file(file, 0, 0644), message, true);
-    _assert(unlink(file) == ERR_SUCCESS, message, true);
+    _assert(clean_file(file), message, true);
 }
 
 static vm_address_t get_kernel_base(mach_port_t tfp0)
