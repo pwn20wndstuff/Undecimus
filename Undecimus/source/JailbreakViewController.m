@@ -888,7 +888,8 @@ void exploit()
         
         LOG("Writing a test file to UserFS...");
         SETMESSAGE(NSLocalizedString(@"Failed to write a test file to UserFS.", nil));
-        writeTestFile("/var/mobile/test.txt");
+        const char *testFile = [NSString stringWithFormat:@"/var/mobile/test-%lu.txt", time(NULL)].UTF8String;
+        writeTestFile(testFile);
         LOG("Successfully wrote a test file to UserFS.");
     }
     
@@ -1074,7 +1075,8 @@ void exploit()
         
         LOG("Writing a test file to RootFS...");
         SETMESSAGE(NSLocalizedString(@"Failed to write a test file to RootFS.", nil));
-        writeTestFile("/test.txt");
+        const char *testFile = [NSString stringWithFormat:@"/test-%lu.txt", time(NULL)].UTF8String;
+        writeTestFile(testFile);
         LOG("Successfully wrote a test file to RootFS.");
     }
     
