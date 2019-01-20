@@ -191,7 +191,7 @@
     md[@"Preferences"][@"IncreaseMemoryLimit"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_INCREASE_MEMORY_LIMIT];
     md[@"Preferences"][@"InstallCydia"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_INSTALL_CYDIA];
     md[@"Preferences"][@"InstallOpenSSH"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_INSTALL_OPENSSH];
-    md[@"AppVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    md[@"AppVersion"] = appVersion();
     md[@"LogFile"] = [NSString stringWithContentsOfFile:[NSString stringWithUTF8String:getLogFile()] encoding:NSUTF8StringEncoding error:nil];
     return md;
 }
@@ -378,7 +378,7 @@
         NSString *Update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
         if (Update == nil) {
             NOTICE(NSLocalizedString(@"Failed to check for update.", nil), true, false);
-        } else if ([Update compare:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] options:NSNumericSearch] == NSOrderedDescending) {
+        } else if ([Update compare:appVersion() options:NSNumericSearch] == NSOrderedDescending) {
             NOTICE(NSLocalizedString(@"An update is available.", nil), true, false);
         } else {
             NOTICE(NSLocalizedString(@"Already up to date.", nil), true, false);
@@ -410,7 +410,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayFooterView:(UITableViewHeaderFooterView *)footerView forSection:(NSInteger)section {
-    footerView.textLabel.text = [@"unc0ver " stringByAppendingString:[[[NSBundle mainBundle] infoDictionary] valueForKey:@"CFBundleShortVersionString"]];
+    footerView.textLabel.text = [@"unc0ver " stringByAppendingString:appVersion()];
     footerView.textLabel.textAlignment = NSTextAlignmentCenter;
 }
 

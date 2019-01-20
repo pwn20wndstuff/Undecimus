@@ -1931,13 +1931,14 @@ void exploit(mach_port_t tfp0,
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     sharedController = self;
+    bundledResources = bundledResourcesVersion();
+    LOG("Unc0ver Version: %@", appVersion());
+    LOG("Bundled Resources Version: %@", bundledResources);
     if (jailbreakEnabled()) {
         STATUS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);
     } else if (!jailbreakSupported()) {
         STATUS(NSLocalizedString(@"Unsupported", nil), false, true);
     }
-    bundledResources = getBundledResources();
-    LOG("Bundled Resources Version: %@", bundledResources);
     if (bundledResources == nil) {
         showAlert(NSLocalizedString(@"Error", nil), NSLocalizedString(@"Bundled Resources version is missing. This build is invalid.", nil), false, false);
     }

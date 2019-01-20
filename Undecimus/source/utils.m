@@ -695,12 +695,14 @@ bool daemonIsLoaded(char *daemonID) {
     return isLoaded;
 }
 
-NSString *getBundledResources() {
+NSString *bundledResourcesVersion() {
     NSBundle *bundle = [NSBundle mainBundle];
-    NSDictionary *infoDictionary = [bundle infoDictionary];
-    NSString *bundledResourcesKey = @"BundledResources";
-    NSString *bundledResources = [infoDictionary objectForKey:bundledResourcesKey];
-    return bundledResources;
+    return [bundle objectForInfoDictionaryKey:@"BundledResources"];
+}
+
+NSString *appVersion() {
+    NSBundle *bundle = [NSBundle mainBundle];
+    return [bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
 }
 
 bool debuggerEnabled() {
