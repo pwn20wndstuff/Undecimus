@@ -16,11 +16,11 @@ extern int logfd;
 
 #define DEFAULT_VERSION_STRING "Hacked"
 
-#define empty_list 0
-#define multi_path 1
-#define async_wake 2
-#define deja_xnu 3
-#define necp 4
+#define empty_list_exploit 0
+#define multi_path_exploit 1
+#define async_wake_exploit 2
+#define deja_xnu_exploit 3
+#define necp_exploit 4
 
 enum hashtype {
     HASHTYPE_MD5 = 0,

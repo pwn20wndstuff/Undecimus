@@ -234,9 +234,9 @@
     [self.KernelExploitSegmentedControl setSelectedSegmentIndex:[[NSUserDefaults standardUserDefaults] integerForKey:K_EXPLOIT]];
     [self.DisableAutoUpdatesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_DISABLE_AUTO_UPDATES]];
     [self.DisableAppRevokesSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_DISABLE_APP_REVOKES]];
-    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(empty_list) forSegmentAtIndex:0];
-    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(multi_path) forSegmentAtIndex:1];
-    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(async_wake) forSegmentAtIndex:2];
+    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(empty_list_exploit) forSegmentAtIndex:0];
+    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(multi_path_exploit) forSegmentAtIndex:1];
+    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(async_wake_exploit) forSegmentAtIndex:2];
     [self.OpenCydiaButton setEnabled:[[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://"]]];
     [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[SettingsTableViewController _provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, NSLocalizedString(@"Days", nil)]];
     [self.OverwriteBootNonceSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_OVERWRITE_BOOT_NONCE]];
@@ -306,7 +306,7 @@
         NSInteger support = recommendedRestartSupport();
         _assert(support != -1, message, true);
         switch (support) {
-            case necp: {
+            case necp_exploit: {
                 necp_die();
                 break;
             }
@@ -439,7 +439,7 @@
         NSInteger support = recommendedRespringSupport();
         _assert(support != -1, message, true);
         switch (support) {
-            case deja_xnu: {
+            case deja_xnu_exploit: {
                 mach_port_t bb_tp = hid_event_queue_exploit();
                 _assert(MACH_PORT_VALID(bb_tp), message, true);
                 _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0)) == 0, message, true);

@@ -16,7 +16,6 @@
 		2139534C21763A0C00B17F8D /* rsync.tar in Resources */ = {isa = PBXBuildFile; fileRef = 2139534B21763A0B00B17F8D /* rsync.tar */; };
 		21466CDC21AEEA3A00B99B4C /* injector.deb in Resources */ = {isa = PBXBuildFile; fileRef = 21466CDB21AEEA3A00B99B4C /* injector.deb */; };
 		21466CDE21AEEC9200B99B4C /* spawn.deb in Resources */ = {isa = PBXBuildFile; fileRef = 21466CDD21AEEC9200B99B4C /* spawn.deb */; };
-		2170BD3721B193650059BD10 /* qilin.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC8C2136A0D100849420 /* qilin.o */; };
 		2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */; };
 		2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
@@ -99,7 +98,6 @@
 		21C0FC8521369EE900849420 /* empty_list_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = empty_list_sploit.c; sourceTree = "<group>"; };
 		21C0FC8621369EE900849420 /* KernelStructureOffsets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KernelStructureOffsets.m; sourceTree = "<group>"; };
 		21C0FC8B21369FC500849420 /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
-		21C0FC8C2136A0D100849420 /* qilin.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = qilin.o; sourceTree = "<group>"; };
 		21C0FC8D2136A0D100849420 /* QiLin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QiLin.h; sourceTree = "<group>"; };
 		21C0FC8F2136A2C500849420 /* iokit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iokit.h; sourceTree = "<group>"; };
 		21C0FC902136A46500849420 /* SpringBoardServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpringBoardServices.framework; sourceTree = "<group>"; };
@@ -147,7 +145,6 @@
 			files = (
 				226689DD21EC1C5A00262F66 /* libarchive.2.tbd in Frameworks */,
 				22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */,
-				2170BD3721B193650059BD10 /* qilin.o in Frameworks */,
 				2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */,
 				2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */,
 			);
@@ -203,7 +200,6 @@
 		2170BD3521B192A30059BD10 /* libs */ = {
 			isa = PBXGroup;
 			children = (
-				21C0FC8C2136A0D100849420 /* qilin.o */,
 			);
 			path = libs;
 			sourceTree = "<group>";

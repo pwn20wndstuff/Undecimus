@@ -11,7 +11,6 @@
 #import <Foundation/Foundation.h>
 #import <CommonCrypto/CommonDigest.h>
 #import <spawn.h>
-#import <QiLin.h>
 #include <copyfile.h>
 #include <common.h>
 #include <libproc.h>
@@ -463,7 +462,7 @@ bool jailbreakEnabled() {
 
 bool supportsExploit(NSInteger exploit) {
     switch (exploit) {
-        case empty_list: {
+        case empty_list_exploit: {
             NSArray *list =
             @[@"4397.0.0.2.4~1",
               @"4481.0.0.2.1~1",
@@ -500,7 +499,7 @@ bool supportsExploit(NSInteger exploit) {
             }
             break;
         }
-        case multi_path: {
+        case multi_path_exploit: {
             NSArray *list =
             @[@"4397.0.0.2.4~1",
               @"4481.0.0.2.1~1",
@@ -535,7 +534,7 @@ bool supportsExploit(NSInteger exploit) {
             }
             break;
         }
-        case async_wake: {
+        case async_wake_exploit: {
             NSArray *list =
             @[@"4397.0.0.2.4~1",
               @"4481.0.0.2.1~1",
@@ -556,7 +555,7 @@ bool supportsExploit(NSInteger exploit) {
             }
             break;
         }
-        case deja_xnu: {
+        case deja_xnu_exploit: {
             NSArray *list =
             @[@"4397.0.0.2.4~1",
               @"4481.0.0.2.1~1",
@@ -600,7 +599,7 @@ bool supportsExploit(NSInteger exploit) {
             }
             break;
         }
-        case necp: {
+        case necp_exploit: {
             NSArray *list =
             @[@"4397.0.0.2.4~1",
               @"4481.0.0.2.1~1",
@@ -650,40 +649,40 @@ bool supportsExploit(NSInteger exploit) {
 }
 
 bool jailbreakSupported() {
-    return supportsExploit(empty_list) ||
-    supportsExploit(multi_path) ||
-    supportsExploit(async_wake);
+    return supportsExploit(empty_list_exploit) ||
+    supportsExploit(multi_path_exploit) ||
+    supportsExploit(async_wake_exploit);
 }
 
 bool respringSupported() {
-    return supportsExploit(deja_xnu);
+    return supportsExploit(deja_xnu_exploit);
 }
 
 bool restartSupported() {
-    return supportsExploit(necp);
+    return supportsExploit(necp_exploit);
 }
 
 NSInteger recommendedJailbreakSupport() {
-    if (supportsExploit(async_wake))
-        return async_wake;
-    else if (supportsExploit(multi_path))
-        return multi_path;
-    else if (supportsExploit(empty_list))
-        return empty_list;
+    if (supportsExploit(async_wake_exploit))
+        return async_wake_exploit;
+    else if (supportsExploit(multi_path_exploit))
+        return multi_path_exploit;
+    else if (supportsExploit(empty_list_exploit))
+        return empty_list_exploit;
     else
         return -1;
 }
 
 NSInteger recommendedRestartSupport() {
-    if (supportsExploit(necp))
-        return necp;
+    if (supportsExploit(necp_exploit))
+        return necp_exploit;
     else
         return -1;
 }
 
 NSInteger recommendedRespringSupport() {
-    if (supportsExploit(deja_xnu))
-        return deja_xnu;
+    if (supportsExploit(deja_xnu_exploit))
+        return deja_xnu_exploit;
     else
         return -1;
 }

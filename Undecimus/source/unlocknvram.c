@@ -12,7 +12,6 @@
 
 #include <stdlib.h>
 #include <CoreFoundation/CoreFoundation.h>
-#include <QiLin.h>
 #include <iokit.h>
 #include <common.h>
 #include "KernelUtilities.h"
@@ -38,7 +37,7 @@ uint64_t get_iodtnvram_obj(void) {
             LOG("Failed to get IODTNVRAM service");
             return 0;
         }
-        uint64_t nvram_up = getAddressOfPort(getpid(), IODTNVRAMSrv);
+        uint64_t nvram_up = get_address_of_port(getpid(), IODTNVRAMSrv);
         IODTNVRAMObj = ReadKernel64(nvram_up + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
 
         LOG("IODTNVRAM obj at 0x%llx", IODTNVRAMObj);

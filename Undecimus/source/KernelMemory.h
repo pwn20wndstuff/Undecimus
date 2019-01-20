@@ -1,52 +1,52 @@
 #ifndef KernelMemory_h
 #define KernelMemory_h
 
-#include <stdbool.h>
 #include <mach/mach.h>
+#include <stdbool.h>
 
 /***** mach_vm.h *****/
 kern_return_t mach_vm_read(
-                           vm_map_t target_task,
-                           mach_vm_address_t address,
-                           mach_vm_size_t size,
-                           vm_offset_t *data,
-                           mach_msg_type_number_t *dataCnt);
+    vm_map_t target_task,
+    mach_vm_address_t address,
+    mach_vm_size_t size,
+    vm_offset_t* data,
+    mach_msg_type_number_t* dataCnt);
 
 kern_return_t mach_vm_write(
-                            vm_map_t target_task,
-                            mach_vm_address_t address,
-                            vm_offset_t data,
-                            mach_msg_type_number_t dataCnt);
+    vm_map_t target_task,
+    mach_vm_address_t address,
+    vm_offset_t data,
+    mach_msg_type_number_t dataCnt);
 
 kern_return_t mach_vm_read_overwrite(
-                                     vm_map_t target_task,
-                                     mach_vm_address_t address,
-                                     mach_vm_size_t size,
-                                     mach_vm_address_t data,
-                                     mach_vm_size_t *outsize);
+    vm_map_t target_task,
+    mach_vm_address_t address,
+    mach_vm_size_t size,
+    mach_vm_address_t data,
+    mach_vm_size_t* outsize);
 
 kern_return_t mach_vm_allocate(
-                               vm_map_t target,
-                               mach_vm_address_t *address,
-                               mach_vm_size_t size,
-                               int flags);
+    vm_map_t target,
+    mach_vm_address_t* address,
+    mach_vm_size_t size,
+    int flags);
 
-kern_return_t mach_vm_deallocate (
-                                  vm_map_t target,
-                                  mach_vm_address_t address,
-                                  mach_vm_size_t size);
+kern_return_t mach_vm_deallocate(
+    vm_map_t target,
+    mach_vm_address_t address,
+    mach_vm_size_t size);
 
-kern_return_t mach_vm_protect (
-                               vm_map_t target_task,
-                               mach_vm_address_t address,
-                               mach_vm_size_t size,
-                               boolean_t set_maximum,
-                               vm_prot_t new_protection);
+kern_return_t mach_vm_protect(
+    vm_map_t target_task,
+    mach_vm_address_t address,
+    mach_vm_size_t size,
+    boolean_t set_maximum,
+    vm_prot_t new_protection);
 
 extern mach_port_t tfp0;
 
-size_t kread(uint64_t where, void *p, size_t size);
-size_t kwrite(uint64_t where, const void *p, size_t size);
+size_t kread(uint64_t where, void* p, size_t size);
+size_t kwrite(uint64_t where, const void* p, size_t size);
 
 #define rk32(kaddr) ReadKernel32(kaddr)
 #define rk64(kaddr) ReadKernel64(kaddr)
