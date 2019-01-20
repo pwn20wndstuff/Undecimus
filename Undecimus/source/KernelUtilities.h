@@ -21,7 +21,6 @@ typedef struct {
     kptr_t vfs_context_current;
     kptr_t vnode_lookup;
     kptr_t vnode_put;
-    kptr_t kernproc;
     kptr_t kernel_task;
     kptr_t shenanigans;
     kptr_t lck_mtx_lock;

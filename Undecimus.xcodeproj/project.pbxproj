@@ -98,7 +98,6 @@
 		21C0FC8521369EE900849420 /* empty_list_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = empty_list_sploit.c; sourceTree = "<group>"; };
 		21C0FC8621369EE900849420 /* KernelStructureOffsets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KernelStructureOffsets.m; sourceTree = "<group>"; };
 		21C0FC8B21369FC500849420 /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
-		21C0FC8D2136A0D100849420 /* QiLin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QiLin.h; sourceTree = "<group>"; };
 		21C0FC8F2136A2C500849420 /* iokit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iokit.h; sourceTree = "<group>"; };
 		21C0FC902136A46500849420 /* SpringBoardServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpringBoardServices.framework; sourceTree = "<group>"; };
 		21C130DE214BC2880021AA9D /* unlocknvram.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unlocknvram.c; sourceTree = "<group>"; };
@@ -190,18 +189,10 @@
 				211C372821CE2DD800ADBEA2 /* sys */,
 				21C0FC8B21369FC500849420 /* common.h */,
 				21C0FC8F2136A2C500849420 /* iokit.h */,
-				21C0FC8D2136A0D100849420 /* QiLin.h */,
 				21E9642421A1DD6F000625F7 /* NSTask.h */,
 				21395357217CBA1000B17F8D /* MobileGestalt.h */,
 			);
 			path = include;
-			sourceTree = "<group>";
-		};
-		2170BD3521B192A30059BD10 /* libs */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = libs;
 			sourceTree = "<group>";
 		};
 		2170BD3621B192B90059BD10 /* resources */ = {
@@ -309,7 +300,6 @@
 				2170BDCC21B330210059BD10 /* frameworks */,
 				2170BDCB21B32FF10059BD10 /* source */,
 				2170BD3621B192B90059BD10 /* resources */,
-				2170BD3521B192A30059BD10 /* libs */,
 				2170BD3421B192750059BD10 /* include */,
 				8D592A67218E47F60035D2BC /* Main.storyboard */,
 				21C0FC7321369EB800849420 /* Assets.xcassets */,
@@ -619,7 +609,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus",
-					"$(PROJECT_DIR)/Undecimus/libs",
 				);
 				OTHER_CFLAGS = "";
 				"OTHER_CFLAGS[arch=*]" = "-DUNDECIMUS";
@@ -662,7 +651,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus",
-					"$(PROJECT_DIR)/Undecimus/libs",
 				);
 				OTHER_CFLAGS = "";
 				"OTHER_CFLAGS[arch=*]" = "-DUNDECIMUS";

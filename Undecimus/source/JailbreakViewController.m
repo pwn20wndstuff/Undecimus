@@ -802,10 +802,6 @@ void exploit()
         SETOFFSET(vnode_put, find_vnode_put());
         LOG("vnode_put = "ADDR"", GETOFFSET(vnode_put));
         _assert(ISADDR(GETOFFSET(vnode_put)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find kernproc offset.", nil));
-        SETOFFSET(kernproc, find_kernproc());
-        LOG("kernproc = "ADDR"", GETOFFSET(kernproc));
-        _assert(ISADDR(GETOFFSET(kernproc)), message, true);
         SETMESSAGE(NSLocalizedString(@"Failed to find kernel_task offset.", nil));
         SETOFFSET(kernel_task, find_kernel_task());
         LOG("kernel_task = "ADDR"", GETOFFSET(kernel_task));
@@ -1276,7 +1272,7 @@ void exploit()
         dictionary[@"VfsContextCurrent"] = ADDRSTRING(GETOFFSET(vfs_context_current));
         dictionary[@"VnodeLookup"] = ADDRSTRING(GETOFFSET(vnode_lookup));
         dictionary[@"VnodePut"] = ADDRSTRING(GETOFFSET(vnode_put));
-        dictionary[@"KernProc"] = ADDRSTRING(GETOFFSET(kernproc));
+        dictionary[@"KernProc"] = ADDRSTRING(ReadKernel64(GETOFFSET(kernel_task))  + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
         dictionary[@"KernelTask"] = ADDRSTRING(GETOFFSET(kernel_task));
         dictionary[@"Shenanigans"] = ADDRSTRING(GETOFFSET(shenanigans));
         dictionary[@"LckMtxLock"] = ADDRSTRING(GETOFFSET(lck_mtx_lock));
