@@ -369,10 +369,6 @@
     [self presentViewController:copyBootNonceAlert animated:TRUE completion:nil];
 }
 
-- (IBAction)tappedOnGetTechnicalSupport:(id)sender {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://discord.gg/jb"] options:@{} completionHandler:nil];
-}
-
 - (IBAction)tappedOnCheckForUpdate:(id)sender {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         NSString *Update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
