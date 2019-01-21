@@ -104,13 +104,14 @@ int message_size_for_kalloc_size(int kalloc_size)
     return ((3 * kalloc_size) / 4) - 0x74;
 }
 
+
 uint64_t get_proc_struct_for_pid(pid_t pid)
 {
-    uint64_t proc = ReadKernel64(GETOFFSET(allproc));
+    uint64_t proc = ReadKernel64(ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
     while (proc) {
         if (ReadKernel32(proc + koffset(KSTRUCT_OFFSET_PROC_PID)) == pid)
             return proc;
-        proc = ReadKernel64(proc);
+        proc = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_P_LIST));
     }
     return 0;
 }
@@ -129,7 +130,7 @@ uint64_t get_address_of_port(pid_t pid, mach_port_t port)
 
 uint64_t get_kernel_cred_addr()
 {
-    uint64_t kernel_proc_struct_addr = get_proc_struct_for_pid(0);
+    uint64_t kernel_proc_struct_addr = ReadKernel64(ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
     return ReadKernel64(kernel_proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_UCRED));
 }
 

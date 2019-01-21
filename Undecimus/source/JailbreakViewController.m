@@ -774,10 +774,6 @@ void exploit()
         SETOFFSET(smalloc, find_smalloc());
         LOG("smalloc = "ADDR"", GETOFFSET(smalloc));
         _assert(ISADDR(GETOFFSET(smalloc)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find allproc offset.", nil));
-        SETOFFSET(allproc, find_allproc());
-        LOG("allproc = "ADDR"", GETOFFSET(allproc));
-        _assert(ISADDR(GETOFFSET(allproc)), message, true);
         SETMESSAGE(NSLocalizedString(@"Failed to find add_x0_x0_0x40_ret offset.", nil));
         SETOFFSET(add_x0_x0_0x40_ret, find_add_x0_x0_0x40_ret());
         LOG("add_x0_x0_0x40_ret = "ADDR"", GETOFFSET(add_x0_x0_0x40_ret));
@@ -1273,7 +1269,6 @@ void exploit()
         dictionary[@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
         dictionary[@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
         dictionary[@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
-        dictionary[@"AllProc"] = ADDRSTRING(GETOFFSET(allproc));
         dictionary[@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
         dictionary[@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref));
         dictionary[@"VfsContextCurrent"] = ADDRSTRING(GETOFFSET(vfs_context_current));

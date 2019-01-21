@@ -14,7 +14,6 @@ typedef struct {
     kptr_t OSBoolean_False;
     kptr_t osunserializexml;
     kptr_t smalloc;
-    kptr_t allproc;
     kptr_t add_x0_x0_0x40_ret;
     kptr_t zone_map_ref;
     kptr_t vfs_context_current;
