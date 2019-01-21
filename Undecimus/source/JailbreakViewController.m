@@ -117,7 +117,7 @@ static void writeTestFile(const char *file) {
     _assert(clean_file(file), message, true);
 }
 
-static vm_address_t get_kernel_base(mach_port_t tfp0)
+static vm_address_t get_kernel_base()
 {
     uint64_t addr = 0;
     addr = KERNEL_SEARCH_ADDRESS+MAX_KASLR_SLIDE;
@@ -433,7 +433,7 @@ void unblockDomainWithName(const char *name) {
 
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
 
-int updateVersionString(const char *newVersionString, mach_port_t tfp0, vm_address_t kernel_base) {
+int updateVersionString(const char *newVersionString) {
     uintptr_t versionPtr = 0;
     struct utsname u = {0};
     uname(&u);
@@ -1309,7 +1309,7 @@ void exploit()
             _assert(uname(&u) == ERR_SUCCESS, message, true);
             const char *kernelVersionString = [NSString stringWithFormat:@"%s %s", u.version, DEFAULT_VERSION_STRING].UTF8String;
             for (int i = 0; !(i >= 5 || strstr(u.version, kernelVersionString) != NULL); i++) {
-                _assert(updateVersionString(kernelVersionString, tfp0, kernel_base) == ERR_SUCCESS, message, true);
+                _assert(updateVersionString(kernelVersionString) == ERR_SUCCESS, message, true);
                 _assert(uname(&u) == ERR_SUCCESS, message, true);
             }
             _assert(strstr(u.version, kernelVersionString) != NULL, message, true);
@@ -1827,7 +1827,7 @@ void exploit()
             NOTICE(NSLocalizedString(@"Kernel exploit failed. This is not an error. Reboot and try again.", nil), true, false);
             exit(EXIT_FAILURE);
         }
-        kernel_base = (uint64_t)get_kernel_base(tfp0);
+        kernel_base = (uint64_t)get_kernel_base();
         LOG("kernel_base = "ADDR"", kernel_base);
         _assert(ISADDR(kernel_base), message, true);
         uint32_t kernel_magic = ReadKernel32(kernel_base);
