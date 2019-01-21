@@ -992,7 +992,7 @@ void exploit()
             const char *systemSnapshotMountPoint = "/var/MobileSoftwareUpdate/mnt1";
             _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
             _assert(runCommand("/sbin/mount_apfs", thedisk, systemSnapshotMountPoint, NULL) == ERR_SUCCESS, message, true);
-            const char *systemSnapshotLaunchdPath = [NSString stringWithFormat:@"%s/sbin/launchd", systemSnapshotMountPoint].UTF8String;
+            const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
             _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
             LOG("Successfully mounted system snapshot.");
             
@@ -1132,7 +1132,7 @@ void exploit()
                 const char *systemSnapshotMountPoint = [NSString stringWithFormat:@"/var/tmp/mnt-%lu", time(NULL)].UTF8String;
                 _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
                 _assert(fs_snapshot_mount(rootfd, systemSnapshotMountPoint, snapshot, 0) == ERR_SUCCESS, message, true);
-                const char *systemSnapshotLaunchdPath = [NSString stringWithFormat:@"%s/sbin/launchd", systemSnapshotMountPoint].UTF8String;
+                const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
                 _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
                 NSString *rsync_tar = pathForResource(@"rsync.tar");
                 _assert(rsync_tar != nil, message, true);
