@@ -7,7 +7,7 @@
 //
 
 #include <sys/snapshot.h>
-#include  <dlfcn.h>
+#include <dlfcn.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
 #include <copyfile.h>
