@@ -785,7 +785,7 @@ void exploit()
         SETMESSAGE(NSLocalizedString(@"Failed to find rootvnode offset.", nil));
         SETOFFSET(rootvnode, find_rootvnode());
         LOG("rootvnode = "ADDR"", GETOFFSET(rootvnode));
-        _assert(ISADDR(GETOFFSET(add_x0_x0_0x40_ret)), message, true);
+        _assert(ISADDR(GETOFFSET(rootvnode)), message, true);
         SETMESSAGE(NSLocalizedString(@"Failed to find zone_map_ref offset.", nil));
         SETOFFSET(zone_map_ref, find_zone_map_ref());
         LOG("zone_map_ref = "ADDR"", GETOFFSET(zone_map_ref));
