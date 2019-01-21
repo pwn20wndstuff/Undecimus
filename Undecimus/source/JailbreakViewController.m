@@ -894,7 +894,7 @@ void exploit()
     {
         if (prefs.dump_apticket) {
             NSString *originalFile = @"/System/Library/Caches/apticket.der";
-            NSString *dumpFile = [NSString stringWithFormat:@"%@/Documents/apticket.der", homeDirectory];
+            NSString *dumpFile = [homeDirectory stringByAppendingPathComponent:@"Documents/apticket.der"];
             if (![sha1sum(originalFile) isEqualToString:sha1sum(dumpFile)]) {
                 // Dump APTicket.
                 
@@ -1129,7 +1129,7 @@ void exploit()
             LOG("%s", snapshot);
             _assert(snapshot != NULL, message, true);
             if (kCFCoreFoundationVersionNumber < 1452.23) {
-                const char *systemSnapshotMountPoint = "/var/MobileSoftwareUpdate/mnt1";
+                const char *systemSnapshotMountPoint = [NSString stringWithFormat:@"/var/tmp/mnt-%lu", time(NULL)].UTF8String;
                 _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
                 _assert(fs_snapshot_mount(rootfd, systemSnapshotMountPoint, snapshot, 0) == ERR_SUCCESS, message, true);
                 const char *systemSnapshotLaunchdPath = [NSString stringWithFormat:@"%s/sbin/launchd", systemSnapshotMountPoint].UTF8String;
@@ -1140,7 +1140,7 @@ void exploit()
                 _assert(rsync != nil, message, true);
                 _assert([rsync extractToPath:@"/jb"], message, true);
                 _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
-                _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "/var/MobileSoftwareUpdate/mnt1/.", "/", NULL) == 0, message, true);
+                _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, message, true);
                 unmount(systemSnapshotMountPoint, 0);
             } else {
                 char *systemSnapshot = copySystemSnapshot();
