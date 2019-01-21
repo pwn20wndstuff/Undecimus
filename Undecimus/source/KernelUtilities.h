@@ -16,7 +16,6 @@ typedef struct {
     kptr_t smalloc;
     kptr_t allproc;
     kptr_t add_x0_x0_0x40_ret;
-    kptr_t rootvnode;
     kptr_t zone_map_ref;
     kptr_t vfs_context_current;
     kptr_t vnode_lookup;
