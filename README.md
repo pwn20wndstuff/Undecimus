@@ -102,12 +102,12 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@stek29](https://twitter.com/stek29) for the patchfinder64 additions, unlocknvram, host_get_special_port(4) patch and shenanigans bypass
 * [@theninjaprawn](https://twitter.com/theninjaprawn) for the patchfinder64 additions
 * [@saurik](https://twitter.com/saurik) for Cydia and Substrate
+* [@FCE365](https://twitter.com/FCE365) for the empty_list reliability improvements
 * [@Cryptiiiic](https://twitter.com/Cryptiiiic) for testing
 * [@xanDesign_](https://twitter.com/xanDesign_) for testing
 * [@AppleDry05](https://twitter.com/AppleDry05) for testing
 * [@Rob_Coleman123](https://twitter.com/Rob_Coleman123) for testing
 * [@MidnightChip](https://twitter.com/MidnightChip) for testing
-* [@FCE365](https://twitter.com/FCE365) for testing
 * [@Swag_iOS](https://twitter.com/Swag_iOS) for testing
 * [@jailbreakbuster](https://twitter.com/jailbreakbuster) for testing
 * [@Jakeashacks](https://twitter.com/Jakeashacks) for testing
