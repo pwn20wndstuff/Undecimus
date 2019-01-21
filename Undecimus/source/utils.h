@@ -77,7 +77,7 @@ bool is_directory(const char *filename);
 bool ensure_directory(const char *directory, int owner, mode_t mode);
 bool ensure_symlink(const char *to, const char *from);
 bool mode_is(const char *filename, mode_t mode);
-int runCommandv(const char *cmd, int argc, const char * const*argv);
+int runCommandv(const char *cmd, int argc, const char * const* argv, void (^unrestrict)(pid_t));
 int runCommand(const char *cmd, ...);
 NSString *pathForResource(NSString *resource);
 pid_t pidOfProcess(const char *name);

@@ -135,7 +135,7 @@ bool verifySums(NSString *sumFile, enum hashtype hash) {
 
 int _system(const char *cmd) {
     const char *argv[] = {"sh", "-c", (char *)cmd, NULL};
-    return runCommandv("/bin/sh", 3, argv);
+    return runCommandv("/bin/sh", 3, argv, NULL);
 }
 
 int systemf(const char *cmd, ...) {
@@ -200,7 +200,7 @@ bool runDpkg(NSArray <NSString*> *args, bool forceDeps) {
         argv[i] = [command[i] UTF8String];
     }
     argv[command.count] = NULL;
-    int rv = runCommandv("/usr/bin/dpkg", (int)[command count], argv);
+    int rv = runCommandv("/usr/bin/dpkg", (int)[command count], argv, NULL);
     return !WEXITSTATUS(rv);
 }
 
@@ -304,12 +304,14 @@ bool mode_is(const char *filename, mode_t mode) {
     return buf.st_mode == mode;
 }
 
-int runCommandv(const char *cmd, int argc, const char * const* argv) {
+int runCommandv(const char *cmd, int argc, const char * const* argv, void (^unrestrict)(pid_t)) {
     pid_t pid;
     posix_spawn_file_actions_t *actions = NULL;
     posix_spawn_file_actions_t actionsStruct;
     int out_pipe[2];
     bool valid_pipe = false;
+    posix_spawnattr_t *attr = NULL;
+    posix_spawnattr_t attrStruct;
     
     NSMutableString *cmdstr = [NSMutableString stringWithCString:cmd encoding:NSUTF8StringEncoding];
     for (int i=1; i<argc; i++) {
@@ -325,8 +327,19 @@ int runCommandv(const char *cmd, int argc, const char * const* argv) {
         posix_spawn_file_actions_addclose(actions, out_pipe[1]);
     }
     
-    int rv = posix_spawn(&pid, cmd, actions, NULL, (char *const *)argv, environ);
+    if (unrestrict && posix_spawnattr_init(&attrStruct) == ERR_SUCCESS) {
+        attr = &attrStruct;
+        posix_spawnattr_init(attr);
+        posix_spawnattr_setflags(attr, POSIX_SPAWN_START_SUSPENDED);
+    }
+    
+    int rv = posix_spawn(&pid, cmd, actions, attr, (char *const *)argv, environ);
     LOG("%s(%d) command: %@", __FUNCTION__, pid, cmdstr);
+    
+    if (unrestrict) {
+        unrestrict(pid);
+        kill(pid, SIGCONT);
+    }
     
     if (valid_pipe) {
         close(out_pipe[1]);
@@ -389,7 +402,7 @@ int runCommand(const char *cmd, ...) {
     va_end(ap2);
     argv[argc] = NULL;
 
-    int rv = runCommandv(cmd, argc, argv);
+    int rv = runCommandv(cmd, argc, argv, NULL);
     return WEXITSTATUS(rv);
 }
 
