@@ -1034,14 +1034,16 @@ void exploit()
             }
         }
         uint64_t rootfs_vnode = ReadKernel64(GETOFFSET(rootvnode));
+        LOG("rootfs_vnode = "ADDR"", rootfs_vnode);
+        _assert(ISADDR(rootfs_vnode), message, true);
         uint64_t v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
+        LOG("v_mount = "ADDR"", v_mount);
+        _assert(ISADDR(v_mount), message, true);
         uint32_t v_flag = ReadKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG));
-        if ((v_flag & MNT_NOSUID) || (v_flag & MNT_RDONLY)) {
-            v_flag = v_flag & ~MNT_NOSUID;
-            v_flag = v_flag & ~MNT_RDONLY;
+        if ((v_flag & (MNT_RDONLY | MNT_NOSUID))) {
+            v_flag = v_flag & ~(MNT_RDONLY | MNT_NOSUID);
             WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag & ~MNT_ROOTFS);
             _assert(runCommand("/sbin/mount", "-u", thedisk, NULL) == ERR_SUCCESS, message, true);
-            v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
             WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag);
         }
         NSString *file = [NSString stringWithContentsOfFile:@"/.installed_unc0ver" encoding:NSUTF8StringEncoding error:nil];
