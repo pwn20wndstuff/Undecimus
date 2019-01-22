@@ -766,10 +766,6 @@ void exploit()
         SETOFFSET(trust_chain, find_trustcache());
         LOG("trust_chain = "ADDR"", GETOFFSET(trust_chain));
         _assert(ISADDR(GETOFFSET(trust_chain)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find amficache offset.", nil));
-        SETOFFSET(amficache, find_amficache());
-        LOG("amficache = "ADDR"", GETOFFSET(amficache));
-        _assert(ISADDR(GETOFFSET(amficache)), message, true);
         SETMESSAGE(NSLocalizedString(@"Failed to find OSBoolean_True offset.", nil));
         SETOFFSET(OSBoolean_True, find_OSBoolean_True());
         LOG("OSBoolean_True = "ADDR"", GETOFFSET(OSBoolean_True));
@@ -1292,7 +1288,6 @@ void exploit()
         dictionary[@"KernelBase"] = ADDRSTRING(kernel_base);
         dictionary[@"KernelSlide"] = ADDRSTRING(kernel_slide);
         dictionary[@"TrustChain"] = ADDRSTRING(GETOFFSET(trust_chain));
-        dictionary[@"AmfiCache"] = ADDRSTRING(GETOFFSET(amficache));
         dictionary[@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
         dictionary[@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
         dictionary[@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));

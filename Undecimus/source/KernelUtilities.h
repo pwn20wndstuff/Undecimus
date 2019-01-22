@@ -9,7 +9,6 @@
 
 typedef struct {
     kptr_t trust_chain;
-    kptr_t amficache;
     kptr_t OSBoolean_True;
     kptr_t OSBoolean_False;
     kptr_t osunserializexml;
