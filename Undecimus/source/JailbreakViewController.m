@@ -565,17 +565,29 @@ int _vnode_put(uint64_t vnode){
 }
 
 uint64_t getVnodeAtPath(const char *path) {
-    uint64_t vfs_context = _vfs_context();
-    _assert(ISADDR(vfs_context), message, true);
-    uint64_t *vpp = (uint64_t *)malloc(sizeof(uint64_t));
-    int ret = _vnode_lookup(path, O_RDONLY, vpp, vfs_context);
-    if (ret != 0){
-        LOG("unable to get vnode from path for %s", path);
-        free(vpp);
-        return -1;
+    uint64_t vfs_context = 0;
+    uint64_t *vpp = NULL;
+    uint64_t vnode = 0;
+    vfs_context = _vfs_context();
+    if (!ISADDR(vfs_context)) {
+        LOG("Failed to get vfs_context.");
+        goto out;
     }
-    uint64_t vnode = *vpp;
-    free(vpp);
+    vpp = malloc(sizeof(uint64_t));
+    if (vpp == NULL) {
+        LOG("Failed to allocate memory.");
+        goto out;
+    }
+    if (_vnode_lookup(path, O_RDONLY, vpp, vfs_context) != ERR_SUCCESS) {
+        LOG("Failed to get vnode at path \"%s\".", path);
+        goto out;
+    }
+    vnode = *vpp;
+out:
+    if (vpp != NULL) {
+        free(vpp);
+        vpp = NULL;
+    }
     return vnode;
 }
 
