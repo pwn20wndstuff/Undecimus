@@ -979,15 +979,12 @@ void exploit()
             
             LOG("Mounting system snapshot...");
             SETMESSAGE(NSLocalizedString(@"Unable to mount system snapshot.  Delete OTA file from Settings - Storage if present", nil));
-            const char *systemSnapshotMountPoint = "/private/var/tmp/jb/mnt";
+            const char *systemSnapshotMountPoint = "/private/var/tmp/jb/mnt1";
             if (is_mountpoint(systemSnapshotMountPoint)) {
-                if (unmount(systemSnapshotMountPoint, MNT_FORCE) != ERR_SUCCESS) {
-                    message = [NSString stringWithFormat:@"Unable to unmount: %s", strerror(errno)];
-                    _assert(false, message, true);
-                }
+                _assert(unmount(systemSnapshotMountPoint, MNT_FORCE) == ERR_SUCCESS, message, true);
             }
-            _assert(clean_file(systemSnapshotMountPoint), @"Unable to clean mount point for system snapshot", true);
-            _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), @"Unable to create path to mount system snapshot", true);
+            _assert(clean_file(systemSnapshotMountPoint), message, true);
+            _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
             const char *argv[] = {"/sbin/mount_apfs", thedisk, systemSnapshotMountPoint, NULL};
             _assert(runCommandv(argv[0], 3, argv, ^(pid_t pid) {
                 uint64_t procStructAddr = get_proc_struct_for_pid(pid);
@@ -1024,7 +1021,7 @@ void exploit()
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
             NOTICE(NSLocalizedString(@"The system snapshot has been successfully renamed. The device will be rebooted now.", nil), true, false);
-            unmount(systemSnapshotMountPoint, 0);
+            unmount(systemSnapshotMountPoint, MNT_FORCE);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         } else {
@@ -1144,7 +1141,11 @@ void exploit()
             LOG("%s", snapshot);
             _assert(snapshot != NULL, message, true);
             if (kCFCoreFoundationVersionNumber < 1452.23) {
-                const char *systemSnapshotMountPoint = [NSString stringWithFormat:@"/var/tmp/mnt-%lu", time(NULL)].UTF8String;
+                const char *systemSnapshotMountPoint = "/private/var/tmp/jb/mnt2";
+                if (is_mountpoint(systemSnapshotMountPoint)) {
+                    _assert(unmount(systemSnapshotMountPoint, MNT_FORCE) == ERR_SUCCESS, message, true);
+                }
+                _assert(clean_file(systemSnapshotMountPoint), message, true);
                 _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
                 _assert(fs_snapshot_mount(rootfd, systemSnapshotMountPoint, snapshot, 0) == ERR_SUCCESS, message, true);
                 const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
@@ -1156,7 +1157,7 @@ void exploit()
                 _assert([rsync extractToPath:@"/jb"], message, true);
                 _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
                 _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, message, true);
-                unmount(systemSnapshotMountPoint, 0);
+                unmount(systemSnapshotMountPoint, MNT_FORCE);
             } else {
                 char *systemSnapshot = copySystemSnapshot();
                 _assert(systemSnapshot != NULL, message, true);
