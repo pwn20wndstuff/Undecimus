@@ -980,7 +980,7 @@ void exploit()
             LOG("Mounting system snapshot...");
             SETMESSAGE(NSLocalizedString(@"Unable to mount system snapshot.", nil));
             _assert(!is_mountpoint("/var/MobileSoftwareUpdate/mnt1"),
-                    @"Rootfs already mounted, delete OTA file from Settings - Storage if present and reboot", true);
+                    NSLocalizedString(@"Rootfs already mounted, delete OTA file from Settings - Storage if present and reboot", nil), true);
             const char *systemSnapshotMountPoint = "/private/var/tmp/jb/mnt";
             if (is_mountpoint(systemSnapshotMountPoint)) {
                 _assert(unmount(systemSnapshotMountPoint, MNT_FORCE) == ERR_SUCCESS, message, true);
