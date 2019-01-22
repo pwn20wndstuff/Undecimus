@@ -351,7 +351,6 @@ int runCommandv(const char *cmd, int argc, const char * const* argv, void (^unre
     
     if (unrestrict && posix_spawnattr_init(&attrStruct) == ERR_SUCCESS) {
         attr = &attrStruct;
-        posix_spawnattr_init(attr);
         posix_spawnattr_setflags(attr, POSIX_SPAWN_START_SUSPENDED);
     }
     
