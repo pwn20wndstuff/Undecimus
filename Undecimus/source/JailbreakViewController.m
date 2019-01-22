@@ -979,8 +979,15 @@ void exploit()
             
             LOG("Mounting system snapshot...");
             SETMESSAGE(NSLocalizedString(@"Unable to mount system snapshot.  Delete OTA file from Settings - Storage if present", nil));
-            const char *systemSnapshotMountPoint = [NSString stringWithFormat:@"/var/tmp/mnt-%lu", time(NULL)].UTF8String;
-            _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
+            const char *systemSnapshotMountPoint = "/private/var/tmp/jb/mnt";
+            if (is_mountpoint(systemSnapshotMountPoint)) {
+                if (unmount(systemSnapshotMountPoint, MNT_FORCE) != ERR_SUCCESS) {
+                    message = [NSString stringWithFormat:@"Unable to unmount: %s", strerror(errno)];
+                    _assert(false, message, true);
+                }
+            }
+            _assert(clean_file(systemSnapshotMountPoint), @"Unable to clean mount point for system snapshot", true);
+            _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), @"Unable to create path to mount system snapshot", true);
             const char *argv[] = {"/sbin/mount_apfs", thedisk, systemSnapshotMountPoint, NULL};
             _assert(runCommandv(argv[0], 3, argv, ^(pid_t pid) {
                 uint64_t procStructAddr = get_proc_struct_for_pid(pid);

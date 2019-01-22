@@ -244,6 +244,28 @@ bool is_directory(const char *filename) {
     return S_ISDIR(buf.st_mode);
 }
 
+bool is_mountpoint(const char *filename) {
+    struct stat buf;
+    if (lstat(filename, &buf) != ERR_SUCCESS) {
+        return false;
+    }
+
+    if (!S_ISDIR(buf.st_mode))
+        return false;
+    
+    char *cwd = getcwd(NULL, 0);
+    int rv = chdir(filename);
+    assert(rv == ERR_SUCCESS);
+    struct stat p_buf;
+    rv = lstat("..", &p_buf);
+    assert(rv == ERR_SUCCESS);
+    if (cwd) {
+        chdir(cwd);
+        free(cwd);
+    }
+    return buf.st_dev != p_buf.st_dev || buf.st_ino == p_buf.st_ino;
+}
+
 bool ensure_directory(const char *directory, int owner, mode_t mode) {
     NSString *path = @(directory);
     NSFileManager *fm = [NSFileManager defaultManager];

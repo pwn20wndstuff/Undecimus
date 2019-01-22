@@ -74,6 +74,7 @@ bool removePkg(char *packageID, bool forceDeps);
 bool removePkgs(NSArray <NSString*> *packageIDs, bool forceDeps);
 bool is_symlink(const char *filename);
 bool is_directory(const char *filename);
+bool is_mountpoint(const char *filename);
 bool ensure_directory(const char *directory, int owner, mode_t mode);
 bool ensure_symlink(const char *to, const char *from);
 bool mode_is(const char *filename, mode_t mode);
