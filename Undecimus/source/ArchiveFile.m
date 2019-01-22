@@ -9,6 +9,9 @@
 #import <archive.h>
 #import <archive_entry.h>
 
+#define DEFAULT_FLAGS (ARCHIVE_EXTRACT_TIME|ARCHIVE_EXTRACT_PERM|ARCHIVE_EXTRACT_ACL| \
+                       ARCHIVE_EXTRACT_FFLAGS|ARCHIVE_EXTRACT_OWNER|ARCHIVE_EXTRACT_UNLINK)
+
 static int
 copy_data(struct archive *ar, struct archive *aw)
 {
@@ -107,11 +110,7 @@ copy_data(struct archive *ar, struct archive *aw)
 {
     BOOL result = NO;
     /* Select which attributes we want to restore. */
-    int flags = ARCHIVE_EXTRACT_TIME;
-    flags |= ARCHIVE_EXTRACT_PERM;
-    flags |= ARCHIVE_EXTRACT_ACL;
-    flags |= ARCHIVE_EXTRACT_FFLAGS;
-    flags |= ARCHIVE_EXTRACT_OWNER;
+    int flags = DEFAULT_FLAGS;
     
     int fd = dup(_fd);
     if (fd == -1) {
@@ -192,18 +191,20 @@ out:
 
 -(BOOL)extractToPath:(NSString*)path
 {
-    /* Select which attributes we want to restore. */
-    int flags = ARCHIVE_EXTRACT_TIME;
-    flags |= ARCHIVE_EXTRACT_PERM;
-    flags |= ARCHIVE_EXTRACT_ACL;
-    flags |= ARCHIVE_EXTRACT_FFLAGS;
-    flags |= ARCHIVE_EXTRACT_OWNER;
-    flags |= ARCHIVE_EXTRACT_UNLINK;
-    
-    return [self extractToPath:path withFlags:flags];
+    return [self extractToPath:path withFlags:DEFAULT_FLAGS];
+}
+
+-(BOOL)extractToPath:(NSString*)path overWriteDirectories:(BOOL)overwrite_dirs
+{
+    return [self extractToPath:path withFlags:DEFAULT_FLAGS overWriteDirectories:overwrite_dirs];
 }
 
 -(BOOL)extractToPath:(NSString*)path withFlags:(int)flags
+{
+    return [self extractToPath:path withFlags:flags overWriteDirectories:NO];
+}
+
+-(BOOL)extractToPath:(NSString*)path withFlags:(int)flags overWriteDirectories:(BOOL)overwrite_dirs
 {
     BOOL result = NO;
 
@@ -243,15 +244,17 @@ out:
                 goto out;
         }
         
+        if (!overwrite_dirs) {
+            struct stat st;
+            rv = lstat(archive_entry_pathname(entry), &st);
+            if (rv == 0 && S_ISDIR(st.st_mode)) {
+                // Directory already exists, don't mess with it
+                continue;
+            }
+        }
         rv = archive_write_header(ext, entry);
         if (rv < ARCHIVE_OK) {
             NSLog(@"Archive \"%s\": %s", archive_entry_pathname(entry), archive_error_string(ext));
-            if (rv < ARCHIVE_WARN) {
-                // Make already exists not a fatal error
-                if (strcmp(archive_error_string(ext), "Already exists")==0)
-                    continue;
-                goto out;
-            }
         }
         if (archive_entry_size(entry) > 0)
             copy_data(a, ext);

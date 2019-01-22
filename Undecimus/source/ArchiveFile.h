@@ -21,7 +21,9 @@
 -(BOOL)extractWithFlags:(int)flags;
 -(BOOL)extract:(NSString*)file toPath:(NSString*)path;
 -(BOOL)extractToPath:(NSString*)path;
+-(BOOL)extractToPath:(NSString*)path overWriteDirectories:(BOOL)overwrite_dirs;
 -(BOOL)extractToPath:(NSString*)path withFlags:(int)flags;
+-(BOOL)extractToPath:(NSString*)path withFlags:(int)flags overWriteDirectories:(BOOL)overwrite_dirs;
 @end
 
 #endif /* _ARCHIVE_FILE_H */

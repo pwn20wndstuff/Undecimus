@@ -978,8 +978,10 @@ void exploit()
             // Mount system snapshot.
             
             LOG("Mounting system snapshot...");
-            SETMESSAGE(NSLocalizedString(@"Unable to mount system snapshot.  Delete OTA file from Settings - Storage if present", nil));
-            const char *systemSnapshotMountPoint = "/private/var/tmp/jb/mnt1";
+            SETMESSAGE(NSLocalizedString(@"Unable to mount system snapshot.", nil));
+            _assert(!is_mountpoint("/var/MobileSoftwareUpdate/mnt1"),
+                    @"Rootfs already mounted, delete OTA file from Settings - Storage if present and reboot", true);
+            const char *systemSnapshotMountPoint = "/private/var/tmp/jb/mnt";
             if (is_mountpoint(systemSnapshotMountPoint)) {
                 _assert(unmount(systemSnapshotMountPoint, MNT_FORCE) == ERR_SUCCESS, message, true);
             }
@@ -999,7 +1001,7 @@ void exploit()
             // Rename system snapshot.
             
             LOG("Renaming system snapshot...");
-            SETMESSAGE(NSLocalizedString(@"Unable to rename system snapshot.  Delete OTA file from Settings - Storage if present", nil));
+            SETMESSAGE(NSLocalizedString(@"Unable to rename system snapshot.", nil));
             rootfd = open(systemSnapshotMountPoint, O_RDONLY);
             _assert(rootfd != -1, message, true);
             snapshots = snapshot_list(rootfd);
@@ -1390,13 +1392,7 @@ void exploit()
             _assert(strap_tar != nil, message, true);
             ArchiveFile *strap = [ArchiveFile archiveWithFile:strap_tar];
             _assert(strap != nil, message, true);
-            int flags = ARCHIVE_EXTRACT_TIME;
-            flags |= ARCHIVE_EXTRACT_PERM;
-            flags |= ARCHIVE_EXTRACT_ACL;
-            flags |= ARCHIVE_EXTRACT_FFLAGS;
-            flags |= ARCHIVE_EXTRACT_OWNER;
-            flags |= ARCHIVE_EXTRACT_NO_OVERWRITE;
-            _assert([strap extractToPath:@"/" withFlags:flags], message, true);
+            _assert([strap extractToPath:@"/" overWriteDirectories:NO], message, true);
             rv = system("/usr/libexec/cydia/firmware.sh");
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             extractResources();
