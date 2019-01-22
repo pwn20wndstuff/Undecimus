@@ -13,17 +13,17 @@ mach_port_t prepare_user_client()
     io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOSurfaceRoot"));
 
     if (service == IO_OBJECT_NULL) {
-        LOG("unable to find service\n");
+        LOG("unable to find service");
         exit(EXIT_FAILURE);
     }
 
     err = IOServiceOpen(service, mach_task_self(), 0, &user_client);
     if (err != KERN_SUCCESS) {
-        LOG("unable to get user client connection\n");
+        LOG("unable to get user client connection");
         exit(EXIT_FAILURE);
     }
 
-    LOG("got user client: 0x%x\n", user_client);
+    LOG("got user client: 0x%x", user_client);
     return user_client;
 }
 

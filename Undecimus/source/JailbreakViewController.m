@@ -134,7 +134,7 @@ static vm_address_t get_kernel_base()
         if (*((uint32_t *)buf) == MACH_HEADER_MAGIC) {
             int ret = vm_read(tfp0, addr, 0x1000, (vm_offset_t*)&buf, &sz);
             if (ret != KERN_SUCCESS) {
-                LOG("Failed vm_read %i\n", ret);
+                LOG("Failed vm_read %i", ret);
                 goto next;
             }
             
@@ -143,7 +143,7 @@ static vm_address_t get_kernel_base()
                 int ret = vm_read(tfp0, i, 0x120, (vm_offset_t*)&buf, &sz);
                 
                 if (ret != KERN_SUCCESS) {
-                    LOG("Failed vm_read %i\n", ret);
+                    LOG("Failed vm_read %i", ret);
                     exit(EXIT_FAILURE);
                 }
                 if (!strcmp(buf, "__text") && !strcmp(buf+0x10, "__PRELINK_TEXT")) {
@@ -168,7 +168,7 @@ find_gadget_candidate(
     for (char* candidate = *alternatives; candidate != NULL; alternatives++) {
         void* found_at = memmem(haystack_start, haystack_size, candidate, gadget_length);
         if (found_at != NULL){
-            LOG("found at: %llx\n", (uint64_t)found_at);
+            LOG("found at: %llx", (uint64_t)found_at);
             return (uint64_t)found_at;
         }
     }
@@ -202,20 +202,20 @@ uint64_t zm_fix_addr(uint64_t addr) {
     if (zm_hdr.start == 0) {
         // xxx ReadKernel64(0) ?!
         // uint64_t zone_map_ref = find_zone_map_ref();
-        LOG("zone_map_ref: %llx \n", GETOFFSET(zone_map_ref));
+        LOG("zone_map_ref: %llx ", GETOFFSET(zone_map_ref));
         uint64_t zone_map = ReadKernel64(GETOFFSET(zone_map_ref));
-        LOG("zone_map: %llx \n", zone_map);
+        LOG("zone_map: %llx ", zone_map);
         // hdr is at offset 0x10, mutexes at start
         size_t r = kread(zone_map + 0x10, &zm_hdr, sizeof(zm_hdr));
-        LOG("zm_range: 0x%llx - 0x%llx (read 0x%zx, exp 0x%zx)\n", zm_hdr.start, zm_hdr.end, r, sizeof(zm_hdr));
+        LOG("zm_range: 0x%llx - 0x%llx (read 0x%zx, exp 0x%zx)", zm_hdr.start, zm_hdr.end, r, sizeof(zm_hdr));
         
         if (r != sizeof(zm_hdr) || zm_hdr.start == 0 || zm_hdr.end == 0) {
-            LOG("kread of zone_map failed!\n");
+            LOG("kread of zone_map failed!");
             exit(EXIT_FAILURE);
         }
         
         if (zm_hdr.end - zm_hdr.start > 0x100000000) {
-            LOG("zone_map is too big, sorry.\n");
+            LOG("zone_map is too big, sorry.");
             exit(EXIT_FAILURE);
         }
     }
@@ -453,7 +453,7 @@ int updateVersionString(const char *newVersionString) {
     for (uintptr_t i=kernel_base; i < (kernel_base+0x2000); i+=(ptrSize)) {
         int ret = vm_read(tfp0, i, 0x150, (vm_offset_t*)&buf, (mach_msg_type_number_t*)&sz);
         if (ret != KERN_SUCCESS) {
-            LOG("Failed vm_read %i\n", ret);
+            LOG("Failed vm_read %i", ret);
             exit(EXIT_FAILURE);
         }
         
@@ -473,7 +473,7 @@ int updateVersionString(const char *newVersionString) {
     }
     
     if (!(TEXT_const && sizeofTEXT_const && DATA_data && sizeofDATA_data)) {
-        LOG("Error parsing kernel macho\n");
+        LOG("Error parsing kernel macho");
         return -1;
     }
     
@@ -481,7 +481,7 @@ int updateVersionString(const char *newVersionString) {
     {
         int ret = vm_read_overwrite(tfp0, i, strlen("Darwin Kernel Version"), (vm_address_t)buf, &sz);
         if (ret != KERN_SUCCESS) {
-            LOG("Failed vm_read %i\n", ret);
+            LOG("Failed vm_read %i", ret);
             return -1;
         }
         if (!memcmp(buf, "Darwin Kernel Version", strlen("Darwin Kernel Version"))) {
@@ -491,7 +491,7 @@ int updateVersionString(const char *newVersionString) {
     }
     
     if (!darwinTextPtr) {
-        LOG("Error finding Darwin text\n");
+        LOG("Error finding Darwin text");
         return -1;
     }
     
@@ -501,7 +501,7 @@ int updateVersionString(const char *newVersionString) {
     for (uintptr_t i = DATA_data; i < (DATA_data+sizeofDATA_data); i += ptrSize) {
         int ret = vm_read_overwrite(tfp0, i, ptrSize, (vm_address_t)buf, &sz);
         if (ret != KERN_SUCCESS) {
-            LOG("Failed vm_read %i\n", ret);
+            LOG("Failed vm_read %i", ret);
             return -1;
         }
         
@@ -512,7 +512,7 @@ int updateVersionString(const char *newVersionString) {
     }
     
     if (!versionPtr) {
-        LOG("Error finding _version pointer, did you already patch it?\n");
+        LOG("Error finding _version pointer, did you already patch it?");
         return -1;
     }
     
@@ -522,13 +522,13 @@ int updateVersionString(const char *newVersionString) {
     
     ret = vm_write(tfp0, newStringPtr, (vm_offset_t)newVersionString, (mach_msg_type_number_t)strlen(newVersionString));
     if (ret != KERN_SUCCESS) {
-        LOG("Failed vm_write %i\n", ret);
+        LOG("Failed vm_write %i", ret);
         exit(EXIT_FAILURE);
     }
     
     ret = vm_write(tfp0, versionPtr, (vm_offset_t)&newStringPtr, ptrSize);
     if (ret != KERN_SUCCESS) {
-        LOG("Failed vm_write %i\n", ret);
+        LOG("Failed vm_write %i", ret);
         return -1;
     }
     else {
@@ -570,7 +570,7 @@ uint64_t getVnodeAtPath(const char *path) {
     uint64_t *vpp = (uint64_t *)malloc(sizeof(uint64_t));
     int ret = _vnode_lookup(path, O_RDONLY, vpp, vfs_context);
     if (ret != 0){
-        LOG("unable to get vnode from path for %s\n", path);
+        LOG("unable to get vnode from path for %s", path);
         free(vpp);
         return -1;
     }
@@ -584,10 +584,10 @@ uint64_t getVnodeAtPath(const char *path) {
 int necp_die() {
     int necp_fd = syscall(SYS_necp_open, 0);
     if (necp_fd < 0) {
-        LOG("Create NECP client failed!\n");
+        LOG("Create NECP client failed!");
         return 0;
     }
-    LOG("NECP client = %d\n", necp_fd);
+    LOG("NECP client = %d", necp_fd);
     syscall(SYS_necp_session_action, necp_fd, 1, 0x1234, 0x5678);
     return 0;
 }
@@ -600,7 +600,7 @@ int necp_die() {
 void make_host_into_host_priv() {
     uint64_t hostport_addr = get_address_of_port(getpid(), mach_host_self());
     uint32_t old = ReadKernel32(hostport_addr);
-    LOG("old host type: 0x%08x\n", old);
+    LOG("old host type: 0x%08x", old);
     if ((old & (IO_ACTIVE | IKOT_HOST_PRIV)) != (IO_ACTIVE | IKOT_HOST_PRIV))
         WriteKernel32(hostport_addr, IO_ACTIVE | IKOT_HOST_PRIV);
 }
@@ -608,7 +608,7 @@ void make_host_into_host_priv() {
 void make_host_priv_into_host() {
     uint64_t hostport_addr = get_address_of_port(getpid(), mach_host_self());
     uint32_t old = ReadKernel32(hostport_addr);
-    LOG("old host type: 0x%08x\n", old);
+    LOG("old host type: 0x%08x", old);
     if ((old & (IO_ACTIVE | IKOT_HOST)) != (IO_ACTIVE | IKOT_HOST))
         WriteKernel32(hostport_addr, IO_ACTIVE | IKOT_HOST);
 }
@@ -618,11 +618,11 @@ mach_port_t try_restore_port() {
     kern_return_t err;
     err = host_get_special_port(mach_host_self(), 0, 4, &port);
     if (err == KERN_SUCCESS && port != MACH_PORT_NULL) {
-        LOG("got persisted port!\n");
+        LOG("got persisted port!");
         // make sure rk64 etc use this port
         return port;
     }
-    LOG("unable to retrieve persisted port\n");
+    LOG("unable to retrieve persisted port");
     return MACH_PORT_NULL;
 }
 
@@ -1226,7 +1226,7 @@ void exploit()
         
         LOG("Injecting trust cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
-        LOG("trust_chain = 0x%llx\n", GETOFFSET(trust_chain));
+        LOG("trust_chain = 0x%llx", GETOFFSET(trust_chain));
         NSArray *resources = nil;
         if (!needResources) {
             resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];

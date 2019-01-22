@@ -24,7 +24,7 @@ uint64_t early_kalloc(int size)
     mach_port_t port = MACH_PORT_NULL;
     kern_return_t err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &port);
     if (err != KERN_SUCCESS) {
-        LOG("unable to allocate port\n");
+        LOG("unable to allocate port");
     }
 
     uint64_t port_kaddr = find_port_address(port, MACH_MSG_TYPE_MAKE_SEND);
@@ -53,13 +53,13 @@ uint64_t early_kalloc(int size)
         MACH_PORT_NULL);
 
     if (err != KERN_SUCCESS) {
-        LOG("early kalloc failed to send message\n");
+        LOG("early kalloc failed to send message");
     }
 
     // find the message buffer:
 
     uint64_t message_buffer = ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE));
-    LOG("message buffer: %llx\n", message_buffer);
+    LOG("message buffer: %llx", message_buffer);
 
     // leak the message buffer:
     WriteKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE), 0);

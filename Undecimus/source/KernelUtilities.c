@@ -24,7 +24,7 @@ uint64_t task_self_addr()
 {
     if (cached_task_self_addr == 0) {
         cached_task_self_addr = (kCFCoreFoundationVersionNumber >= 1450.14) ? get_address_of_port(getpid(), mach_task_self()) : find_port_address(mach_task_self(), MACH_MSG_TYPE_COPY_SEND);
-        LOG("task self: 0x%llx\n", cached_task_self_addr);
+        LOG("task self: 0x%llx", cached_task_self_addr);
     }
     return cached_task_self_addr;
 }
@@ -73,7 +73,7 @@ mach_port_t fake_host_priv()
     kern_return_t err;
     err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &port);
     if (err != KERN_SUCCESS) {
-        LOG("failed to allocate port\n");
+        LOG("failed to allocate port");
         return MACH_PORT_NULL;
     }
 

