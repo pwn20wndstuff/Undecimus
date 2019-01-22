@@ -754,7 +754,7 @@ const char *getLogFile() {
 void enableLogging() {
     if (!debuggerEnabled()) {
         int old_logfd = logfd;
-        int newfd = open(getLogFile(), O_WRONLY|O_CREAT);
+        int newfd = open(getLogFile(), O_WRONLY|O_CREAT, 0);
         if (newfd > 0) {
             init_file(getLogFile(), 501, 0644);
         }
