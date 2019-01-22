@@ -429,7 +429,7 @@ bool vfs_sploit()
         waitFor(20);
     } else if (kernel_page_size == 0x1000) {
         LOG("this device uses 4k kernel pages");
-        waitFor(60);
+        waitFor(45);
     } else {
         LOG("this device uses an unsupported kernel page size");
         return false;
