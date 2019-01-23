@@ -1390,8 +1390,16 @@ void exploit()
     UPSTAGE();
     
     {
+        // Make sure firmware-sbin package is not corrupted.
+        NSString *file = [NSString stringWithContentsOfFile:@"/var/lib/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil];
+        if ([file rangeOfString:@"/sbin/fstyp"].location != NSNotFound || [file rangeOfString:@"\n\n"].location != NSNotFound) {
+            // This is not a stock file for iOS11+
+            file = [file stringByReplacingOccurrencesOfString:@"/sbin/fstyp\n" withString:@""];
+            file = [file stringByReplacingOccurrencesOfString:@"\n\n" withString:@"\n"];
+            [file writeToFile:@"/var/lib/dpkg/info/firmware-sbin.list" atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        }
+
         // Extract bootstrap.
-        
         LOG("Extracting bootstrap...");
         SETMESSAGE(NSLocalizedString(@"Failed to extract bootstrap.", nil));
         if (needStrap) {
@@ -1415,6 +1423,21 @@ void exploit()
             if (!needResources) {
                 updatedResources = compareInstalledVersion("jailbreak-resources", "lt", bundledResources.UTF8String);
             }
+            bool xz_installed = debIsInstalled("xz");
+            if (access("/usr/local/lib/liblzma.5.dylib", F_OK) != ERR_SUCCESS) {
+                LOG("Extracting XZ");
+                xz_installed = false;
+                ArchiveFile *xz_deb = [ArchiveFile archiveWithFile:pathForResource(@"xz.deb")];
+                _assert(xz_deb != nil, message, true);
+                _assert([xz_deb extract:@"data.tar.lzma" toPath:@"/jb/xz.tar.lzma"], message, true);
+                ArchiveFile *xz = [ArchiveFile archiveWithFile:@"/jb/xz.tar.lzma"];
+                _assert(xz != nil, message, true);
+                _assert([xz extractToPath:@"/"], message, true);
+                clean_file("/jb/xz.tar.lzma");
+            } else {
+                LOG("Not extracting XZ");
+            }
+            // Now that things are running, let's install the deb for the files we just extracted
             if (needResources || updatedResources) {
                 extractResources();
             } else if (needSubstrate) {
@@ -1423,12 +1446,27 @@ void exploit()
                 }
                 _assert(installDebs(@[@"substrate-safemode.deb", @"mobilesubstrate.deb"], true), message, true);
             }
-            // Now that things are running, let's install the deb for the files we just extracted
-            if (!debIsInstalled("lzma") || compareInstalledVersion("lzma", "lt", "2:0")) {
-                installDeb("lzma.deb", false);
+            if (!xz_installed || !debIsInstalled("lzma") || compareInstalledVersion("lzma", "lt", "2:0")) {
+                installDebs(@[@"lzma.deb", @"xz.deb"], false);
             }
-            if (!debIsInstalled("xz")) {
-                installDeb("xz.deb", false);
+            if (!debIsConfigured("libapt-pkg5.0") || !debIsConfigured("libapt") || !debIsConfigured("apt-key") || !debIsConfigured("lz4")) {
+                NSMutableArray *toRemove = [NSMutableArray new];
+                if (debIsInstalled("apt7-lib")) {
+                    [toRemove addObject:@"apt7-lib"];
+                }
+                if (debIsInstalled("apt7")) {
+                    [toRemove addObject:@"apt7"];
+                }
+                if (debIsInstalled("apt7-key")) {
+                    [toRemove addObject:@"apt7-key"];
+                }
+                if (toRemove.count > 0) {
+                    _assert(removePkgs(toRemove, true), message, true);
+                }
+                _assert(installDebs(@[@"libapt.deb", @"libapt-pkg.deb", @"apt-key.deb", @"lz4.deb"], true), message, true);
+            }
+            if (pkgIsBy("CoolStar", "dpkg")) {
+                _assert(installDeb("dpkg.deb", true), message, true);
             }
         }
         NSData *file_data = [[NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber] dataUsingEncoding:NSUTF8StringEncoding];
@@ -1441,6 +1479,7 @@ void exploit()
         clean_file("/jb/substrate.tar.lzma");
         clean_file("/electra");
         clean_file("/.bootstrapped_electra");
+        clean_file("/usr/lib/libjailbreak.dylib");
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
         LOG("Successfully extracted bootstrap.");
     }
@@ -1638,6 +1677,20 @@ void exploit()
             }
             LOG("Successfully removed Electra's Cydia.");
         }
+        if (access("/etc/apt/sources.list.d/sileo.sources", F_OK) == ERR_SUCCESS) {
+            // Remove Electra's Sileo - it has trigger loops and incompatible depends
+            LOG("Removing Incompatible Sileo...");
+            SETMESSAGE(NSLocalizedString(@"Failed to remove incompatible Sileo.", nil));
+
+            if (debIsInstalled("org.coolstar.sileo")) {
+                _assert(removePkg("org.coolstar.sileo", true), message, true);
+                prefs.run_uicache = true;
+                _assert(modifyPlist(prefsFile, ^(id plist) {
+                    plist[K_REFRESH_ICON_CACHE] = @YES;
+                }), message, true); // barf
+            }
+            clean_file("/etc/apt/sources.list.d/sileo.sources");
+        }
         if (debIsInstalled("cydia-upgrade-helper")) {
             // Remove Electra's Cydia Upgrade Helper.
             LOG("Removing Electra's Cydia Upgrade Helper...");
@@ -1670,12 +1723,6 @@ void exploit()
                     plist[K_REFRESH_ICON_CACHE] = @YES;
                 }), message, true);
             }
-        }
-        NSString *file = [NSString stringWithContentsOfFile:@"/var/lib/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil];
-        if ([file rangeOfString:@"/sbin/fstyp"].location != NSNotFound) {
-            // This is not a stock file for iOS11+
-            file = [file stringByReplacingOccurrencesOfString:@"/sbin/fstyp" withString:@""];
-            [file writeToFile:@"/var/lib/dpkg/info/firmware-sbin.list" atomically:YES encoding:NSUTF8StringEncoding error:nil];
         }
         // Unblock Saurik's repo if it is blocked.
         unblockDomainWithName("apt.saurik.com");

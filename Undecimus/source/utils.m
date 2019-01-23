@@ -160,6 +160,13 @@ bool debIsConfigured(char *packageID) {
     return isConfigured;
 }
 
+bool pkgIsBy(const char *maintainer, const char *packageID) {
+    int rv = systemf("/usr/bin/dpkg -s \"%s\" | grep -i ^Maintainer: | grep -qi \"%s\"", packageID, maintainer);
+    bool isBy = !WEXITSTATUS(rv);
+    LOG("Deb: \"%s\" is%s by %s", packageID, isBy?"":" not", maintainer);
+    return isBy;
+}
+
 bool compareInstalledVersion(const char *packageID, const char *op, const char *version) {
     int rv = systemf("/usr/bin/dpkg --compare-versions $(dpkg-query --showformat='${Version}' --show \"%s\") \"%s\" \"%s\"",
                       packageID, op, version);
@@ -178,11 +185,11 @@ bool runDpkg(NSArray <NSString*> *args, bool forceDeps) {
                         @"/usr/bin/dpkg",
                         @"--force-bad-path",
                         @"--force-configure-any",
-                        @"--no-triggers",
+                        @"--no-triggers"
                      ]];
     
     if (forceDeps) {
-        [command addObject:@"--force-depends"];
+        [command addObjectsFromArray:@[@"--force-depends", @"--force-remove-essential"]];
     }
     for (NSString *arg in args) {
         if ([arg hasSuffix:@".deb"]) {

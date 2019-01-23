@@ -38,6 +38,11 @@
 		225D142221E052960045493D /* ArchiveFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 225D142121E052960045493D /* ArchiveFile.m */; };
 		225D142521E0593E0045493D /* mobilesubstrate.deb in Resources */ = {isa = PBXBuildFile; fileRef = 225D142421E0593E0045493D /* mobilesubstrate.deb */; };
 		226689DD21EC1C5A00262F66 /* libarchive.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 226689DC21EC1C5A00262F66 /* libarchive.2.tbd */; };
+		229BC6C721F85D6C0061D89D /* libapt-pkg.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229BC6C621F85D6C0061D89D /* libapt-pkg.deb */; };
+		229BC6C921F860830061D89D /* libapt.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229BC6C821F860830061D89D /* libapt.deb */; };
+		229BC6CB21F860EF0061D89D /* lz4.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229BC6CA21F860EF0061D89D /* lz4.deb */; };
+		229BC6CD21F861CD0061D89D /* apt-key.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229BC6CC21F861CD0061D89D /* apt-key.deb */; };
+		229BC6CF21F869920061D89D /* dpkg.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229BC6CE21F869910061D89D /* dpkg.deb */; };
 		229F753421E688B50024E44B /* substrate-safemode.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229F753321E688B50024E44B /* substrate-safemode.deb */; };
 		229F753621E68B520024E44B /* lzma.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229F753521E68B520024E44B /* lzma.deb */; };
 		229F753821E68B7C0024E44B /* xz.deb in Resources */ = {isa = PBXBuildFile; fileRef = 229F753721E68B7B0024E44B /* xz.deb */; };
@@ -118,6 +123,11 @@
 		226689DA21EC145000262F66 /* archive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = archive.h; sourceTree = "<group>"; };
 		226689DB21EC145000262F66 /* libproc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libproc.h; sourceTree = "<group>"; };
 		226689DC21EC1C5A00262F66 /* libarchive.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libarchive.2.tbd; path = usr/lib/libarchive.2.tbd; sourceTree = SDKROOT; };
+		229BC6C621F85D6C0061D89D /* libapt-pkg.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libapt-pkg.deb"; sourceTree = "<group>"; };
+		229BC6C821F860830061D89D /* libapt.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapt.deb; sourceTree = "<group>"; };
+		229BC6CA21F860EF0061D89D /* lz4.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = lz4.deb; sourceTree = "<group>"; };
+		229BC6CC21F861CD0061D89D /* apt-key.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "apt-key.deb"; sourceTree = "<group>"; };
+		229BC6CE21F869910061D89D /* dpkg.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = dpkg.deb; sourceTree = "<group>"; };
 		229F753321E688B50024E44B /* substrate-safemode.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "substrate-safemode.deb"; sourceTree = "<group>"; };
 		229F753521E68B520024E44B /* lzma.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = lzma.deb; sourceTree = "<group>"; };
 		229F753721E68B7B0024E44B /* xz.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = xz.deb; sourceTree = "<group>"; };
@@ -198,7 +208,12 @@
 		2170BD3621B192B90059BD10 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				229BC6CC21F861CD0061D89D /* apt-key.deb */,
+				229BC6CE21F869910061D89D /* dpkg.deb */,
 				229F753721E68B7B0024E44B /* xz.deb */,
+				229BC6C821F860830061D89D /* libapt.deb */,
+				229BC6C621F85D6C0061D89D /* libapt-pkg.deb */,
+				229BC6CA21F860EF0061D89D /* lz4.deb */,
 				229F753521E68B520024E44B /* lzma.deb */,
 				229F753321E688B50024E44B /* substrate-safemode.deb */,
 				225D142421E0593E0045493D /* mobilesubstrate.deb */,
@@ -386,6 +401,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				229BC6CF21F869920061D89D /* dpkg.deb in Resources */,
+				229BC6CD21F861CD0061D89D /* apt-key.deb in Resources */,
+				229BC6CB21F860EF0061D89D /* lz4.deb in Resources */,
+				229BC6C921F860830061D89D /* libapt.deb in Resources */,
+				229BC6C721F85D6C0061D89D /* libapt-pkg.deb in Resources */,
 				229F753821E68B7C0024E44B /* xz.deb in Resources */,
 				229F753621E68B520024E44B /* lzma.deb in Resources */,
 				229F753421E688B50024E44B /* substrate-safemode.deb in Resources */,

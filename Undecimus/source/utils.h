@@ -67,6 +67,7 @@ int _system(const char *cmd);
 int systemf(const char *cmd, ...);
 bool debIsInstalled(char *packageID);
 bool debIsConfigured(char *packageID);
+bool pkgIsBy(const char *maintainer, const char *packageID);
 bool compareInstalledVersion(const char *packageID, const char *op, const char *version);
 bool installDeb(char *debName, bool forceDeps);
 bool installDebs(NSArray <NSString*> *debs, bool forceDeps);
