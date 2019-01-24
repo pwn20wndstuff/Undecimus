@@ -1500,11 +1500,12 @@ void exploit()
     UPSTAGE();
     
     {
-        // Verify filesystem.
-        LOG("Verifying filesystem...");
-        SETMESSAGE(NSLocalizedString(@"Failed to verify filesystem.", nil));
+        // Repair filesystem.
+        
+        LOG("Repairing filesystem...");
+        SETMESSAGE(NSLocalizedString(@"Failed to repair filesystem.", nil));
         _assert(ensure_directory("/Library/Caches", 0, S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO), message, true);
-        LOG("Successfully verified filesystem.");
+        LOG("Successfully repaired filesystem.");
     }
     
     UPSTAGE();
