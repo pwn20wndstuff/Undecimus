@@ -426,10 +426,10 @@ bool vfs_sploit()
     host_page_size(mach_host_self(), &kernel_page_size);
     if (kernel_page_size == 0x4000) {
         LOG("this device uses 16k kernel pages");
-        waitFor(20);
+        // waitFor(20);
     } else if (kernel_page_size == 0x1000) {
         LOG("this device uses 4k kernel pages");
-        waitFor(45);
+        // waitFor(45);
     } else {
         LOG("this device uses an unsupported kernel page size");
         return false;
