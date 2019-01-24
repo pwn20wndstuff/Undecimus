@@ -1358,6 +1358,7 @@ void exploit()
         // Extract Substrate if necessary
         if (needSubstrate) {
             LOG("Extracting substrate from deb...");
+            SETMESSAGE(NSLocalizedString(@"Failed to extract Substrate from deb.", nil));
             NSString *substrate_deb = pathForResource(@"mobilesubstrate.deb");
             _assert(substrate_deb != nil, message, true);
             ArchiveFile *substrate = [ArchiveFile archiveWithFile:substrate_deb];
@@ -1371,7 +1372,8 @@ void exploit()
         }
         // We don't trust server plugins from resources if they aren't valid
         if (needResources) {
-            LOG("Cleaning out un-trusted resources");
+            LOG("Cleaning out un-trusted resources...");
+            SETMESSAGE(NSLocalizedString(@"Failed to clean out un-trusted resources.", nil));
             NSString *list = [NSString stringWithContentsOfFile:@"/usr/lib/dpkg/info/jailbreak-resources.list" encoding:NSUTF8StringEncoding error:nil];
             if (list) {
                 for (NSString *file in [list componentsSeparatedByString:@"\n"]) {
@@ -1380,11 +1382,13 @@ void exploit()
                     }
                 }
             }
+            LOG("Successfully cleaned out un-trusted resources.");
         }
         // Run substrate
         LOG("Starting Substrate...");
         SETMESSAGE(NSLocalizedString(@"Failed to start Substrate.", nil));
         _assert(runCommand("/usr/libexec/substrate", NULL) == ERR_SUCCESS, message, true);
+        LOG("Successfully started Substrate.");
     }
     
     UPSTAGE();
