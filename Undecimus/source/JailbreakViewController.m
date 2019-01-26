@@ -31,11 +31,11 @@
 #include <reboot.h>
 #import <snappy.h>
 #import <inject.h>
+#import <patchfinder64.h>
 #import "JailbreakViewController.h"
 #include "KernelStructureOffsets.h"
 #include "empty_list_sploit.h"
 #include "KernelMemory.h"
-#include "patchfinder64.h"
 #include "KernelExecution.h"
 #include "KernelUtilities.h"
 #include "remote_memory.h"
@@ -770,10 +770,6 @@ void exploit()
         SETOFFSET(OSBoolean_True, find_OSBoolean_True());
         LOG("OSBoolean_True = "ADDR"", GETOFFSET(OSBoolean_True));
         _assert(ISADDR(GETOFFSET(OSBoolean_True)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find OSBoolean_False offset.", nil));
-        SETOFFSET(OSBoolean_False, find_OSBoolean_False());
-        LOG("OSBoolean_False = "ADDR"", GETOFFSET(OSBoolean_False));
-        _assert(ISADDR(GETOFFSET(OSBoolean_False)), message, true);
         SETMESSAGE(NSLocalizedString(@"Failed to find osunserializexml offset.", nil));
         SETOFFSET(osunserializexml, find_osunserializexml());
         LOG("osunserializexml = "ADDR"", GETOFFSET(osunserializexml));
@@ -1288,8 +1284,8 @@ void exploit()
         dictionary[@"KernelBase"] = ADDRSTRING(kernel_base);
         dictionary[@"KernelSlide"] = ADDRSTRING(kernel_slide);
         dictionary[@"TrustChain"] = ADDRSTRING(GETOFFSET(trust_chain));
-        dictionary[@"OSBooleanTrue"] = ADDRSTRING(GETOFFSET(OSBoolean_True));
-        dictionary[@"OSBooleanFalse"] = ADDRSTRING(GETOFFSET(OSBoolean_False));
+        dictionary[@"OSBooleanTrue"] = ADDRSTRING(ReadKernel64(GETOFFSET(OSBoolean_True)));
+        dictionary[@"OSBooleanFalse"] = ADDRSTRING(ReadKernel64(GETOFFSET(OSBoolean_True)) + 0x8);
         dictionary[@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
         dictionary[@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
         dictionary[@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));

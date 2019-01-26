@@ -10,7 +10,6 @@
 typedef struct {
     kptr_t trust_chain;
     kptr_t OSBoolean_True;
-    kptr_t OSBoolean_False;
     kptr_t osunserializexml;
     kptr_t smalloc;
     kptr_t add_x0_x0_0x40_ret;

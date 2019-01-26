@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		2101395521A09BB700F9C5F2 /* hideventsystem.c in Sources */ = {isa = PBXBuildFile; fileRef = 2101395321A09BB700F9C5F2 /* hideventsystem.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		2116449A21737F9500250744 /* JailbreakViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* JailbreakViewController.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function -Wno-deprecated-declarations"; }; };
-		212D8841216B9FB400A36DA5 /* patchfinder64.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCA2148103B00DC0023 /* patchfinder64.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		212D8844216E4C4800A36DA5 /* find_port.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8842216E4C4700A36DA5 /* find_port.c */; };
 		212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8846216E4DF600A36DA5 /* early_kalloc.c */; };
 		212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8849216E4EBE00A36DA5 /* async_wake.c */; };
@@ -33,6 +32,7 @@
 		21C13110214C2E570021AA9D /* strap.tar.lzma in Resources */ = {isa = PBXBuildFile; fileRef = 21C1310F214C2E570021AA9D /* strap.tar.lzma */; };
 		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		21F4D70E21FC7A590070D5E0 /* patchfinder64.c in Sources */ = {isa = PBXBuildFile; fileRef = 21F4D70C21FC7A590070D5E0 /* patchfinder64.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21FED6A72168DB460024BC95 /* Painting_With_Chocolate.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */; };
 		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		225D142221E052960045493D /* ArchiveFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 225D142121E052960045493D /* ArchiveFile.m */; };
@@ -82,8 +82,6 @@
 		21A97FC62148103B00DC0023 /* remote_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_memory.c; sourceTree = "<group>"; };
 		21A97FC82148103B00DC0023 /* KernelExecution.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KernelExecution.m; sourceTree = "<group>"; };
 		21A97FC92148103B00DC0023 /* KernelUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KernelUtilities.h; sourceTree = "<group>"; };
-		21A97FCA2148103B00DC0023 /* patchfinder64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = patchfinder64.c; sourceTree = "<group>"; };
-		21A97FCB2148103B00DC0023 /* patchfinder64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = patchfinder64.h; sourceTree = "<group>"; };
 		21A97FCC2148103B00DC0023 /* KernelUtilities.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = KernelUtilities.c; sourceTree = "<group>"; };
 		21A97FCD2148103B00DC0023 /* remote_call.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_call.c; sourceTree = "<group>"; };
 		21A97FCE2148103C00DC0023 /* remote_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_memory.h; sourceTree = "<group>"; };
@@ -116,6 +114,8 @@
 		21C13118214D268F0021AA9D /* multi_path_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multi_path_sploit.h; sourceTree = "<group>"; };
 		21C1312E214D5A710021AA9D /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
 		21E9642421A1DD6F000625F7 /* NSTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSTask.h; sourceTree = "<group>"; };
+		21F4D70C21FC7A590070D5E0 /* patchfinder64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = patchfinder64.c; path = patchfinder64/patchfinder64.c; sourceTree = SOURCE_ROOT; };
+		21F4D70D21FC7A590070D5E0 /* patchfinder64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = patchfinder64.h; path = patchfinder64/patchfinder64.h; sourceTree = SOURCE_ROOT; };
 		21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Painting_With_Chocolate.ttf; sourceTree = "<group>"; };
 		225D142121E052960045493D /* ArchiveFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ArchiveFile.m; sourceTree = "<group>"; };
 		225D142321E055E90045493D /* ArchiveFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArchiveFile.h; sourceTree = "<group>"; };
@@ -236,6 +236,7 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				21F4D70B21FC7A490070D5E0 /* patchfinder64 */,
 				22F91CDC21E02D0B00B2FCAE /* snappy */,
 				22F91CD821E02CC700B2FCAE /* injector */,
 				21C0FC6A21369EB700849420 /* AppDelegate.h */,
@@ -263,8 +264,6 @@
 				21C0FC7921369EB800849420 /* main.m */,
 				21C13117214D268F0021AA9D /* multi_path_sploit.c */,
 				21C13118214D268F0021AA9D /* multi_path_sploit.h */,
-				21A97FCB2148103B00DC0023 /* patchfinder64.h */,
-				21A97FCA2148103B00DC0023 /* patchfinder64.c */,
 				21A97FC52148103B00DC0023 /* remote_call.h */,
 				21A97FCD2148103B00DC0023 /* remote_call.c */,
 				21A97FC62148103B00DC0023 /* remote_memory.c */,
@@ -322,6 +321,15 @@
 				21C0FC7821369EB800849420 /* Info.plist */,
 			);
 			path = Undecimus;
+			sourceTree = "<group>";
+		};
+		21F4D70B21FC7A490070D5E0 /* patchfinder64 */ = {
+			isa = PBXGroup;
+			children = (
+				21F4D70C21FC7A590070D5E0 /* patchfinder64.c */,
+				21F4D70D21FC7A590070D5E0 /* patchfinder64.h */,
+			);
+			name = patchfinder64;
 			sourceTree = "<group>";
 		};
 		22F91CD821E02CC700B2FCAE /* injector */ = {
@@ -456,11 +464,11 @@
 				212D8844216E4C4800A36DA5 /* find_port.c in Sources */,
 				22C546AB21A8A8FD00EFC09C /* utils.m in Sources */,
 				22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */,
-				212D8841216B9FB400A36DA5 /* patchfinder64.c in Sources */,
 				21A97FD42148103C00DC0023 /* remote_call.c in Sources */,
 				21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */,
 				21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */,
 				2116449A21737F9500250744 /* JailbreakViewController.m in Sources */,
+				21F4D70E21FC7A590070D5E0 /* patchfinder64.c in Sources */,
 				22F91CDB21E02CF300B2FCAE /* inject.m in Sources */,
 				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* KernelMemory.c in Sources */,
@@ -620,6 +628,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus/include",
+					"$(PROJECT_DIR)/patchfinder64",
 					"$(PROJECT_DIR)/snappy",
 					"$(PROJECT_DIR)/Injector",
 				);
@@ -662,6 +671,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus/include",
+					"$(PROJECT_DIR)/patchfinder64",
 					"$(PROJECT_DIR)/snappy",
 					"$(PROJECT_DIR)/Injector",
 				);
