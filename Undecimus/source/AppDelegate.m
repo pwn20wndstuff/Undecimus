@@ -148,6 +148,10 @@
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_RELOAD_SYSTEM_DAEMONS];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_HIDE_LOG_WINDOW] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_HIDE_LOG_WINDOW];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
 }
 
 - (void)initShortcuts {

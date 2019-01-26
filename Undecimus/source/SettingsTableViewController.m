@@ -248,6 +248,7 @@
     [self.installCydiaSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_INSTALL_CYDIA]];
     [self.ECIDLabel setPlaceholder:hexFromInt([[[NSUserDefaults standardUserDefaults] objectForKey:K_ECID] integerValue])];
     [self.ReloadSystemDaemonsSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_RELOAD_SYSTEM_DAEMONS]];
+    [self.HideLogWindowSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_HIDE_LOG_WINDOW]];
     [self.RestartSpringBoardButton setEnabled:respringSupported()];
     [self.restartButton setEnabled:restartSupported()];
     [self.tableView reloadData];
@@ -450,7 +451,17 @@
 
 - (IBAction)tappedOnCleanDiagnosticsData:(id)sender {
     cleanLogs();
-    NOTICE(@"Cleaned diagnostics data.", false, false);
+    NOTICE(NSLocalizedString(@"Cleaned diagnostics data.", nil), false, false);
+}
+
+- (IBAction)hideLogWindowSwitchTriggered:(id)sender {
+    [[NSUserDefaults standardUserDefaults] setBool:[self.HideLogWindowSwitch isOn] forKey:K_HIDE_LOG_WINDOW];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reloadData];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+        NOTICE(NSLocalizedString(@"Preference was changed. The app will exit now.", nil), true, false);
+        exit(EXIT_SUCCESS);
+    });
 }
 
 - (void)didReceiveMemoryWarning {

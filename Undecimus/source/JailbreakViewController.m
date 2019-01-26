@@ -1923,6 +1923,10 @@ void exploit()
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:K_HIDE_LOG_WINDOW]) {
+        _outputView.hidden = YES;
+        _outputView = nil;
+    }
     sharedController = self;
     bundledResources = bundledResourcesVersion();
     LOG("unc0ver Version: %@", appVersion());
@@ -1968,6 +1972,9 @@ void exploit()
 }
 
 -(void)appendTextToOutput:(NSString *)text {
+    if (_outputView == nil) {
+        return;
+    }
     static NSRegularExpression *remove = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
