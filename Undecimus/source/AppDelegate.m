@@ -149,7 +149,7 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:K_HIDE_LOG_WINDOW] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_HIDE_LOG_WINDOW];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_HIDE_LOG_WINDOW];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
