@@ -31,7 +31,6 @@
 #include <reboot.h>
 #import <snappy.h>
 #import <inject.h>
-#import <patchfinder64.h>
 #import "JailbreakViewController.h"
 #include "KernelStructureOffsets.h"
 #include "empty_list_sploit.h"
@@ -46,6 +45,7 @@
 #include "async_wake.h"
 #include "utils.h"
 #include "ArchiveFile.h"
+#include "../../patchfinder64/patchfinder64.h" // Work around Xcode 9
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
