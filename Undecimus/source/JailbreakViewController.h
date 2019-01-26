@@ -52,6 +52,7 @@ static inline void showAlert(NSString *title, NSString *message, Boolean wait, B
 @property (weak, nonatomic) IBOutlet UIButton *goButton;
 @property (weak, nonatomic) IBOutlet UITextView *outputView;
 @property (readonly) JailbreakViewController *sharedController;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *goButtonSpacing;
 
 double uptime(void);
 int necp_die(void);

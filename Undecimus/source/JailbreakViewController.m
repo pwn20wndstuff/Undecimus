@@ -1926,6 +1926,7 @@ void exploit()
     if ([[NSUserDefaults standardUserDefaults] boolForKey:K_HIDE_LOG_WINDOW]) {
         _outputView.hidden = YES;
         _outputView = nil;
+        _goButtonSpacing.constant = 93;
     }
     sharedController = self;
     bundledResources = bundledResourcesVersion();
