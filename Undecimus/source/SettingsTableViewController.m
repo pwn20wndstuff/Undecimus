@@ -439,7 +439,7 @@
             case deja_xnu_exploit: {
                 mach_port_t bb_tp = hid_event_queue_exploit();
                 _assert(MACH_PORT_VALID(bb_tp), message, true);
-                _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(0)) == 0, message, true);
+                _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(EXIT_SUCCESS)) == ERR_SUCCESS, message, true);
                 break;
             }
             default:

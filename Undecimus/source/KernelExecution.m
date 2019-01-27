@@ -102,7 +102,7 @@ uint64_t kexecute(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_t
     uint64_t offx28 = ReadKernel64(fake_client + 0x48);
     WriteKernel64(fake_client + 0x40, x0);
     WriteKernel64(fake_client + 0x48, addr);
-    uint64_t returnval = IOConnectTrap6(user_client, 0, (uint64_t)(x1), (uint64_t)(x2), (uint64_t)(x3), (uint64_t)(x4), (uint64_t)(x5), (uint64_t)(x6));
+    uint64_t returnval = IOConnectTrap6(user_client, 0, x1, x2, x3, x4, x5, x6);
     WriteKernel64(fake_client + 0x40, offx20);
     WriteKernel64(fake_client + 0x48, offx28);
 

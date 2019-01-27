@@ -552,7 +552,7 @@ int _vnode_lookup(const char *path, int flags, uint64_t *vpp, uint64_t vfs_conte
     uint64_t ks = kmem_alloc(len);
     kwrite(ks, path, len);
     int ret = (int)kexecute(GETOFFSET(vnode_lookup), ks, 0, vnode, vfs_context, 0, 0, 0);
-    if (ret != 0) {
+    if (ret != ERR_SUCCESS) {
         return -1;
     }
     *vpp = ReadKernel64(vnode);
