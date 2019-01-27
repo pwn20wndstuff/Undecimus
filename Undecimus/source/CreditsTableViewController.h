@@ -10,4 +10,6 @@
 
 @interface CreditsTableViewController : UITableViewController
 
++ (NSURL *)getURLForUserName:(NSString *)userName;
+
 @end

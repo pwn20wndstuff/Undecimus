@@ -46,6 +46,7 @@
 #include "utils.h"
 #include "ArchiveFile.h"
 #include "../../patchfinder64/patchfinder64.h" // Work around Xcode 9
+#include "CreditsTableViewController.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -1906,20 +1907,6 @@ void exploit()
     });
 }
 
-+ (NSURL *)getURLForUserName:(NSString *)userName {
-    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetbot://"]]) {
-        return [NSURL URLWithString:[NSString stringWithFormat:@"tweetbot:///user_profile/%@", userName]];
-    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitterrific://"]]) {
-        return [NSURL URLWithString:[NSString stringWithFormat:@"twitterrific:///profile?screen_name=%@", userName]];
-    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetings://"]]) {
-        return [NSURL URLWithString:[NSString stringWithFormat:@"tweetings:///user?screen_name=%@", userName]];
-    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitter://"]]) {
-        return [NSURL URLWithString:[NSString stringWithFormat:@"https://mobile.twitter.com/%@", userName]];
-    } else {
-        return [NSURL URLWithString:[NSString stringWithFormat:@"https://mobile.twitter.com/%@", userName]];
-    }
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
@@ -1952,15 +1939,15 @@ void exploit()
 }
 
 - (IBAction)tappedOnPwn:(id)sender{
-    [[UIApplication sharedApplication] openURL:[JailbreakViewController getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnDennis:(id)sender{
-    [[UIApplication sharedApplication] openURL:[JailbreakViewController getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnSamB:(id)sender{
-    [[UIApplication sharedApplication] openURL:[JailbreakViewController getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)tappedOnSamG:(id)sender{
