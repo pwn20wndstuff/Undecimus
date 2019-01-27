@@ -98,6 +98,7 @@ typedef struct {
     bool install_cydia;
     bool install_openssh;
     bool reload_system_daemons;
+    bool reset_cydia_cache;
 } prefs_t;
 
 #define ISADDR(val)            (val != 0 && val != HUGE_VAL && val != -HUGE_VAL)
@@ -705,6 +706,7 @@ bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
     prefs->install_cydia = [defaults[K_INSTALL_CYDIA] boolValue];
     prefs->install_openssh = [defaults[K_INSTALL_OPENSSH] boolValue];
     prefs->reload_system_daemons = [defaults[K_RELOAD_SYSTEM_DAEMONS] boolValue];
+    prefs->reset_cydia_cache = [defaults[K_RESET_CYDIA_CACHE] boolValue];
     return true;
 }
 
@@ -1774,6 +1776,24 @@ void exploit()
                          "fi;"
                     "done");
             LOG("Successfully loaded Daemons.");
+        }
+    }
+    
+    UPSTAGE();
+    
+    {
+        if (prefs.reset_cydia_cache) {
+            // Reset Cydia cache.
+            
+            LOG("Resetting Cydia cache...");
+            SETMESSAGE(NSLocalizedString(@"Failed to reset Cydia cache.", nil));
+            _assert(clean_file("/var/mobile/Library/Cydia"), message, true);
+            _assert(clean_file("/var/mobile/Library/Caches/com.saurik.Cydia"), message, true);
+            prefs.reset_cydia_cache = false;
+            _assert(modifyPlist(prefsFile, ^(id plist) {
+                plist[K_RESET_CYDIA_CACHE] = @NO;
+            }), message, true);
+            LOG("Successfully reset Cydia cache.");
         }
     }
 

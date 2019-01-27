@@ -27,6 +27,7 @@
 #define K_INSTALL_CYDIA            @"InstallCydia"
 #define K_RELOAD_SYSTEM_DAEMONS    @"ReloadSystemDaemons"
 #define K_HIDE_LOG_WINDOW          @"HideLogWindow"
+#define K_RESET_CYDIA_CACHE        @"ResetCydiaCache"
 
 @interface SettingsTableViewController : UITableViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UISwitch *TweakInjectionSwitch;
@@ -53,6 +54,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *ReloadSystemDaemonsSwitch;
 @property (weak, nonatomic) IBOutlet UIButton *RestartSpringBoardButton;
 @property (weak, nonatomic) IBOutlet UISwitch *HideLogWindowSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *ResetCydiaCacheSwitch;
 
 + (NSDictionary *)_provisioningProfileAtPath:(NSString *)path;
 

@@ -152,6 +152,10 @@
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_HIDE_LOG_WINDOW];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_RESET_CYDIA_CACHE] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_RESET_CYDIA_CACHE];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
 }
 
 - (void)initShortcuts {
