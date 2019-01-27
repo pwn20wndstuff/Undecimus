@@ -564,7 +564,7 @@ int _vnode_put(uint64_t vnode){
     return (int)kexecute(GETOFFSET(vnode_put), vnode, 0, 0, 0, 0, 0, 0);
 }
 
-uint64_t getVnodeAtPath(const char *path) {
+uint64_t vnodeFor(const char *path) {
     uint64_t vfs_context = 0;
     uint64_t *vpp = NULL;
     uint64_t vnode = 0;
@@ -966,7 +966,7 @@ void exploit()
             
             LOG("Clearing dev vnode's si_flags...");
             SETMESSAGE(NSLocalizedString(@"Failed to clear dev vnode's si_flags.", nil));
-            uint64_t devVnode = getVnodeAtPath(thedisk);
+            uint64_t devVnode = vnodeFor(thedisk);
             LOG("devVnode = "ADDR"", devVnode);
             _assert(ISADDR(devVnode), message, true);
             uint64_t v_specinfo = ReadKernel64(devVnode + koffset(KSTRUCT_OFFSET_VNODE_VU_SPECINFO));
@@ -1039,7 +1039,7 @@ void exploit()
                 LOG("%s", *snapshot);
             }
         }
-        uint64_t rootfs_vnode = getVnodeAtPath("/");
+        uint64_t rootfs_vnode = vnodeFor("/");
         LOG("rootfs_vnode = "ADDR"", rootfs_vnode);
         _assert(ISADDR(rootfs_vnode), message, true);
         uint64_t v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
