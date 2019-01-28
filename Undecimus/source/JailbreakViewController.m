@@ -768,7 +768,7 @@ void exploit()
 #define FIND(x) do { \
         SETMESSAGE(NSLocalizedString(@"Failed to find " #x " offset.", nil)); \
         SETOFFSET(x, find_ ##x()); \
-        LOG(#x " = "ADDR"", GETOFFSET(x)); \
+        LOG(#x " = " ADDR, GETOFFSET(x)); \
         _assert(ISADDR(GETOFFSET(x)), message, true); \
 } while (false)
         FIND(trustcache);
