@@ -784,6 +784,7 @@ void exploit()
         FIND(shenanigans);
         FIND(lck_mtx_lock);
         FIND(lck_mtx_unlock);
+#undef FIND
         LOG("Successfully found offsets.");
     }
     
