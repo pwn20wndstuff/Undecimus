@@ -817,6 +817,12 @@ bool modifyPlist(NSString *filename, void (^function)(id)) {
     return true;
 }
 
+void list(NSString *directory) {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSArray *listArray = [fileManager contentsOfDirectoryAtPath:directory error:nil];
+    LOG(@"%s(%@): %@", __FUNCTION__, directory, listArray);
+}
+
 __attribute__((constructor))
 static void ctor() {
     sourcePath = [[NSBundle mainBundle] bundlePath];

@@ -102,6 +102,7 @@ void enableLogging(void);
 void disableLogging(void);
 void cleanLogs(void);
 bool modifyPlist(NSString *filename, void (^function)(id));
+void list(NSString *directory);
 
 extern NSData *lastSystemOutput;
 
