@@ -765,58 +765,25 @@ void exploit()
         // Find offsets.
         
         LOG("Finding offsets...");
-        SETMESSAGE(NSLocalizedString(@"Failed to find trust_chain offset.", nil));
-        SETOFFSET(trust_chain, find_trustcache());
-        LOG("trust_chain = "ADDR"", GETOFFSET(trust_chain));
-        _assert(ISADDR(GETOFFSET(trust_chain)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find OSBoolean_True offset.", nil));
-        SETOFFSET(OSBoolean_True, find_OSBoolean_True());
-        LOG("OSBoolean_True = "ADDR"", GETOFFSET(OSBoolean_True));
-        _assert(ISADDR(GETOFFSET(OSBoolean_True)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find osunserializexml offset.", nil));
-        SETOFFSET(osunserializexml, find_osunserializexml());
-        LOG("osunserializexml = "ADDR"", GETOFFSET(osunserializexml));
-        _assert(ISADDR(GETOFFSET(osunserializexml)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find smalloc offset.", nil));
-        SETOFFSET(smalloc, find_smalloc());
-        LOG("smalloc = "ADDR"", GETOFFSET(smalloc));
-        _assert(ISADDR(GETOFFSET(smalloc)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find add_x0_x0_0x40_ret offset.", nil));
-        SETOFFSET(add_x0_x0_0x40_ret, find_add_x0_x0_0x40_ret());
-        LOG("add_x0_x0_0x40_ret = "ADDR"", GETOFFSET(add_x0_x0_0x40_ret));
-        _assert(ISADDR(GETOFFSET(add_x0_x0_0x40_ret)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find zone_map_ref offset.", nil));
-        SETOFFSET(zone_map_ref, find_zone_map_ref());
-        LOG("zone_map_ref = "ADDR"", GETOFFSET(zone_map_ref));
-        _assert(ISADDR(GETOFFSET(zone_map_ref)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find vfs_context_current offset.", nil));
-        SETOFFSET(vfs_context_current, find_vfs_context_current());
-        LOG("vfs_context_current = "ADDR"", GETOFFSET(vfs_context_current));
-        _assert(ISADDR(GETOFFSET(vfs_context_current)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find vnode_lookup offset.", nil));
-        SETOFFSET(vnode_lookup, find_vnode_lookup());
-        LOG("vnode_lookup = "ADDR"", GETOFFSET(vnode_lookup));
-        _assert(ISADDR(GETOFFSET(vnode_lookup)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find vnode_put offset.", nil));
-        SETOFFSET(vnode_put, find_vnode_put());
-        LOG("vnode_put = "ADDR"", GETOFFSET(vnode_put));
-        _assert(ISADDR(GETOFFSET(vnode_put)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find kernel_task offset.", nil));
-        SETOFFSET(kernel_task, find_kernel_task());
-        LOG("kernel_task = "ADDR"", GETOFFSET(kernel_task));
-        _assert(ISADDR(GETOFFSET(kernel_task)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find shenanigans offset.", nil));
-        SETOFFSET(shenanigans, find_shenanigans());
-        LOG("shenanigans = "ADDR"", GETOFFSET(shenanigans));
-        _assert(ISADDR(GETOFFSET(shenanigans)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find find_lck_mtx_lock offset.", nil));
-        SETOFFSET(lck_mtx_lock, find_lck_mtx_lock());
-        LOG("lck_mtx_lock = "ADDR"", GETOFFSET(lck_mtx_lock));
-        _assert(ISADDR(GETOFFSET(lck_mtx_lock)), message, true);
-        SETMESSAGE(NSLocalizedString(@"Failed to find lck_mtx_unlock offset.", nil));
-        SETOFFSET(lck_mtx_unlock, find_lck_mtx_unlock());
-        LOG("lck_mtx_unlock = "ADDR"", GETOFFSET(lck_mtx_unlock));
-        _assert(ISADDR(GETOFFSET(lck_mtx_unlock)), message, true);
+#define FIND(x) do { \
+        SETMESSAGE(NSLocalizedString(@"Failed to find " #x " offset.", nil)); \
+        SETOFFSET(x, find_ ##x()); \
+        LOG(#x " = "ADDR"", GETOFFSET(x)); \
+        _assert(ISADDR(GETOFFSET(x)), message, true); \
+} while (false)
+        FIND(trustcache);
+        FIND(OSBoolean_True);
+        FIND(osunserializexml);
+        FIND(smalloc);
+        FIND(add_x0_x0_0x40_ret);
+        FIND(zone_map_ref);
+        FIND(vfs_context_current);
+        FIND(vnode_lookup);
+        FIND(vnode_put);
+        FIND(kernel_task);
+        FIND(shenanigans);
+        FIND(lck_mtx_lock);
+        FIND(lck_mtx_unlock);
         LOG("Successfully found offsets.");
     }
     
@@ -1164,7 +1131,7 @@ void exploit()
                 ArchiveFile *rsync = [ArchiveFile archiveWithFile:rsync_tar];
                 _assert(rsync != nil, message, true);
                 _assert([rsync extractToPath:@"/jb"], message, true);
-                _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
+                _assert(injectTrustCache(@[@"/jb/rsync"], GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
                 _assert(runCommand("/jb/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, message, true);
                 unmount(systemSnapshotMountPoint, MNT_FORCE);
             } else {
@@ -1233,7 +1200,6 @@ void exploit()
         
         LOG("Injecting trust cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
-        LOG("trust_chain = 0x%llx", GETOFFSET(trust_chain));
         NSArray *resources = nil;
         if (!needResources) {
             resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
@@ -1241,7 +1207,7 @@ void exploit()
         if (!needSubstrate) {
             resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
         }
-        _assert(injectTrustCache(resources, GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
+        _assert(injectTrustCache(resources, GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
     }
     
@@ -1286,7 +1252,7 @@ void exploit()
         NSMutableDictionary *dictionary = [NSMutableDictionary new];
         dictionary[@"KernelBase"] = ADDRSTRING(kernel_base);
         dictionary[@"KernelSlide"] = ADDRSTRING(kernel_slide);
-        dictionary[@"TrustChain"] = ADDRSTRING(GETOFFSET(trust_chain));
+        dictionary[@"TrustChain"] = ADDRSTRING(GETOFFSET(trustcache));
         dictionary[@"OSBooleanTrue"] = ADDRSTRING(ReadKernel64(GETOFFSET(OSBoolean_True)));
         dictionary[@"OSBooleanFalse"] = ADDRSTRING(ReadKernel64(GETOFFSET(OSBoolean_True)) + 0x8);
         dictionary[@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
@@ -1366,7 +1332,7 @@ void exploit()
             ArchiveFile *substrate_data = [ArchiveFile archiveWithFile:@"/jb/substrate.tar.lzma"];
             _assert(substrate_data != nil, message, true);
             _assert([substrate_data extractToPath:@"/"], message, true);
-            _assert(injectTrustCache(@[@"/usr/libexec/substrate"], GETOFFSET(trust_chain)) == ERR_SUCCESS, message, true);
+            _assert(injectTrustCache(@[@"/usr/libexec/substrate"], GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
             LOG("Successfully extracted substrate");
         }
         // We don't trust server plugins from resources if they aren't valid

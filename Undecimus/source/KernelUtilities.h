@@ -8,7 +8,7 @@
 #define GETOFFSET(offset) offs.offset
 
 typedef struct {
-    kptr_t trust_chain;
+    kptr_t trustcache;
     kptr_t OSBoolean_True;
     kptr_t osunserializexml;
     kptr_t smalloc;
