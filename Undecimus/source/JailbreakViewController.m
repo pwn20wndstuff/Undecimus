@@ -755,7 +755,7 @@ void exploit()
         
         LOG("Initializing patchfinder64...");
         SETMESSAGE(NSLocalizedString(@"Failed to initialize patchfinder64.", nil));
-        _assert(init_kernel(kernel_base, NULL) == ERR_SUCCESS, message, true);
+        _assert(init_kernel(kread, kernel_base, NULL) == ERR_SUCCESS, message, true);
         LOG("Successfully initialized patchfinder64.");
     }
     
