@@ -904,7 +904,9 @@ bool modifyPlist(NSString *filename, void (^function)(id)) {
         LOG("%s: Failed to generate plist data: %@", __FUNCTION__, error);
         return false;
     }
-    function(plist);
+    if (function) {
+        function(plist);
+    }
     NSData *newData = [NSPropertyListSerialization dataWithPropertyList:plist format:format options:0 error:&error];
     if (newData == nil) {
         LOG("%s: Failed to generate new plist data: %@", __FUNCTION__, error);
