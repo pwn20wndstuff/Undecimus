@@ -914,7 +914,7 @@ void exploit()
         LOG("Remounting RootFS...");
         SETMESSAGE(NSLocalizedString(@"Failed to remount RootFS.", nil));
         int rootfd = open("/", O_RDONLY);
-        _assert(rootfd != -1, message, true);
+        _assert(rootfd > 0, message, true);
         const char **snapshots = snapshot_list(rootfd);
         const char *origfs = "orig-fs";
         bool has_origfs = false;
@@ -967,7 +967,7 @@ void exploit()
             LOG("Renaming system snapshot...");
             SETMESSAGE(NSLocalizedString(@"Unable to rename system snapshot.", nil));
             rootfd = open(systemSnapshotMountPoint, O_RDONLY);
-            _assert(rootfd != -1, message, true);
+            _assert(rootfd > 0, message, true);
             snapshots = snapshot_list(rootfd);
             _assert(snapshots != NULL, message, true);
             if (snapshots != NULL) {
@@ -1131,7 +1131,7 @@ void exploit()
             NOTICE(NSLocalizedString(@"Will restore RootFS. This may take a while. Don't exit the app and don't let the device lock.", nil), 1, 1);
             SETMESSAGE(NSLocalizedString(@"Unable to mount or rename system snapshot.  Delete OTA file from Settings - Storage if present", nil));
             int rootfd = open("/", O_RDONLY);
-            _assert(rootfd != -1, message, true);
+            _assert(rootfd > 0, message, true);
             const char **snapshots = snapshot_list(rootfd);
             _assert(snapshots != NULL, message, true);
             const char *snapshot = *snapshots;
@@ -1870,7 +1870,7 @@ void exploit()
         }
         
         if (exploit_success) {
-            LOG("TFP0 Obtained");
+            LOG("TFP0 Obtained.");
         } else if (restartSupported()) {
             NOTICE(NSLocalizedString(@"Kernel exploit failed. This is not an error. Tap OK to reboot and try again.", nil), true, false);
             NSInteger support = recommendedRestartSupport();
