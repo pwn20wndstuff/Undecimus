@@ -1020,7 +1020,7 @@ void exploit()
                     ![file isEqualToString:[NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber]]))
                     && access("/electra", F_OK) != ERR_SUCCESS;
         if (needStrap)
-            LOG("We need strap");
+            LOG("We need strap.");
         if (snapshots != NULL && needStrap && !has_origfs) {
             // Create system snapshot.
             
@@ -1074,13 +1074,13 @@ void exploit()
                          !verifySums(@"/var/lib/dpkg/info/mobilesubstrate.md5sums", HASHTYPE_MD5)
                          );
         if (needSubstrate) {
-            LOG(@"We need substrate");
+            LOG(@"We need substrate.");
             NSString *substrateDeb = debForPkg(@"mobilesubstrate");
             _assert(substrateDeb != nil, message, true);
             if (pidOfProcess("/usr/libexec/substrated") == 0) {
                 _assert(extractDeb(substrateDeb), message, true);
             } else {
-                LOG("Substrate is running, not extracting again for now");
+                LOG("Substrate is running, not extracting again for now.");
             }
             [debsToInstall addObject:substrateDeb];
         }
@@ -1088,20 +1088,20 @@ void exploit()
         NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
         _assert(resourcesPkgs != nil, message, true);
         NSMutableArray *pkgsToRepair = [NSMutableArray new];
-        LOG("Resource Pkgs: %@", resourcesPkgs);
+        LOG("Resource Pkgs: \"%@\".", resourcesPkgs);
         for (NSString *pkg in resourcesPkgs) {
             // Ignore mobilesubstrate because we just handled that separately.
             if ([pkg isEqualToString:@"mobilesubstrate"] || [pkg isEqualToString:@"firmware"])
                 continue;
             if (verifySums([NSString stringWithFormat:@"/var/lib/dpkg/info/%@.md5sums", pkg], HASHTYPE_MD5)) {
-                LOG("Pkg %@ verified", pkg);
+                LOG("Pkg \"%@\" verified.", pkg);
             } else {
-                LOG(@"Need to repair %@", pkg);
+                LOG(@"Need to repair \"%@\".", pkg);
                 [pkgsToRepair addObject:pkg];
             }
         }
         if (pkgsToRepair.count > 0) {
-            LOG(@"(Re-)Extracting %@", pkgsToRepair);
+            LOG(@"(Re-)Extracting \"%@\".", pkgsToRepair);
             NSArray *debsToRepair = debsForPkgs(pkgsToRepair);
             _assert(debsToRepair.count == pkgsToRepair.count, message, true);
             _assert(extractDebs(debsToRepair), message, true);
@@ -1321,10 +1321,10 @@ void exploit()
         BOOL isDir;
         if ([fm fileExistsAtPath:@"/var/lib/dpkg" isDirectory:&isDir] && isDir) {
             if ([fm fileExistsAtPath:@"/Library/dpkg" isDirectory:&isDir] && isDir) {
-                LOG(@"Removing /var/lib/dpkg");
+                LOG(@"Removing /var/lib/dpkg...");
                 _assert([fm removeItemAtPath:@"/var/lib/dpkg" error:nil], message, true);
             } else {
-                LOG(@"Moving /var/lib/dpkg to /Library/dpkg");
+                LOG(@"Moving /var/lib/dpkg to /Library/dpkg...");
                 _assert([fm moveItemAtPath:@"/var/lib/dpkg" toPath:@"/Library/dpkg" error:nil], message, true);
             }
         }
@@ -1386,7 +1386,7 @@ void exploit()
         }
         // Test dpkg
         if (!pkgIsConfigured("dpkg") || pkgIsBy("CoolStar", "dpkg")) {
-            LOG("Extracting dpkg");
+            LOG("Extracting dpkg...");
             _assert(extractDebsForPkg(@"dpkg", debsToInstall, false), message, true);
             NSString *dpkg_deb = debForPkg(@"dpkg");
             _assert(installDeb(dpkg_deb.UTF8String, true), message, true);
@@ -1394,7 +1394,7 @@ void exploit()
         }
         
         if (needStrap || !pkgIsConfigured("firmware")) {
-            LOG("Extracting cydia");
+            LOG("Extracting Cydia...");
             if (![[NSFileManager defaultManager] fileExistsAtPath:@"/usr/libexec/cydia/firmware.sh"] || !pkgIsConfigured("cydia")) {
                 NSArray *fwDebs = debsForPkgs(@[@"cydia", @"cydia-lproj", @"darwintools", @"uikittools", @"system-cmds"]);
                 _assert(fwDebs != nil, message, true);
@@ -1406,7 +1406,7 @@ void exploit()
         
         // Dpkg better work now
         if (debsToInstall.count > 0) {
-            LOG("Installing manually exctracted debs");
+            LOG("Installing manually exctracted debs...");
             _assert(installDebs(debsToInstall, true), message, true);
         }
 
@@ -1899,6 +1899,8 @@ void exploit()
         _assert(ISADDR(kernel_slide), message, true);
         exploit();
         STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
+        NOTICE(NSLocalizedString(@"The device has been successfully jailbroken. The app will now exit.", nil), true, false);
+        exit(EXIT_SUCCESS);
     });
 }
 

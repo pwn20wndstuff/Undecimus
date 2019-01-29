@@ -460,7 +460,7 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-        NOTICE(NSLocalizedString(@"Preference was changed. The app will exit now.", nil), true, false);
+        NOTICE(NSLocalizedString(@"Preference was changed. The app will now exit.", nil), true, false);
         exit(EXIT_SUCCESS);
     });
 }
