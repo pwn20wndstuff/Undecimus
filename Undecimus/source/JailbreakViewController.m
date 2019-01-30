@@ -1015,11 +1015,10 @@ void exploit()
         }
         _assert(_vnode_put(rootfs_vnode) == ERR_SUCCESS, message, true);
         NSString *file = [NSString stringWithContentsOfFile:@"/.installed_unc0ver" encoding:NSUTF8StringEncoding error:nil];
-        needStrap = ((file == nil ||
+        needStrap = (file == nil ||
                     (![file isEqualToString:@""] &&
                     ![file isEqualToString:[NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber]]))
-                    && access("/electra", F_OK) != ERR_SUCCESS) ||
-                    access("/bin/sh", F_OK) != ERR_SUCCESS;
+                    && access("/electra", F_OK) != ERR_SUCCESS;
         if (needStrap)
             LOG("We need strap.");
         if (snapshots != NULL && needStrap && !has_origfs) {
