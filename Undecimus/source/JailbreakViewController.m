@@ -1408,7 +1408,7 @@ void exploit()
         
         // Dpkg better work now
         
-        if (pkgIsConfigured("science.xnu.undecimus.resources")) {
+        if (pkgIsInstalled("science.xnu.undecimus.resources")) {
             LOG("Removing old resources...");
             _assert(removePkg("science.xnu.undecimus.resources", true), message, true);
         }
