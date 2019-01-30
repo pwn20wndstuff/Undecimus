@@ -1957,6 +1957,55 @@ void exploit()
     return sharedController;
 }
 
+-(void)updateOutputView {
+    [self updateOutputViewFromQueue:@NO];
+}
+
+-(void)updateOutputViewFromQueue:(NSNumber*)fromQueue {
+    static BOOL updateQueued = NO;
+    static struct timeval last = {0,0};
+    static dispatch_queue_t updateQueue;
+
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        updateQueue = dispatch_queue_create("updateView", NULL);
+    });
+    
+    dispatch_async(updateQueue, ^{
+        struct timeval now;
+
+        if (fromQueue.boolValue) {
+            updateQueued = NO;
+        }
+        
+        if (updateQueued) {
+            return;
+        }
+        
+        if (gettimeofday(&now, NULL)) {
+            LOG("gettimeofday failed");
+            return;
+        }
+        
+        uint64_t elapsed = (now.tv_sec - last.tv_sec) * 1000000 + now.tv_usec - last.tv_usec;
+        // 30 FPS
+        if (elapsed > 1000000/30) {
+            updateQueued = NO;
+            gettimeofday(&last, NULL);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.outputView.text = output;
+                [self.outputView scrollRangeToVisible:NSMakeRange(self.outputView.text.length, 0)];
+            });
+        } else {
+            NSTimeInterval waitTime = ((1000000/30) - elapsed) / 1000000.0;
+            updateQueued = YES;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self performSelector:@selector(updateOutputViewFromQueue:) withObject:@YES afterDelay:waitTime];
+            });
+        }
+    });
+}
+
 -(void)appendTextToOutput:(NSString *)text {
     if (_outputView == nil) {
         return;
@@ -1973,11 +2022,8 @@ void exploit()
 
     @synchronized (output) {
         [output appendString:text];
-        dispatch_async(dispatch_get_main_queue(), ^{
-                self.outputView.text = output;
-                [self.outputView scrollRangeToVisible:NSMakeRange(output.length - 1, 1)];
-        });
     }
+    [self updateOutputView];
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
