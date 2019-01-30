@@ -277,7 +277,7 @@ bool runApt(NSArray <NSString*> *args) {
     }
     NSMutableArray <NSString*> *command = [NSMutableArray arrayWithArray:@[
                         @"/usr/bin/apt-get",
-                        @"-o", @"Dir::Etc::sourcelist=sources.list.d/undecimus.list",
+                        @"-o", @"Dir::Etc::sourcelist=undecimus/undecimus.list",
                         @"-o", @"Dir::Etc::sourceparts=-",
                         @"-o", @"APT::Get::List-Cleanup=0"
                         ]];

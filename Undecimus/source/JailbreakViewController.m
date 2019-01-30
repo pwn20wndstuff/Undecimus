@@ -1410,14 +1410,16 @@ void exploit()
             _assert(installDebs(debsToInstall, true), message, true);
         }
 
-        const char *listPath = "/etc/apt/sources.list.d/undecimus.list";
+        _assert(ensure_directory("/etc/apt/undecimus", 0, 0755), message, true);
+        clean_file("/etc/apt/sources.list.d/undecimus.list");
+        const char *listPath = "/etc/apt/undecimus/undecimus.list";
         NSString *listContents = @"deb file:///var/lib/undecimus/apt ./\n";
         NSString *existingList = [NSString stringWithContentsOfFile:@(listPath) encoding:NSUTF8StringEncoding error:nil];
         if (![listContents isEqualToString:existingList]) {
             clean_file(listPath);
             [listContents writeToFile:@(listPath) atomically:NO encoding:NSUTF8StringEncoding error:nil];
         }
-        init_file("/etc/apt/sources.list.d/undecimus.list", 0, 0644);
+        init_file(listPath, 0, 0644);
         NSString *repoPath = pathForResource(@"apt");
         _assert(repoPath != nil, message, true);
         ensure_directory("/var/lib/undecimus", 0, 0755);
