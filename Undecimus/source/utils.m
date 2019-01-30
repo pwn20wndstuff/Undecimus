@@ -6,7 +6,7 @@
 //  Copyright © 2018 - 2019 Sam Bingner. All rights reserved.
 //
 
-#import <mach/error.h>
+#import <mach/mach.h>
 #import <sys/sysctl.h>
 #import <Foundation/Foundation.h>
 #import <CommonCrypto/CommonDigest.h>
@@ -700,6 +700,50 @@ bool supportsExploit(NSInteger exploit) {
             }
             break;
         }
+        case voucher_swap_exploit: {
+            NSArray *list =
+            @[@"4397.0.0.2.4~1",
+              @"4481.0.0.2.1~1",
+              @"4532.0.0.0.1~30",
+              @"4556.0.0.2.5~1",
+              @"4570.1.24.2.3~1",
+              @"4570.2.3~8",
+              @"4570.2.5~84",
+              @"4570.2.5~167",
+              @"4570.7.2~3",
+              @"4570.20.55~10",
+              @"4570.20.62~9",
+              @"4570.20.62~4",
+              @"4570.30.79~22",
+              @"4570.30.85~18",
+              @"4570.32.1~2",
+              @"4570.32.1~1",
+              @"4570.40.6~8",
+              @"4570.40.9~7",
+              @"4570.40.9~1",
+              @"4570.50.243~9",
+              @"4570.50.257~6",
+              @"4570.50.279~9",
+              @"4570.50.294~5",
+              @"4570.52.2~3",
+              @"4570.52.2~8",
+              @"4570.60.10.0.1~16",
+              @"4570.60.16~9",
+              @"4570.60.19~25",
+              @"4570.60.21~7",
+              @"4570.60.21~3",
+              @"4570.70.14~16",
+              @"4570.70.19~13",
+              @"4570.70.24~9",
+              @"4570.70.24~3"];
+            for (NSString *string in list) {
+                vm_size_t vm_size = 0;
+                if (kernelVersionContains(string.UTF8String) && host_page_size(mach_host_self(), &vm_size) == ERR_SUCCESS && vm_size == 0x4000 && !kernelVersionContains("iPad5,")) {
+                    return true;
+                }
+            }
+            break;
+        }
         case deja_xnu_exploit: {
             NSArray *list =
             @[@"4397.0.0.2.4~1",
@@ -796,7 +840,8 @@ bool supportsExploit(NSInteger exploit) {
 bool jailbreakSupported() {
     return supportsExploit(empty_list_exploit) ||
     supportsExploit(multi_path_exploit) ||
-    supportsExploit(async_wake_exploit);
+    supportsExploit(async_wake_exploit) ||
+    supportsExploit(voucher_swap_exploit);
 }
 
 bool respringSupported() {
@@ -810,6 +855,8 @@ bool restartSupported() {
 NSInteger recommendedJailbreakSupport() {
     if (supportsExploit(async_wake_exploit))
         return async_wake_exploit;
+    else if (supportsExploit(voucher_swap_exploit))
+        return voucher_swap_exploit;
     else if (supportsExploit(multi_path_exploit))
         return multi_path_exploit;
     else if (supportsExploit(empty_list_exploit))

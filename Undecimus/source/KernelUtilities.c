@@ -16,7 +16,6 @@
 
 uint64_t the_realhost;
 uint64_t kernel_base;
-uint64_t kernel_slide;
 offsets_t offs;
 
 uint64_t cached_task_self_addr = 0;
@@ -98,12 +97,6 @@ mach_port_t fake_host_priv()
 
     return port;
 }
-
-int message_size_for_kalloc_size(int kalloc_size)
-{
-    return ((3 * kalloc_size) / 4) - 0x74;
-}
-
 
 uint64_t get_proc_struct_for_pid(pid_t pid)
 {

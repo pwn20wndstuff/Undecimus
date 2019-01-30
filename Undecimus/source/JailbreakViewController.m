@@ -48,6 +48,8 @@
 #include "../../patchfinder64/patchfinder64.h" // Work around Xcode 9
 #include "CreditsTableViewController.h"
 #include "FakeApt.h"
+#include "voucher_swap.h"
+#include "kernel_memory.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -1857,7 +1859,13 @@ void exploit()
                     exploit_success = async_wake_go();
                     break;
                 }
-                    
+                case voucher_swap_exploit: {
+                    voucher_swap();
+                    offsets_init();
+                    prepare_for_rw_with_fake_tfp0(kernel_task_port);
+                    exploit_success = true;
+                    break;
+                }
                 default: {
                     NOTICE(NSLocalizedString(@"No exploit selected", nil), false, false);
                     STATUS(NSLocalizedString(@"Jailbreak", nil), true, true);
@@ -1866,7 +1874,7 @@ void exploit()
                 }
             }
             if (exploit_success && !MACH_PORT_VALID(tfp0)) {
-                LOG(@"Exploit returned success but tfp0 is invalid");
+                LOG(@"Exploit returned success but tfp0 is invalid.");
                 exploit_success = false;
             }
         }

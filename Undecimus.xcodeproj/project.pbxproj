@@ -12,6 +12,14 @@
 		212D8844216E4C4800A36DA5 /* find_port.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8842216E4C4700A36DA5 /* find_port.c */; };
 		212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8846216E4DF600A36DA5 /* early_kalloc.c */; };
 		212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8849216E4EBE00A36DA5 /* async_wake.c */; };
+		2150A9CD22021330001C8677 /* voucher_swap.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CC22021330001C8677 /* voucher_swap.c */; };
+		2150A9DC22021348001C8677 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CE22021347001C8677 /* log.c */; };
+		2150A9DD22021348001C8677 /* platform_match.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CF22021347001C8677 /* platform_match.c */; };
+		2150A9DE22021348001C8677 /* platform.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9D422021347001C8677 /* platform.c */; };
+		2150A9DF22021348001C8677 /* kernel_slide.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9D622021348001C8677 /* kernel_slide.c */; };
+		2150A9E022021348001C8677 /* parameters.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9D922021348001C8677 /* parameters.c */; };
+		2150A9E122021348001C8677 /* kernel_alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9DA22021348001C8677 /* kernel_alloc.c */; };
+		2150A9E222021348001C8677 /* kernel_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9DB22021348001C8677 /* kernel_memory.c */; };
 		2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */; };
 		2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
@@ -56,6 +64,25 @@
 		212D8848216E4EBE00A36DA5 /* async_wake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = async_wake.h; sourceTree = "<group>"; };
 		212D8849216E4EBE00A36DA5 /* async_wake.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = async_wake.c; sourceTree = "<group>"; };
 		21395357217CBA1000B17F8D /* MobileGestalt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileGestalt.h; sourceTree = "<group>"; };
+		2150A9CB22021330001C8677 /* voucher_swap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = voucher_swap.h; sourceTree = "<group>"; };
+		2150A9CC22021330001C8677 /* voucher_swap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = voucher_swap.c; sourceTree = "<group>"; };
+		2150A9CE22021347001C8677 /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
+		2150A9CF22021347001C8677 /* platform_match.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = platform_match.c; sourceTree = "<group>"; };
+		2150A9D022021347001C8677 /* parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parameters.h; sourceTree = "<group>"; };
+		2150A9D122021347001C8677 /* kernel_alloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kernel_alloc.h; sourceTree = "<group>"; };
+		2150A9D222021347001C8677 /* platform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = platform.h; sourceTree = "<group>"; };
+		2150A9D322021347001C8677 /* kernel_slide.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kernel_slide.h; sourceTree = "<group>"; };
+		2150A9D422021347001C8677 /* platform.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = platform.c; sourceTree = "<group>"; };
+		2150A9D522021347001C8677 /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
+		2150A9D622021348001C8677 /* kernel_slide.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kernel_slide.c; sourceTree = "<group>"; };
+		2150A9D722021348001C8677 /* platform_match.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = platform_match.h; sourceTree = "<group>"; };
+		2150A9D822021348001C8677 /* kernel_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kernel_memory.h; sourceTree = "<group>"; };
+		2150A9D922021348001C8677 /* parameters.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parameters.c; sourceTree = "<group>"; };
+		2150A9DA22021348001C8677 /* kernel_alloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kernel_alloc.c; sourceTree = "<group>"; };
+		2150A9DB22021348001C8677 /* kernel_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kernel_memory.c; sourceTree = "<group>"; };
+		2150A9E322021381001C8677 /* mach_vm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mach_vm.h; sourceTree = "<group>"; };
+		2150A9E422021381001C8677 /* ipc_port.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ipc_port.h; sourceTree = "<group>"; };
+		2150A9E52202138A001C8677 /* IOKitLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IOKitLib.h; sourceTree = "<group>"; };
 		21A97FC42148103A00DC0023 /* KernelExecution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KernelExecution.h; sourceTree = "<group>"; };
 		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
 		21A97FC62148103B00DC0023 /* remote_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_memory.c; sourceTree = "<group>"; };
@@ -144,6 +171,69 @@
 			path = sys;
 			sourceTree = "<group>";
 		};
+		2150A9C6220212A6001C8677 /* empty_list */ = {
+			isa = PBXGroup;
+			children = (
+				21C0FC8521369EE900849420 /* empty_list_sploit.c */,
+				21C0FC8121369EE900849420 /* empty_list_sploit.h */,
+			);
+			name = empty_list;
+			sourceTree = "<group>";
+		};
+		2150A9C7220212BC001C8677 /* multi_path */ = {
+			isa = PBXGroup;
+			children = (
+				21C13117214D268F0021AA9D /* multi_path_sploit.c */,
+				21C13118214D268F0021AA9D /* multi_path_sploit.h */,
+			);
+			name = multi_path;
+			sourceTree = "<group>";
+		};
+		2150A9C8220212D1001C8677 /* async_wake */ = {
+			isa = PBXGroup;
+			children = (
+				212D8849216E4EBE00A36DA5 /* async_wake.c */,
+				212D8848216E4EBE00A36DA5 /* async_wake.h */,
+				212D8846216E4DF600A36DA5 /* early_kalloc.c */,
+				212D8845216E4DF600A36DA5 /* early_kalloc.h */,
+				212D8842216E4C4700A36DA5 /* find_port.c */,
+				212D8843216E4C4700A36DA5 /* find_port.h */,
+			);
+			name = async_wake;
+			sourceTree = "<group>";
+		};
+		2150A9C9220212E6001C8677 /* deja_xnu */ = {
+			isa = PBXGroup;
+			children = (
+				2101395421A09BB700F9C5F2 /* hideventsystem.h */,
+				2101395321A09BB700F9C5F2 /* hideventsystem.c */,
+			);
+			name = deja_xnu;
+			sourceTree = "<group>";
+		};
+		2150A9CA220212F8001C8677 /* voucher_swap */ = {
+			isa = PBXGroup;
+			children = (
+				2150A9DA22021348001C8677 /* kernel_alloc.c */,
+				2150A9D122021347001C8677 /* kernel_alloc.h */,
+				2150A9DB22021348001C8677 /* kernel_memory.c */,
+				2150A9D822021348001C8677 /* kernel_memory.h */,
+				2150A9D622021348001C8677 /* kernel_slide.c */,
+				2150A9D322021347001C8677 /* kernel_slide.h */,
+				2150A9CE22021347001C8677 /* log.c */,
+				2150A9D522021347001C8677 /* log.h */,
+				2150A9D922021348001C8677 /* parameters.c */,
+				2150A9D022021347001C8677 /* parameters.h */,
+				2150A9CF22021347001C8677 /* platform_match.c */,
+				2150A9D722021348001C8677 /* platform_match.h */,
+				2150A9D422021347001C8677 /* platform.c */,
+				2150A9D222021347001C8677 /* platform.h */,
+				2150A9CC22021330001C8677 /* voucher_swap.c */,
+				2150A9CB22021330001C8677 /* voucher_swap.h */,
+			);
+			name = voucher_swap;
+			sourceTree = "<group>";
+		};
 		21675B62214A68B700D20E2B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -157,6 +247,9 @@
 		2170BD3421B192750059BD10 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				2150A9E322021381001C8677 /* mach_vm.h */,
+				2150A9E422021381001C8677 /* ipc_port.h */,
+				2150A9E52202138A001C8677 /* IOKitLib.h */,
 				226689DA21EC145000262F66 /* archive.h */,
 				226689DB21EC145000262F66 /* libproc.h */,
 				211C372621CE2DD800ADBEA2 /* net */,
@@ -182,6 +275,11 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				2150A9CA220212F8001C8677 /* voucher_swap */,
+				2150A9C9220212E6001C8677 /* deja_xnu */,
+				2150A9C8220212D1001C8677 /* async_wake */,
+				2150A9C7220212BC001C8677 /* multi_path */,
+				2150A9C6220212A6001C8677 /* empty_list */,
 				21F4D70B21FC7A490070D5E0 /* patchfinder64 */,
 				22F91CDC21E02D0B00B2FCAE /* snappy */,
 				22F91CD821E02CC700B2FCAE /* injector */,
@@ -189,16 +287,6 @@
 				21C0FC6B21369EB700849420 /* AppDelegate.m */,
 				225D142321E055E90045493D /* ArchiveFile.h */,
 				225D142121E052960045493D /* ArchiveFile.m */,
-				212D8849216E4EBE00A36DA5 /* async_wake.c */,
-				212D8848216E4EBE00A36DA5 /* async_wake.h */,
-				212D8846216E4DF600A36DA5 /* early_kalloc.c */,
-				212D8845216E4DF600A36DA5 /* early_kalloc.h */,
-				21C0FC8521369EE900849420 /* empty_list_sploit.c */,
-				21C0FC8121369EE900849420 /* empty_list_sploit.h */,
-				212D8842216E4C4700A36DA5 /* find_port.c */,
-				212D8843216E4C4700A36DA5 /* find_port.h */,
-				2101395421A09BB700F9C5F2 /* hideventsystem.h */,
-				2101395321A09BB700F9C5F2 /* hideventsystem.c */,
 				21A97FC42148103A00DC0023 /* KernelExecution.h */,
 				21A97FC82148103B00DC0023 /* KernelExecution.m */,
 				21C0FC8021369EE900849420 /* KernelMemory.c */,
@@ -208,8 +296,6 @@
 				21A97FC92148103B00DC0023 /* KernelUtilities.h */,
 				21A97FCC2148103B00DC0023 /* KernelUtilities.c */,
 				21C0FC7921369EB800849420 /* main.m */,
-				21C13117214D268F0021AA9D /* multi_path_sploit.c */,
-				21C13118214D268F0021AA9D /* multi_path_sploit.h */,
 				21A97FC52148103B00DC0023 /* remote_call.h */,
 				21A97FCD2148103B00DC0023 /* remote_call.c */,
 				21A97FC62148103B00DC0023 /* remote_memory.c */,
@@ -389,15 +475,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */,
+				2150A9E022021348001C8677 /* parameters.c in Sources */,
 				21A97FD12148103C00DC0023 /* KernelExecution.m in Sources */,
+				2150A9E122021348001C8677 /* kernel_alloc.c in Sources */,
+				2150A9DD22021348001C8677 /* platform_match.c in Sources */,
 				212D8844216E4C4800A36DA5 /* find_port.c in Sources */,
 				22C546AB21A8A8FD00EFC09C /* utils.m in Sources */,
+				2150A9DC22021348001C8677 /* log.c in Sources */,
 				22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */,
 				21A97FD42148103C00DC0023 /* remote_call.c in Sources */,
 				21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */,
 				21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */,
 				2116449A21737F9500250744 /* JailbreakViewController.m in Sources */,
 				21F4D70E21FC7A590070D5E0 /* patchfinder64.c in Sources */,
+				2150A9DE22021348001C8677 /* platform.c in Sources */,
 				22F91CDB21E02CF300B2FCAE /* inject.m in Sources */,
 				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* KernelMemory.c in Sources */,
@@ -408,8 +499,11 @@
 				21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */,
 				21C0FC8A21369EE900849420 /* KernelStructureOffsets.m in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,
+				2150A9E222021348001C8677 /* kernel_memory.c in Sources */,
+				2150A9DF22021348001C8677 /* kernel_slide.c in Sources */,
 				2101395521A09BB700F9C5F2 /* hideventsystem.c in Sources */,
 				21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */,
+				2150A9CD22021330001C8677 /* voucher_swap.c in Sources */,
 				21C0FC6C21369EB700849420 /* AppDelegate.m in Sources */,
 				225D142221E052960045493D /* ArchiveFile.m in Sources */,
 			);
