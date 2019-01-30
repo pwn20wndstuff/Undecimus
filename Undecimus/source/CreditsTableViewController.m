@@ -50,6 +50,10 @@
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"i41nbeer"] options:@{} completionHandler:nil];
 }
 
+-(IBAction)tappedOnBazad:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"_bazad"] options:@{} completionHandler:nil];
+}
+
 -(IBAction)tappedOnMorpheus:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"morpheus______"] options:@{} completionHandler:nil];
 }

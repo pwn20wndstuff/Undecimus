@@ -47,6 +47,7 @@ platform_init() {
 	platform.physical_cpu = basic_info.physical_cpu;
 	platform.logical_cpu  = basic_info.logical_cpu;
 	platform.memory_size  = basic_info.max_mem;
+    INFO("memory_size: %zu", platform.memory_size);
 	mach_port_deallocate(mach_task_self(), host);
 	// Log basic platform info.
 	DEBUG_TRACE(1, "platform: %s %s", platform.machine, platform.osversion);
