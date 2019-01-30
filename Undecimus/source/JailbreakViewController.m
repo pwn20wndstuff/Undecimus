@@ -1407,6 +1407,12 @@ void exploit()
         }
         
         // Dpkg better work now
+        
+        if (pkgIsConfigured("science.xnu.undecimus.resources")) {
+            LOG("Removing old resources...");
+            _assert(removePkg("science.xnu.undecimus.resources", true), message, true);
+        }
+        
         if (debsToInstall.count > 0) {
             LOG("Installing manually exctracted debs...");
             _assert(installDebs(debsToInstall, true), message, true);
