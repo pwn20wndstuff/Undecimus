@@ -50,6 +50,7 @@
 #include "FakeApt.h"
 #include "voucher_swap.h"
 #include "kernel_memory.h"
+#include "kernel_slide.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;

@@ -606,6 +606,9 @@ bool jailbreakEnabled() {
 }
 
 bool supportsExploit(NSInteger exploit) {
+#ifdef CAN_HAS_UNSUPPORTED_EXPLOIT
+    return true;
+#else /* !CAN_HAS_UNSUPPORTED_EXPLOIT */
     switch (exploit) {
         case empty_list_exploit: {
             NSArray *list =
@@ -835,6 +838,7 @@ bool supportsExploit(NSInteger exploit) {
             break;
     }
     return false;
+#endif /* !CAN_HAS_UNSUPPORTED_EXPLOIT */
 }
 
 bool jailbreakSupported() {
