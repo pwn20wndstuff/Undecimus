@@ -237,19 +237,16 @@ NSArray *allDepsForPkg(NSString *pkg) {
 }
 
 NSArray *resolveDepsForPkgWithQueue(NSString *pkg, NSMutableArray *queue, BOOL preDeps) {
+    if (pkg == nil) {
+        LOG("I can't resolve deps for no pkg. WTF.");
+        return nil;
+    }
+
     NSArray *deps = preDeps?allDepsForPkg(pkg):getDepsForPkg(pkg);
     NSDictionary *pkgs = getPkgs();
     
     if (queue == nil) {
         queue = [NSMutableArray new];
-    }
-    
-    if (deps == nil) {
-        return queue;
-    }
-    
-    if (deps.count < 1) {
-        return queue;
     }
     
     NSRegularExpression *or = [NSRegularExpression regularExpressionWithPattern:@"\\s*([^\\|]+)\\s*\\|?" options:0 error:nil];
@@ -318,25 +315,24 @@ NSArray *resolveDepsForPkgWithQueue(NSString *pkg, NSMutableArray *queue, BOOL p
             return nil;
         }
     }
-    [queue removeObject:pkg];
-    [queue addObject:pkg];
+    if (![queue containsObject:pkg])
+        [queue addObject:pkg];
     return queue;
 }
 
 NSArray *resolveDepsForPkg(NSString *pkg, BOOL preDeps) {
-    if (pkg == nil) {
-        return nil;
-    }
     return resolveDepsForPkgWithQueue(pkg, nil, preDeps);
 }
 
 BOOL extractDebsForPkg(NSString *pkg, NSMutableArray *installed, BOOL preDeps) {
     NSArray *pkgsForPkg = resolveDepsForPkg(pkg, preDeps);
     if (pkgsForPkg == nil || pkgsForPkg.count < 1) {
+        LOG("Found no pkgs to install for \"%@\"", pkg);
         return NO;
     }
     NSMutableArray *debsForPkg = [debsForPkgs(pkgsForPkg) mutableCopy];
     if (debsForPkg == nil) {
+        LOG("Found no debs to install for \"%@\"", pkg);
         return NO;
     }
     if (installed != nil) {
@@ -347,6 +343,7 @@ BOOL extractDebsForPkg(NSString *pkg, NSMutableArray *installed, BOOL preDeps) {
         return YES;
     }
     if (!extractDebs(debsForPkg)) {
+        LOG("Failed to extract debs for \"%@\"", pkg);
         return NO;
     }
     [installed addObjectsFromArray:debsForPkg];
