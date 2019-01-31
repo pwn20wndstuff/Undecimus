@@ -738,7 +738,7 @@ bool supportsExploit(NSInteger exploit) {
               @"4570.70.24~3"];
             for (NSString *string in list) {
                 vm_size_t vm_size = 0;
-                if (kernelVersionContains(string.UTF8String) && host_page_size(mach_host_self(), &vm_size) == ERR_SUCCESS && vm_size == 0x4000 && !kernelVersionContains("iPad5,")) {
+                if (kernelVersionContains(string.UTF8String) && host_page_size(mach_host_self(), &vm_size) == ERR_SUCCESS && vm_size == 0x4000) {
                     return true;
                 }
             }
