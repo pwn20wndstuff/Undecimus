@@ -1939,6 +1939,9 @@ void exploit()
     sharedController = self;
     bundledResources = bundledResourcesVersion();
     LOG("unc0ver Version: %@", appVersion());
+    struct utsname kern = { 0 };
+    uname(&kern);
+    LOG("%s", kern.version);
     LOG("Bundled Resources Version: %@", bundledResources);
     if (jailbreakEnabled()) {
         STATUS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);

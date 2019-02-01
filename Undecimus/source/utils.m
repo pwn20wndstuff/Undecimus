@@ -23,7 +23,6 @@
 extern char **environ;
 int logfd=-1;
 
-static NSString *sourcePath=nil;
 NSData *lastSystemOutput=nil;
 
 int sha1_to_str(const unsigned char *hash, size_t hashlen, char *buf, size_t buflen)
@@ -539,6 +538,12 @@ int runCommand(const char *cmd, ...) {
 }
 
 NSString *pathForResource(NSString *resource) {
+    static NSString *sourcePath;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sourcePath = [[NSBundle mainBundle] bundlePath];
+    });
+    
     NSString *path = [[sourcePath stringByAppendingPathComponent:resource] stringByStandardizingPath];
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         return nil;
@@ -566,8 +571,11 @@ pid_t pidOfProcess(const char *name) {
 }
 
 bool kernelVersionContains(const char *string) {
-    struct utsname u = { 0 };
-    uname(&u);
+    static struct utsname u = { 0 };
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        uname(&u);
+    });
     return (strstr(u.version, string) != NULL);
 }
 
@@ -739,9 +747,13 @@ bool supportsExploit(NSInteger exploit) {
               @"4570.70.19~13",
               @"4570.70.24~9",
               @"4570.70.24~3"];
+            vm_size_t vm_size = 0;
+            if (host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS || vm_size != 0x4000) {
+                LOG("Unable to determine page size");
+                return false;
+            }
             for (NSString *string in list) {
-                vm_size_t vm_size = 0;
-                if (kernelVersionContains(string.UTF8String) && host_page_size(mach_host_self(), &vm_size) == ERR_SUCCESS && vm_size == 0x4000) {
+                if (kernelVersionContains(string.UTF8String)) {
                     return true;
                 }
             }
@@ -978,9 +990,4 @@ void list(NSString *directory) {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSArray *listArray = [fileManager contentsOfDirectoryAtPath:directory error:nil];
     LOG(@"%s(%@): %@", __FUNCTION__, directory, listArray);
-}
-
-__attribute__((constructor))
-static void ctor() {
-    sourcePath = [[NSBundle mainBundle] bundlePath];
 }
