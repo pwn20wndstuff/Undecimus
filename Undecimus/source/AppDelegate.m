@@ -100,7 +100,7 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:K_EXPLOIT] != nil &&
-        !supportsExploit([[NSUserDefaults standardUserDefaults] integerForKey:K_EXPLOIT])) {
+        !supportsExploit((exploit_t)[[NSUserDefaults standardUserDefaults] integerForKey:K_EXPLOIT])) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:K_EXPLOIT];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
