@@ -826,7 +826,9 @@ bool supportsExploit(exploit_t exploit) {
         case empty_list_exploit:
         case async_wake_exploit:
         case necp_exploit:
+            break;
         default:
+            return false;
             break;
     }
     
