@@ -164,36 +164,38 @@
 
 + (NSDictionary *)getDiagnostics {
     struct utsname u = { 0 };
-    NSMutableDictionary *md = nil;
     uname(&u);
-    md = [NSMutableDictionary new];
-    md[@"Sysname"] = [NSString stringWithUTF8String:u.sysname];
-    md[@"Nodename"] = [NSString stringWithUTF8String:u.nodename];
-    md[@"Release"] = [NSString stringWithUTF8String:u.release];
-    md[@"Version"] = [NSString stringWithUTF8String:u.version];
-    md[@"Machine"] = [NSString stringWithUTF8String:u.machine];
-    md[@"ProductVersion"] = [NSMutableDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductVersion"];
-    md[@"ProductBuildVersion"] = [NSMutableDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"][@"ProductBuildVersion"];
-    md[@"Sources"] = [SettingsTableViewController sourcesFromFile:CYDIA_LIST];
-    md[@"Packages"] = [SettingsTableViewController parsedPackageArray];
-    md[@"Preferences"] = [NSMutableDictionary new];
-    md[@"Preferences"][@"TweakInjection"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_TWEAK_INJECTION];
-    md[@"Preferences"][@"LoadDaemons"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_LOAD_DAEMONS];
-    md[@"Preferences"][@"DumpAPTicket"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_DUMP_APTICKET];
-    md[@"Preferences"][@"RefreshIconCache"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_REFRESH_ICON_CACHE];
-    md[@"Preferences"][@"BootNonce"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_BOOT_NONCE];
-    md[@"Preferences"][@"Exploit"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_EXPLOIT];
-    md[@"Preferences"][@"DisableAutoUpdates"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_DISABLE_AUTO_UPDATES];
-    md[@"Preferences"][@"DisableAppRevokes"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_DISABLE_APP_REVOKES];
-    md[@"Preferences"][@"OverwriteBootNonce"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_OVERWRITE_BOOT_NONCE];
-    md[@"Preferences"][@"ExportKernelTaskPort"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_EXPORT_KERNEL_TASK_PORT];
-    md[@"Preferences"][@"RestoreRootFS"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_RESTORE_ROOTFS];
-    md[@"Preferences"][@"IncreaseMemoryLimit"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_INCREASE_MEMORY_LIMIT];
-    md[@"Preferences"][@"InstallCydia"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_INSTALL_CYDIA];
-    md[@"Preferences"][@"InstallOpenSSH"] = [[NSUserDefaults standardUserDefaults] objectForKey:K_INSTALL_OPENSSH];
-    md[@"AppVersion"] = appVersion();
-    md[@"LogFile"] = [NSString stringWithContentsOfFile:[NSString stringWithUTF8String:getLogFile()] encoding:NSUTF8StringEncoding error:nil];
-    return md;
+    NSDictionary *systemVersion = [NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    return @{
+        @"Sysname": @(u.sysname),
+        @"Nodename": @(u.nodename),
+        @"Release": @(u.release),
+        @"Version": @(u.version),
+        @"Machine": @(u.machine),
+        @"ProductVersion": systemVersion[@"ProductVersion"],
+        @"ProductBuildVersion": systemVersion[@"ProductBuildVersion"],
+        @"Sources": [SettingsTableViewController sourcesFromFile:CYDIA_LIST],
+        @"Packages": [SettingsTableViewController parsedPackageArray],
+        @"Preferences": @{
+            @"TweakInjection": [defaults objectForKey:K_TWEAK_INJECTION],
+            @"LoadDaemons": [defaults objectForKey:K_LOAD_DAEMONS],
+            @"DumpAPTicket": [defaults objectForKey:K_DUMP_APTICKET],
+            @"RefreshIconCache": [defaults objectForKey:K_REFRESH_ICON_CACHE],
+            @"BootNonce": [defaults objectForKey:K_BOOT_NONCE],
+            @"Exploit": [defaults objectForKey:K_EXPLOIT],
+            @"DisableAutoUpdates": [defaults objectForKey:K_DISABLE_AUTO_UPDATES],
+            @"DisableAppRevokes": [defaults objectForKey:K_DISABLE_APP_REVOKES],
+            @"OverwriteBootNonce": [defaults objectForKey:K_OVERWRITE_BOOT_NONCE],
+            @"ExportKernelTaskPort": [defaults objectForKey:K_EXPORT_KERNEL_TASK_PORT],
+            @"RestoreRootFS": [defaults objectForKey:K_RESTORE_ROOTFS],
+            @"IncreaseMemoryLimit": [defaults objectForKey:K_INCREASE_MEMORY_LIMIT],
+            @"InstallCydia": [defaults objectForKey:K_INSTALL_CYDIA],
+            @"InstallOpenSSH": [defaults objectForKey:K_INSTALL_OPENSSH]
+        },
+        @"AppVersion": appVersion(),
+        @"LogFile": [NSString stringWithContentsOfFile:getLogFile() encoding:NSUTF8StringEncoding error:nil]
+    };
 }
 
 - (void)viewDidLoad {
