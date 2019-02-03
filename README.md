@@ -104,7 +104,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@saurik](https://twitter.com/saurik) for Cydia and Substrate
 * [@FCE365](https://twitter.com/FCE365) for the empty_list reliability improvements
 * Credits for [Undecimus-Resources](https://github.com/pwn20wndstuff/Undecimus-Resources)
-* [@coolstarorg](https://twitter.com/coolstarorg) for the snapshot rename idea
+* [@coolstarorg](https://twitter.com/coolstarorg) for originally testing the snapshot rename idea on corellium
 * [@Cryptiiiic](https://twitter.com/Cryptiiiic) for testing
 * [@xanDesign_](https://twitter.com/xanDesign_) for testing
 * [@AppleDry05](https://twitter.com/AppleDry05) for testing
