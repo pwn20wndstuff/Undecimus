@@ -905,21 +905,21 @@ bool debuggerEnabled() {
     return (getppid() != 1);
 }
 
-const char *getLogFile() {
-    static const char *logfile = NULL;
-    if (logfile == NULL) {
-        NSString *homeDirectory = NSHomeDirectory();
-        logfile = [NSString stringWithFormat:@"%@/Documents/log_file.txt", homeDirectory].UTF8String;
-    }
+NSString *getLogFile() {
+    static NSString *logfile;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        logfile = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/log_file.txt"];
+    });
     return logfile;
 }
 
 void enableLogging() {
     if (!debuggerEnabled()) {
         int old_logfd = logfd;
-        int newfd = open(getLogFile(), O_WRONLY|O_CREAT, 0);
-        if (newfd > 0) {
-            init_file(getLogFile(), 501, 0644);
+        int newfd = open(getLogFile().UTF8String, O_WRONLY|O_CREAT|O_APPEND, 0644);
+        if (newfd < 0) {
+            LOG("Error opening logfile: %s", strerror(errno));
         }
         logfd = newfd;
         if (old_logfd > 0)
@@ -937,7 +937,7 @@ void disableLogging() {
 }
 
 void cleanLogs() {
-    const char *logFile = getLogFile();
+    const char *logFile = getLogFile().UTF8String;
     clean_file(logFile);
     enableLogging();
 }

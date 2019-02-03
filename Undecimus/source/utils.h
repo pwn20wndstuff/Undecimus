@@ -109,7 +109,7 @@ bool daemonIsLoaded(char *daemonID);
 NSString *bundledResourcesVersion(void);
 NSString *appVersion(void);
 bool debuggerEnabled(void);
-const char *getLogFile(void);
+NSString *getLogFile(void);
 void enableLogging(void);
 void disableLogging(void);
 void cleanLogs(void);
