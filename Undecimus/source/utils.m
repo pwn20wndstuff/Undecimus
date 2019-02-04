@@ -23,7 +23,6 @@
 extern char **environ;
 int logfd=-1;
 
-static NSString *sourcePath=nil;
 NSData *lastSystemOutput=nil;
 
 int sha1_to_str(const unsigned char *hash, size_t hashlen, char *buf, size_t buflen)
@@ -400,12 +399,12 @@ bool ensure_file(const char *file, int owner, mode_t mode) {
     NSFileManager *fm = [NSFileManager defaultManager];
     id attributes = [fm attributesOfItemAtPath:path error:nil];
     if (attributes &&
-        [attributes[NSFileType] isEqual:NSFileTypeDirectory] &&
+        [attributes[NSFileType] isEqual:NSFileTypeRegular] &&
         [attributes[NSFileOwnerAccountID] isEqual:@(owner)] &&
         [attributes[NSFileGroupOwnerAccountID] isEqual:@(owner)] &&
         [attributes[NSFilePosixPermissions] isEqual:@(mode)]
         ) {
-        // Directory exists and matches arguments
+        // File exists and matches arguments
         return true;
     }
     if (attributes) {
@@ -539,6 +538,12 @@ int runCommand(const char *cmd, ...) {
 }
 
 NSString *pathForResource(NSString *resource) {
+    static NSString *sourcePath;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sourcePath = [[NSBundle mainBundle] bundlePath];
+    });
+    
     NSString *path = [[sourcePath stringByAppendingPathComponent:resource] stringByStandardizingPath];
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         return nil;
@@ -566,8 +571,11 @@ pid_t pidOfProcess(const char *name) {
 }
 
 bool kernelVersionContains(const char *string) {
-    struct utsname u = { 0 };
-    uname(&u);
+    static struct utsname u = { 0 };
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        uname(&u);
+    });
     return (strstr(u.version, string) != NULL);
 }
 
@@ -605,142 +613,239 @@ bool jailbreakEnabled() {
     return kernelVersionContains(DEFAULT_VERSION_STRING);
 }
 
-bool supportsExploit(NSInteger exploit) {
+bool supportsExploit(exploit_t exploit) {
+#ifdef CAN_HAS_UNSUPPORTED_EXPLOIT
+    return true;
+#else /* !CAN_HAS_UNSUPPORTED_EXPLOIT */
+    static NSArray *list;
+    static dispatch_once_t onceToken;
+
+    dispatch_once(&onceToken, ^{
+        list = @[
+                 // Empty List
+                 @[@"4397.0.0.2.4~1",
+                   @"4481.0.0.2.1~1",
+                   @"4532.0.0.0.1~30",
+                   @"4556.0.0.2.5~1",
+                   @"4570.1.24.2.3~1",
+                   @"4570.2.3~8",
+                   @"4570.2.5~84",
+                   @"4570.2.5~167",
+                   @"4570.7.2~3",
+                   @"4570.20.55~10",
+                   @"4570.20.62~9",
+                   @"4570.20.62~4",
+                   @"4570.30.79~22",
+                   @"4570.30.85~18",
+                   @"4570.32.1~2",
+                   @"4570.32.1~1",
+                   @"4570.40.6~8",
+                   @"4570.40.9~7",
+                   @"4570.40.9~1",
+                   @"4570.50.243~9",
+                   @"4570.50.257~6",
+                   @"4570.50.279~9",
+                   @"4570.50.294~5",
+                   @"4570.52.2~3",
+                   @"4570.52.2~8",
+                   @"4570.60.10.0.1~16",
+                   @"4570.60.16~9",
+                   @"4570.60.19~25"],
+                 
+                 // Multi Path
+                 @[@"4397.0.0.2.4~1",
+                   @"4481.0.0.2.1~1",
+                   @"4532.0.0.0.1~30",
+                   @"4556.0.0.2.5~1",
+                   @"4570.1.24.2.3~1",
+                   @"4570.2.3~8",
+                   @"4570.2.5~84",
+                   @"4570.2.5~167",
+                   @"4570.7.2~3",
+                   @"4570.20.55~10",
+                   @"4570.20.62~9",
+                   @"4570.20.62~4",
+                   @"4570.30.79~22",
+                   @"4570.30.85~18",
+                   @"4570.32.1~2",
+                   @"4570.32.1~1",
+                   @"4570.40.6~8",
+                   @"4570.40.9~7",
+                   @"4570.40.9~1",
+                   @"4570.50.243~9",
+                   @"4570.50.257~6",
+                   @"4570.50.279~9",
+                   @"4570.50.294~5",
+                   @"4570.52.2~3",
+                   @"4570.52.2~8",],
+                 
+                 // Async Wake
+                 @[@"4397.0.0.2.4~1",
+                   @"4481.0.0.2.1~1",
+                   @"4532.0.0.0.1~30",
+                   @"4556.0.0.2.5~1",
+                   @"4570.1.24.2.3~1",
+                   @"4570.2.3~8",
+                   @"4570.2.5~84",
+                   @"4570.2.5~167",
+                   @"4570.7.2~3",
+                   @"4570.20.55~10",
+                   @"4570.20.62~9",
+                   @"4570.20.62~4"],
+                 
+                 // Voucher Swap
+                 @[@"4397.0.0.2.4~1",
+                   @"4481.0.0.2.1~1",
+                   @"4532.0.0.0.1~30",
+                   @"4556.0.0.2.5~1",
+                   @"4570.1.24.2.3~1",
+                   @"4570.2.3~8",
+                   @"4570.2.5~84",
+                   @"4570.2.5~167",
+                   @"4570.7.2~3",
+                   @"4570.20.55~10",
+                   @"4570.20.62~9",
+                   @"4570.20.62~4",
+                   @"4570.30.79~22",
+                   @"4570.30.85~18",
+                   @"4570.32.1~2",
+                   @"4570.32.1~1",
+                   @"4570.40.6~8",
+                   @"4570.40.9~7",
+                   @"4570.40.9~1",
+                   @"4570.50.243~9",
+                   @"4570.50.257~6",
+                   @"4570.50.279~9",
+                   @"4570.50.294~5",
+                   @"4570.52.2~3",
+                   @"4570.52.2~8",
+                   @"4570.60.10.0.1~16",
+                   @"4570.60.16~9",
+                   @"4570.60.19~25",
+                   @"4570.60.21~7",
+                   @"4570.60.21~3",
+                   @"4570.70.14~16",
+                   @"4570.70.19~13",
+                   @"4570.70.24~9",
+                   @"4570.70.24~3",
+                   @"4903.200.199.12.3~1",
+                   @"4903.200.249.22.3~1",
+                   @"4903.200.274.32.3~1",
+                   @"4903.200.304.42.1~1",
+                   @"4903.200.327.52.1~1",
+                   @"4903.200.342.62.3~1",
+                   @"4903.200.354~11",
+                   @"4903.202.1~2",
+                   @"4903.202.2~2",
+                   @"4903.202.2~1",
+                   @"4903.220.42~21",
+                   @"4903.220.48~40",
+                   @"4903.222.1~7",
+                   @"4903.222.4~3",
+                   @"4903.222.5~3",
+                   @"4903.222.5~1",
+                   @"4903.230.15~8",
+                   @"4903.232.1~3",
+                   @"4903.232.2~2",
+                   @"4903.232.2~1",
+                   @"4903.240.8~8",
+                   @"4903.232.2~1"],
+                 
+                 // Deja Xnu
+                 @[@"4397.0.0.2.4~1",
+                   @"4481.0.0.2.1~1",
+                   @"4532.0.0.0.1~30",
+                   @"4556.0.0.2.5~1",
+                   @"4570.1.24.2.3~1",
+                   @"4570.2.3~8",
+                   @"4570.2.5~84",
+                   @"4570.2.5~167",
+                   @"4570.7.2~3",
+                   @"4570.20.55~10",
+                   @"4570.20.62~9",
+                   @"4570.20.62~4",
+                   @"4570.30.79~22",
+                   @"4570.30.85~18",
+                   @"4570.32.1~2",
+                   @"4570.32.1~1",
+                   @"4570.40.6~8",
+                   @"4570.40.9~7",
+                   @"4570.40.9~1",
+                   @"4570.50.243~9",
+                   @"4570.50.257~6",
+                   @"4570.50.279~9",
+                   @"4570.50.294~5",
+                   @"4570.52.2~3",
+                   @"4570.52.2~8",
+                   @"4570.60.10.0.1~16",
+                   @"4570.60.16~9",
+                   @"4570.60.19~25",
+                   @"4570.60.21~7",
+                   @"4570.60.21~3",
+                   @"4570.70.14~16",
+                   @"4570.70.19~13",
+                   @"4570.70.24~9",
+                   @"4570.70.24~3"],
+                 
+                 // Necp
+                 @[@"4397.0.0.2.4~1",
+                   @"4481.0.0.2.1~1",
+                   @"4532.0.0.0.1~30",
+                   @"4556.0.0.2.5~1",
+                   @"4570.1.24.2.3~1",
+                   @"4570.2.3~8",
+                   @"4570.2.5~84",
+                   @"4570.2.5~167",
+                   @"4570.7.2~3",
+                   @"4570.20.55~10",
+                   @"4570.20.62~9",
+                   @"4570.20.62~4",
+                   @"4570.30.79~22",
+                   @"4570.30.85~18",
+                   @"4570.32.1~2",
+                   @"4570.32.1~1",
+                   @"4570.40.6~8",
+                   @"4570.40.9~7",
+                   @"4570.40.9~1",
+                   @"4570.50.243~9",
+                   @"4570.50.257~6",
+                   @"4570.50.279~9",
+                   @"4570.50.294~5",
+                   @"4570.52.2~3",
+                   @"4570.52.2~8",
+                   @"4570.60.10.0.1~16",
+                   @"4570.60.16~9",
+                   @"4570.60.19~25",
+                   @"4570.60.21~7",
+                   @"4570.60.21~3",
+                   @"4570.70.14~16",
+                   @"4570.70.19~13",
+                   @"4570.70.24~9",
+                   @"4570.70.24~3"],
+                 ];
+    });
+    
     switch (exploit) {
-        case empty_list_exploit: {
-            NSArray *list =
-            @[@"4397.0.0.2.4~1",
-              @"4481.0.0.2.1~1",
-              @"4532.0.0.0.1~30",
-              @"4556.0.0.2.5~1",
-              @"4570.1.24.2.3~1",
-              @"4570.2.3~8",
-              @"4570.2.5~84",
-              @"4570.2.5~167",
-              @"4570.7.2~3",
-              @"4570.20.55~10",
-              @"4570.20.62~9",
-              @"4570.20.62~4",
-              @"4570.30.79~22",
-              @"4570.30.85~18",
-              @"4570.32.1~2",
-              @"4570.32.1~1",
-              @"4570.40.6~8",
-              @"4570.40.9~7",
-              @"4570.40.9~1",
-              @"4570.50.243~9",
-              @"4570.50.257~6",
-              @"4570.50.279~9",
-              @"4570.50.294~5",
-              @"4570.52.2~3",
-              @"4570.52.2~8",
-              @"4570.60.10.0.1~16",
-              @"4570.60.16~9",
-              @"4570.60.19~25"];
-            for (NSString *string in list) {
-                if (kernelVersionContains(string.UTF8String)) {
-                    return true;
-                }
-            }
-            break;
-        }
         case multi_path_exploit: {
-            NSArray *list =
-            @[@"4397.0.0.2.4~1",
-              @"4481.0.0.2.1~1",
-              @"4532.0.0.0.1~30",
-              @"4556.0.0.2.5~1",
-              @"4570.1.24.2.3~1",
-              @"4570.2.3~8",
-              @"4570.2.5~84",
-              @"4570.2.5~167",
-              @"4570.7.2~3",
-              @"4570.20.55~10",
-              @"4570.20.62~9",
-              @"4570.20.62~4",
-              @"4570.30.79~22",
-              @"4570.30.85~18",
-              @"4570.32.1~2",
-              @"4570.32.1~1",
-              @"4570.40.6~8",
-              @"4570.40.9~7",
-              @"4570.40.9~1",
-              @"4570.50.243~9",
-              @"4570.50.257~6",
-              @"4570.50.279~9",
-              @"4570.50.294~5",
-              @"4570.52.2~3",
-              @"4570.52.2~8",];
-            for (NSString *string in list) {
-                if (kernelVersionContains(string.UTF8String) &&
-                    multi_path_tcp_enabled()) {
-                    return true;
-                }
-            }
-            break;
-        }
-        case async_wake_exploit: {
-            NSArray *list =
-            @[@"4397.0.0.2.4~1",
-              @"4481.0.0.2.1~1",
-              @"4532.0.0.0.1~30",
-              @"4556.0.0.2.5~1",
-              @"4570.1.24.2.3~1",
-              @"4570.2.3~8",
-              @"4570.2.5~84",
-              @"4570.2.5~167",
-              @"4570.7.2~3",
-              @"4570.20.55~10",
-              @"4570.20.62~9",
-              @"4570.20.62~4"];
-            for (NSString *string in list) {
-                if (kernelVersionContains(string.UTF8String)) {
-                    return true;
-                }
+            if (!multi_path_tcp_enabled()) {
+                return false;
             }
             break;
         }
         case voucher_swap_exploit: {
-            NSArray *list =
-            @[@"4397.0.0.2.4~1",
-              @"4481.0.0.2.1~1",
-              @"4532.0.0.0.1~30",
-              @"4556.0.0.2.5~1",
-              @"4570.1.24.2.3~1",
-              @"4570.2.3~8",
-              @"4570.2.5~84",
-              @"4570.2.5~167",
-              @"4570.7.2~3",
-              @"4570.20.55~10",
-              @"4570.20.62~9",
-              @"4570.20.62~4",
-              @"4570.30.79~22",
-              @"4570.30.85~18",
-              @"4570.32.1~2",
-              @"4570.32.1~1",
-              @"4570.40.6~8",
-              @"4570.40.9~7",
-              @"4570.40.9~1",
-              @"4570.50.243~9",
-              @"4570.50.257~6",
-              @"4570.50.279~9",
-              @"4570.50.294~5",
-              @"4570.52.2~3",
-              @"4570.52.2~8",
-              @"4570.60.10.0.1~16",
-              @"4570.60.16~9",
-              @"4570.60.19~25",
-              @"4570.60.21~7",
-              @"4570.60.21~3",
-              @"4570.70.14~16",
-              @"4570.70.19~13",
-              @"4570.70.24~9",
-              @"4570.70.24~3"];
-            for (NSString *string in list) {
-                vm_size_t vm_size = 0;
-                if (kernelVersionContains(string.UTF8String) && host_page_size(mach_host_self(), &vm_size) == ERR_SUCCESS && vm_size == 0x4000 && !kernelVersionContains("iPad5,")) {
-                    return true;
-                }
+            vm_size_t vm_size = 0;
+            if (host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS) {
+                LOG("Unable to determine page size.");
+                return false;
+            }
+            if (vm_size != 0x4000) {
+                return false;
+            }
+            if (kernelVersionContains("iPad5,") && kCFCoreFoundationVersionNumber >= 1535.12) {
+                return false;
+            }
+            if (kernelVersionContains("iPhone11,")) {
+                return false;
             }
             break;
         }
@@ -789,96 +894,27 @@ bool supportsExploit(NSInteger exploit) {
             break;
         }
         case deja_xnu_exploit: {
-            NSArray *list =
-            @[@"4397.0.0.2.4~1",
-              @"4481.0.0.2.1~1",
-              @"4532.0.0.0.1~30",
-              @"4556.0.0.2.5~1",
-              @"4570.1.24.2.3~1",
-              @"4570.2.3~8",
-              @"4570.2.5~84",
-              @"4570.2.5~167",
-              @"4570.7.2~3",
-              @"4570.20.55~10",
-              @"4570.20.62~9",
-              @"4570.20.62~4",
-              @"4570.30.79~22",
-              @"4570.30.85~18",
-              @"4570.32.1~2",
-              @"4570.32.1~1",
-              @"4570.40.6~8",
-              @"4570.40.9~7",
-              @"4570.40.9~1",
-              @"4570.50.243~9",
-              @"4570.50.257~6",
-              @"4570.50.279~9",
-              @"4570.50.294~5",
-              @"4570.52.2~3",
-              @"4570.52.2~8",
-              @"4570.60.10.0.1~16",
-              @"4570.60.16~9",
-              @"4570.60.19~25",
-              @"4570.60.21~7",
-              @"4570.60.21~3",
-              @"4570.70.14~16",
-              @"4570.70.19~13",
-              @"4570.70.24~9",
-              @"4570.70.24~3"];
-            for (NSString *string in list) {
-                if (kernelVersionContains(string.UTF8String) &&
-                    !jailbreakEnabled()) {
-                    return true;
-                }
-            }
+            if (jailbreakEnabled())
+                return false;
             break;
         }
-        case necp_exploit: {
-            NSArray *list =
-            @[@"4397.0.0.2.4~1",
-              @"4481.0.0.2.1~1",
-              @"4532.0.0.0.1~30",
-              @"4556.0.0.2.5~1",
-              @"4570.1.24.2.3~1",
-              @"4570.2.3~8",
-              @"4570.2.5~84",
-              @"4570.2.5~167",
-              @"4570.7.2~3",
-              @"4570.20.55~10",
-              @"4570.20.62~9",
-              @"4570.20.62~4",
-              @"4570.30.79~22",
-              @"4570.30.85~18",
-              @"4570.32.1~2",
-              @"4570.32.1~1",
-              @"4570.40.6~8",
-              @"4570.40.9~7",
-              @"4570.40.9~1",
-              @"4570.50.243~9",
-              @"4570.50.257~6",
-              @"4570.50.279~9",
-              @"4570.50.294~5",
-              @"4570.52.2~3",
-              @"4570.52.2~8",
-              @"4570.60.10.0.1~16",
-              @"4570.60.16~9",
-              @"4570.60.19~25",
-              @"4570.60.21~7",
-              @"4570.60.21~3",
-              @"4570.70.14~16",
-              @"4570.70.19~13",
-              @"4570.70.24~9",
-              @"4570.70.24~3"];
-            for (NSString *string in list) {
-                if (kernelVersionContains(string.UTF8String)) {
-                    return true;
-                }
-            }
+        case empty_list_exploit:
+        case async_wake_exploit:
+        case necp_exploit:
             break;
-        }
         default:
+            return false;
             break;
     }
+    
+    for (NSString *string in list[exploit]) {
+        if (kernelVersionContains(string.UTF8String)) {
+            return true;
+        }
+    }
+
     return false;
+#endif /* !CAN_HAS_UNSUPPORTED_EXPLOIT */
 }
 
 bool jailbreakSupported() {
@@ -946,21 +982,21 @@ bool debuggerEnabled() {
     return (getppid() != 1);
 }
 
-const char *getLogFile() {
-    static const char *logfile = NULL;
-    if (logfile == NULL) {
-        NSString *homeDirectory = NSHomeDirectory();
-        logfile = [NSString stringWithFormat:@"%@/Documents/log_file.txt", homeDirectory].UTF8String;
-    }
+NSString *getLogFile() {
+    static NSString *logfile;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        logfile = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/log_file.txt"];
+    });
     return logfile;
 }
 
 void enableLogging() {
     if (!debuggerEnabled()) {
         int old_logfd = logfd;
-        int newfd = open(getLogFile(), O_WRONLY|O_CREAT, 0);
-        if (newfd > 0) {
-            init_file(getLogFile(), 501, 0644);
+        int newfd = open(getLogFile().UTF8String, O_WRONLY|O_CREAT|O_APPEND, 0644);
+        if (newfd < 0) {
+            LOG("Error opening logfile: %s", strerror(errno));
         }
         logfd = newfd;
         if (old_logfd > 0)
@@ -978,7 +1014,7 @@ void disableLogging() {
 }
 
 void cleanLogs() {
-    const char *logFile = getLogFile();
+    const char *logFile = getLogFile().UTF8String;
     clean_file(logFile);
     enableLogging();
 }
@@ -1020,9 +1056,4 @@ void list(NSString *directory) {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSArray *listArray = [fileManager contentsOfDirectoryAtPath:directory error:nil];
     LOG(@"%s(%@): %@", __FUNCTION__, directory, listArray);
-}
-
-__attribute__((constructor))
-static void ctor() {
-    sourcePath = [[NSBundle mainBundle] bundlePath];
 }

@@ -16,13 +16,14 @@ extern int logfd;
 
 #define DEFAULT_VERSION_STRING "Hacked"
 
-#define empty_list_exploit 0
-#define multi_path_exploit 1
-#define async_wake_exploit 2
-#define voucher_swap_exploit 3
-#define v1ntex_exploit 4
-#define deja_xnu_exploit 5
-#define necp_exploit 6
+typedef enum {
+    empty_list_exploit = 0,
+    multi_path_exploit,
+    async_wake_exploit,
+    voucher_swap_exploit,
+    deja_xnu_exploit,
+    necp_exploit
+} exploit_t;
 
 enum hashtype {
     HASHTYPE_MD5 = 0,
@@ -97,7 +98,7 @@ pid_t pidOfProcess(const char *name);
 bool kernelVersionContains(const char *string);
 bool multi_path_tcp_enabled(void);
 bool jailbreakEnabled(void);
-bool supportsExploit(NSInteger exploit);
+bool supportsExploit(exploit_t exploit);
 bool jailbreakSupported(void);
 bool respringSupported(void);
 bool restartSupported(void);
@@ -108,7 +109,7 @@ bool daemonIsLoaded(char *daemonID);
 NSString *bundledResourcesVersion(void);
 NSString *appVersion(void);
 bool debuggerEnabled(void);
-const char *getLogFile(void);
+NSString *getLogFile(void);
 void enableLogging(void);
 void disableLogging(void);
 void cleanLogs(void);

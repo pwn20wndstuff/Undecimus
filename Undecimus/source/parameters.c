@@ -70,7 +70,7 @@ offsets__iphone11_8__16C50() {
 	OFFSET(ipc_entry, ie_request) = 16;
 
 	SIZE(ipc_port)                  =   0xa8;
-	BLOCK_SIZE(ipc_port)            = 0x4000;
+	BLOCK_SIZE(ipc_port)            = page_size;
 	OFFSET(ipc_port, ip_bits)       =   0;
 	OFFSET(ipc_port, ip_references) =   4;
 	OFFSET(ipc_port, waitq_flags)   =  24;
@@ -91,7 +91,7 @@ offsets__iphone11_8__16C50() {
 	OFFSET(ipc_space, is_table)      = 0x20;
 
 	SIZE(ipc_voucher)       =   0x50;
-	BLOCK_SIZE(ipc_voucher) = 0x4000;
+	BLOCK_SIZE(ipc_voucher) = page_size;
 
 	OFFSET(proc, p_pid)   = 0x60;
 	OFFSET(proc, p_ucred) = 0xf8;
@@ -129,7 +129,7 @@ offsets__iphone9_3__15E302() {
     OFFSET(ipc_entry, ie_request) = 16;
     
     SIZE(ipc_port)                  =   0xa8;
-    BLOCK_SIZE(ipc_port)            = 0x4000;
+    BLOCK_SIZE(ipc_port)            = page_size;
     OFFSET(ipc_port, ip_bits)       =   0;
     OFFSET(ipc_port, ip_references) =   4;
     OFFSET(ipc_port, waitq_flags)   =  24;
@@ -150,7 +150,7 @@ offsets__iphone9_3__15E302() {
     OFFSET(ipc_space, is_table)      = 0x20;
     
     SIZE(ipc_voucher)       =   0x50;
-    BLOCK_SIZE(ipc_voucher) = 0x4000;
+    BLOCK_SIZE(ipc_voucher) = page_size;
     
     OFFSET(proc, p_pid)   = 0x10;
     OFFSET(proc, p_ucred) = 0x100;
@@ -182,6 +182,7 @@ initialize_computed_offsets() {
 static struct initialization offsets[] = {
 	{ "iPhone11,*", "16C50-16C104", offsets__iphone11_8__16C50  },
 	{ "iPhone10,1", "16B92-16C101", offsets__iphone10_1__16B92  },
+    { "*", "16A5288q-16C104", offsets__iphone10_1__16B92  },
     { "*", "15A5278f-15G77", offsets__iphone9_3__15E302 },
 	{ "*",          "*",            initialize_computed_offsets },
 };

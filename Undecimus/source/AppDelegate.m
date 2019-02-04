@@ -96,11 +96,11 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:K_BOOT_NONCE] == nil) {
-        [[NSUserDefaults standardUserDefaults] setObject:@"0xbd34a880be0b53f3" forKey:K_BOOT_NONCE];
+        [[NSUserDefaults standardUserDefaults] setObject:@"0x1111111111111111" forKey:K_BOOT_NONCE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:K_EXPLOIT] != nil &&
-        !supportsExploit([[NSUserDefaults standardUserDefaults] integerForKey:K_EXPLOIT])) {
+        !supportsExploit((exploit_t)[[NSUserDefaults standardUserDefaults] integerForKey:K_EXPLOIT])) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:K_EXPLOIT];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
@@ -109,7 +109,7 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:K_DISABLE_AUTO_UPDATES] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_DISABLE_AUTO_UPDATES];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_DISABLE_AUTO_UPDATES];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:K_DISABLE_APP_REVOKES] == nil) {
