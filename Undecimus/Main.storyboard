@@ -805,6 +805,7 @@
                                                         <segment title="MP"/>
                                                         <segment title="AW"/>
                                                         <segment title="VS"/>
+                                                        <segment title="VT"/>
                                                     </segments>
                                                     <connections>
                                                         <action selector="KernelExploitSegmentedControl:" destination="ScN-Hx-Um8" eventType="valueChanged" id="Lgd-u2-qmM"/>

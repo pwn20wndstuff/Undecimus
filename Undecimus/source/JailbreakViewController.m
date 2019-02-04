@@ -49,7 +49,7 @@
 #include "CreditsTableViewController.h"
 #include "FakeApt.h"
 #include "voucher_swap.h"
-#include "v1ntex/exploit.h"
+#include "exploit.h"
 #include "kernel_memory.h"
 #include "kernel_slide.h"
 
@@ -944,7 +944,7 @@ void jailbreak()
     UPSTAGE();
     
     {
-        if (prefs.export_kernel_task_port || isv1ntex) { // workaround for hsp4 from v1ntex
+        if (prefs.export_kernel_task_port || isv1ntex) {
             // Export kernel task port.
             LOG("Exporting kernel task port...");
             SETMESSAGE(NSLocalizedString(@"Failed to export kernel task port.", nil));
@@ -991,7 +991,7 @@ void jailbreak()
     UPSTAGE();
     
     if (!isv1ntex) {
-        // Set HSP4.
+        // Set HSP4. Disabled if using v1ntex
         
         LOG("Setting HSP4 as TFP0...");
         SETMESSAGE(NSLocalizedString(@"Failed to set HSP4 as TFP0.", nil));

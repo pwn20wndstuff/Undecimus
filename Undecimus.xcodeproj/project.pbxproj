@@ -12,7 +12,9 @@
 		212D8844216E4C4800A36DA5 /* find_port.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8842216E4C4700A36DA5 /* find_port.c */; };
 		212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8846216E4DF600A36DA5 /* early_kalloc.c */; };
 		212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8849216E4EBE00A36DA5 /* async_wake.c */; };
-		2150A9CD22021330001C8677 /* voucher_swap.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CC22021330001C8677 /* voucher_swap.c */; };
+		213E78262208654700FDF3B7 /* necp.c in Sources */ = {isa = PBXBuildFile; fileRef = 213E78252208654700FDF3B7 /* necp.c */; settings = {COMPILER_FLAGS = "-Wno-deprecated-declarations"; }; };
+		213E7828220865A100FDF3B7 /* voucher_swap-poc.c in Sources */ = {isa = PBXBuildFile; fileRef = 213E7827220865A100FDF3B7 /* voucher_swap-poc.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		2150A9CD22021330001C8677 /* voucher_swap.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CC22021330001C8677 /* voucher_swap.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		2150A9DC22021348001C8677 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CE22021347001C8677 /* log.c */; };
 		2150A9DD22021348001C8677 /* platform_match.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CF22021347001C8677 /* platform_match.c */; };
 		2150A9DE22021348001C8677 /* platform.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9D422021347001C8677 /* platform.c */; };
@@ -47,6 +49,8 @@
 		22F91CDB21E02CF300B2FCAE /* inject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CD921E02CF200B2FCAE /* inject.m */; };
 		22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CE221E033A500B2FCAE /* libsnappy.c */; };
 		8D592A68218E47F60035D2BC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D592A67218E47F60035D2BC /* Main.storyboard */; };
+		F3ABB8A32208DC4F0001D986 /* offsets.c in Sources */ = {isa = PBXBuildFile; fileRef = F3ABB89F2208DC4E0001D986 /* offsets.c */; };
+		F3ABB8A42208DC4F0001D986 /* exploit.m in Sources */ = {isa = PBXBuildFile; fileRef = F3ABB8A02208DC4E0001D986 /* exploit.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +68,10 @@
 		212D8848216E4EBE00A36DA5 /* async_wake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = async_wake.h; sourceTree = "<group>"; };
 		212D8849216E4EBE00A36DA5 /* async_wake.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = async_wake.c; sourceTree = "<group>"; };
 		21395357217CBA1000B17F8D /* MobileGestalt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileGestalt.h; sourceTree = "<group>"; };
+		213E78242208654700FDF3B7 /* necp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = necp.h; sourceTree = "<group>"; };
+		213E78252208654700FDF3B7 /* necp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = necp.c; sourceTree = "<group>"; };
+		213E7827220865A100FDF3B7 /* voucher_swap-poc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "voucher_swap-poc.c"; sourceTree = "<group>"; };
+		213E7829220865BF00FDF3B7 /* voucher_swap-poc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "voucher_swap-poc.h"; sourceTree = "<group>"; };
 		2150A9CB22021330001C8677 /* voucher_swap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = voucher_swap.h; sourceTree = "<group>"; };
 		2150A9CC22021330001C8677 /* voucher_swap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = voucher_swap.c; sourceTree = "<group>"; };
 		2150A9CE22021347001C8677 /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
@@ -137,6 +145,10 @@
 		22F91CDE21E02EB000B2FCAE /* snappy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = snappy.h; path = snappy/snappy.h; sourceTree = SOURCE_ROOT; };
 		22F91CE221E033A500B2FCAE /* libsnappy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libsnappy.c; path = snappy/libsnappy.c; sourceTree = SOURCE_ROOT; };
 		8D592A67218E47F60035D2BC /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		F3ABB89F2208DC4E0001D986 /* offsets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = offsets.c; sourceTree = "<group>"; };
+		F3ABB8A02208DC4E0001D986 /* exploit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = exploit.m; sourceTree = "<group>"; };
+		F3ABB8A12208DC4F0001D986 /* exploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exploit.h; sourceTree = "<group>"; };
+		F3ABB8A22208DC4F0001D986 /* offsets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = offsets.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +181,15 @@
 				211C372A21CE2DD800ADBEA2 /* kern_control.h */,
 			);
 			path = sys;
+			sourceTree = "<group>";
+		};
+		213E78222208652B00FDF3B7 /* necp */ = {
+			isa = PBXGroup;
+			children = (
+				213E78242208654700FDF3B7 /* necp.h */,
+				213E78252208654700FDF3B7 /* necp.c */,
+			);
+			name = necp;
 			sourceTree = "<group>";
 		};
 		2150A9C6220212A6001C8677 /* empty_list */ = {
@@ -230,6 +251,8 @@
 				2150A9D222021347001C8677 /* platform.h */,
 				2150A9CC22021330001C8677 /* voucher_swap.c */,
 				2150A9CB22021330001C8677 /* voucher_swap.h */,
+				213E7827220865A100FDF3B7 /* voucher_swap-poc.c */,
+				213E7829220865BF00FDF3B7 /* voucher_swap-poc.h */,
 			);
 			name = voucher_swap;
 			sourceTree = "<group>";
@@ -275,6 +298,8 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				F3ABB89E2208DC3E0001D986 /* v1ntex */,
+				213E78222208652B00FDF3B7 /* necp */,
 				2150A9CA220212F8001C8677 /* voucher_swap */,
 				2150A9C9220212E6001C8677 /* deja_xnu */,
 				2150A9C8220212D1001C8677 /* async_wake */,
@@ -384,6 +409,17 @@
 			name = snappy;
 			sourceTree = "<group>";
 		};
+		F3ABB89E2208DC3E0001D986 /* v1ntex */ = {
+			isa = PBXGroup;
+			children = (
+				F3ABB8A12208DC4F0001D986 /* exploit.h */,
+				F3ABB8A02208DC4E0001D986 /* exploit.m */,
+				F3ABB89F2208DC4E0001D986 /* offsets.c */,
+				F3ABB8A22208DC4F0001D986 /* offsets.h */,
+			);
+			name = v1ntex;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -480,6 +516,7 @@
 				2150A9E122021348001C8677 /* kernel_alloc.c in Sources */,
 				2150A9DD22021348001C8677 /* platform_match.c in Sources */,
 				212D8844216E4C4800A36DA5 /* find_port.c in Sources */,
+				213E78262208654700FDF3B7 /* necp.c in Sources */,
 				22C546AB21A8A8FD00EFC09C /* utils.m in Sources */,
 				2150A9DC22021348001C8677 /* log.c in Sources */,
 				22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */,
@@ -489,13 +526,16 @@
 				2116449A21737F9500250744 /* JailbreakViewController.m in Sources */,
 				21F4D70E21FC7A590070D5E0 /* patchfinder64.c in Sources */,
 				2150A9DE22021348001C8677 /* platform.c in Sources */,
+				213E7828220865A100FDF3B7 /* voucher_swap-poc.c in Sources */,
 				22F91CDB21E02CF300B2FCAE /* inject.m in Sources */,
 				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* KernelMemory.c in Sources */,
+				F3ABB8A32208DC4F0001D986 /* offsets.c in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
 				212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */,
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
 				222AD59321FA731800DCBA2A /* FakeApt.m in Sources */,
+				F3ABB8A42208DC4F0001D986 /* exploit.m in Sources */,
 				21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */,
 				21C0FC8A21369EE900849420 /* KernelStructureOffsets.m in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,
