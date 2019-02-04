@@ -579,6 +579,15 @@ bool kernelVersionContains(const char *string) {
     return (strstr(u.version, string) != NULL);
 }
 
+bool machineNameContains(const char *string) {
+    static struct utsname u = { 0 };
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        uname(&u);
+    });
+    return (strstr(u.machine, string) != NULL);
+}
+
 #define AF_MULTIPATH 39
 
 bool multi_path_tcp_enabled() {
@@ -841,10 +850,10 @@ bool supportsExploit(exploit_t exploit) {
             if (vm_size != 0x4000) {
                 return false;
             }
-            if (kernelVersionContains("iPad5,") && kCFCoreFoundationVersionNumber >= 1535.12) {
+            if (machineNameContains("iPad5,") && kCFCoreFoundationVersionNumber >= 1535.12) {
                 return false;
             }
-            if (kernelVersionContains("iPhone11,")) {
+            if (machineNameContains("iPhone11,")) {
                 return false;
             }
             break;
