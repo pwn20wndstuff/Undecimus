@@ -29,7 +29,7 @@
 // ---- Global state ------------------------------------------------------------------------------
 
 // Stash the host port for create_voucher().
-mach_port_t host;
+static mach_port_t host;
 
 // The base port. This port is located at a fixed offset from the fake port.
 mach_port_t base_port;

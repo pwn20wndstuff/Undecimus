@@ -864,7 +864,9 @@ bool supportsExploit(exploit_t exploit) {
             break;
         }
         case empty_list_exploit:
+            break;
         case async_wake_exploit:
+            break;
         case necp_exploit:
             break;
         default:
@@ -894,7 +896,8 @@ bool respringSupported() {
 }
 
 bool restartSupported() {
-    return supportsExploit(necp_exploit);
+    return supportsExploit(necp_exploit) ||
+    supportsExploit(voucher_swap_exploit);
 }
 
 NSInteger recommendedJailbreakSupport() {
@@ -913,6 +916,8 @@ NSInteger recommendedJailbreakSupport() {
 NSInteger recommendedRestartSupport() {
     if (supportsExploit(necp_exploit))
         return necp_exploit;
+    else if (supportsExploit(voucher_swap_exploit))
+        return voucher_swap_exploit;
     else
         return -1;
 }

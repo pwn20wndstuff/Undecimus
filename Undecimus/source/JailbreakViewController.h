@@ -36,7 +36,6 @@ while (false)
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *goButtonSpacing;
 
 double uptime(void);
-int necp_die(void);
 
 NSString *hexFromInt(NSInteger val);
 
