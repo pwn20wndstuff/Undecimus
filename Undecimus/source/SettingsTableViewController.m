@@ -14,6 +14,8 @@
 #include "remote_call.h"
 #include "JailbreakViewController.h"
 #include "utils.h"
+#include "voucher_swap-poc.h"
+#include "necp.h"
 
 @interface SettingsTableViewController ()
 
@@ -314,6 +316,10 @@
         switch (support) {
             case necp_exploit: {
                 necp_die();
+                break;
+            }
+            case voucher_swap_exploit: {
+                voucher_swap_poc();
                 break;
             }
             default:

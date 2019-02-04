@@ -47,8 +47,6 @@
 		22F91CDB21E02CF300B2FCAE /* inject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CD921E02CF200B2FCAE /* inject.m */; };
 		22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CE221E033A500B2FCAE /* libsnappy.c */; };
 		8D592A68218E47F60035D2BC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D592A67218E47F60035D2BC /* Main.storyboard */; };
-		F3ABB87F220329670001D986 /* offsets.c in Sources */ = {isa = PBXBuildFile; fileRef = F3ABB870220329670001D986 /* offsets.c */; };
-		F3ABB882220329670001D986 /* exploit.m in Sources */ = {isa = PBXBuildFile; fileRef = F3ABB874220329670001D986 /* exploit.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -139,10 +137,6 @@
 		22F91CDE21E02EB000B2FCAE /* snappy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = snappy.h; path = snappy/snappy.h; sourceTree = SOURCE_ROOT; };
 		22F91CE221E033A500B2FCAE /* libsnappy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libsnappy.c; path = snappy/libsnappy.c; sourceTree = SOURCE_ROOT; };
 		8D592A67218E47F60035D2BC /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
-		F3ABB867220329670001D986 /* offsets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = offsets.h; sourceTree = "<group>"; };
-		F3ABB869220329670001D986 /* exploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exploit.h; sourceTree = "<group>"; };
-		F3ABB870220329670001D986 /* offsets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = offsets.c; sourceTree = "<group>"; };
-		F3ABB874220329670001D986 /* exploit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = exploit.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -281,7 +275,6 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
-				F3ABB85F220329670001D986 /* v1ntex */,
 				2150A9CA220212F8001C8677 /* voucher_swap */,
 				2150A9C9220212E6001C8677 /* deja_xnu */,
 				2150A9C8220212D1001C8677 /* async_wake */,
@@ -391,17 +384,6 @@
 			name = snappy;
 			sourceTree = "<group>";
 		};
-		F3ABB85F220329670001D986 /* v1ntex */ = {
-			isa = PBXGroup;
-			children = (
-				F3ABB867220329670001D986 /* offsets.h */,
-				F3ABB869220329670001D986 /* exploit.h */,
-				F3ABB870220329670001D986 /* offsets.c */,
-				F3ABB874220329670001D986 /* exploit.m */,
-			);
-			path = v1ntex;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -434,7 +416,7 @@
 				TargetAttributes = {
 					21C0FC6621369EB700849420 = {
 						CreatedOnToolsVersion = 9.4.1;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -492,7 +474,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F3ABB882220329670001D986 /* exploit.m in Sources */,
 				21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */,
 				2150A9E022021348001C8677 /* parameters.c in Sources */,
 				21A97FD12148103C00DC0023 /* KernelExecution.m in Sources */,
@@ -512,7 +493,6 @@
 				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* KernelMemory.c in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
-				F3ABB87F220329670001D986 /* offsets.c in Sources */,
 				212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */,
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
 				222AD59321FA731800DCBA2A /* FakeApt.m in Sources */,
@@ -659,16 +639,15 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/resources/multi_path.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 78P62G49FE;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus",
 					"$(PROJECT_DIR)/Undecimus/frameworks",
-					"$(PROJECT_DIR)/Undecimus/source/v1ntex",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -690,11 +669,10 @@
 					"-framework",
 					IOKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.quanganh9x.undecimus;
+				PRODUCT_BUNDLE_IDENTIFIER = science.xnu.undecimus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 arm64e";
 			};
 			name = Debug;
 		};
@@ -704,16 +682,15 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/resources/multi_path.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 78P62G49FE;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus",
 					"$(PROJECT_DIR)/Undecimus/frameworks",
-					"$(PROJECT_DIR)/Undecimus/source/v1ntex",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -735,11 +712,10 @@
 					"-framework",
 					IOKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.quanganh9x.undecimus;
+				PRODUCT_BUNDLE_IDENTIFIER = science.xnu.undecimus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 arm64e";
 			};
 			name = Release;
 		};

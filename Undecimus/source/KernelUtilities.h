@@ -21,6 +21,7 @@ typedef struct {
     kptr_t shenanigans;
     kptr_t lck_mtx_lock;
     kptr_t lck_mtx_unlock;
+    kptr_t strlen;
 } offsets_t;
 
 extern offsets_t offs;

@@ -97,6 +97,7 @@ int runCommand(const char *cmd, ...);
 NSString *pathForResource(NSString *resource);
 pid_t pidOfProcess(const char *name);
 bool kernelVersionContains(const char *string);
+bool machineNameContains(const char *string);
 bool multi_path_tcp_enabled(void);
 bool jailbreakEnabled(void);
 bool supportsExploit(exploit_t exploit);
