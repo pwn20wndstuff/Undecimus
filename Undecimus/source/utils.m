@@ -399,12 +399,12 @@ bool ensure_file(const char *file, int owner, mode_t mode) {
     NSFileManager *fm = [NSFileManager defaultManager];
     id attributes = [fm attributesOfItemAtPath:path error:nil];
     if (attributes &&
-        [attributes[NSFileType] isEqual:NSFileTypeDirectory] &&
+        [attributes[NSFileType] isEqual:NSFileTypeRegular] &&
         [attributes[NSFileOwnerAccountID] isEqual:@(owner)] &&
         [attributes[NSFileGroupOwnerAccountID] isEqual:@(owner)] &&
         [attributes[NSFilePosixPermissions] isEqual:@(mode)]
         ) {
-        // Directory exists and matches arguments
+        // File exists and matches arguments
         return true;
     }
     if (attributes) {
@@ -727,7 +727,29 @@ bool supportsExploit(exploit_t exploit) {
                    @"4570.70.14~16",
                    @"4570.70.19~13",
                    @"4570.70.24~9",
-                   @"4570.70.24~3"],
+                   @"4570.70.24~3",
+                   @"4903.200.199.12.3~1",
+                   @"4903.200.249.22.3~1",
+                   @"4903.200.274.32.3~1",
+                   @"4903.200.304.42.1~1",
+                   @"4903.200.327.52.1~1",
+                   @"4903.200.342.62.3~1",
+                   @"4903.200.354~11",
+                   @"4903.202.1~2",
+                   @"4903.202.2~2",
+                   @"4903.202.2~1",
+                   @"4903.220.42~21",
+                   @"4903.220.48~40",
+                   @"4903.222.1~7",
+                   @"4903.222.4~3",
+                   @"4903.222.5~3",
+                   @"4903.222.5~1",
+                   @"4903.230.15~8",
+                   @"4903.232.1~3",
+                   @"4903.232.2~2",
+                   @"4903.232.2~1",
+                   @"4903.240.8~8",
+                   @"4903.232.2~1"],
                  
                  // Deja Xnu
                  @[@"4397.0.0.2.4~1",
@@ -812,8 +834,17 @@ bool supportsExploit(exploit_t exploit) {
         }
         case voucher_swap_exploit: {
             vm_size_t vm_size = 0;
-            if (host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS || vm_size != 0x4000) {
-                LOG("Unable to determine page size");
+            if (host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS) {
+                LOG("Unable to determine page size.");
+                return false;
+            }
+            if (vm_size != 0x4000) {
+                return false;
+            }
+            if (kernelVersionContains("iPad5,") && kCFCoreFoundationVersionNumber >= 1560.00) {
+                return false;
+            }
+            if (kernelVersionContains("iPhone11,")) {
                 return false;
             }
             break;
