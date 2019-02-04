@@ -49,6 +49,7 @@
 #include "CreditsTableViewController.h"
 #include "FakeApt.h"
 #include "voucher_swap.h"
+#include "v1ntex/exploit.h"
 #include "kernel_memory.h"
 
 @interface NSUserDefaults ()
@@ -103,6 +104,7 @@ typedef struct {
     bool reload_system_daemons;
     bool reset_cydia_cache;
 } prefs_t;
+bool isv1ntex = false;
 
 #define ISADDR(val)            (val != 0 && val != HUGE_VAL && val != -HUGE_VAL)
 #define ADDRSTRING(val)        [NSString stringWithFormat:@ADDR, val]
@@ -826,7 +828,7 @@ void exploit()
     
     UPSTAGE();
     
-    {
+    if (!isv1ntex) {
         // Set HSP4.
         
         LOG("Setting HSP4...");
@@ -1869,6 +1871,13 @@ void exploit()
                     voucher_swap();
                     offsets_init();
                     prepare_for_rw_with_fake_tfp0(kernel_task_port);
+                    exploit_success = true;
+                    break;
+                }
+                case v1ntex_exploit: {
+                    offsets_init();
+                    prepare_rwk_via_tfp0(v1ntex());
+                    isv1ntex = true;
                     exploit_success = true;
                     break;
                 }

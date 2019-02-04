@@ -20,8 +20,9 @@ extern int logfd;
 #define multi_path_exploit 1
 #define async_wake_exploit 2
 #define voucher_swap_exploit 3
-#define deja_xnu_exploit 4
-#define necp_exploit 5
+#define v1ntex_exploit 4
+#define deja_xnu_exploit 5
+#define necp_exploit 6
 
 enum hashtype {
     HASHTYPE_MD5 = 0,
