@@ -767,6 +767,18 @@ void jailbreak()
                     }
                     break;
                 }
+                case v1ntex_exploit: {
+                    v1ntex_cb_t cb = v1ntex();
+                    if (MACH_PORT_VALID(cb.tfp0)) {
+                        prepare_for_rw_with_fake_tfp0(cb.tfp0);
+                        offsets_init();
+                        kernel_base = cb.kernel_base;
+                        kernel_slide = cb.kernel_slide;
+                        isv1ntex = true;
+                        exploit_success = true;
+                    }
+                    break;
+                }
                 default: {
                     NOTICE(NSLocalizedString(@"No exploit selected", nil), false, false);
                     STATUS(NSLocalizedString(@"Jailbreak", nil), true, true);
@@ -840,7 +852,7 @@ void jailbreak()
     UPSTAGE();
     
     {
-        if (prefs.export_kernel_task_port) {
+        if (prefs.export_kernel_task_port || isv1ntex) { // workaround for hsp4 from v1ntex
             // Export kernel task port.
             LOG("Exporting kernel task port...");
             SETMESSAGE(NSLocalizedString(@"Failed to export kernel task port.", nil));
@@ -1948,6 +1960,7 @@ void jailbreak()
         }
     }
 out:
+    if (isv1ntex && !prefs.export_kernel_task_port) make_host_priv_into_host();
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed With Status:", nil), status, NSLocalizedString(@"The app will now exit.", nil)], true, false);
     exit(EXIT_SUCCESS);
