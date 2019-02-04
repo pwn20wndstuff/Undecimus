@@ -107,6 +107,7 @@ typedef struct {
     bool reset_cydia_cache;
     int exploit;
 } prefs_t;
+
 bool isv1ntex = false;
 
 #define ISADDR(val)            (val != 0 && val != HUGE_VAL && val != -HUGE_VAL)
