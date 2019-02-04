@@ -253,6 +253,7 @@ uint64_t find_port_via_kmem_read(mach_port_name_t port)
 uint64_t find_port_address(mach_port_t port, int disposition)
 {
     if (have_kmem_read()) {
+        if (cached_task_self_addr == 0) return get_address_of_port(getpid(), port);
         return find_port_via_kmem_read(port);
     }
     return find_port_via_proc_pidlistuptrs_bug(port, disposition);

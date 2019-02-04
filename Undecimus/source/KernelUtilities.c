@@ -109,6 +109,18 @@ uint64_t get_proc_struct_for_pid(pid_t pid)
     return 0;
 }
 
+uint64_t get_address_of_port(pid_t pid, mach_port_t port)
+{
+    uint64_t proc_struct_addr = get_proc_struct_for_pid(pid);
+    uint64_t task_addr = ReadKernel64(proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_TASK));
+    uint64_t itk_space = ReadKernel64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+    uint64_t is_table = ReadKernel64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+    uint32_t port_index = port >> 8;
+    const int sizeof_ipc_entry_t = 0x18;
+    uint64_t port_addr = ReadKernel64(is_table + (port_index * sizeof_ipc_entry_t));
+    return port_addr;
+}
+
 uint64_t get_kernel_cred_addr()
 {
     uint64_t kernel_proc_struct_addr = ReadKernel64(ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
