@@ -188,7 +188,7 @@ int koffset(enum kstruct_offset offset)
 void offsets_init()
 {
     LOG("kCFCoreFoundationVersionNumber: %f", kCFCoreFoundationVersionNumber);
-    if (kCFCoreFoundationVersionNumber >= 1560.00) {
+    if (kCFCoreFoundationVersionNumber >= 1535.12) {
         LOG("offsets selected for iOS 12.0 or above");
         offsets = kstruct_offsets_12_0;
     } else if (kCFCoreFoundationVersionNumber >= 1452.23) {

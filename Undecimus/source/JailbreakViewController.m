@@ -1021,7 +1021,7 @@ void jailbreak()
         }
     }
     
-    if (kCFCoreFoundationVersionNumber >= 1560.00) {
+    if (kCFCoreFoundationVersionNumber >= 1535.12) {
         goto out;
     }
     

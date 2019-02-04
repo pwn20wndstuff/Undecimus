@@ -841,7 +841,7 @@ bool supportsExploit(exploit_t exploit) {
             if (vm_size != 0x4000) {
                 return false;
             }
-            if (kernelVersionContains("iPad5,") && kCFCoreFoundationVersionNumber >= 1560.00) {
+            if (kernelVersionContains("iPad5,") && kCFCoreFoundationVersionNumber >= 1535.12) {
                 return false;
             }
             if (kernelVersionContains("iPhone11,")) {
