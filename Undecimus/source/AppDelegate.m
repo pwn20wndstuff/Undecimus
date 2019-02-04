@@ -96,7 +96,7 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:K_BOOT_NONCE] == nil) {
-        [[NSUserDefaults standardUserDefaults] setObject:@"0xbd34a880be0b53f3" forKey:K_BOOT_NONCE];
+        [[NSUserDefaults standardUserDefaults] setObject:@"0x1111111111111111" forKey:K_BOOT_NONCE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     if ([[NSUserDefaults standardUserDefaults] objectForKey:K_EXPLOIT] != nil &&
