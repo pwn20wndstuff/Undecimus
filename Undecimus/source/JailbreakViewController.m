@@ -1486,7 +1486,7 @@ void jailbreak()
         
         LOG("Injecting trust cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
-        NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
+        NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/jailbreak/injectme.plist"];
         // If substrate is already running but was broken, skip injecting again
         if (!skipSubstrate) {
             resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
