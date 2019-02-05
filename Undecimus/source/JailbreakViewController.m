@@ -203,7 +203,7 @@ uint32_t IKOT_NONE = 0;
 
 void convert_port_to_task_port(mach_port_t port, uint64_t space, uint64_t task_kaddr) {
     // now make the changes to the port object to make it a task port:
-    uint64_t port_kaddr = find_port_address(port, MACH_MSG_TYPE_MAKE_SEND);
+    uint64_t port_kaddr = get_address_of_port(getpid(), port);
     
     WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_TASK);
     WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_REFERENCES), 0xf00d);
@@ -343,12 +343,12 @@ void remap_tfp0_set_hsp4(mach_port_t *port) {
     _assert(kernel_task_kaddr != remapped_task_addr, message, true);
     LOG("remapped_task_addr = "ADDR"", remapped_task_addr);
     _assert(mach_vm_wire(mach_host_self(), km_fake_task_port, remapped_task_addr, sizeof_task, VM_PROT_READ | VM_PROT_WRITE) == KERN_SUCCESS, message, true);
-    uint64_t port_kaddr = find_port_address(*port, MACH_PORT_TYPE_SEND);
+    uint64_t port_kaddr = get_address_of_port(getpid(), *port);
     LOG("port_kaddr = "ADDR"", port_kaddr);
     make_port_fake_task_port(*port, remapped_task_addr);
     _assert(ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT)) == remapped_task_addr, message, true);
     // lck_mtx -- arm: 8  arm64: 16
-    uint64_t host_priv_kaddr = find_port_address(mach_host_self(), MACH_PORT_TYPE_SEND);
+    uint64_t host_priv_kaddr = get_address_of_port(getpid(), mach_host_self());
     uint64_t realhost_kaddr = ReadKernel64(host_priv_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
     WriteKernel64(realhost_kaddr + koffset(KSTRUCT_OFFSET_HOST_SPECIAL) + 4 * sizeof(void*), port_kaddr);
     set_all_image_info_addr(kernel_task_kaddr, kernel_base);
@@ -569,7 +569,7 @@ out:
 #define IKOT_HOST_PRIV 4
 
 void make_host_into_host_priv() {
-    uint64_t hostport_addr = find_port_address(mach_host_self(), MACH_MSG_TYPE_COPY_SEND);
+    uint64_t hostport_addr = get_address_of_port(getpid(), mach_host_self());
     uint32_t old = ReadKernel32(hostport_addr);
     LOG("old host type: 0x%08x", old);
     if ((old & (IO_ACTIVE | IKOT_HOST_PRIV)) != (IO_ACTIVE | IKOT_HOST_PRIV))
@@ -577,24 +577,11 @@ void make_host_into_host_priv() {
 }
 
 void make_host_priv_into_host() {
-    uint64_t hostport_addr = find_port_address(mach_host_self(), MACH_MSG_TYPE_COPY_SEND);
+    uint64_t hostport_addr = get_address_of_port(getpid(), mach_host_self());
     uint32_t old = ReadKernel32(hostport_addr);
     LOG("old host type: 0x%08x", old);
     if ((old & (IO_ACTIVE | IKOT_HOST)) != (IO_ACTIVE | IKOT_HOST))
         WriteKernel32(hostport_addr, IO_ACTIVE | IKOT_HOST);
-}
-
-mach_port_t try_restore_port() {
-    mach_port_t port = MACH_PORT_NULL;
-    kern_return_t err;
-    err = host_get_special_port(mach_host_self(), 0, 4, &port);
-    if (err == KERN_SUCCESS && port != MACH_PORT_NULL) {
-        LOG("got persisted port!");
-        // make sure rk64 etc use this port
-        return port;
-    }
-    LOG("unable to retrieve persisted port");
-    return MACH_PORT_NULL;
 }
 
 double uptime() {
@@ -761,6 +748,7 @@ void jailbreak()
     prefs_t prefs;
     bool needStrap = false;
     bool needSubstrate = false;
+    bool skipSubstrate = false;
     bool updatedResources = false;
     NSUserDefaults *userDefaults = nil;
     NSDictionary *userDefaultsDictionary = nil;
@@ -898,6 +886,7 @@ void jailbreak()
         LOG("Initializing patchfinder64...");
         SETMESSAGE(NSLocalizedString(@"Failed to initialize patchfinder64.", nil));
         _assert(init_kernel(kread, kernel_base, NULL) == ERR_SUCCESS, message, true);
+        did_init_kernel = true;
         LOG("Successfully initialized patchfinder64.");
     }
     
@@ -907,27 +896,27 @@ void jailbreak()
         // Find offsets.
         
         LOG("Finding offsets...");
-#define FIND(x) do { \
+#define PF(x) do { \
         SETMESSAGE(NSLocalizedString(@"Failed to find " #x " offset.", nil)); \
         SETOFFSET(x, find_ ##x()); \
         LOG(#x " = " ADDR, GETOFFSET(x)); \
         _assert(ISADDR(GETOFFSET(x)), message, true); \
 } while (false)
-        FIND(trustcache);
-        FIND(OSBoolean_True);
-        FIND(osunserializexml);
-        FIND(smalloc);
-        FIND(add_x0_x0_0x40_ret);
-        FIND(zone_map_ref);
-        FIND(vfs_context_current);
-        FIND(vnode_lookup);
-        FIND(vnode_put);
-        FIND(kernel_task);
-        FIND(shenanigans);
-        FIND(lck_mtx_lock);
-        FIND(lck_mtx_unlock);
-        FIND(strlen);
-#undef FIND
+        PF(trustcache);
+        PF(OSBoolean_True);
+        PF(osunserializexml);
+        PF(smalloc);
+        PF(add_x0_x0_0x40_ret);
+        PF(zone_map_ref);
+        PF(vfs_context_current);
+        PF(vnode_lookup);
+        PF(vnode_put);
+        PF(kernel_task);
+        PF(shenanigans);
+        PF(lck_mtx_lock);
+        PF(lck_mtx_unlock);
+        PF(strlen);
+#undef PF
         LOG("Successfully found offsets.");
     }
     
@@ -1207,10 +1196,12 @@ void jailbreak()
             _assert(rootfd > 0, message, true);
             snapshots = snapshot_list(rootfd);
             _assert(snapshots != NULL, message, true);
-            if (snapshots != NULL) {
-                free(snapshots);
-                snapshots = NULL;
+            LOG("Snapshots on newly mounted rootfs:");
+            for (const char *snapshot = *snapshots; snapshot; snapshot++) {
+                LOG("\t%s", snapshot);
             }
+            free(snapshots);
+            snapshots = NULL;
             char *systemSnapshot = copySystemSnapshot();
             _assert(systemSnapshot != NULL, message, true);
             uint64_t rootfs_vnode = vnodeFor("/");
@@ -1359,6 +1350,7 @@ void jailbreak()
             if (pidOfProcess("/usr/libexec/substrated") == 0) {
                 _assert(extractDeb(substrateDeb), message, true);
             } else {
+                skipSubstrate = true;
                 LOG("Substrate is running, not extracting again for now.");
             }
             [debsToInstall addObject:substrateDeb];
@@ -1499,8 +1491,11 @@ void jailbreak()
         
         LOG("Injecting trust cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
-        NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
-        resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
+        NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/jailbreak/injectme.plist"];
+        // If substrate is already running but was broken, skip injecting again
+        if (!skipSubstrate) {
+            resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
+        }
         _assert(injectTrustCache(resources, GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
         INSERTSTATUS(NSLocalizedString(@"Injected trust cache.\n", nil));
@@ -1625,8 +1620,8 @@ void jailbreak()
 
         // Run substrate
         LOG("Starting Substrate...");
-        SETMESSAGE(NSLocalizedString(@"Failed to start Substrate.", nil));
-        _assert(runCommand("/usr/libexec/substrate", NULL) == ERR_SUCCESS, message, true);
+        SETMESSAGE(NSLocalizedString(skipSubstrate?@"Failed to restart Substrate":@"Failed to start Substrate.", nil));
+        _assert(runCommand("/usr/libexec/substrate", NULL) == ERR_SUCCESS, message, skipSubstrate?false:true);
         LOG("Successfully started Substrate.");
         
         INSERTSTATUS(NSLocalizedString(@"Loaded Substrate.\n", nil));
@@ -2072,7 +2067,10 @@ out:
     if (isv1ntex && !prefs.export_kernel_task_port) make_host_priv_into_host();
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(@"The app will now exit.", nil)], true, false);
-    exit(EXIT_SUCCESS);
+    if (sharedController.canExit) {
+        exit(EXIT_SUCCESS);
+    }
+    sharedController.canExit = YES;
 }
 
 - (IBAction)tappedOnJailbreak:(id)sender
@@ -2090,6 +2088,7 @@ out:
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _canExit = YES;
     // Do any additional setup after loading the view, typically from a nib.
     if ([[NSUserDefaults standardUserDefaults] boolForKey:K_HIDE_LOG_WINDOW]) {
         _outputView.hidden = YES;

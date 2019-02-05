@@ -22,8 +22,13 @@ static NSString *message = nil;
             showAlert(fatal ? @"Error (Fatal)" : @"Error (Nonfatal)", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s\nDescription: %@", saved_errno, #test, __FILENAME__, __LINE__, __FUNCTION__, message], true, false); \
         else \
             showAlert(fatal ? @"Error (Fatal)" : @"Error (Nonfatal)", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s", saved_errno, #test, __FILENAME__, __LINE__, __FUNCTION__], true, false); \
-        if (fatal) \
-            exit(EXIT_FAILURE); \
+        if (fatal) { \
+            if ([[JailbreakViewController sharedController] canExit]) {\
+                exit(EXIT_FAILURE); \
+            } else { \
+                return; \
+            } \
+        } \
     } \
 while (false)
 
@@ -34,6 +39,7 @@ while (false)
 @property (weak, nonatomic) IBOutlet UITextView *outputView;
 @property (readonly) JailbreakViewController *sharedController;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *goButtonSpacing;
+@property (assign) BOOL canExit;
 
 double uptime(void);
 
@@ -45,7 +51,7 @@ NSString *hexFromInt(NSInteger val);
 
 @end
 
-static inline void showAlert(NSString *title, NSString *message, Boolean wait, Boolean destructive) {
+static inline void showAlertWithCancel(NSString *title, NSString *message, Boolean wait, Boolean destructive, NSString *cancel) {
     dispatch_semaphore_t semaphore;
     if (wait)
         semaphore = dispatch_semaphore_create(0);
@@ -55,13 +61,31 @@ static inline void showAlert(NSString *title, NSString *message, Boolean wait, B
         [controller dismissViewControllerAnimated:YES completion:nil];
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *OK = [UIAlertAction actionWithTitle:@"OK" style:destructive ? UIAlertActionStyleDestructive : UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            controller.canExit = YES;
             if (wait)
                 dispatch_semaphore_signal(semaphore);
         }];
         [alertController addAction:OK];
         [alertController setPreferredAction:OK];
+        if (cancel) {
+            UIAlertAction *abort = [UIAlertAction actionWithTitle:cancel style:destructive ? UIAlertActionStyleDestructive : UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                controller.canExit = NO;
+                if (wait)
+                    dispatch_semaphore_signal(semaphore);
+            }];
+            [alertController addAction:abort];
+            [alertController setPreferredAction:abort];
+        }
         [controller presentViewController:alertController animated:YES completion:nil];
     });
     if (wait)
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+}
+
+static inline void showAlert(NSString *title, NSString *message, Boolean wait, Boolean destructive) {
+    static bool outputIsHidden;
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        outputIsHidden = [[[JailbreakViewController sharedController] outputView] isHidden];
+    });
+    showAlertWithCancel(title, message, wait, destructive, outputIsHidden?nil:@"View Log");
 }
