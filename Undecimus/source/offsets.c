@@ -12,6 +12,8 @@
 #include <string.h>
 #include <sys/utsname.h>
 #include <sys/sysctl.h>
+#include <unistd.h>
+
 
 /*
 #define OFFSET_TASK_BSD_INFO 0x368
@@ -86,7 +88,7 @@ t_offsets *info_to_target_environment() {
         pushOffset(0xfffffff0070b8aa4);
         pushOffset(0xfffffff0075e2b98);
         pushOffset(0x10);
-    } else if (strcmp(device.build_id, "15D100") && strstr(device.machine, "iPhone5,2")) {
+    } else if (strcmp(device.build_id, "15D100") == 0 && strstr(device.machine, "iPhone5,2")) {
         pushOffset(0x368);
         pushOffset(0x28);
         pushOffset(0x2f0);
@@ -114,7 +116,7 @@ t_offsets *info_to_target_environment() {
         printf("[!] Failed to load offsets\n");
         return NULL;
     }
-    
+    usleep(500);
     guoffsets = malloc(sizeof(t_offsets));
     memcpy(guoffsets,&uoffsets,sizeof(t_offsets));
     
