@@ -1140,6 +1140,7 @@ void jailbreak()
             uint64_t devVnode = vnodeFor(thedisk);
             LOG("devVnode = "ADDR"", devVnode);
             _assert(ISADDR(devVnode), message, true);
+            show_vnode(devVnode);
             uint64_t v_specinfo = ReadKernel64(devVnode + koffset(KSTRUCT_OFFSET_VNODE_VU_SPECINFO));
             LOG("v_specinfo = "ADDR"", v_specinfo);
             _assert(ISADDR(v_specinfo), message, true);
@@ -1181,9 +1182,9 @@ void jailbreak()
             _assert(rootfd > 0, message, true);
             snapshots = snapshot_list(rootfd);
             _assert(snapshots != NULL, message, true);
-            LOG("Snapshots on newly mounted rootfs:");
-            for (const char *snapshot = *snapshots; snapshot; snapshot++) {
-                LOG("\t%s", snapshot);
+            LOG("Snapshots on newly mounted RootFS:");
+            for (const char **snapshot = snapshots; *snapshot; snapshot++) {
+                LOG("\t%s", *snapshot);
             }
             free(snapshots);
             snapshots = NULL;
@@ -1231,6 +1232,7 @@ void jailbreak()
         uint64_t rootfs_vnode = vnodeFor("/");
         LOG("rootfs_vnode = "ADDR"", rootfs_vnode);
         _assert(ISADDR(rootfs_vnode), message, true);
+        show_vnode(rootfs_vnode);
         uint64_t v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
         LOG("v_mount = "ADDR"", v_mount);
         _assert(ISADDR(v_mount), message, true);

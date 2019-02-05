@@ -58,6 +58,9 @@
         rv = select(FD_SETSIZE, &fds, NULL, NULL, NULL);
         if (FD_ISSET(input_fd, &fds)) {
             NSString *read = [self readDataFromFD:input_fd toFD:_orig_stdout];
+            if (read == nil) {
+                read = @"";
+            }
             [outline appendString:read];
             NSRange lastNewline = [read rangeOfString:@"\n" options:NSBackwardsSearch];
             if (lastNewline.location != NSNotFound) {
