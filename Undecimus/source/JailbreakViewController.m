@@ -1411,11 +1411,18 @@ void exploit()
             _assert(removePkg("science.xnu.undecimus.resources", true), message, true);
         }
         
-        if (pkgIsInstalled("apt7") && compareInstalledVersion("apt7", "lt", "1:0")) {
+        if ((pkgIsInstalled("apt7") && compareInstalledVersion("apt7", "lt", "1:0")) ||
+            (pkgIsInstalled("apt7-lib") && compareInstalledVersion("apt7-lib", "lt", "1:0")) ||
+            (pkgIsInstalled("apt7-key") && compareInstalledVersion("apt7-key", "lt", "1:0"))
+            ) {
             LOG("Installing newer version of apt7");
-            NSString *apt7deb = debForPkg(@"apt7");
-            _assert(apt7deb != nil, message, true);
-            [debsToInstall addObject:apt7deb];
+            NSArray *apt7debs = debsForPkgs(@[@"apt7", @"apt7-key", @"apt7-lib"]);
+            _assert(apt7debs != nil && apt7debs.count == 3, message, true);
+            for (NSString *deb in apt7debs) {
+                if (![debsToInstall containsObject:deb]) {
+                    [debsToInstall addObject:deb];
+                }
+            }
         }
         
         if (debsToInstall.count > 0) {
