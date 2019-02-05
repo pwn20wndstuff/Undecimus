@@ -758,6 +758,7 @@ void jailbreak()
     prefs_t prefs;
     bool needStrap = false;
     bool needSubstrate = false;
+    bool skipSubstrate = false;
     bool updatedResources = false;
     NSUserDefaults *userDefaults = nil;
     NSDictionary *userDefaultsDictionary = nil;
@@ -1344,6 +1345,7 @@ void jailbreak()
             if (pidOfProcess("/usr/libexec/substrated") == 0) {
                 _assert(extractDeb(substrateDeb), message, true);
             } else {
+                skipSubstrate = true;
                 LOG("Substrate is running, not extracting again for now.");
             }
             [debsToInstall addObject:substrateDeb];
@@ -1485,7 +1487,10 @@ void jailbreak()
         LOG("Injecting trust cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
         NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
-        resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
+        // If substrate is already running but was broken, skip injecting again
+        if (!skipSubstrate) {
+            resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
+        }
         _assert(injectTrustCache(resources, GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
         INSERTSTATUS(NSLocalizedString(@"Injected trust cache.\n", nil));
@@ -1610,8 +1615,8 @@ void jailbreak()
 
         // Run substrate
         LOG("Starting Substrate...");
-        SETMESSAGE(NSLocalizedString(@"Failed to start Substrate.", nil));
-        _assert(runCommand("/usr/libexec/substrate", NULL) == ERR_SUCCESS, message, true);
+        SETMESSAGE(NSLocalizedString(skipSubstrate?@"Failed to restart Substrate":@"Failed to start Substrate.", nil));
+        _assert(runCommand("/usr/libexec/substrate", NULL) == ERR_SUCCESS, message, skipSubstrate?false:true);
         LOG("Successfully started Substrate.");
         
         INSERTSTATUS(NSLocalizedString(@"Loaded Substrate.\n", nil));
@@ -2056,7 +2061,10 @@ void jailbreak()
 out:
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(@"The app will now exit.", nil)], true, false);
-    exit(EXIT_SUCCESS);
+    if (sharedController.canExit) {
+        exit(EXIT_SUCCESS);
+    }
+    sharedController.canExit = YES;
 }
 
 - (IBAction)tappedOnJailbreak:(id)sender
@@ -2074,6 +2082,7 @@ out:
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _canExit = YES;
     // Do any additional setup after loading the view, typically from a nib.
     if ([[NSUserDefaults standardUserDefaults] boolForKey:K_HIDE_LOG_WINDOW]) {
         _outputView.hidden = YES;
