@@ -1217,7 +1217,7 @@ void exploit()
         
         LOG("Injecting trust cache...");
         SETMESSAGE(NSLocalizedString(@"Failed to inject trust cache.", nil));
-        NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/undecimus/injectme.plist"];
+        NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/jailbreak/injectme.plist"];
         resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
         _assert(injectTrustCache(resources, GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
