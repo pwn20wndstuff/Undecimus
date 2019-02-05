@@ -1193,10 +1193,12 @@ void jailbreak()
             _assert(rootfd > 0, message, true);
             snapshots = snapshot_list(rootfd);
             _assert(snapshots != NULL, message, true);
-            if (snapshots != NULL) {
-                free(snapshots);
-                snapshots = NULL;
+            LOG("Snapshots on newly mounted rootfs:");
+            for (const char *snapshot = *snapshots; snapshot; snapshot++) {
+                LOG("\t%s", snapshot);
             }
+            free(snapshots);
+            snapshots = NULL;
             char *systemSnapshot = copySystemSnapshot();
             _assert(systemSnapshot != NULL, message, true);
             uint64_t rootfs_vnode = vnodeFor("/");
