@@ -29,7 +29,7 @@ extern uint64_t kernel_base;
 extern uint64_t kernel_slide;
 
 extern uint64_t cached_task_self_addr;
-extern bool did_init_kernel;
+extern bool found_offsets;
 
 uint64_t task_self_addr(void);
 uint64_t ipc_space_kernel(void);
