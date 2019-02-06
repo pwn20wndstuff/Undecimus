@@ -853,7 +853,7 @@ bool supportsExploit(exploit_t exploit) {
             if (machineNameContains("iPad5,") && kCFCoreFoundationVersionNumber >= 1535.12) {
                 return false;
             }
-            if (machineNameContains("iPhone11,") && machineNameContains("iPad8,")) {
+            if (machineNameContains("iPhone11,") || machineNameContains("iPad8,")) {
                 return false;
             }
             break;
