@@ -22,6 +22,16 @@
 		2150A9E022021348001C8677 /* parameters.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9D922021348001C8677 /* parameters.c */; };
 		2150A9E122021348001C8677 /* kernel_alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9DA22021348001C8677 /* kernel_alloc.c */; };
 		2150A9E222021348001C8677 /* kernel_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9DB22021348001C8677 /* kernel_memory.c */; };
+		216FDA04220C5BA90086D802 /* libfragmentzip.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA03220C5BA90086D802 /* libfragmentzip.a */; };
+		216FDA08220C5BDC0086D802 /* libgrabkernel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA07220C5BDC0086D802 /* libgrabkernel.a */; };
+		216FDA0D220C5C320086D802 /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA0B220C5C320086D802 /* libplist.a */; };
+		216FDA0E220C5C320086D802 /* libplist++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA0C220C5C320086D802 /* libplist++.a */; };
+		216FDA10220C5C3E0086D802 /* libimg4tool.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA0F220C5C3E0086D802 /* libimg4tool.a */; };
+		216FDA12220C5C530086D802 /* liboffsetfinder64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA11220C5C530086D802 /* liboffsetfinder64.a */; };
+		216FDA1A220C5EAD0086D802 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA19220C5EAD0086D802 /* libcurl.a */; };
+		216FDA1E220C5F5C0086D802 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA1D220C5F5C0086D802 /* libz.tbd */; };
+		216FDA22220C62C80086D802 /* v1ntex_offsets.mm in Sources */ = {isa = PBXBuildFile; fileRef = 216FDA20220C62C80086D802 /* v1ntex_offsets.mm */; };
+		216FDA25220C68A60086D802 /* v1ntex_exploit.m in Sources */ = {isa = PBXBuildFile; fileRef = 216FDA24220C68A60086D802 /* v1ntex_exploit.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */; };
 		2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
@@ -89,6 +99,25 @@
 		2150A9E322021381001C8677 /* mach_vm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mach_vm.h; sourceTree = "<group>"; };
 		2150A9E422021381001C8677 /* ipc_port.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ipc_port.h; sourceTree = "<group>"; };
 		2150A9E52202138A001C8677 /* IOKitLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IOKitLib.h; sourceTree = "<group>"; };
+		216FDA03220C5BA90086D802 /* libfragmentzip.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfragmentzip.a; sourceTree = "<group>"; };
+		216FDA06220C5BB80086D802 /* libfragmentzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libfragmentzip.h; sourceTree = "<group>"; };
+		216FDA07220C5BDC0086D802 /* libgrabkernel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libgrabkernel.a; sourceTree = "<group>"; };
+		216FDA0A220C5BE50086D802 /* libgrabkernel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libgrabkernel.h; sourceTree = "<group>"; };
+		216FDA0B220C5C320086D802 /* libplist.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplist.a; sourceTree = "<group>"; };
+		216FDA0C220C5C320086D802 /* libplist++.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libplist++.a"; sourceTree = "<group>"; };
+		216FDA0F220C5C3E0086D802 /* libimg4tool.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libimg4tool.a; sourceTree = "<group>"; };
+		216FDA11220C5C530086D802 /* liboffsetfinder64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liboffsetfinder64.a; sourceTree = "<group>"; };
+		216FDA14220C5C620086D802 /* insn.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = insn.hpp; sourceTree = "<group>"; };
+		216FDA15220C5C620086D802 /* liboffsetfinder64.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = liboffsetfinder64.hpp; sourceTree = "<group>"; };
+		216FDA16220C5C620086D802 /* patch.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = patch.hpp; sourceTree = "<group>"; };
+		216FDA17220C5C620086D802 /* liboffsetfinder64_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = liboffsetfinder64_common.h; sourceTree = "<group>"; };
+		216FDA18220C5C620086D802 /* exception.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = exception.hpp; sourceTree = "<group>"; };
+		216FDA19220C5EAD0086D802 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcurl.a; sourceTree = "<group>"; };
+		216FDA1D220C5F5C0086D802 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		216FDA20220C62C80086D802 /* v1ntex_offsets.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = v1ntex_offsets.mm; sourceTree = "<group>"; };
+		216FDA21220C62C80086D802 /* v1ntex_offsets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = v1ntex_offsets.h; sourceTree = "<group>"; };
+		216FDA23220C68A60086D802 /* v1ntex_exploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = v1ntex_exploit.h; sourceTree = "<group>"; };
+		216FDA24220C68A60086D802 /* v1ntex_exploit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = v1ntex_exploit.m; sourceTree = "<group>"; };
 		21A97FC42148103A00DC0023 /* KernelExecution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KernelExecution.h; sourceTree = "<group>"; };
 		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
 		21A97FC62148103B00DC0023 /* remote_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_memory.c; sourceTree = "<group>"; };
@@ -150,10 +179,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				216FDA1E220C5F5C0086D802 /* libz.tbd in Frameworks */,
+				216FDA0D220C5C320086D802 /* libplist.a in Frameworks */,
+				216FDA10220C5C3E0086D802 /* libimg4tool.a in Frameworks */,
 				226689DD21EC1C5A00262F66 /* libarchive.2.tbd in Frameworks */,
 				22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */,
+				216FDA12220C5C530086D802 /* liboffsetfinder64.a in Frameworks */,
 				2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */,
+				216FDA0E220C5C320086D802 /* libplist++.a in Frameworks */,
 				2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */,
+				216FDA08220C5BDC0086D802 /* libgrabkernel.a in Frameworks */,
+				216FDA04220C5BA90086D802 /* libfragmentzip.a in Frameworks */,
+				216FDA1A220C5EAD0086D802 /* libcurl.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,6 +291,7 @@
 		21675B62214A68B700D20E2B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				216FDA1D220C5F5C0086D802 /* libz.tbd */,
 				226689DC21EC1C5A00262F66 /* libarchive.2.tbd */,
 				22CFED9121CDFE6B00A216BE /* libmis.tbd */,
 				211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */,
@@ -261,9 +299,65 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		216FDA02220C5B620086D802 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				216FDA03220C5BA90086D802 /* libfragmentzip.a */,
+				216FDA07220C5BDC0086D802 /* libgrabkernel.a */,
+				216FDA0B220C5C320086D802 /* libplist.a */,
+				216FDA0C220C5C320086D802 /* libplist++.a */,
+				216FDA0F220C5C3E0086D802 /* libimg4tool.a */,
+				216FDA11220C5C530086D802 /* liboffsetfinder64.a */,
+				216FDA19220C5EAD0086D802 /* libcurl.a */,
+			);
+			path = libs;
+			sourceTree = "<group>";
+		};
+		216FDA05220C5BB80086D802 /* libfragmentzip */ = {
+			isa = PBXGroup;
+			children = (
+				216FDA06220C5BB80086D802 /* libfragmentzip.h */,
+			);
+			path = libfragmentzip;
+			sourceTree = "<group>";
+		};
+		216FDA09220C5BE50086D802 /* libgrabkernel */ = {
+			isa = PBXGroup;
+			children = (
+				216FDA0A220C5BE50086D802 /* libgrabkernel.h */,
+			);
+			path = libgrabkernel;
+			sourceTree = "<group>";
+		};
+		216FDA13220C5C620086D802 /* liboffsetfinder64 */ = {
+			isa = PBXGroup;
+			children = (
+				216FDA14220C5C620086D802 /* insn.hpp */,
+				216FDA15220C5C620086D802 /* liboffsetfinder64.hpp */,
+				216FDA16220C5C620086D802 /* patch.hpp */,
+				216FDA17220C5C620086D802 /* liboffsetfinder64_common.h */,
+				216FDA18220C5C620086D802 /* exception.hpp */,
+			);
+			path = liboffsetfinder64;
+			sourceTree = "<group>";
+		};
+		216FDA1F220C62B20086D802 /* v1ntex */ = {
+			isa = PBXGroup;
+			children = (
+				216FDA20220C62C80086D802 /* v1ntex_offsets.mm */,
+				216FDA21220C62C80086D802 /* v1ntex_offsets.h */,
+				216FDA23220C68A60086D802 /* v1ntex_exploit.h */,
+				216FDA24220C68A60086D802 /* v1ntex_exploit.m */,
+			);
+			name = v1ntex;
+			sourceTree = "<group>";
+		};
 		2170BD3421B192750059BD10 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				216FDA13220C5C620086D802 /* liboffsetfinder64 */,
+				216FDA09220C5BE50086D802 /* libgrabkernel */,
+				216FDA05220C5BB80086D802 /* libfragmentzip */,
 				2150A9E322021381001C8677 /* mach_vm.h */,
 				2150A9E422021381001C8677 /* ipc_port.h */,
 				2150A9E52202138A001C8677 /* IOKitLib.h */,
@@ -292,6 +386,7 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				216FDA1F220C62B20086D802 /* v1ntex */,
 				213E78222208652B00FDF3B7 /* necp */,
 				2150A9CA220212F8001C8677 /* voucher_swap */,
 				2150A9C9220212E6001C8677 /* deja_xnu */,
@@ -363,6 +458,7 @@
 		21C0FC6921369EB700849420 /* Undecimus */ = {
 			isa = PBXGroup;
 			children = (
+				216FDA02220C5B620086D802 /* libs */,
 				2170BDCC21B330210059BD10 /* frameworks */,
 				2170BDCB21B32FF10059BD10 /* source */,
 				2170BD3621B192B90059BD10 /* resources */,
@@ -499,6 +595,7 @@
 				2150A9DD22021348001C8677 /* platform_match.c in Sources */,
 				212D8844216E4C4800A36DA5 /* find_port.c in Sources */,
 				213E78262208654700FDF3B7 /* necp.c in Sources */,
+				216FDA22220C62C80086D802 /* v1ntex_offsets.mm in Sources */,
 				22C546AB21A8A8FD00EFC09C /* utils.m in Sources */,
 				2150A9DC22021348001C8677 /* log.c in Sources */,
 				22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */,
@@ -516,6 +613,7 @@
 				212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */,
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
 				222AD59321FA731800DCBA2A /* FakeApt.m in Sources */,
+				216FDA25220C68A60086D802 /* v1ntex_exploit.m in Sources */,
 				21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */,
 				21C0FC8A21369EE900849420 /* KernelStructureOffsets.m in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,
@@ -682,12 +780,14 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus",
+					"$(PROJECT_DIR)/Undecimus/libs",
 				);
 				OTHER_CFLAGS = "";
 				"OTHER_CFLAGS[arch=*]" = "-DUNDECIMUS";
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,
+					"-w",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = science.xnu.undecimus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -725,12 +825,14 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Undecimus",
+					"$(PROJECT_DIR)/Undecimus/libs",
 				);
 				OTHER_CFLAGS = "";
 				"OTHER_CFLAGS[arch=*]" = "-DUNDECIMUS";
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,
+					"-w",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = science.xnu.undecimus;
 				PRODUCT_NAME = "$(TARGET_NAME)";

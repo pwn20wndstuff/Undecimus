@@ -95,7 +95,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Releases are now available at https://github.com/pwn20wndstuff/Undecimus/releases
 
 ## Special Thanks
-* [@i41nbeer](https://twitter.com/i41nbeer) for mach_portal, triple_fetch, async_wake, empty_list, multi_path & deja_xnu
+* [@i41nbeer](https://twitter.com/i41nbeer) for mach_portal, triple_fetch, async_wake, empty_list, multi_path and deja_xnu
 * [@Morpheus______](https://twitter.com/Morpheus______) for the QiLin Toolkit
 * [@xerub](https://twitter.com/xerub) for libjb and the original patchfinder64
 * [@iBSparkes](https://twitter.com/iBSparkes) for the original amfid_payload, jailbreakd and pspawn_hook
@@ -103,6 +103,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@theninjaprawn](https://twitter.com/theninjaprawn) for the patchfinder64 additions
 * [@saurik](https://twitter.com/saurik) for Cydia and Substrate
 * [@FCE365](https://twitter.com/FCE365) for the empty_list reliability improvements
+* [@tihmstar](https://twitter.com/tihmstar) for libgrabkernel, liboffsetfinder64 and v1ntex
 * Credits for [Undecimus-Resources](https://github.com/pwn20wndstuff/Undecimus-Resources)
 * [@coolstarorg](https://twitter.com/coolstarorg) for originally testing the snapshot rename idea on corellium
 * [@Cryptiiiic](https://twitter.com/Cryptiiiic) for testing

