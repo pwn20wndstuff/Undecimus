@@ -350,7 +350,7 @@ void remap_tfp0_set_hsp4(mach_port_t *port) {
     // lck_mtx -- arm: 8  arm64: 16
     uint64_t host_priv_kaddr = get_address_of_port(getpid(), mach_host_self());
     uint64_t realhost_kaddr = ReadKernel64(host_priv_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
-    WriteKernel64(realhost_kaddr + koffset(KSTRUCT_OFFSET_HOST_SPECIAL) + 4 * sizeof(void*), port_kaddr);
+    WriteKernel64(realhost_kaddr + koffset(KSTRUCT_OFFSET_HOST_SPECIAL) + 4 * sizeof(void *), port_kaddr);
     set_all_image_info_addr(kernel_task_kaddr, kernel_base);
     set_all_image_info_size(kernel_task_kaddr, kernel_slide);
 }

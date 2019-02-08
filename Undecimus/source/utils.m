@@ -870,7 +870,7 @@ bool supportsExploit(exploit_t exploit) {
         }
         case voucher_swap_exploit: {
             vm_size_t vm_size = 0;
-            if (host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS) {
+            if (_host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS) {
                 LOG("Unable to determine page size.");
                 return false;
             }
@@ -887,7 +887,7 @@ bool supportsExploit(exploit_t exploit) {
         }
         case v1ntex_exploit: {
             vm_size_t vm_size = 0;
-            if (host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS) {
+            if (_host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS) {
                 LOG("Unable to determine page size.");
                 return false;
             }
