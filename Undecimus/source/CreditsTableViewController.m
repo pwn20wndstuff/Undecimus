@@ -55,7 +55,7 @@
 }
 
 -(IBAction)tappedOnMorpheus:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"morpheus______"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Morpheus______"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnXerub:(id)sender{
@@ -124,6 +124,34 @@
 
 -(IBAction)tappedOnTihmstar:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"tihmstar"] options:@{} completionHandler:nil];
+}
+
+-(IBAction)tappedOnSiguza:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"s1guza"] options:@{} completionHandler:nil];
+}
+
+-(IBAction)tappedOnS0rryMyBad:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"S0rryMyBad"] options:@{} completionHandler:nil];
+}
+
+-(IBAction)tappedOnExternalist:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Externalist"] options:@{} completionHandler:nil];
+}
+
+-(IBAction)tappedOnRealBrightiup:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"realBrightiup"] options:@{} completionHandler:nil];
+}
+
+-(IBAction)tappedOnNitoTV:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"nitoTV"] options:@{} completionHandler:nil];
+}
+
+-(IBAction)tappedOnMatchstic:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"_Matchstic"] options:@{} completionHandler:nil];
+}
+
+-(IBAction)tappedOnLibimobiledevice:(id)sender{
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/libimobiledevice"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnCoolStar:(id)sender{
