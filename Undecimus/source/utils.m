@@ -944,10 +944,10 @@ NSInteger recommendedJailbreakSupport() {
         return async_wake_exploit;
     else if (supportsExploit(voucher_swap_exploit))
         return voucher_swap_exploit;
-    else if (supportsExploit(v1ntex_exploit))
-        return v1ntex_exploit;
     else if (supportsExploit(multi_path_exploit))
         return multi_path_exploit;
+    else if (supportsExploit(v1ntex_exploit))
+        return v1ntex_exploit;
     else if (supportsExploit(empty_list_exploit))
         return empty_list_exploit;
     else
