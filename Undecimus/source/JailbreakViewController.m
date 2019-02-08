@@ -752,27 +752,31 @@ void jailbreak()
                     break;
                 }
                 case v1ntex_exploit: {
+                    const char *kernelCachePath = NULL;
                     const char *kernelCacheDownloadPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"kernel"].UTF8String;
-                    const char *kernelCachePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/kernel"].UTF8String;
-                    const char *originalKernelCachePath = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
-                    if (canRead(originalKernelCachePath)) {
-                        kernelCachePath = originalKernelCachePath;
+                    const char *kernelCacheDownloadedPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/kernel"].UTF8String;
+                    const char *kernelCacheFilesystemPath = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
+                    _assert(clean_file(kernelCacheDownloadPath), message, true);
+                    if (canRead(kernelCacheFilesystemPath)) {
+                        kernelCachePath = kernelCacheFilesystemPath;
                         LOG("Found kernelcache in filesystem.");
-                    } else if (canRead(kernelCachePath)) {
+                    } else if (canRead(kernelCacheDownloadedPath)) {
+                        kernelCachePath = kernelCacheDownloadedPath;
                         LOG("Found kernelcache in documents.");
                     } else {
                         LOG("Downloading kernelcache from Apple...");
                         NOTICE(NSLocalizedString(@"Downloading kernelcache from Apple. This may take a while.", nil), false, false);
-                        _assert(clean_file(kernelCacheDownloadPath), message, true);
-                        _assert(clean_file(kernelCachePath), message, true);
                         _assert(grabkernel((char *)kernelCacheDownloadPath) == ERR_SUCCESS, message, true);
-                        _assert(copyfile(kernelCacheDownloadPath, kernelCachePath, 0, COPYFILE_ALL) == ERR_SUCCESS, message, true);
-                        _assert(clean_file(kernelCacheDownloadPath), message, true);
+                        _assert(rename(kernelCacheDownloadPath, kernelCacheDownloadedPath) == ERR_SUCCESS, message, true);
+                        kernelCachePath = kernelCacheDownloadedPath;
                         LOG("Successfully downloaded kernelcache from Apple.");
                     }
+                    LOG("kernelCachePath = %s", kernelCachePath);
                     v1ntex_offsets *v1ntex_offs = NULL;
-                    v1ntex_offs = get_v1ntex_offsets(kernelCachePath);
-                    _assert(v1ntex_offs != NULL, message, true);
+                    if ((v1ntex_offs = get_v1ntex_offsets(kernelCachePath)) == NULL) {
+                        _assert(clean_file(kernelCacheDownloadedPath), message, true);
+                        _assert(false, message, true);
+                    }
                     if (v1ntex(v1ntex_callback, NULL, v1ntex_offs) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR(kernel_base) &&
@@ -782,7 +786,7 @@ void jailbreak()
                     break;
                 }
                 default: {
-                    NOTICE(NSLocalizedString(@"No exploit selected", nil), false, false);
+                    NOTICE(NSLocalizedString(@"No exploit selected.", nil), false, false);
                     STATUS(NSLocalizedString(@"Jailbreak", nil), true, true);
                     return;
                     break;
