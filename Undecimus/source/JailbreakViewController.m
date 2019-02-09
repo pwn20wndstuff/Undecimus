@@ -752,11 +752,18 @@ void jailbreak()
                     break;
                 }
                 case v1ntex_exploit: {
-                    const char *kernelCachePath = NULL;
-                    const char *kernelCacheDownloadPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"kernel"].UTF8String;
-                    const char *kernelCacheDownloadedPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/kernel"].UTF8String;
+                    NSString *temporaryDirectory = NSTemporaryDirectory();
+                    LOG("temporaryDirectory = %@", temporaryDirectory);
+                    const char *kernelCacheDownloadPath = [temporaryDirectory stringByAppendingPathComponent:@"kernel"].UTF8String;
+                    LOG("kernelCacheDownloadPath = %s", kernelCacheDownloadPath);
+                    NSString *homeDirectory = NSHomeDirectory();
+                    LOG("homeDirectory = %@", homeDirectory);
+                    const char *kernelCacheDownloadedPath = [homeDirectory stringByAppendingPathComponent:@"Documents/kernel"].UTF8String;
+                    LOG("kernelCacheDownloadedPath = %s", kernelCacheDownloadedPath);
                     const char *kernelCacheFilesystemPath = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
+                    LOG("kernelCacheFilesystemPath = %s", kernelCacheFilesystemPath);
                     _assert(clean_file(kernelCacheDownloadPath), message, true);
+                    const char *kernelCachePath = NULL;
                     if (canRead(kernelCacheFilesystemPath)) {
                         kernelCachePath = kernelCacheFilesystemPath;
                         LOG("Found kernelcache in filesystem.");
