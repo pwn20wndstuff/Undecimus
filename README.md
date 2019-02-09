@@ -1,5 +1,5 @@
 # Unc0ver
-### The most advanced jailbreak tool
+### The most advance jailbreak tool
 ![unc0ver logo](https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Undecimus/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png?token=AlyO4xDujoguob2DCFfUbNI8jO82OyCgks5bx5ZPwA%3D%3D)
 
 unc0ver jailbreak for iOS 11.0 - 11.4.1<br/>
@@ -8,24 +8,24 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 
 ## The most outstanding changes over the other jailbreaks
 * All exploits in same app
-* Detailed error messages
+* Detailed and specific error messages
 * Faster patches
 * More stable patches
 * No extra battery drain
 * No random freezes
-* No random slow downs
+* No random slow downs/lags
 * No data is logged or shared
-* No malware
+* No malware/spyware
 * Proper jailbreak state detection
 * Proper bootstrap extraction to fix issues such as Cydia not appearing after jailbreak
 * Native build of Cydia for iOS 11
 * Telesphoreo port for ARM64
-* Much faster Cydia
+* Much faster Cydia interaction
 * Much more stable Cydia
-* Much more modern looking and acting Cydia
+* Much more modern user interface based Cydia
 * Cydia skips uicache when not needed
 * Cydia supports iPhone X screen size
-* Cydia Substrate for tweak injection
+* Official Cydia Substrate for tweak injection
 * Much faster ldrestart 
 * Much more stable ldrestart
 * Changes to Cydia were made with permission from Saurik 
@@ -40,8 +40,9 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Button to open Cydia in case it doesn't appear on the Home Screen
 * Label to show the days left till the application expires
 * Working debugserver
+* Detailed debugging 
+* Realtime Log window 
 * An awesome UI
-* Substrate and Cydia Support 
 
 ## Switching from the other jailbreaks
 * The RootFS will automatically be restored
@@ -54,10 +55,11 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Perform a full restore with Rollectra before switching from the other jailbreaks
 * Turn on the AirPlane Mode before starting the jailbreak
 * Turn off Siri before starting the jailbreak
+* Wait atleast one minute on the jailbreak screen
 
 ## Source code
 * This project is completely open source and it will be kept like it in the future
-* Any kind of contribution is welcome
+* Any kind of contribution is cordially welcome
 * The source code can be found on [pwn20wndstuff](https://github.com/pwn20wndstuff)'s GitHub account
 
 ## Video tutorial
@@ -68,6 +70,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Completely switch to Cydia Substrate and ditch Substitute: Done
 * Make switching from other jailbreaks without wiping the device possible: Done
 * Fix a kernel panic that's triggered by a kernel data abort which is caused by a UaF bug in jailbreakd: Done
+* Add the v1ntex exploit by tihmster for better success rate : Done
 * Chain [@_bazad](https://twitter.com/_bazad)'s [blanket](https://github.com/bazad/blanket) to bypass the developer certificate requirement for multi_path: Almost done
 * Enable the on-fly entitlement patching on iOS 11: Work in progress
 * WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1): Work in progress
@@ -115,3 +118,5 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@Swag_iOS](https://twitter.com/Swag_iOS) for testing
 * [@jailbreakbuster](https://twitter.com/jailbreakbuster) for testing
 * [@Jakeashacks](https://twitter.com/Jakeashacks) for testing
+* [@king4q](https://twitter.com/King4Q?s=17)
+* [@t4shf33n](https://mobile.twitter.com/t4shf33n) for testing
