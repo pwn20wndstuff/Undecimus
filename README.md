@@ -40,6 +40,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Label to show the days left till the application expires
 * Working debugserver
 * An awesome UI
+* Substrate and Cydia Support 
 
 ## Switching from the other jailbreaks
 * The RootFS will automatically be restored
