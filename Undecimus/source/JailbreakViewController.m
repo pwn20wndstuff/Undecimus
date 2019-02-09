@@ -831,7 +831,7 @@ void jailbreak()
 #define PF(x) do { \
         SETMESSAGE(NSLocalizedString(@"Failed to find " #x " offset.", nil)); \
         SETOFFSET(x, find_ ##x()); \
-        LOG(#x " = " ADDR, GETOFFSET(x)); \
+        LOG(#x " = " ADDR " + " ADDR, GETOFFSET(x) - kernel_slide, kernel_slide); \
         _assert(ISADDR(GETOFFSET(x)), message, true); \
 } while (false)
         PF(trustcache);
@@ -847,6 +847,9 @@ void jailbreak()
         PF(shenanigans);
         PF(lck_mtx_lock);
         PF(lck_mtx_unlock);
+        PF(apfs_jhash_getvnode);
+        SETOFFSET(vnode_get_snapshot, 0xFFFFFFF007245714 + kernel_slide);
+        SETOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name, 0xFFFFFFF00697964C + kernel_slide);
 #undef PF
         found_offsets = true;
         LOG("Successfully found offsets.");
@@ -1049,10 +1052,6 @@ void jailbreak()
         }
     }
     
-    if (kCFCoreFoundationVersionNumber >= 1535.12) {
-        goto out;
-    }
-    
     UPSTAGE();
     
     {
@@ -1136,7 +1135,61 @@ void jailbreak()
             snapshots = NULL;
             char *systemSnapshot = copySystemSnapshot();
             _assert(systemSnapshot != NULL, message, true);
+            uint64_t rvpp_ptr = kmem_alloc(sizeof(uint64_t));
+            LOG("rvpp_ptr = "ADDR"", rvpp_ptr);
+            _assert(ISADDR(rvpp_ptr), message, true);
+            uint64_t sdvpp_ptr = kmem_alloc(sizeof(uint64_t));
+            LOG("sdvpp_ptr = "ADDR"", sdvpp_ptr);
+            _assert(ISADDR(sdvpp_ptr), message, true);
+            uint64_t ndp_buf = kmem_alloc(816);
+            LOG("ndp_buf = "ADDR"", ndp_buf);
+            _assert(ISADDR(ndp_buf), message, true);
+            uint64_t vfs_context = _vfs_context();
+            LOG("vfs_context = "ADDR"", vfs_context);
+            _assert(ISADDR(vfs_context), message, true);
+            _assert(kexecute(GETOFFSET(vnode_get_snapshot), rootfd, rvpp_ptr, sdvpp_ptr, (uint64_t)systemSnapshot, ndp_buf, 2, vfs_context) == ERR_SUCCESS, message, true);
+            uint64_t sdvpp = ReadKernel64(sdvpp_ptr);
+            LOG("sdvpp = "ADDR"", sdvpp);
+            _assert(ISADDR(sdvpp), message, true);
+            uint64_t sdvpp_v_mount = ReadKernel64(sdvpp + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
+            LOG("sdvpp_v_mount = "ADDR"", sdvpp_v_mount);
+            _assert(ISADDR(sdvpp_v_mount), message, true);
+            uint64_t sdvpp_v_mount_mnt_data = ReadKernel64(sdvpp_v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_DATA));
+            LOG("sdvpp_v_mount_mnt_data = "ADDR"", sdvpp_v_mount_mnt_data);
+            _assert(ISADDR(sdvpp_v_mount_mnt_data), message, true);
+            uint64_t snap_meta_ptr = kmem_alloc(sizeof(uint64_t));
+            LOG("snap_meta_ptr = "ADDR"", snap_meta_ptr);
+            _assert(ISADDR(snap_meta_ptr), message, true);
+            uint64_t old_name_ptr = kmem_alloc(sizeof(uint64_t));
+            LOG("old_name_ptr = "ADDR"", old_name_ptr);
+            _assert(ISADDR(old_name_ptr), message, true);
+            uint32_t ndp_old_name_len = ReadKernel32(ndp_buf + 336 + 48);
+            LOG("ndp_old_name_len = 0x%x", ndp_old_name_len);
+            uint64_t ndp_old_name = ReadKernel64(ndp_buf + 336 + 40);
+            LOG("ndp_old_name = "ADDR"", ndp_old_name);
+            _assert(ISADDR(ndp_old_name), message, true);
+            _assert(kexecute(GETOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name), sdvpp_v_mount_mnt_data, ndp_old_name, ndp_old_name_len, snap_meta_ptr, old_name_ptr, 0, 0) == ERR_SUCCESS, message, true);
+            uint64_t snap_meta = ReadKernel64(snap_meta_ptr);
+            LOG("snap_meta = "ADDR"", snap_meta);
+            _assert(ISADDR(snap_meta), message, true);
+            uint64_t snap_vnode = kexecute(GETOFFSET(apfs_jhash_getvnode), sdvpp_v_mount_mnt_data, ReadKernel32(sdvpp_v_mount_mnt_data + 440), ReadKernel64(snap_meta + 8), 1, 0, 0, 0);
+            snap_vnode = zm_fix_addr(snap_vnode);
+            LOG("snap_vnode = "ADDR"", snap_vnode);
+            _assert(ISADDR(snap_vnode), message, true);
+            uint64_t snap_vnode_v_data = ReadKernel64(snap_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_DATA));
+            LOG("snap_vnode_v_data = "ADDR"", snap_vnode_v_data);
+            _assert(ISADDR(snap_vnode_v_data), message, true);
+            uint32_t snap_vnode_v_data_flag = ReadKernel32(snap_vnode_v_data + 49);
+            LOG("snap_vnode_v_data_flag = 0x%x", snap_vnode_v_data_flag);
+            snap_vnode_v_data_flag &= ~0x40;
+            WriteKernel32(snap_vnode_v_data + 49, snap_vnode_v_data_flag);
             _assert(fs_snapshot_rename(rootfd, systemSnapshot, origfs, 0) == ERR_SUCCESS, message, true);
+            _assert(_vnode_put(sdvpp) == ERR_SUCCESS, message, true);
+            _assert(_vnode_put(snap_vnode) == ERR_SUCCESS, message, true);
+            kmem_free(sdvpp_ptr, sizeof(uint64_t));
+            kmem_free(ndp_buf, 816);
+            kmem_free(snap_meta_ptr, sizeof(uint64_t));
+            kmem_free(old_name_ptr, sizeof(uint64_t));
             free(systemSnapshot);
             systemSnapshot = NULL;
             LOG("Successfully renamed system snapshot.");
@@ -1242,6 +1295,10 @@ void jailbreak()
             LOG("Successfully enabled app revokes.");
             INSERTSTATUS(NSLocalizedString(@"Enabled App Revokes.\n", nil));
         }
+    }
+    
+    if (kCFCoreFoundationVersionNumber >= 1535.12) {
+        goto out;
     }
     
     UPSTAGE();

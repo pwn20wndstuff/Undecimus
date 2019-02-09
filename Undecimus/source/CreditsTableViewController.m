@@ -150,6 +150,14 @@
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"_Matchstic"] options:@{} completionHandler:nil];
 }
 
+-(IBAction)tappedOnUmanghere:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"umanghere"] options:@{} completionHandler:nil];
+}
+
+-(IBAction)tappedOnMiscMisty:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"MiscMisty"] options:@{} completionHandler:nil];
+}
+
 -(IBAction)tappedOnLibimobiledevice:(id)sender{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/libimobiledevice"] options:@{} completionHandler:nil];
 }
