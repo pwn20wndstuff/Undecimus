@@ -735,9 +735,9 @@ void jailbreak()
         PF(shenanigans);
         PF(lck_mtx_lock);
         PF(lck_mtx_unlock);
-        PF(apfs_jhash_getvnode);
         PF(vnode_get_snapshot);
         PF(fs_lookup_snapshot_metadata_by_name_and_return_name);
+        PF(apfs_jhash_getvnode);
 #undef PF
         found_offsets = true;
         LOG("Successfully found offsets.");
@@ -965,6 +965,7 @@ void jailbreak()
         const char *origfs = "orig-fs";
         bool has_origfs = false;
         const char *thedisk = "/dev/disk0s1s1";
+        _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
         if (snapshots == NULL) {
             close(rootfd);
             
@@ -1004,6 +1005,7 @@ void jailbreak()
                 _assert(ISADDR(procStructAddr), message, true);
                 give_creds_to_process_at_addr(procStructAddr, kernelCredAddr);
             }) == ERR_SUCCESS, message, true);
+            _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
             const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
             _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
             LOG("Successfully mounted system snapshot.");
@@ -1101,6 +1103,7 @@ void jailbreak()
             }
         }
         
+        _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
         uint64_t rootfs_vnode = vnodeFor("/");
         LOG("rootfs_vnode = "ADDR"", rootfs_vnode);
         _assert(ISADDR(rootfs_vnode), message, true);
@@ -1115,6 +1118,7 @@ void jailbreak()
             WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag);
         }
         _assert(_vnode_put(rootfs_vnode) == ERR_SUCCESS, message, true);
+        _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
         NSString *file = [NSString stringWithContentsOfFile:@"/.installed_unc0ver" encoding:NSUTF8StringEncoding error:nil];
         needStrap = (file == nil ||
                     (![file isEqualToString:@""] &&
