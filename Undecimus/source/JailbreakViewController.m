@@ -1128,18 +1128,25 @@ void jailbreak()
             snapshots = NULL;
             char *systemSnapshot = copySystemSnapshot();
             _assert(systemSnapshot != NULL, message, true);
-            uint64_t system_snapshot_vnode = vnodeForSnapshot(rootfd, systemSnapshot);
-            LOG("system_snapshot_vnode = "ADDR"", system_snapshot_vnode);
-            _assert(ISADDR(system_snapshot_vnode), message, true);
-            uint64_t system_snapshot_vnode_v_data = ReadKernel64(system_snapshot_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_DATA));
-            LOG("system_snapshot_vnode_v_data = "ADDR"", system_snapshot_vnode_v_data);
-            _assert(ISADDR(system_snapshot_vnode_v_data), message, true);
-            uint32_t system_snapshot_vnode_v_data_flag = ReadKernel32(system_snapshot_vnode_v_data + 49);
-            LOG("system_snapshot_vnode_v_data_flag = 0x%x", system_snapshot_vnode_v_data_flag);
-            WriteKernel32(system_snapshot_vnode_v_data + 49, system_snapshot_vnode_v_data_flag & ~0x40);
+            uint64_t system_snapshot_vnode = 0;
+            uint64_t system_snapshot_vnode_v_data = 0;
+            uint32_t system_snapshot_vnode_v_data_flag = 0;
+            if (kCFCoreFoundationVersionNumber >= 1535.12) {
+                system_snapshot_vnode = vnodeForSnapshot(rootfd, systemSnapshot);
+                LOG("system_snapshot_vnode = "ADDR"", system_snapshot_vnode);
+                _assert(ISADDR(system_snapshot_vnode), message, true);
+                system_snapshot_vnode_v_data = ReadKernel64(system_snapshot_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_DATA));
+                LOG("system_snapshot_vnode_v_data = "ADDR"", system_snapshot_vnode_v_data);
+                _assert(ISADDR(system_snapshot_vnode_v_data), message, true);
+                system_snapshot_vnode_v_data_flag = ReadKernel32(system_snapshot_vnode_v_data + 49);
+                LOG("system_snapshot_vnode_v_data_flag = 0x%x", system_snapshot_vnode_v_data_flag);
+                WriteKernel32(system_snapshot_vnode_v_data + 49, system_snapshot_vnode_v_data_flag & ~0x40);
+            }
             _assert(fs_snapshot_rename(rootfd, systemSnapshot, origfs, 0) == ERR_SUCCESS, message, true);
-            WriteKernel32(system_snapshot_vnode_v_data + 49, system_snapshot_vnode_v_data_flag);
-            _assert(_vnode_put(system_snapshot_vnode) == ERR_SUCCESS, message, true);
+            if (kCFCoreFoundationVersionNumber >= 1535.12) {
+                WriteKernel32(system_snapshot_vnode_v_data + 49, system_snapshot_vnode_v_data_flag);
+                _assert(_vnode_put(system_snapshot_vnode) == ERR_SUCCESS, message, true);
+            }
             free(systemSnapshot);
             systemSnapshot = NULL;
             LOG("Successfully renamed system snapshot.");
