@@ -848,8 +848,8 @@ void jailbreak()
         PF(lck_mtx_lock);
         PF(lck_mtx_unlock);
         PF(apfs_jhash_getvnode);
-        SETOFFSET(vnode_get_snapshot, 0xFFFFFFF007245714 + kernel_slide);
-        SETOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name, 0xFFFFFFF00697964C + kernel_slide);
+        PF(vnode_get_snapshot);
+        PF(fs_lookup_snapshot_metadata_by_name_and_return_name);
 #undef PF
         found_offsets = true;
         LOG("Successfully found offsets.");
