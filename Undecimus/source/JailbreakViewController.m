@@ -248,7 +248,7 @@ void set_all_image_info_addr(uint64_t kernel_task_kaddr, uint64_t all_image_info
     struct task_dyld_info dyld_info = { 0 };
     mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
     _assert(task_info(tfp0, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS, message, true);
-    LOG("Will set all_image_info_addr to: "ADDR"", all_image_info_addr);
+    LOG("Will set all_image_info_addr to: " ADDR, all_image_info_addr);
     if (dyld_info.all_image_info_addr != all_image_info_addr) {
         LOG("Setting all_image_info_addr...");
         WriteKernel64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_ALL_IMAGE_INFO_ADDR), all_image_info_addr);
@@ -263,7 +263,7 @@ void set_all_image_info_size(uint64_t kernel_task_kaddr, uint64_t all_image_info
     struct task_dyld_info dyld_info = { 0 };
     mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
     _assert(task_info(tfp0, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS, message, true);
-    LOG("Will set all_image_info_size to: "ADDR"", all_image_info_size);
+    LOG("Will set all_image_info_size to: " ADDR, all_image_info_size);
     if (dyld_info.all_image_info_size != all_image_info_size) {
         LOG("Setting all_image_info_size...");
         WriteKernel64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_ALL_IMAGE_INFO_SIZE), all_image_info_size);
@@ -313,7 +313,7 @@ void remap_tfp0_set_hsp4(mach_port_t *port) {
     uint64_t sizeof_task = 0x1000;
     uint64_t kernel_task_kaddr = ReadKernel64(GETOFFSET(kernel_task));
     _assert(kernel_task_kaddr != 0, message, true);
-    LOG("kernel_task_kaddr = "ADDR"", kernel_task_kaddr);
+    LOG("kernel_task_kaddr = " ADDR, kernel_task_kaddr);
     mach_port_t zm_fake_task_port = MACH_PORT_NULL;
     mach_port_t km_fake_task_port = MACH_PORT_NULL;
     kern_return_t kr = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &zm_fake_task_port);
@@ -336,10 +336,10 @@ void remap_tfp0_set_hsp4(mach_port_t *port) {
     vm_prot_t max = 0;
     _assert(mach_vm_remap(km_fake_task_port, &remapped_task_addr, sizeof_task, 0, VM_FLAGS_ANYWHERE | VM_FLAGS_RETURN_DATA_ADDR, zm_fake_task_port, kernel_task_kaddr, 0, &cur, &max, VM_INHERIT_NONE) == KERN_SUCCESS, message, true);
     _assert(kernel_task_kaddr != remapped_task_addr, message, true);
-    LOG("remapped_task_addr = "ADDR"", remapped_task_addr);
+    LOG("remapped_task_addr = " ADDR, remapped_task_addr);
     _assert(mach_vm_wire(mach_host_self(), km_fake_task_port, remapped_task_addr, sizeof_task, VM_PROT_READ | VM_PROT_WRITE) == KERN_SUCCESS, message, true);
     uint64_t port_kaddr = get_address_of_port(getpid(), *port);
-    LOG("port_kaddr = "ADDR"", port_kaddr);
+    LOG("port_kaddr = " ADDR, port_kaddr);
     make_port_fake_task_port(*port, remapped_task_addr);
     _assert(ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT)) == remapped_task_addr, message, true);
     // lck_mtx -- arm: 8  arm64: 16
@@ -466,22 +466,22 @@ uint64_t vnodeForSnapshot(int fd, char *name) {
     uint64_t snap_meta = 0;
     uint64_t snap_vnode = 0;
     rvpp_ptr = kmem_alloc(sizeof(uint64_t));
-    LOG("rvpp_ptr = "ADDR"", rvpp_ptr);
+    LOG("rvpp_ptr = " ADDR, rvpp_ptr);
     if (!ISADDR(rvpp_ptr)) {
         goto out;
     }
     sdvpp_ptr = kmem_alloc(sizeof(uint64_t));
-    LOG("sdvpp_ptr = "ADDR"", sdvpp_ptr);
+    LOG("sdvpp_ptr = " ADDR, sdvpp_ptr);
     if (!ISADDR(sdvpp_ptr)) {
         goto out;
     }
     ndp_buf = kmem_alloc(816);
-    LOG("ndp_buf = "ADDR"", ndp_buf);
+    LOG("ndp_buf = " ADDR, ndp_buf);
     if (!ISADDR(ndp_buf)) {
         goto out;
     }
     vfs_context = _vfs_context();
-    LOG("vfs_context = "ADDR"", vfs_context);
+    LOG("vfs_context = " ADDR, vfs_context);
     if (!ISADDR(vfs_context)) {
         goto out;
     }
@@ -489,34 +489,34 @@ uint64_t vnodeForSnapshot(int fd, char *name) {
         goto out;
     }
     sdvpp = ReadKernel64(sdvpp_ptr);
-    LOG("sdvpp = "ADDR"", sdvpp);
+    LOG("sdvpp = " ADDR, sdvpp);
     if (!ISADDR(sdvpp)) {
         goto out;
     }
     sdvpp_v_mount = ReadKernel64(sdvpp + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
-    LOG("sdvpp_v_mount = "ADDR"", sdvpp_v_mount);
+    LOG("sdvpp_v_mount = " ADDR, sdvpp_v_mount);
     if (!ISADDR(sdvpp_v_mount)) {
         goto out;
     }
     sdvpp_v_mount_mnt_data = ReadKernel64(sdvpp_v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_DATA));
-    LOG("sdvpp_v_mount_mnt_data = "ADDR"", sdvpp_v_mount_mnt_data);
+    LOG("sdvpp_v_mount_mnt_data = " ADDR, sdvpp_v_mount_mnt_data);
     if (!ISADDR(sdvpp_v_mount_mnt_data)) {
         goto out;
     }
     snap_meta_ptr = kmem_alloc(sizeof(uint64_t));
-    LOG("snap_meta_ptr = "ADDR"", snap_meta_ptr);
+    LOG("snap_meta_ptr = " ADDR, snap_meta_ptr);
     if (!ISADDR(snap_meta_ptr)) {
         goto out;
     }
     old_name_ptr = kmem_alloc(sizeof(uint64_t));
-    LOG("old_name_ptr = "ADDR"", old_name_ptr);
+    LOG("old_name_ptr = " ADDR, old_name_ptr);
     if (!ISADDR(old_name_ptr)) {
         goto out;
     }
     ndp_old_name_len = ReadKernel32(ndp_buf + 336 + 48);
     LOG("ndp_old_name_len = 0x%x", ndp_old_name_len);
     ndp_old_name = ReadKernel64(ndp_buf + 336 + 40);
-    LOG("ndp_old_name = "ADDR"", ndp_old_name);
+    LOG("ndp_old_name = " ADDR, ndp_old_name);
     if (!ISADDR(ndp_old_name)) {
         goto out;
     }
@@ -524,13 +524,13 @@ uint64_t vnodeForSnapshot(int fd, char *name) {
         goto out;
     }
     snap_meta = ReadKernel64(snap_meta_ptr);
-    LOG("snap_meta = "ADDR"", snap_meta);
+    LOG("snap_meta = " ADDR, snap_meta);
     if (!ISADDR(snap_meta)) {
         goto out;
     }
     snap_vnode = kexecute(GETOFFSET(apfs_jhash_getvnode), sdvpp_v_mount_mnt_data, ReadKernel32(sdvpp_v_mount_mnt_data + 440), ReadKernel64(snap_meta + 8), 1, 0, 0, 0);
     snap_vnode = zm_fix_addr(snap_vnode);
-    LOG("snap_vnode = "ADDR"", snap_vnode);
+    LOG("snap_vnode = " ADDR, snap_vnode);
     if (!ISADDR(snap_vnode)) {
         goto out;
     }
@@ -791,8 +791,8 @@ void jailbreak()
             }
         }
         LOG("tfp0: 0x%x", tfp0);
-        LOG("kernel_base: "ADDR"", kernel_base);
-        LOG("kernel_slide: "ADDR"", kernel_slide);
+        LOG("kernel_base: " ADDR, kernel_base);
+        LOG("kernel_slide: " ADDR, kernel_slide);
         if (!exploit_success) {
             NOTICE(NSLocalizedString(@"Failed to exploit kernel_task. This is not an error. Reboot and try again.", nil), true, false);
             exit(EXIT_FAILURE);
@@ -865,17 +865,17 @@ void jailbreak()
         LOG("Escaping Sandbox...");
         SETMESSAGE(NSLocalizedString(@"Failed to escape sandbox.", nil));
         myProcAddr = get_proc_struct_for_pid(myPid);
-        LOG("myProcAddr = "ADDR"", myProcAddr);
+        LOG("myProcAddr = " ADDR, myProcAddr);
         _assert(ISADDR(myProcAddr), message, true);
         kernelCredAddr = get_kernel_cred_addr();
-        LOG("kernelCredAddr = "ADDR"", kernelCredAddr);
+        LOG("kernelCredAddr = " ADDR, kernelCredAddr);
         _assert(ISADDR(kernelCredAddr), message, true);
         Shenanigans = ReadKernel64(GETOFFSET(shenanigans));
-        LOG("Shenanigans = "ADDR"", Shenanigans);
+        LOG("Shenanigans = " ADDR, Shenanigans);
         _assert(ISADDR(Shenanigans), message, true);
         WriteKernel64(GETOFFSET(shenanigans), ShenanigansPatch);
         myOriginalCredAddr = give_creds_to_process_at_addr(myProcAddr, kernelCredAddr);
-        LOG("myOriginalCredAddr = "ADDR"", myOriginalCredAddr);
+        LOG("myOriginalCredAddr = " ADDR, myOriginalCredAddr);
         _assert(ISADDR(myOriginalCredAddr), message, true);
         _assert(setuid(0) == ERR_SUCCESS, message, true);
         _assert(getuid() == 0, message, true);
@@ -1076,10 +1076,10 @@ void jailbreak()
             LOG("Clearing dev vnode's si_flags...");
             SETMESSAGE(NSLocalizedString(@"Failed to clear dev vnode's si_flags.", nil));
             uint64_t devVnode = vnodeForPath(thedisk);
-            LOG("devVnode = "ADDR"", devVnode);
+            LOG("devVnode = " ADDR, devVnode);
             _assert(ISADDR(devVnode), message, true);
             uint64_t v_specinfo = ReadKernel64(devVnode + koffset(KSTRUCT_OFFSET_VNODE_VU_SPECINFO));
-            LOG("v_specinfo = "ADDR"", v_specinfo);
+            LOG("v_specinfo = " ADDR, v_specinfo);
             _assert(ISADDR(v_specinfo), message, true);
             WriteKernel32(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS), 0);
             uint32_t si_flags = ReadKernel32(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS));
@@ -1103,7 +1103,7 @@ void jailbreak()
             const char *argv[] = {"/sbin/mount_apfs", thedisk, systemSnapshotMountPoint, NULL};
             _assert(runCommandv(argv[0], 3, argv, ^(pid_t pid) {
                 uint64_t procStructAddr = get_proc_struct_for_pid(pid);
-                LOG("procStructAddr = "ADDR"", procStructAddr);
+                LOG("procStructAddr = " ADDR, procStructAddr);
                 _assert(ISADDR(procStructAddr), message, true);
                 give_creds_to_process_at_addr(procStructAddr, kernelCredAddr);
             }) == ERR_SUCCESS, message, true);
@@ -1133,10 +1133,10 @@ void jailbreak()
             uint32_t system_snapshot_vnode_v_data_flag = 0;
             if (kCFCoreFoundationVersionNumber >= 1535.12) {
                 system_snapshot_vnode = vnodeForSnapshot(rootfd, systemSnapshot);
-                LOG("system_snapshot_vnode = "ADDR"", system_snapshot_vnode);
+                LOG("system_snapshot_vnode = " ADDR, system_snapshot_vnode);
                 _assert(ISADDR(system_snapshot_vnode), message, true);
                 system_snapshot_vnode_v_data = ReadKernel64(system_snapshot_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_DATA));
-                LOG("system_snapshot_vnode_v_data = "ADDR"", system_snapshot_vnode_v_data);
+                LOG("system_snapshot_vnode_v_data = " ADDR, system_snapshot_vnode_v_data);
                 _assert(ISADDR(system_snapshot_vnode_v_data), message, true);
                 system_snapshot_vnode_v_data_flag = ReadKernel32(system_snapshot_vnode_v_data + 49);
                 LOG("system_snapshot_vnode_v_data_flag = 0x%x", system_snapshot_vnode_v_data_flag);
@@ -1171,10 +1171,10 @@ void jailbreak()
         
         _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
         uint64_t rootfs_vnode = vnodeForPath("/");
-        LOG("rootfs_vnode = "ADDR"", rootfs_vnode);
+        LOG("rootfs_vnode = " ADDR, rootfs_vnode);
         _assert(ISADDR(rootfs_vnode), message, true);
         uint64_t v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
-        LOG("v_mount = "ADDR"", v_mount);
+        LOG("v_mount = " ADDR, v_mount);
         _assert(ISADDR(v_mount), message, true);
         uint32_t v_flag = ReadKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG));
         if ((v_flag & (MNT_RDONLY | MNT_NOSUID))) {
