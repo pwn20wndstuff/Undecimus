@@ -116,13 +116,8 @@ typedef struct {
 static NSString *bundledResources = nil;
 static mach_port_t host = MACH_PORT_NULL;
 
-// https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
-
-#define IMAGE_OFFSET 0x2000
 #define MAX_KASLR_SLIDE 0x21000000
 #define KERNEL_SEARCH_ADDRESS 0xfffffff007004000
-
-#define ptrSize sizeof(uintptr_t)
 
 static void writeTestFile(const char *file) {
     _assert(create_file(file, 0, 0644), message, true);
@@ -400,113 +395,6 @@ void unblockDomainWithName(const char *name) {
     }
     if (![newHostsFile isEqual:hostsFile]) {
         [newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil];
-    }
-}
-
-// https://github.com/JonathanSeals/kernelversionhacker/blob/3dcbf59f316047a34737f393ff946175164bf03f/kernelversionhacker.c#L92
-
-int updateVersionString(const char *newVersionString) {
-    uintptr_t versionPtr = 0;
-    struct utsname u = {0};
-    uname(&u);
-    
-    uintptr_t darwinTextPtr = 0;
-    
-    char *buf = NULL;
-    
-    vm_size_t sz;
-    uintptr_t TEXT_const = 0;
-    uint32_t sizeofTEXT_const = 0;
-    uintptr_t DATA_data = 0;
-    uint32_t sizeofDATA_data = 0;
-    
-    char *sectName = "__const";
-    
-    for (uintptr_t i=kernel_base; i < (kernel_base+0x2000); i+=(ptrSize)) {
-        int ret = vm_read(tfp0, i, 0x150, (vm_offset_t*)&buf, (mach_msg_type_number_t*)&sz);
-        if (ret != KERN_SUCCESS) {
-            LOG("Failed vm_read %i", ret);
-            exit(EXIT_FAILURE);
-        }
-        
-        if (!strcmp(buf, sectName) && !strcmp(buf+0x10, "__TEXT")) {
-            TEXT_const = *(uintptr_t*)(buf+0x20);
-            sizeofTEXT_const = (uint32_t)*(uintptr_t*)(buf+(0x20 + ptrSize));
-            
-        }
-        
-        else if (!strcmp(buf, "__data") && !strcmp(buf+0x10, "__DATA")) {
-            DATA_data = *(uintptr_t*)(buf+0x20);
-            sizeofDATA_data = (uint32_t)*(uintptr_t*)(buf+(0x20 + ptrSize));
-        }
-        
-        if (TEXT_const && sizeofTEXT_const && DATA_data && sizeofDATA_data)
-            break;
-    }
-    
-    if (!(TEXT_const && sizeofTEXT_const && DATA_data && sizeofDATA_data)) {
-        LOG("Error parsing kernel macho");
-        return -1;
-    }
-    
-    for (uintptr_t i = TEXT_const; i < (TEXT_const+sizeofTEXT_const); i += 2)
-    {
-        int ret = vm_read_overwrite(tfp0, i, strlen("Darwin Kernel Version"), (vm_address_t)buf, &sz);
-        if (ret != KERN_SUCCESS) {
-            LOG("Failed vm_read %i", ret);
-            return -1;
-        }
-        if (!memcmp(buf, "Darwin Kernel Version", strlen("Darwin Kernel Version"))) {
-            darwinTextPtr = i;
-            break;
-        }
-    }
-    
-    if (!darwinTextPtr) {
-        LOG("Error finding Darwin text");
-        return -1;
-    }
-    
-    uintptr_t versionTextXref[ptrSize];
-    versionTextXref[0] = darwinTextPtr;
-    
-    for (uintptr_t i = DATA_data; i < (DATA_data+sizeofDATA_data); i += ptrSize) {
-        int ret = vm_read_overwrite(tfp0, i, ptrSize, (vm_address_t)buf, &sz);
-        if (ret != KERN_SUCCESS) {
-            LOG("Failed vm_read %i", ret);
-            return -1;
-        }
-        
-        if (!memcmp(buf, versionTextXref, ptrSize)) {
-            versionPtr = i;
-            break;
-        }
-    }
-    
-    if (!versionPtr) {
-        LOG("Error finding _version pointer, did you already patch it?");
-        return -1;
-    }
-    
-    kern_return_t ret;
-    vm_address_t newStringPtr = 0;
-    vm_allocate(tfp0, &newStringPtr, strlen(newVersionString), VM_FLAGS_ANYWHERE);
-    
-    ret = vm_write(tfp0, newStringPtr, (vm_offset_t)newVersionString, (mach_msg_type_number_t)strlen(newVersionString));
-    if (ret != KERN_SUCCESS) {
-        LOG("Failed vm_write %i", ret);
-        exit(EXIT_FAILURE);
-    }
-    
-    ret = vm_write(tfp0, versionPtr, (vm_offset_t)&newStringPtr, ptrSize);
-    if (ret != KERN_SUCCESS) {
-        LOG("Failed vm_write %i", ret);
-        return -1;
-    }
-    else {
-        memset(&u, 0x0, sizeof(u));
-        uname(&u);
-        return 0;
     }
 }
 
@@ -997,10 +885,11 @@ void jailbreak()
         
         LOG("Logging slide...");
         SETMESSAGE(NSLocalizedString(@"Failed to log slide.", nil));
+        NSString *file = @(SLIDE_FILE);
         NSData *fileData = [[NSString stringWithFormat:@(ADDR "\n"), kernel_slide] dataUsingEncoding:NSUTF8StringEncoding];
-        if (![[NSData dataWithContentsOfFile:@"/var/tmp/slide.txt"] isEqual:fileData]) {
-            _assert(clean_file("/var/tmp/slide.txt"), message, true);
-            _assert(create_file_data("/var/tmp/slide.txt", 0, 0644, fileData), message, false);
+        if (![[NSData dataWithContentsOfFile:file] isEqual:fileData]) {
+            _assert(clean_file(file.UTF8String), message, true);
+            _assert(create_file_data(file.UTF8String, 0, 0644, fileData), message, false);
         }
         LOG("Successfully logged slide.");
         INSERTSTATUS(NSLocalizedString(@"Logged slide.\n", nil));
@@ -1488,6 +1377,7 @@ void jailbreak()
     UPSTAGE();
     
     {
+        NSString *offsetsFile = @"/jb/offsets.plist";
         NSMutableDictionary *dictionary = [NSMutableDictionary new];
         dictionary[@"KernelBase"] = ADDRSTRING(kernel_base);
         dictionary[@"KernelSlide"] = ADDRSTRING(kernel_slide);
@@ -1507,36 +1397,15 @@ void jailbreak()
         dictionary[@"LckMtxLock"] = ADDRSTRING(GETOFFSET(lck_mtx_lock));
         dictionary[@"LckMtxUnlock"] = ADDRSTRING(GETOFFSET(lck_mtx_unlock));
         dictionary[@"Strlen"] = ADDRSTRING(GETOFFSET(strlen));
-        if (![[NSMutableDictionary dictionaryWithContentsOfFile:@"/jb/offsets.plist"] isEqual:dictionary]) {
+        if (![[NSMutableDictionary dictionaryWithContentsOfFile:offsetsFile] isEqual:dictionary]) {
             // Log offsets.
             
             LOG("Logging offsets...");
             SETMESSAGE(NSLocalizedString(@"Failed to log offsets.", nil));
-            _assert(([dictionary writeToFile:@"/jb/offsets.plist" atomically:YES]), message, true);
-            _assert(init_file("/jb/offsets.plist", 0, 0644), message, true);
+            _assert(([dictionary writeToFile:offsetsFile atomically:YES]), message, true);
+            _assert(init_file(offsetsFile.UTF8String, 0, 0644), message, true);
             LOG("Successfully logged offsets.");
             INSERTSTATUS(NSLocalizedString(@"Logged Offsets.\n", nil));
-        }
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Update version string.
-        
-        if (!jailbreakEnabled()) {
-            LOG("Updating version string...");
-            SETMESSAGE(NSLocalizedString(@"Failed to update version string.", nil));
-            struct utsname u;
-            _assert(uname(&u) == ERR_SUCCESS, message, true);
-            const char *kernelVersionString = [NSString stringWithFormat:@"%s %s", u.version, DEFAULT_VERSION_STRING].UTF8String;
-            for (int i = 0; !(i >= 5 || strstr(u.version, kernelVersionString) != NULL); i++) {
-                _assert(updateVersionString(kernelVersionString) == ERR_SUCCESS, message, true);
-                _assert(uname(&u) == ERR_SUCCESS, message, true);
-            }
-            _assert(strstr(u.version, kernelVersionString) != NULL, message, true);
-            LOG("Successfully updated version string.");
-            INSERTSTATUS(NSLocalizedString(@"Updated Version String.\n", nil));
         }
     }
     

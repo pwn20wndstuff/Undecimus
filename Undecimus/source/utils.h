@@ -15,6 +15,7 @@
 extern int logfd;
 
 #define DEFAULT_VERSION_STRING "Hacked"
+#define SLIDE_FILE "/var/tmp/slide.txt"
 
 typedef enum {
     empty_list_exploit = 0,

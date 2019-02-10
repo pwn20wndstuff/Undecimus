@@ -619,7 +619,8 @@ bool multi_path_tcp_enabled() {
 }
 
 bool jailbreakEnabled() {
-    return kernelVersionContains(DEFAULT_VERSION_STRING);
+    return kernelVersionContains(DEFAULT_VERSION_STRING) ||
+    access(SLIDE_FILE, F_OK) == ERR_SUCCESS;
 }
 
 bool supportsExploit(exploit_t exploit) {
