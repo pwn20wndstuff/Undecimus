@@ -648,6 +648,7 @@ void jailbreak()
     NSDictionary *userDefaultsDictionary = nil;
     NSString *prefsFile = nil;
     NSString *homeDirectory = NSHomeDirectory();
+    NSString *temporaryDirectory = NSTemporaryDirectory();
     NSMutableArray *debsToInstall = [NSMutableArray new];
     NSMutableString *status = [NSMutableString string];
 #define INSERTSTATUS(x) do { \
@@ -742,12 +743,8 @@ void jailbreak()
                     break;
                 }
                 case v1ntex_exploit: {
-                    NSString *temporaryDirectory = NSTemporaryDirectory();
-                    LOG("temporaryDirectory = %@", temporaryDirectory);
                     const char *kernelCacheDownloadPath = [temporaryDirectory stringByAppendingPathComponent:@"kernel"].UTF8String;
                     LOG("kernelCacheDownloadPath = %s", kernelCacheDownloadPath);
-                    NSString *homeDirectory = NSHomeDirectory();
-                    LOG("homeDirectory = %@", homeDirectory);
                     const char *kernelCacheDownloadedPath = [homeDirectory stringByAppendingPathComponent:@"Documents/kernel"].UTF8String;
                     LOG("kernelCacheDownloadedPath = %s", kernelCacheDownloadedPath);
                     const char *kernelCacheFilesystemPath = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
