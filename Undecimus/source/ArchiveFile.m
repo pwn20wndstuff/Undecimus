@@ -58,7 +58,18 @@ copy_data(struct archive *ar, struct archive *aw)
     return [[[ArchiveFile alloc] initWithFd:fd] autorelease];
 #endif
 }
-
+-(void)addEntry:(struct archive_entry *)entry
+{
+    NSString *path = @(archive_entry_pathname(entry));
+    _files[path] = [NSMutableDictionary new];
+    _files[path][@"mode"] = @(archive_entry_mode(entry));
+    _files[path][@"uid"] = @(archive_entry_uid(entry));
+    _files[path][@"gid"] = @(archive_entry_gid(entry));
+    time_t mtime = archive_entry_mtime(entry);
+    if (mtime) {
+        _files[path][@"mtime"] = [NSDate dateWithTimeIntervalSince1970:mtime];
+    }
+}
 -(void)readContents
 {
     struct archive *a = archive_read_new();
@@ -68,21 +79,21 @@ copy_data(struct archive *ar, struct archive *aw)
         return;
     
     struct archive_entry *entry;
-    _files = [NSMutableDictionary new];
     while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
-        NSString *path = @(archive_entry_pathname(entry));
-        _files[path] = [NSMutableDictionary new];
-        _files[path][@"mode"] = @(archive_entry_mode(entry));
-        _files[path][@"uid"] = @(archive_entry_uid(entry));
-        _files[path][@"gid"] = @(archive_entry_gid(entry));
-        time_t mtime = archive_entry_mtime(entry);
-        if (mtime) {
-            _files[path][@"mtime"] = [NSDate dateWithTimeIntervalSince1970:mtime];
-        }
+        [self addEntry:entry];
     }
+    _hasReadFiles = YES;
     archive_read_close(a);
     archive_read_finish(a);
     lseek(_fd, 0, SEEK_SET);
+}
+
+-(ArchiveFile*)init
+{
+    self = [super init];
+    _files = [NSMutableDictionary new];
+    _hasReadFiles = NO;
+    return self;
 }
 
 -(ArchiveFile*)initWithFile:(NSString*)filename
@@ -92,8 +103,6 @@ copy_data(struct archive *ar, struct archive *aw)
         return nil;
     }
     self = [self init];
-    _files = nil;
-    _hasReadFiles = NO;
 
     _fd = open(filename.UTF8String, O_RDONLY);
     if (_fd < 0) {
@@ -117,8 +126,6 @@ copy_data(struct archive *ar, struct archive *aw)
 -(ArchiveFile*)initWithFd:(int)fd
 {
     self = [self init];
-    _files = nil;
-    _hasReadFiles = NO;
     _isPipe = YES;
     
     _fd = fd;
@@ -130,11 +137,11 @@ copy_data(struct archive *ar, struct archive *aw)
     return self;
 }
 
--(NSArray*)files {
+-(NSDictionary*)files {
     if (!_hasReadFiles) {
         [self readContents];
     }
-    return [_files.allKeys copy];
+    return [_files copy];
 }
 
 -(BOOL)extractFileNum:(int)fileNum toFd:(int)fd
@@ -397,6 +404,7 @@ out:
             if (rv < ARCHIVE_WARN)
                 goto out;
         }
+        [self addEntry:entry];
         
         const char *filename = archive_entry_pathname(entry);
         struct stat st;
@@ -437,6 +445,7 @@ out:
         NSLog(@"%s: OK", filename);
     }
     result = YES;
+    _hasReadFiles = YES;
     out:
     [fm changeCurrentDirectoryPath:cwd];
     archive_write_close(ext);

@@ -1126,7 +1126,7 @@ void jailbreak()
             }
             _assert(clean_file(systemSnapshotMountPoint), message, true);
             _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
-            const char *argv[] = {"/sbin/mount_apfs", thedisk, systemSnapshotMountPoint, NULL};
+            const char *argv[] = {"/sbin/mount_apfs", "-o", "ro", thedisk, systemSnapshotMountPoint, NULL};
             _assert(runCommandv(argv[0], 3, argv, ^(pid_t pid) {
                 uint64_t procStructAddr = get_proc_struct_for_pid(pid);
                 LOG("procStructAddr = " ADDR, procStructAddr);
@@ -1387,10 +1387,6 @@ void jailbreak()
         }
     }
     
-    if (kCFCoreFoundationVersionNumber >= 1535.12) {
-        goto out;
-    }
-    
     UPSTAGE();
     
     {
@@ -1400,6 +1396,17 @@ void jailbreak()
         SETMESSAGE(NSLocalizedString(@"Failed to copy over our resources to RootFS.", nil));
         
         _assert(chdir("/") == ERR_SUCCESS, message, true);
+        
+        NSFileManager *fm = [NSFileManager defaultManager];
+        clean_file("/var/tmp/ents.xml");
+        _assert([fm copyItemAtPath:pathForResource(@"ents.xml") toPath:@"/var/tmp/ents.xml" error:nil], message, true);
+        init_file("/var/tmp/ents.xml", 0, 0600);
+        clean_file("/var/tmp/substrate.p12");
+        _assert([fm copyItemAtPath:pathForResource(@"entcert.p12") toPath:@"/var/tmp/substrate.p12" error:nil], message, true);
+        init_file("/var/tmp/substrate.p12", 0, 0600);
+        clean_file("/var/tmp/cert.p12");
+        _assert([fm copyItemAtPath:pathForResource(@"entcert.p12") toPath:@"/var/tmp/cert.p12" error:nil], message, true);
+        init_file("/var/tmp/cert.p12", 0, 0600);
         
         needSubstrate = ( needStrap ||
                          (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) ||
@@ -1418,7 +1425,7 @@ void jailbreak()
             [debsToInstall addObject:substrateDeb];
         }
         
-        NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
+        NSArray *resourcesPkgs = [@[@"ldid", @"file", @"com.bingner.plutil"] arrayByAddingObjectsFromArray:resolveDepsForPkg(@"jailbreak-resources", true)];
         _assert(resourcesPkgs != nil, message, true);
         NSMutableArray *pkgsToRepair = [NSMutableArray new];
         LOG("Resource Pkgs: \"%@\".", resourcesPkgs);
@@ -1440,8 +1447,6 @@ void jailbreak()
             _assert(extractDebs(debsToRepair), message, true);
             [debsToInstall addObjectsFromArray:debsToRepair];
         }
-        
-        _assert(chdir("/jb") == ERR_SUCCESS, message, true);
         
         // These don't need to lay around
         clean_file("/Library/LaunchDaemons/jailbreakd.plist");
@@ -1698,7 +1703,6 @@ void jailbreak()
         clean_file("/.bootstrapped_electra");
         clean_file("/usr/lib/libjailbreak.dylib");
 
-        _assert(chdir("/jb") == ERR_SUCCESS, message, true);
         LOG("Successfully extracted bootstrap.");
         
         INSERTSTATUS(NSLocalizedString(@"Extracted Bootstrap.\n", nil));

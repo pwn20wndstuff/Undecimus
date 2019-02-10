@@ -8,6 +8,7 @@ fi
 rm -rf "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/apt"
 rm -f "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/"*.deb
 rsync -a "${SOURCE_ROOT}/apt" "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/"
+cp "${SOURCE_ROOT}/Undecimus/resources/"* "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/"
 
 pushd "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/apt"
 dpkg-scanpackages . > Packages

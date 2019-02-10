@@ -34,11 +34,11 @@ int kstruct_offsets_11_0[] = {
     0x90, // KSTRUCT_OFFSET_IPC_PORT_IP_CONTEXT
     0xa0, // KSTRUCT_OFFSET_IPC_PORT_IP_SRIGHTS
 
+    0x8, // KSTRUCT_OFFSET_PROC_P_LIST
     0x10, // KSTRUCT_OFFSET_PROC_PID
-    0x108, // KSTRUCT_OFFSET_PROC_P_FD
     0x18, // KSTRUCT_OFFSET_PROC_TASK
     0x100, // KSTRUCT_OFFSET_PROC_UCRED
-    0x8, // KSTRUCT_OFFSET_PROC_P_LIST
+    0x108, // KSTRUCT_OFFSET_PROC_P_FD
 
     0x0, // KSTRUCT_OFFSET_FILEDESC_FD_OFILES
 
@@ -184,6 +184,23 @@ int kstruct_offsets_12_0[] = {
 
 int koffset(enum kstruct_offset offset)
 {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        LOG("kCFCoreFoundationVersionNumber: %f", kCFCoreFoundationVersionNumber);
+        if (kCFCoreFoundationVersionNumber >= 1535.12) {
+            LOG("offsets selected for iOS 12.0 or above");
+            offsets = kstruct_offsets_12_0;
+        } else if (kCFCoreFoundationVersionNumber >= 1452.23) {
+            LOG("offsets selected for iOS 11.3 or above");
+            offsets = kstruct_offsets_11_3;
+        } else if (kCFCoreFoundationVersionNumber >= 1443.00) {
+            LOG("offsets selected for iOS 11.0 to 11.2.6");
+            offsets = kstruct_offsets_11_0;
+        } else {
+            LOG("iOS version too low, 11.0 required");
+            exit(EXIT_FAILURE);
+        }
+    });
     if (offsets == NULL) {
         LOG("need to call offsets_init() prior to querying offsets");
         return 0;
@@ -193,18 +210,5 @@ int koffset(enum kstruct_offset offset)
 
 void offsets_init()
 {
-    LOG("kCFCoreFoundationVersionNumber: %f", kCFCoreFoundationVersionNumber);
-    if (kCFCoreFoundationVersionNumber >= 1535.12) {
-        LOG("offsets selected for iOS 12.0 or above");
-        offsets = kstruct_offsets_12_0;
-    } else if (kCFCoreFoundationVersionNumber >= 1452.23) {
-        LOG("offsets selected for iOS 11.3 or above");
-        offsets = kstruct_offsets_11_3;
-    } else if (kCFCoreFoundationVersionNumber >= 1443.00) {
-        LOG("offsets selected for iOS 11.0 to 11.2.6");
-        offsets = kstruct_offsets_11_0;
-    } else {
-        LOG("iOS version too low, 11.0 required");
-        exit(EXIT_FAILURE);
-    }
+    return;
 }

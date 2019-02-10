@@ -24,6 +24,9 @@ typedef struct {
     kptr_t apfs_jhash_getvnode;
     kptr_t vnode_get_snapshot;
     kptr_t fs_lookup_snapshot_metadata_by_name_and_return_name;
+    kptr_t extension_create_file;
+    kptr_t extension_add;
+    kptr_t extension_release;
 } offsets_t;
 
 extern offsets_t offs;
