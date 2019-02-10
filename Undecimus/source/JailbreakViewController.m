@@ -1199,7 +1199,7 @@ void jailbreak()
             
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
-            NOTICE(NSLocalizedString(@"The system snapshot has been successfully renamed. The device will be rebooted now.", nil), true, false);
+            NOTICE(NSLocalizedString(@"The system snapshot has been successfully renamed. The device will now be restarted.", nil), true, false);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         } else {
@@ -1296,72 +1296,17 @@ void jailbreak()
         }
     }
     
-    if (kCFCoreFoundationVersionNumber >= 1535.12) {
-        goto out;
-    }
-    
     UPSTAGE();
     
     {
-        // Copy over our resources to RootFS.
+        // Create jailbreak directory.
         
-        LOG("Copying over our resources to RootFS...");
-        SETMESSAGE(NSLocalizedString(@"Failed to copy over our resources to RootFS.", nil));
+        LOG("Creating jailbreak directory...");
+        SETMESSAGE(NSLocalizedString(@"Failed to create jailbreak directory.", nil));
         _assert(ensure_directory("/jb", 0, 0755), message, true);
         _assert(chdir("/jb") == ERR_SUCCESS, message, true);
-        
-        _assert(chdir("/") == ERR_SUCCESS, message, true);
-
-        needSubstrate = ( needStrap ||
-                         (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) ||
-                         !verifySums(@"/var/lib/dpkg/info/mobilesubstrate.md5sums", HASHTYPE_MD5)
-                         );
-        if (needSubstrate) {
-            LOG(@"We need substrate.");
-            NSString *substrateDeb = debForPkg(@"mobilesubstrate");
-            _assert(substrateDeb != nil, message, true);
-            if (pidOfProcess("/usr/libexec/substrated") == 0) {
-                _assert(extractDeb(substrateDeb), message, true);
-            } else {
-                skipSubstrate = true;
-                LOG("Substrate is running, not extracting again for now.");
-            }
-            [debsToInstall addObject:substrateDeb];
-        }
-        
-        NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
-        _assert(resourcesPkgs != nil, message, true);
-        NSMutableArray *pkgsToRepair = [NSMutableArray new];
-        LOG("Resource Pkgs: \"%@\".", resourcesPkgs);
-        for (NSString *pkg in resourcesPkgs) {
-            // Ignore mobilesubstrate because we just handled that separately.
-            if ([pkg isEqualToString:@"mobilesubstrate"] || [pkg isEqualToString:@"firmware"])
-                continue;
-            if (verifySums([NSString stringWithFormat:@"/var/lib/dpkg/info/%@.md5sums", pkg], HASHTYPE_MD5)) {
-                LOG("Pkg \"%@\" verified.", pkg);
-            } else {
-                LOG(@"Need to repair \"%@\".", pkg);
-                [pkgsToRepair addObject:pkg];
-            }
-        }
-        if (pkgsToRepair.count > 0) {
-            LOG(@"(Re-)Extracting \"%@\".", pkgsToRepair);
-            NSArray *debsToRepair = debsForPkgs(pkgsToRepair);
-            _assert(debsToRepair.count == pkgsToRepair.count, message, true);
-            _assert(extractDebs(debsToRepair), message, true);
-            [debsToInstall addObjectsFromArray:debsToRepair];
-        }
-
-        _assert(chdir("/jb") == ERR_SUCCESS, message, true);
-                
-        // These don't need to lay around
-        clean_file("/Library/LaunchDaemons/jailbreakd.plist");
-        clean_file("/jb/jailbreakd.plist");
-        clean_file("/jb/amfid_payload.dylib");
-        clean_file("/jb/libjailbreak.dylib");
-
-        LOG("Successfully copied over our resources to RootFS.");
-        INSERTSTATUS(NSLocalizedString(@"Copied over out resources to RootFS.\n", nil));
+        LOG("Successfully created jailbreak directory.");
+        INSERTSTATUS(NSLocalizedString(@"Created jailbreak directory.\n", nil));
     }
     
     UPSTAGE();
@@ -1451,10 +1396,76 @@ void jailbreak()
             
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
-            NOTICE(NSLocalizedString(@"RootFS has successfully been restored. The device will be restarted.", nil), true, false);
+            NOTICE(NSLocalizedString(@"RootFS has been successfully restored. The device will now be restarted.", nil), true, false);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         }
+    }
+    
+    if (kCFCoreFoundationVersionNumber >= 1535.12) {
+        goto out;
+    }
+    
+    UPSTAGE();
+    
+    {
+        // Copy over our resources to RootFS.
+        
+        LOG("Copying over our resources to RootFS...");
+        SETMESSAGE(NSLocalizedString(@"Failed to copy over our resources to RootFS.", nil));
+        
+        _assert(chdir("/") == ERR_SUCCESS, message, true);
+        
+        needSubstrate = ( needStrap ||
+                         (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) ||
+                         !verifySums(@"/var/lib/dpkg/info/mobilesubstrate.md5sums", HASHTYPE_MD5)
+                         );
+        if (needSubstrate) {
+            LOG(@"We need substrate.");
+            NSString *substrateDeb = debForPkg(@"mobilesubstrate");
+            _assert(substrateDeb != nil, message, true);
+            if (pidOfProcess("/usr/libexec/substrated") == 0) {
+                _assert(extractDeb(substrateDeb), message, true);
+            } else {
+                skipSubstrate = true;
+                LOG("Substrate is running, not extracting again for now.");
+            }
+            [debsToInstall addObject:substrateDeb];
+        }
+        
+        NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
+        _assert(resourcesPkgs != nil, message, true);
+        NSMutableArray *pkgsToRepair = [NSMutableArray new];
+        LOG("Resource Pkgs: \"%@\".", resourcesPkgs);
+        for (NSString *pkg in resourcesPkgs) {
+            // Ignore mobilesubstrate because we just handled that separately.
+            if ([pkg isEqualToString:@"mobilesubstrate"] || [pkg isEqualToString:@"firmware"])
+                continue;
+            if (verifySums([NSString stringWithFormat:@"/var/lib/dpkg/info/%@.md5sums", pkg], HASHTYPE_MD5)) {
+                LOG("Pkg \"%@\" verified.", pkg);
+            } else {
+                LOG(@"Need to repair \"%@\".", pkg);
+                [pkgsToRepair addObject:pkg];
+            }
+        }
+        if (pkgsToRepair.count > 0) {
+            LOG(@"(Re-)Extracting \"%@\".", pkgsToRepair);
+            NSArray *debsToRepair = debsForPkgs(pkgsToRepair);
+            _assert(debsToRepair.count == pkgsToRepair.count, message, true);
+            _assert(extractDebs(debsToRepair), message, true);
+            [debsToInstall addObjectsFromArray:debsToRepair];
+        }
+        
+        _assert(chdir("/jb") == ERR_SUCCESS, message, true);
+        
+        // These don't need to lay around
+        clean_file("/Library/LaunchDaemons/jailbreakd.plist");
+        clean_file("/jb/jailbreakd.plist");
+        clean_file("/jb/amfid_payload.dylib");
+        clean_file("/jb/libjailbreak.dylib");
+        
+        LOG("Successfully copied over our resources to RootFS.");
+        INSERTSTATUS(NSLocalizedString(@"Copied over out resources to RootFS.\n", nil));
     }
     
     UPSTAGE();
