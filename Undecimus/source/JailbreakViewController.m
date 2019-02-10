@@ -1181,9 +1181,9 @@ void jailbreak()
             _assert(ISADDR(snap_vnode_v_data), message, true);
             uint32_t snap_vnode_v_data_flag = ReadKernel32(snap_vnode_v_data + 49);
             LOG("snap_vnode_v_data_flag = 0x%x", snap_vnode_v_data_flag);
-            snap_vnode_v_data_flag &= ~0x40;
-            WriteKernel32(snap_vnode_v_data + 49, snap_vnode_v_data_flag);
+            WriteKernel32(snap_vnode_v_data + 49, snap_vnode_v_data_flag & ~0x40);
             _assert(fs_snapshot_rename(rootfd, systemSnapshot, origfs, 0) == ERR_SUCCESS, message, true);
+            WriteKernel32(snap_vnode_v_data + 49, snap_vnode_v_data_flag);
             _assert(_vnode_put(sdvpp) == ERR_SUCCESS, message, true);
             _assert(_vnode_put(snap_vnode) == ERR_SUCCESS, message, true);
             kmem_free(sdvpp_ptr, sizeof(uint64_t));
@@ -1200,7 +1200,6 @@ void jailbreak()
             LOG("Rebooting...");
             SETMESSAGE(NSLocalizedString(@"Failed to reboot.", nil));
             NOTICE(NSLocalizedString(@"The system snapshot has been successfully renamed. The device will be rebooted now.", nil), true, false);
-            unmount(systemSnapshotMountPoint, MNT_FORCE);
             _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
             LOG("Successfully rebooted.");
         } else {
