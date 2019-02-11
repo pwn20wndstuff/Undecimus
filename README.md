@@ -1,5 +1,5 @@
 # Unc0ver
-### The most advance jailbreak tool
+### The most advanced jailbreak tool
 ![unc0ver logo](https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Undecimus/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png?token=AlyO4xDujoguob2DCFfUbNI8jO82OyCgks5bx5ZPwA%3D%3D)
 
 unc0ver jailbreak for iOS 11.0 - 11.4.1<br/>
@@ -55,7 +55,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Perform a full restore with Rollectra before switching from the other jailbreaks
 * Turn on the AirPlane Mode before starting the jailbreak
 * Turn off Siri before starting the jailbreak
-* Wait atleast one minute on the jailbreak screen
+* Wait at least one minute on the jailbreak screen
 
 ## Source code
 * This project is completely open source and it will be kept like it in the future
@@ -118,5 +118,5 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@Swag_iOS](https://twitter.com/Swag_iOS) for testing
 * [@jailbreakbuster](https://twitter.com/jailbreakbuster) for testing
 * [@Jakeashacks](https://twitter.com/Jakeashacks) for testing
-* [@king4q](https://twitter.com/King4Q?s=17) for testing
+* [@king4q1](https://mobile.twitter.com/King4q1) for testing
 * [@t4shf33n](https://mobile.twitter.com/t4shf33n) for testing
