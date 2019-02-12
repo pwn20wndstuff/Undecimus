@@ -1421,7 +1421,7 @@ void jailbreak()
         clean_file("/jb/libjailbreak.dylib");
         
         LOG("Successfully copied over our resources to RootFS.");
-        INSERTSTATUS(NSLocalizedString(@"Copied over out resources to RootFS.\n", nil));
+        INSERTSTATUS(NSLocalizedString(@"Copied over our resources to RootFS.\n", nil));
     }
     
     UPSTAGE();
