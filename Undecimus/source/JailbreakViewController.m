@@ -1463,7 +1463,9 @@ void jailbreak()
         dictionary[@"Shenanigans"] = ADDRSTRING(GETOFFSET(shenanigans));
         dictionary[@"LckMtxLock"] = ADDRSTRING(GETOFFSET(lck_mtx_lock));
         dictionary[@"LckMtxUnlock"] = ADDRSTRING(GETOFFSET(lck_mtx_unlock));
-        dictionary[@"Strlen"] = ADDRSTRING(GETOFFSET(strlen));
+        dictionary[@"VnodeGetSnapshot"] = ADDRSTRING(GETOFFSET(vnode_get_snapshot));
+        dictionary[@"FsLookupSnapshotMetadataByNameAndReturnName"] = ADDRSTRING(GETOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name));
+        dictionary[@"APFSJhashGetVnode"] = ADDRSTRING(GETOFFSET(apfs_jhash_getvnode));
         if (![[NSMutableDictionary dictionaryWithContentsOfFile:offsetsFile] isEqual:dictionary]) {
             // Log offsets.
             

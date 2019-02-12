@@ -21,7 +21,6 @@ typedef struct {
     kptr_t shenanigans;
     kptr_t lck_mtx_lock;
     kptr_t lck_mtx_unlock;
-    kptr_t strlen;
     kptr_t apfs_jhash_getvnode;
     kptr_t vnode_get_snapshot;
     kptr_t fs_lookup_snapshot_metadata_by_name_and_return_name;
