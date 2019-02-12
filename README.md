@@ -39,11 +39,18 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Button to restart device
 * Button to open Cydia in case it doesn't appear on the Home Screen
 * Label to show the days left till the application expires
-* Buitl-In Update checker
+* Built-In Update checker
 * Working debugserver
 * Detailed debugging 
 * Realtime Log window 
 * An awesome UI
+
+## Currently supported exploits
+* VFS(Empty_list) by lan beer
+* MultiPath by lan beer
+* Async_Wake by lan beer
+* Vouchar Swap by Brandon Azad
+* V1ntex by Tihmstar
 
 ## Switching from the other jailbreaks
 * The RootFS will automatically be restored
