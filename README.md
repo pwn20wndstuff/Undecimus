@@ -1,6 +1,6 @@
 # Unc0ver
 ### The most advanced jailbreak tool
-![unc0ver logo](Undecimus/Resources/Uncoverlogo.PNG)
+![unc0ver logo](/Undecimus/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png)
 
 unc0ver jailbreak for iOS 11.0 - 11.4.1<br/>
 by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
