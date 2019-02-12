@@ -109,7 +109,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@Cryptiiiic](https://twitter.com/Cryptiiiic) for testing
 * [@xanDesign_](https://twitter.com/xanDesign_) for testing
 * [@AppleDry05](https://twitter.com/AppleDry05) for testing
-* [@Rob_Coleman123](https://twitter.com/Rob_Coleman123) for testing
+* [@AyyItzRob](https://twitter.com/AyyItzRob) for testing
 * [@MidnightChip](https://twitter.com/MidnightChip) for testing
 * [@Swag_iOS](https://twitter.com/Swag_iOS) for testing
 * [@jailbreakbuster](https://twitter.com/jailbreakbuster) for testing

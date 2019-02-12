@@ -87,7 +87,7 @@
 }
 
 -(IBAction)tappedOnRob:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Rob_Coleman123"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"AyyItzRob"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnMidnightChip:(id)sender{
