@@ -682,7 +682,7 @@ void jailbreak()
         
         LOG("Exploiting kernel_task...");
         SETMESSAGE(NSLocalizedString(@"Failed to exploit kernel_task.", nil));
-        int exploit_success = false;
+        bool exploit_success = false;
         mach_port_t persisted_kernel_task_port = MACH_PORT_NULL;
         struct task_dyld_info dyld_info = { 0 };
         mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
