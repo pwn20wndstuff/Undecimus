@@ -8,14 +8,14 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 
 ## The most outstanding changes over the other jailbreaks
 * All exploits in same app
-* Detailed and specific error messages
+* Detailed  error messages
 * Faster patches
 * More stable patches
 * No extra battery drain
 * No random freezes
-* No random slow downs/lags
+* No random slow downs
 * No data is logged or shared
-* No malware/spyware
+* No malware
 * Proper jailbreak state detection
 * Proper bootstrap extraction to fix issues such as Cydia not appearing after jailbreak
 * Native build of Cydia for iOS 11
