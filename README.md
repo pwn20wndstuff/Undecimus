@@ -84,7 +84,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1): Work in progress
 
 ## Screenshots
-![ScreenShot1](/Undecimus/Resources/s1.png) <img src="/Undecimus/Resources/s2.PNG" width="281.25" height="609" /> <img src="/Undecimus/Resources/s3.PNG" width="281.25" height="609" />
+![ScreenShot1](Undecimus/Resources/s1.png) <img src="/Undecimus/Resources/s2.PNG" width="281.25" height="609" /> <img src="/Undecimus/Resources/s3.PNG" width="281.25" height="609" />
 
 ## Changelog
 * Releases are now available at https://github.com/pwn20wndstuff/Undecimus/releases
