@@ -55,6 +55,7 @@
 #include "find_port.h"
 #include "v1ntex_offsets.h"
 #include "v1ntex_exploit.h"
+#include "v3ntex_exploit.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -622,12 +623,27 @@ bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
     return true;
 }
 
-kern_return_t v1ntex_callback(task_t kernel_task, kptr_t kbase, void *data) {
+kern_return_t exploit_callback_common(task_t kernel_task, kptr_t kbase, void *data) {
     prepare_for_rw_with_fake_tfp0(kernel_task);
     offsets_init();
     kernel_base = kbase;
     kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS);
     return KERN_SUCCESS;
+}
+
+kern_return_t v1ntex_callback(task_t kernel_task, kptr_t kbase, void *data) {
+    return exploit_callback_common(kernel_task, kbase, data);
+}
+
+kern_return_t v3ntex_callback(task_t tfp0, kptr_t kbase, void *data) {
+    return exploit_callback_common(tfp0, kbase, data);
+}
+
+void waitFor(int seconds) {
+    for (int i = 0; i <= seconds; i++) {
+        LOG("Waiting (%d/%d)", i, seconds);
+        sleep(1);
+    }
 }
 
 void jailbreak()
@@ -779,6 +795,15 @@ void jailbreak()
                     }
                     break;
                 }
+                case v3ntex_exploit: {
+                    if (v3ntex(v3ntex_callback, NULL) == ERR_SUCCESS &&
+                        MACH_PORT_VALID(tfp0) &&
+                        ISADDR(kernel_base) &&
+                        ISADDR(kernel_slide)) {
+                        exploit_success = true;
+                    }
+                    break;
+                }
                 default: {
                     NOTICE(NSLocalizedString(@"No exploit selected.", nil), false, false);
                     STATUS(NSLocalizedString(@"Jailbreak", nil), true, true);
@@ -834,9 +859,11 @@ void jailbreak()
         PF(shenanigans);
         PF(lck_mtx_lock);
         PF(lck_mtx_unlock);
-        PF(vnode_get_snapshot);
-        PF(fs_lookup_snapshot_metadata_by_name_and_return_name);
-        PF(apfs_jhash_getvnode);
+        if (kCFCoreFoundationVersionNumber >= 1535.12) {
+            PF(vnode_get_snapshot);
+            PF(fs_lookup_snapshot_metadata_by_name_and_return_name);
+            PF(apfs_jhash_getvnode);
+        }
 #undef PF
         found_offsets = true;
         LOG("Successfully found offsets.");
@@ -1993,6 +2020,10 @@ void jailbreak()
         }
     }
 out:
+    if (myOriginalCredAddr != 0) {
+        LOG("Restoring original credentials...");
+        give_creds_to_process_at_addr(myProcAddr, myOriginalCredAddr);
+    }
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(@"The app will now exit.", nil)], true, false);
     if (sharedController.canExit) {

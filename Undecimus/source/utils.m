@@ -788,6 +788,30 @@ bool supportsExploit(exploit_t exploit) {
                    @"4570.70.24~9",
                    @"4570.70.24~3"],
                  
+                 // V3ntex
+                 @[@"4903.200.199.12.3~1",
+                   @"4903.200.249.22.3~1",
+                   @"4903.200.274.32.3~1",
+                   @"4903.200.304.42.1~1",
+                   @"4903.200.327.52.1~1",
+                   @"4903.200.342.62.3~1",
+                   @"4903.200.354~11",
+                   @"4903.202.1~2",
+                   @"4903.202.2~2",
+                   @"4903.202.2~1",
+                   @"4903.220.42~21",
+                   @"4903.220.48~40",
+                   @"4903.222.1~7",
+                   @"4903.222.4~3",
+                   @"4903.222.5~3",
+                   @"4903.222.5~1",
+                   @"4903.230.15~8",
+                   @"4903.232.1~3",
+                   @"4903.232.2~2",
+                   @"4903.232.2~1",
+                   @"4903.240.8~8",
+                   @"4903.232.2~1"],
+                 
                  // Deja Xnu
                  @[@"4397.0.0.2.4~1",
                    @"4481.0.0.2.1~1",
@@ -897,6 +921,17 @@ bool supportsExploit(exploit_t exploit) {
             }
             break;
         }
+        case v3ntex_exploit: {
+            vm_size_t vm_size = 0;
+            if (_host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS) {
+                LOG("Unable to determine page size.");
+                return false;
+            }
+            if (vm_size != 0x1000 && !machineNameContains("iPad5,")) {
+                return false;
+            }
+            break;
+        }
         case deja_xnu_exploit: {
             if (jailbreakEnabled())
                 return false;
@@ -928,7 +963,8 @@ bool jailbreakSupported() {
     supportsExploit(multi_path_exploit) ||
     supportsExploit(async_wake_exploit) ||
     supportsExploit(voucher_swap_exploit) ||
-    supportsExploit(v1ntex_exploit);
+    supportsExploit(v1ntex_exploit) ||
+    supportsExploit(v3ntex_exploit);
 }
 
 bool respringSupported() {
@@ -951,6 +987,8 @@ NSInteger recommendedJailbreakSupport() {
         return v1ntex_exploit;
     else if (supportsExploit(empty_list_exploit))
         return empty_list_exploit;
+    else if (supportsExploit(v3ntex_exploit))
+        return v3ntex_exploit;
     else
         return -1;
 }

@@ -406,13 +406,6 @@ uint64_t early_rk64(uint64_t kaddr)
     return final;
 }
 
-void waitFor(int seconds) {
-    for (int i = 0; i <= seconds; i++) {
-        LOG("Waiting (%d/%d)", i, seconds);
-        sleep(1);
-    }
-}
-
 bool vfs_sploit()
 {
     LOG("empty_list by @i41nbeer");
@@ -426,10 +419,8 @@ bool vfs_sploit()
     host_page_size(mach_host_self(), &kernel_page_size);
     if (kernel_page_size == 0x4000) {
         LOG("this device uses 16k kernel pages");
-        // waitFor(20);
     } else if (kernel_page_size == 0x1000) {
         LOG("this device uses 4k kernel pages");
-        // waitFor(45);
     } else {
         LOG("this device uses an unsupported kernel page size");
         return false;

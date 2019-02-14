@@ -23,6 +23,7 @@ typedef enum {
     async_wake_exploit,
     voucher_swap_exploit,
     v1ntex_exploit,
+    v3ntex_exploit,
     deja_xnu_exploit,
     necp_exploit
 } exploit_t;
