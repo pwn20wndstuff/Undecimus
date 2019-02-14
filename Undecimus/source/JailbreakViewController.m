@@ -2020,14 +2020,14 @@ void jailbreak()
         }
     }
 out:
-    if (myOriginalCredAddr != 0) {
-        LOG("Restoring original credentials...");
-        give_creds_to_process_at_addr(myProcAddr, myOriginalCredAddr);
-    }
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(@"The app will now exit.", nil)], true, false);
     if (sharedController.canExit) {
-        exit(EXIT_SUCCESS);
+        if (prefs.exploit == v3ntex_exploit) {
+            _assert(restartSpringBoard(), message, true);
+        } else {
+            exit(EXIT_SUCCESS);
+        }
     }
     sharedController.canExit = YES;
 #undef INSERTSTATUS

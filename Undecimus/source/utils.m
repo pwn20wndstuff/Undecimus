@@ -1111,3 +1111,16 @@ bool canRead(const char *file) {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     return ([fileManager attributesOfItemAtPath:path error:nil]);
 }
+
+bool restartSpringBoard() {
+    pid_t backboardd_pid = pidOfProcess("/usr/libexec/backboardd");
+    if (!(backboardd_pid > 1)) {
+        LOG("Unable to find backboardd pid.");
+        return false;
+    }
+    if (kill(backboardd_pid, SIGTERM) != ERR_SUCCESS) {
+        LOG("Unable to terminate backboardd.");
+        return false;
+    }
+    return true;
+}

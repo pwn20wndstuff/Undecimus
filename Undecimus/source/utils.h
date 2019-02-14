@@ -120,6 +120,7 @@ void cleanLogs(void);
 bool modifyPlist(NSString *filename, void (^function)(id));
 void list(NSString *directory);
 bool canRead(const char *file);
+bool restartSpringBoard(void);
 
 extern NSData *lastSystemOutput;
 
