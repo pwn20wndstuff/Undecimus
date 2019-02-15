@@ -649,6 +649,7 @@ void waitFor(int seconds) {
 void jailbreak()
 {
     int rv = 0;
+    bool usedPersistedKernelTaskPort = false;
     pid_t myPid = getpid();
     uint64_t myProcAddr = 0;
     uint64_t myOriginalCredAddr = 0;
@@ -713,6 +714,7 @@ void jailbreak()
             offsets_init();
             kernel_base = persisted_kernel_base;
             kernel_slide = persisted_kernel_slide;
+            usedPersistedKernelTaskPort = true;
             exploit_success = true;
         } else {
             switch (prefs.exploit) {
@@ -2021,9 +2023,9 @@ void jailbreak()
     }
 out:
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
-    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(prefs.exploit == v3ntex_exploit ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
+    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
     if (sharedController.canExit) {
-        if (prefs.exploit == v3ntex_exploit) {
+        if (prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort) {
             _assert(restartSpringBoard(), message, true);
         } else {
             exit(EXIT_SUCCESS);
