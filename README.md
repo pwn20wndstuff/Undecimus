@@ -18,16 +18,12 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * No malware
 * Proper jailbreak state detection
 * Proper bootstrap extraction to fix issues such as Cydia not appearing after jailbreak
-* Native build of Cydia for iOS 11
+* Native and updated build of Cydia for iOS 11
 * Telesphoreo port for ARM64
-* Much faster Cydia interaction
-* Much more stable Cydia
-* Much more modern user interface based Cydia
 * Cydia skips uicache when not needed
 * Cydia supports iPhone X screen size
 * Official Cydia Substrate for tweak injection
-* Much faster ldrestart 
-* Much more stable ldrestart
+* Much faster and more stable ldrestart 
 * Changes to Cydia were made with permission from Saurik 
 * Option to skip loading daemons
 * Option to dump APTicket
@@ -68,26 +64,25 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 ## Source code
 * This project is completely open source and it will be kept like it in the future
 * Any kind of contribution is cordially welcome
-* The source code can be found on [pwn20wndstuff](https://github.com/pwn20wndstuff)'s GitHub account
 
 ## Video tutorial
 * <a href="https://youtu.be/TqHYjLHO0zs">https://youtu.be/TqHYjLHO0zs</a>
 
 ## To Do List
-* Contact [@saurik](https://twitter.com/saurik) to enable the Cydia Store purchases on iOS 11 and remove the empty front page ads in Cydia: Partially done
-* Completely switch to Cydia Substrate and ditch Substitute: Done
-* Make switching from other jailbreaks without wiping the device possible: Done
-* Fix a kernel panic that's triggered by a kernel data abort which is caused by a UaF bug in jailbreakd: Done
-* Add the v1ntex exploit by tihmster for better success rate : Done
-* Chain [@_bazad](https://twitter.com/_bazad)'s [blanket](https://github.com/bazad/blanket) to bypass the developer certificate requirement for multi_path: Almost done
-* Enable the on-fly entitlement patching on iOS 11: Work in progress
-* WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1): Work in progress
+- [x] Contact [@saurik](https://twitter.com/saurik) to enable the Cydia Store purchases on iOS 11 and remove the empty front page ads in Cydia
+- [x] Completely switch to Cydia Substrate and ditch Substitute
+- [x] Make switching from other jailbreaks without wiping the device possible
+- [x] Fix a kernel panic that's triggered by a kernel data abort which is caused by a UaF bug in jailbreakd
+- [x] Add the v1ntex exploit by tihmster for better success rate
+- [ ] Chain [@_bazad](https://twitter.com/_bazad)'s [blanket](https://github.com/bazad/blanket) to bypass the developer certificate requirement for multi_path
+- [ ] Enable the on-fly entitlement patching on iOS 11
+- [ ] WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1)
 
 ## Screenshots
 <img src="/Resources/s1.PNG" width="281.25" height="609" /> <img src="/Resources/s2.PNG" width="281.25" height="609" /> <img src="/Resources/s3.PNG" width="281.25" height="609" />
 
 ## Changelog
-* Releases are now available at https://github.com/pwn20wndstuff/Undecimus/releases
+* Releases are now available [here](https://github.com/pwn20wndstuff/Undecimus/releases)
 
 ## Special Thanks
 * [@i41nbeer](https://twitter.com/i41nbeer) for mach_portal, triple_fetch, async_wake, empty_list, multi_path & deja_xnu
@@ -98,7 +93,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@theninjaprawn](https://twitter.com/theninjaprawn) for the patchfinder64 additions
 * [@saurik](https://twitter.com/saurik) for Cydia and Substrate
 * [@FCE365](https://twitter.com/FCE365) for the empty_list reliability improvements
-* Credits for [Undecimus-Resources](https://github.com/pwn20wndstuff/Undecimus-Resources)
+#### Credits for [Undecimus-Resources](https://github.com/pwn20wndstuff/Undecimus-Resources)
 * [@coolstarorg](https://twitter.com/coolstarorg) for the snapshot rename idea
 * [@Cryptiiiic](https://twitter.com/Cryptiiiic) for testing
 * [@xanDesign_](https://twitter.com/xanDesign_) for testing
