@@ -7,8 +7,9 @@ by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/s
 UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](https://reddit.com/u/Samg_is_a_Ninja)<br/>
 
 ## The most outstanding changes over the other jailbreaks
+
 * All exploits in the same app
-* Detailed  error messages
+* Detailed error messages
 * Faster patches
 * More stable patches
 * No extra battery drain
@@ -18,30 +19,31 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * No malware
 * Proper jailbreak state detection
 * Proper bootstrap extraction to fix issues such as Cydia not appearing after jailbreak
-* Native and updated build of Cydia for iOS 11
+* Native build of Cydia for iOS 11 that is faster and much more stable
+* Changes to Cydia made with permission from Saurik
 * Telesphoreo port for ARM64
 * Cydia skips uicache when not needed
 * Cydia supports iPhone X screen size
 * Official Cydia Substrate for tweak injection
 * Much faster and more stable ldrestart 
-* Changes to Cydia made with permission from Saurik 
 * Option to skip loading daemons
 * Option to dump APTicket
 * Option to refresh icon cache
 * Option to disable auto updates
 * Option to block app revokes
 * Option to restore RootFS
-* Option to Export tfp0
+* Option to export tfp0
 * Button to restart the device
 * Button to open Cydia if it doesn't appear on the Home Screen
 * Label to show the days left till the application expires
-* Built-In Update checker
+* Built-in Update checker
 * Working debugserver
 * Detailed debugging 
 * Realtime Log window 
 * An awesome UI
 
 ## Currently supported exploits
+
 * VFS(Empty_list) by lan beer (11-11.3.1)
 * MultiPath by lan beer (11.2-11.3.1)
 * Async_Wake by lan beer (11.1.2)
@@ -82,7 +84,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 <img src="/Resources/s1.PNG" width="281.25" height="609" /> <img src="/Resources/s2.PNG" width="281.25" height="609" /> <img src="/Resources/s3.PNG" width="281.25" height="609" />
 
 ## Changelog
-* Releases are now available [here](https://github.com/pwn20wndstuff/Undecimus/releases)
+* Releases are available [here](https://github.com/pwn20wndstuff/Undecimus/releases)
 
 ## Special Thanks
 * [@i41nbeer](https://twitter.com/i41nbeer) for mach_portal, triple_fetch, async_wake, empty_list, multi_path & deja_xnu
@@ -93,7 +95,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@theninjaprawn](https://twitter.com/theninjaprawn) for the patchfinder64 additions
 * [@saurik](https://twitter.com/saurik) for Cydia and Substrate
 * [@FCE365](https://twitter.com/FCE365) for the empty_list reliability improvements
-#### Credits for [Undecimus-Resources](https://github.com/pwn20wndstuff/Undecimus-Resources)
+#### Credits for [Undecimus-Resources](https://github.com/pwn20wndstuff/Undecimus/graphs/contributors)
 * [@coolstarorg](https://twitter.com/coolstarorg) for the snapshot rename idea
 * [@Cryptiiiic](https://twitter.com/Cryptiiiic) for testing
 * [@xanDesign_](https://twitter.com/xanDesign_) for testing
