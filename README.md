@@ -44,6 +44,8 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 
 ## Currently supported exploits
 
+# Multiple exploits supported across multiple iOS version
+
 * VFS(Empty_list) by lan beer (11-11.3.1)
 * MultiPath by lan beer (11.2-11.3.1)
 * Async_Wake by lan beer (11.1.2)
@@ -81,7 +83,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 - [ ] WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1)
 
 ## Screenshots
-<img src="/Resources/s1.PNG" width="281.25" height="609" /> <img src="/Resources/s2.PNG" width="281.25" height="609" /> <img src="/Resources/s3.PNG" width="281.25" height="609" />
+<img src="/Resources/s1.PNG" width="281.25" height="605" /> <img src="/Resources/s2.PNG" width="281.25" height="605" /> <img src="/Resources/s3.PNG" width="281.25" height="605" />
 
 ## Changelog
 * Releases are available [here](https://github.com/pwn20wndstuff/Undecimus/releases)
