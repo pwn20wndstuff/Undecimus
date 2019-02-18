@@ -1017,7 +1017,7 @@ void jailbreak()
         NSData *fileData = [[NSString stringWithFormat:@(ADDR "\n"), kernel_slide] dataUsingEncoding:NSUTF8StringEncoding];
         if (![[NSData dataWithContentsOfFile:file] isEqual:fileData]) {
             _assert(clean_file(file.UTF8String), message, true);
-            _assert(create_file_data(file.UTF8String, 0, 0644, fileData), message, false);
+            _assert(create_file_data(file.UTF8String, 0, 0644, fileData), message, true);
         }
         LOG("Successfully logged slide.");
         INSERTSTATUS(NSLocalizedString(@"Logged slide.\n", nil));
@@ -1397,16 +1397,21 @@ void jailbreak()
         
         _assert(chdir("/") == ERR_SUCCESS, message, true);
         
-        NSFileManager *fm = [NSFileManager defaultManager];
-        clean_file("/var/tmp/ents.xml");
-        _assert([fm copyItemAtPath:pathForResource(@"ents.xml") toPath:@"/var/tmp/ents.xml" error:nil], message, true);
-        init_file("/var/tmp/ents.xml", 0, 0600);
-        clean_file("/var/tmp/substrate.p12");
-        _assert([fm copyItemAtPath:pathForResource(@"entcert.p12") toPath:@"/var/tmp/substrate.p12" error:nil], message, true);
-        init_file("/var/tmp/substrate.p12", 0, 0600);
-        clean_file("/var/tmp/cert.p12");
-        _assert([fm copyItemAtPath:pathForResource(@"entcert.p12") toPath:@"/var/tmp/cert.p12" error:nil], message, true);
-        init_file("/var/tmp/cert.p12", 0, 0600);
+        if (kCFCoreFoundationVersionNumber >= 1535.12) {
+            NSString *entsFile = pathForResource(@"ents.xml");
+            _assert(entsFile != nil, message, true);
+            _assert(clean_file("/var/tmp/ents.xml"), message, true);
+            _assert(copyfile(entsFile.UTF8String, "/var/tmp/ents.xml", 0, COPYFILE_ALL) == ERR_SUCCESS, message, true);
+            _assert(init_file("/var/tmp/ents.xml", 0, 600), message, true);
+            NSString *entCertFile = pathForResource(@"entcert.p12");
+            _assert(entCertFile != nil, message, true);
+            _assert(clean_file("/var/tmp/cert.p12"), message, true);
+            _assert(copyfile(entCertFile.UTF8String, "/var/tmp/cert.p12", 0, COPYFILE_ALL) == ERR_SUCCESS, message, true);
+            _assert(init_file("/var/tmp/cert.p12", 0, 600), message, true);
+            _assert(clean_file("/var/tmp/substrate.p12"), message, true);
+            _assert(symlink("/var/tmp/cert.p12", "/var/tmp/substrate.p12") == ERR_SUCCESS, message, true);
+            _assert(init_file("/var/tmp/substrate.p12", 0, 600), message, true);
+        }
         
         needSubstrate = ( needStrap ||
                          (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) ||
@@ -1865,7 +1870,7 @@ void jailbreak()
             // Remove Electra's Cydia Upgrade Helper.
             LOG("Removing Electra's Cydia Upgrade Helper...");
             SETMESSAGE(NSLocalizedString(@"Failed to remove Electra's Cydia Upgrade Helper.", nil));
-            _assert(removePkg("cydia-upgrade-helper", true), message, false);
+            _assert(removePkg("cydia-upgrade-helper", true), message, true);
             if (!prefs.install_cydia) {
                 prefs.install_cydia = true;
                 _assert(modifyPlist(prefsFile, ^(id plist) {
@@ -1985,7 +1990,6 @@ void jailbreak()
                 plist[K_REFRESH_ICON_CACHE] = @NO;
             }), message, true);
             LOG("Successfully ran uicache.");
-            
             INSERTSTATUS(NSLocalizedString(@"Ran uicache.\n", nil));
         }
     }

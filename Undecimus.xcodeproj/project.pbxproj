@@ -14,6 +14,7 @@
 		212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8849216E4EBE00A36DA5 /* async_wake.c */; };
 		213E78262208654700FDF3B7 /* necp.c in Sources */ = {isa = PBXBuildFile; fileRef = 213E78252208654700FDF3B7 /* necp.c */; settings = {COMPILER_FLAGS = "-Wno-deprecated-declarations"; }; };
 		213E7828220865A100FDF3B7 /* voucher_swap-poc.c in Sources */ = {isa = PBXBuildFile; fileRef = 213E7827220865A100FDF3B7 /* voucher_swap-poc.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		214D283C22146EC70058933D /* libmagic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 214D283B22146EC70058933D /* libmagic.a */; };
 		2150A9CD22021330001C8677 /* voucher_swap.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CC22021330001C8677 /* voucher_swap.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		2150A9DC22021348001C8677 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CE22021347001C8677 /* log.c */; };
 		2150A9DD22021348001C8677 /* platform_match.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CF22021347001C8677 /* platform_match.c */; };
@@ -81,6 +82,8 @@
 		213E78252208654700FDF3B7 /* necp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = necp.c; sourceTree = "<group>"; };
 		213E7827220865A100FDF3B7 /* voucher_swap-poc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "voucher_swap-poc.c"; sourceTree = "<group>"; };
 		213E7829220865BF00FDF3B7 /* voucher_swap-poc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "voucher_swap-poc.h"; sourceTree = "<group>"; };
+		214D283B22146EC70058933D /* libmagic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmagic.a; sourceTree = "<group>"; };
+		214D283D22146EE60058933D /* magic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = magic.h; sourceTree = "<group>"; };
 		2150A9CB22021330001C8677 /* voucher_swap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = voucher_swap.h; sourceTree = "<group>"; };
 		2150A9CC22021330001C8677 /* voucher_swap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = voucher_swap.c; sourceTree = "<group>"; };
 		2150A9CE22021347001C8677 /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
@@ -163,7 +166,6 @@
 		222AD59221FA731800DCBA2A /* FakeApt.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FakeApt.m; sourceTree = "<group>"; };
 		222AD59421FA732A00DCBA2A /* FakeApt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FakeApt.h; sourceTree = "<group>"; };
 		2253F710221020EA0031D809 /* libmagic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmagic.a; path = Undecimus/libs/libmagic.a; sourceTree = "<group>"; };
-		2253F712221027520031D809 /* magic.mgc */ = {isa = PBXFileReference; lastKnownFileType = file; path = magic.mgc; sourceTree = "<group>"; };
 		225D142121E052960045493D /* ArchiveFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ArchiveFile.m; sourceTree = "<group>"; };
 		225D142321E055E90045493D /* ArchiveFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArchiveFile.h; sourceTree = "<group>"; };
 		226689DA21EC145000262F66 /* archive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = archive.h; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 				226689DD21EC1C5A00262F66 /* libarchive.2.tbd in Frameworks */,
 				22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */,
 				216FDA12220C5C530086D802 /* liboffsetfinder64.a in Frameworks */,
+				214D283C22146EC70058933D /* libmagic.a in Frameworks */,
 				2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */,
 				216FDA0E220C5C320086D802 /* libplist++.a in Frameworks */,
 				2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */,
@@ -309,6 +312,7 @@
 		216FDA02220C5B620086D802 /* libs */ = {
 			isa = PBXGroup;
 			children = (
+				214D283B22146EC70058933D /* libmagic.a */,
 				216FDA03220C5BA90086D802 /* libfragmentzip.a */,
 				216FDA07220C5BDC0086D802 /* libgrabkernel.a */,
 				216FDA0B220C5C320086D802 /* libplist.a */,
@@ -362,6 +366,7 @@
 		2170BD3421B192750059BD10 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				214D283D22146EE60058933D /* magic.h */,
 				216FDA13220C5C620086D802 /* liboffsetfinder64 */,
 				216FDA09220C5BE50086D802 /* libgrabkernel */,
 				216FDA05220C5BB80086D802 /* libfragmentzip */,
@@ -384,7 +389,6 @@
 		2170BD3621B192B90059BD10 /* resources */ = {
 			isa = PBXGroup;
 			children = (
-				2253F712221027520031D809 /* magic.mgc */,
 				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
 				21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */,
 			);

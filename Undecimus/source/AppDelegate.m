@@ -181,7 +181,7 @@
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary <UIApplicationOpenURLOptionsKey, id> *)options {
-    if ([[url scheme] isEqualToString:@"jailbreak"]) {
+    if ([[url absoluteString] isEqualToString:@"undecimus://jailbreak"]) {
         [[JailbreakViewController sharedController] performSelectorOnMainThread:@selector(tappedOnJailbreak:) withObject:nil waitUntilDone:YES];
         return YES;
     }

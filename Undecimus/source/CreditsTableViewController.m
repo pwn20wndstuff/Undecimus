@@ -162,6 +162,10 @@
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"notcom"] options:@{} completionHandler:nil];
 }
 
+-(IBAction)tappedOnPimskeks:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"pimskeks"] options:@{} completionHandler:nil];
+}
+
 -(IBAction)tappedOnLibimobiledevice:(id)sender{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/libimobiledevice"] options:@{} completionHandler:nil];
 }
