@@ -18,6 +18,7 @@
 #include <sys/utsname.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <MobileGestalt.h>
 #import <inject.h>
 #import "ArchiveFile.h"
 #import "utils.h"
@@ -1198,6 +1199,19 @@ bool uninstallRootLessJB() {
                 return false;
             }
         }
+    }
+    return true;
+}
+
+bool verifyECID(NSString *ecid) {
+    CFStringRef value = MGCopyAnswer(kMGUniqueChipID);
+    if (value == nil) {
+        LOG("Unable to get ECID.");
+        return false;
+    }
+    if (![ecid isEqualToString:CFBridgingRelease(value)]) {
+        LOG("Unable to verify ECID.");
+        return false;
     }
     return true;
 }
