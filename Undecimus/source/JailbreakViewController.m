@@ -1397,6 +1397,9 @@ void jailbreak()
         
         _assert(chdir("/") == ERR_SUCCESS, message, true);
         
+        // Uninstall RootLessJB if it is found to prevent conflicts with dpkg.
+        _assert(uninstallRootLessJB(), message, true);
+        
         if (kCFCoreFoundationVersionNumber >= 1535.12) {
             NSString *entsFile = pathForResource(@"ents.xml");
             _assert(entsFile != nil, message, true);

@@ -1180,3 +1180,24 @@ bool restartSpringBoard() {
     }
     return true;
 }
+
+bool uninstallRootLessJB() {
+    BOOL foundRootLessJB = NO;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *rootLessJBBootstrapMarkerFile = @"/var/containers/Bundle/.installed_rootlessJB3";
+    NSArray *rootLessJBFileList = @[@"/var/LIB", @"/var/ulb", @"/var/bin", @"/var/sbin", @"/var/libexec", @"/var/containers/Bundle/tweaksupport/Applications", @"/var/Apps", @"/var/profile", @"/var/motd", @"/var/dropbear", @"/var/containers/Bundle/tweaksupport", @"/var/containers/Bundle/iosbinpack64", @"/var/log/testbin.log", @"/var/log/jailbreakd-stdout.log", @"/var/log/jailbreakd-stderr.log", @"/var/log/pspawn_payload_xpcproxy.log", @"/var/lib", @"/var/etc", @"/var/usr", rootLessJBBootstrapMarkerFile];
+    if ([fileManager fileExistsAtPath:rootLessJBBootstrapMarkerFile]) {
+        LOG("Found RootLessJB.");
+        foundRootLessJB = YES;
+    }
+    if (foundRootLessJB) {
+        LOG("Uninstalling RootLessJB...");
+        for (NSString *file in rootLessJBFileList) {
+            if ([fileManager fileExistsAtPath:file] && ![fileManager removeItemAtPath:file error:nil]) {
+                LOG("Unable to remove file: %@", file);
+                return false;
+            }
+        }
+    }
+    return true;
+}

@@ -121,6 +121,7 @@ bool modifyPlist(NSString *filename, void (^function)(id));
 void list(NSString *directory);
 bool canRead(const char *file);
 bool restartSpringBoard(void);
+bool uninstallRootLessJB(void);
 
 extern NSData *lastSystemOutput;
 
