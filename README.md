@@ -44,8 +44,6 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 
 ## Currently supported exploits
 
-# Multiple exploits supported across multiple iOS version
-
 * VFS(Empty_list) by lan beer (11-11.3.1)
 * MultiPath by lan beer (11.2-11.3.1)
 * Async_Wake by lan beer (11.1.2)
