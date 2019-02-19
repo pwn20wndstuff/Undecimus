@@ -1400,22 +1400,6 @@ void jailbreak()
         // Uninstall RootLessJB if it is found to prevent conflicts with dpkg.
         _assert(uninstallRootLessJB(), message, true);
         
-        if (kCFCoreFoundationVersionNumber >= 1535.12) {
-            NSString *entsFile = pathForResource(@"ents.xml");
-            _assert(entsFile != nil, message, true);
-            _assert(clean_file("/var/tmp/ents.xml"), message, true);
-            _assert(copyfile(entsFile.UTF8String, "/var/tmp/ents.xml", 0, COPYFILE_ALL) == ERR_SUCCESS, message, true);
-            _assert(init_file("/var/tmp/ents.xml", 0, 600), message, true);
-            NSString *entCertFile = pathForResource(@"entcert.p12");
-            _assert(entCertFile != nil, message, true);
-            _assert(clean_file("/var/tmp/cert.p12"), message, true);
-            _assert(copyfile(entCertFile.UTF8String, "/var/tmp/cert.p12", 0, COPYFILE_ALL) == ERR_SUCCESS, message, true);
-            _assert(init_file("/var/tmp/cert.p12", 0, 600), message, true);
-            _assert(clean_file("/var/tmp/substrate.p12"), message, true);
-            _assert(symlink("/var/tmp/cert.p12", "/var/tmp/substrate.p12") == ERR_SUCCESS, message, true);
-            _assert(init_file("/var/tmp/substrate.p12", 0, 600), message, true);
-        }
-        
         needSubstrate = ( needStrap ||
                          (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) ||
                          !verifySums(@"/var/lib/dpkg/info/mobilesubstrate.md5sums", HASHTYPE_MD5)
@@ -1533,6 +1517,7 @@ void jailbreak()
         // Make sure dpkg is not corrupted
         NSFileManager *fm = [NSFileManager defaultManager];
         BOOL isDir;
+        // FIXME: this seems to match on symlinks too... probably need to use lstat
         if ([fm fileExistsAtPath:@"/var/lib/dpkg" isDirectory:&isDir] && isDir) {
             if ([fm fileExistsAtPath:@"/Library/dpkg" isDirectory:&isDir] && isDir) {
                 LOG(@"Removing /var/lib/dpkg...");
