@@ -64,8 +64,9 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Wait at least one minute on the jailbreak screen
 
 ## Source code
-* This project is completely open source and will be kept like it in the future
-* Any kind of contribution is cordially welcome
+* This project is completely open source and it will be kept like it in the future
+* Any kind of cordially contribution is welcome
+* The source code can be found on [here](https://github.com/pwn20wndstuff)
 
 ## Video tutorial
 * <a href="https://youtu.be/TqHYjLHO0zs">https://youtu.be/TqHYjLHO0zs</a>
