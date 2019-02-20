@@ -32,6 +32,7 @@
 #import <snappy.h>
 #import <inject.h>
 #include <libgrabkernel/libgrabkernel.h>
+#include <sched.h>
 #import "JailbreakViewController.h"
 #include "KernelStructureOffsets.h"
 #include "empty_list_sploit.h"
@@ -1991,13 +1992,15 @@ void jailbreak()
     UPSTAGE();
     
     {
-        // Flush preference cache.
-        
-        LOG("Flushing preference cache...");
-        SETMESSAGE(NSLocalizedString(@"Failed to flush preference cache.", nil));
-        _assert(runCommand("/bin/launchctl", "stop", "com.apple.cfprefsd.xpc.daemon", NULL) == ERR_SUCCESS, message, true);
-        LOG("Successfully flushed preference cache.");
-        INSERTSTATUS(NSLocalizedString(@"Flushed preference cache.\n", nil));
+        if (!(prefs.load_tweaks && prefs.reload_system_daemons)) {
+            // Flush preference cache.
+            
+            LOG("Flushing preference cache...");
+            SETMESSAGE(NSLocalizedString(@"Failed to flush preference cache.", nil));
+            _assert(runCommand("/bin/launchctl", "stop", "com.apple.cfprefsd.xpc.daemon", NULL) == ERR_SUCCESS, message, true);
+            LOG("Successfully flushed preference cache.");
+            INSERTSTATUS(NSLocalizedString(@"Flushed preference cache.\n", nil));
+        }
     }
     
     UPSTAGE();
