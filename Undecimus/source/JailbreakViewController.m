@@ -1055,6 +1055,10 @@ void jailbreak()
             for (NSString *path in array) {
                 ensure_symlink("/dev/null", path.UTF8String);
             }
+            _assert(modifyPlist(@"/var/mobile/Library/Preferences/com.apple.Preferences.plist", ^(id plist) {
+                plist[@"kBadgedForSoftwareUpdateKey"] = @NO;
+                plist[@"kBadgedForSoftwareUpdateJumpOnceKey"] = @NO;
+            }), message, true);
             LOG("Successfully disabled Auto Updates.");
             INSERTSTATUS(NSLocalizedString(@"Disabled Auto Updates.\n", nil));
         } else {
@@ -1065,6 +1069,10 @@ void jailbreak()
             for (NSString *path in array) {
                 ensure_directory(path.UTF8String, 0, 0755);
             }
+            _assert(modifyPlist(@"/var/mobile/Library/Preferences/com.apple.Preferences.plist", ^(id plist) {
+                plist[@"kBadgedForSoftwareUpdateKey"] = @YES;
+                plist[@"kBadgedForSoftwareUpdateJumpOnceKey"] = @YES;;
+            }), message, true);
             INSERTSTATUS(NSLocalizedString(@"Enabled Auto Updates.\n", nil));
         }
     }
@@ -1360,11 +1368,10 @@ void jailbreak()
             
             LOG("Disallowing SpringBoard to show non-default system apps...");
             SETMESSAGE(NSLocalizedString(@"Failed to disallow SpringBoard to show non-default system apps.", nil));
-            NSString *SpringBoardPreferencesFile = @"/var/mobile/Library/Preferences/com.apple.springboard.plist";
-            NSString *SpringBoardShowNonDefaultSystemAppsKey = @"SBShowNonDefaultSystemApps";
-            _assert(modifyPlist(SpringBoardPreferencesFile, ^(id plist) {
-                plist[SpringBoardShowNonDefaultSystemAppsKey] = @NO;
+            _assert(modifyPlist(@"/var/mobile/Library/Preferences/com.apple.springboard.plist", ^(id plist) {
+                plist[@"SBShowNonDefaultSystemApps"] = @NO;
             }), message, true);
+            LOG("Successfully disallowed SpringBoard to show non-default system apps.");
             
             // Disable RootFS Restore.
             
@@ -1719,10 +1726,8 @@ void jailbreak()
         
         LOG("Allowing SpringBoard to show non-default system apps...");
         SETMESSAGE(NSLocalizedString(@"Failed to allow SpringBoard to show non-default system apps.", nil));
-        NSString *SpringBoardPreferencesFile = @"/var/mobile/Library/Preferences/com.apple.springboard.plist";
-        NSString *SpringBoardShowNonDefaultSystemAppsKey = @"SBShowNonDefaultSystemApps";
-        _assert(modifyPlist(SpringBoardPreferencesFile, ^(id plist) {
-            plist[SpringBoardShowNonDefaultSystemAppsKey] = @YES;
+        _assert(modifyPlist(@"/var/mobile/Library/Preferences/com.apple.springboard.plist", ^(id plist) {
+            plist[@"SBShowNonDefaultSystemApps"] = @YES;
         }), message, true);
         LOG("Successfully allowed SpringBoard to show non-default system apps.");
         INSERTSTATUS(NSLocalizedString(@"Allowed SpringBoard to show non-default system apps.\n", nil));
