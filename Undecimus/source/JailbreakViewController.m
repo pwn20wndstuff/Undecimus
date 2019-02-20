@@ -1515,16 +1515,13 @@ void jailbreak()
         _assert(ensure_directory("/var/lib", 0, 0755), message, true);
 
         // Make sure dpkg is not corrupted
-        NSFileManager *fm = [NSFileManager defaultManager];
-        BOOL isDir;
-        // FIXME: this seems to match on symlinks too... probably need to use lstat
-        if ([fm fileExistsAtPath:@"/var/lib/dpkg" isDirectory:&isDir] && isDir) {
-            if ([fm fileExistsAtPath:@"/Library/dpkg" isDirectory:&isDir] && isDir) {
+        if (is_directory("/var/lib/dpkg")) {
+            if (is_directory("/Library/dpkg")) {
                 LOG(@"Removing /var/lib/dpkg...");
-                _assert([fm removeItemAtPath:@"/var/lib/dpkg" error:nil], message, true);
+                _assert(clean_file("/var/lib/dpkg"), message, true);
             } else {
                 LOG(@"Moving /var/lib/dpkg to /Library/dpkg...");
-                _assert([fm moveItemAtPath:@"/var/lib/dpkg" toPath:@"/Library/dpkg" error:nil], message, true);
+                _assert([[NSFileManager defaultManager] moveItemAtPath:@"/var/lib/dpkg" toPath:@"/Library/dpkg" error:nil], message, true);
             }
         }
         
@@ -1598,7 +1595,7 @@ void jailbreak()
         
         if (needStrap || !pkgIsConfigured("firmware")) {
             LOG("Extracting Cydia...");
-            if (![[NSFileManager defaultManager] fileExistsAtPath:@"/usr/libexec/cydia/firmware.sh"] || !pkgIsConfigured("cydia")) {
+            if (access("/usr/libexec/cydia/firmware.sh", F_OK) != ERR_SUCCESS || !pkgIsConfigured("cydia")) {
                 NSArray *fwDebs = debsForPkgs(@[@"cydia", @"cydia-lproj", @"darwintools", @"uikittools", @"system-cmds"]);
                 _assert(fwDebs != nil, message, true);
                 _assert(installDebs(fwDebs, true), message, true);
