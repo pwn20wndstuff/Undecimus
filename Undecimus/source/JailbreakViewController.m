@@ -2013,7 +2013,7 @@ void jailbreak()
             SETMESSAGE(NSLocalizedString(@"Failed to run ldrestart", nil));
             if (prefs.reload_system_daemons) {
                 rv = system("nohup bash -c \""
-                             "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
+                             "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && sleep 2 && "
                              "ldrestart ;"
                              "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
                              "\" 2>&1 >/dev/null &");
