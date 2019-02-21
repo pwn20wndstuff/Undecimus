@@ -202,13 +202,7 @@ int koffset(enum kstruct_offset offset)
         }
     });
     if (offsets == NULL) {
-        LOG("need to call offsets_init() prior to querying offsets");
         return 0;
     }
     return offsets[offset];
-}
-
-void offsets_init()
-{
-    return;
 }

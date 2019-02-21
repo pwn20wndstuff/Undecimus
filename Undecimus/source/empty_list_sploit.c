@@ -409,7 +409,6 @@ uint64_t early_rk64(uint64_t kaddr)
 bool vfs_sploit()
 {
     LOG("empty_list by @i41nbeer");
-    offsets_init();
 
     start_spinners();
     LOG("vfs_sploit");

@@ -533,8 +533,6 @@ mach_port_t prepare_tfp0(uint64_t vm_map, uint64_t receiver)
 
 bool mptcp_go()
 {
-    offsets_init();
-
     // increase the limit on the number of open files:
     increase_limits();
 

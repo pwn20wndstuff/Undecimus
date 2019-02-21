@@ -455,9 +455,6 @@ const uint64_t initial_context = 0x1020304015253545; // another random constant
 
 mach_port_t get_kernel_memory_rw()
 {
-    // offsets are required before we get r/w:
-    offsets_init();
-
     kern_return_t err;
 
     uint32_t MAX_KERNEL_TRAILER_SIZE = 0x44;

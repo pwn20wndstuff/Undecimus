@@ -626,7 +626,6 @@ bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
 
 kern_return_t exploit_callback_common(task_t kernel_task, kptr_t kbase, void *data) {
     prepare_for_rw_with_fake_tfp0(kernel_task);
-    offsets_init();
     kernel_base = kbase;
     kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS);
     return KERN_SUCCESS;
@@ -712,7 +711,6 @@ void jailbreak()
             ISADDR((persisted_kernel_base = dyld_info.all_image_info_addr)) &&
             ISADDR((persisted_kernel_slide = dyld_info.all_image_info_size))) {
             prepare_for_rw_with_fake_tfp0(persisted_kernel_task_port);
-            offsets_init();
             kernel_base = persisted_kernel_base;
             kernel_slide = persisted_kernel_slide;
             usedPersistedKernelTaskPort = true;
@@ -751,7 +749,6 @@ void jailbreak()
                 }
                 case voucher_swap_exploit: {
                     voucher_swap();
-                    offsets_init();
                     prepare_for_rw_with_fake_tfp0(kernel_task_port);
                     if (MACH_PORT_VALID(tfp0) &&
                         ISADDR((kernel_base = find_kernel_base())) &&
