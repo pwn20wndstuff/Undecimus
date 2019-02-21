@@ -174,5 +174,8 @@
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"coolstarorg"] options:@{} completionHandler:nil];
 }
 
+-(IBAction)tappedOnBen:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"benjweaverdev"] options:@{} completionHandler:nil];
+}
 
 @end
