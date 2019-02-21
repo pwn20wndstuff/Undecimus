@@ -1425,7 +1425,7 @@ void jailbreak()
             [debsToInstall addObject:substrateDeb];
         }
         
-        NSArray *resourcesPkgs = [@[@"ldid", @"file", @"com.bingner.plutil"] arrayByAddingObjectsFromArray:resolveDepsForPkg(@"jailbreak-resources", true)];
+        NSArray *resourcesPkgs = [@[@"ldid", @"file", @"com.bingner.plutil"] arrayByAddingObjectsFromArray:resolveDepsForPkg((kCFCoreFoundationVersionNumber >= 1535.12) ? @"jailbreak-resources-with-cert" : @"jailbreak-resources", true)];
         _assert(resourcesPkgs != nil, message, true);
         NSMutableArray *pkgsToRepair = [NSMutableArray new];
         LOG("Resource Pkgs: \"%@\".", resourcesPkgs);
@@ -2013,7 +2013,8 @@ void jailbreak()
             SETMESSAGE(NSLocalizedString(@"Failed to run ldrestart", nil));
             if (prefs.reload_system_daemons) {
                 rv = system("nohup bash -c \""
-                             "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && sleep 2 && "
+                             "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
+                             "sleep 2 && "
                              "ldrestart ;"
                              "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
                              "\" 2>&1 >/dev/null &");
