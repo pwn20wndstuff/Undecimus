@@ -653,31 +653,34 @@ bool machineNameContains(const char *string) {
 #define AF_MULTIPATH 39
 
 bool multi_path_tcp_enabled() {
-    bool rv = false;
-    int sock = socket(AF_MULTIPATH, SOCK_STREAM, 0);
-    if (sock < 0) {
-        return rv;
-    }
-    struct sockaddr* sockaddr_src = malloc(sizeof(struct sockaddr));
-    memset(sockaddr_src, 'A', sizeof(struct sockaddr));
-    sockaddr_src->sa_len = sizeof(struct sockaddr);
-    sockaddr_src->sa_family = AF_INET6;
-    struct sockaddr* sockaddr_dst = malloc(sizeof(struct sockaddr));
-    memset(sockaddr_dst, 'A', sizeof(struct sockaddr));
-    sockaddr_dst->sa_len = sizeof(struct sockaddr);
-    sockaddr_dst->sa_family = AF_INET;
-    sa_endpoints_t eps = {0};
-    eps.sae_srcif = 0;
-    eps.sae_srcaddr = sockaddr_src;
-    eps.sae_srcaddrlen = sizeof(struct sockaddr);
-    eps.sae_dstaddr = sockaddr_dst;
-    eps.sae_dstaddrlen = sizeof(struct sockaddr);
-    connectx(sock, &eps, SAE_ASSOCID_ANY, 0, NULL, 0, NULL, NULL);
-    rv = (errno != EPERM);
-    free(sockaddr_src);
-    free(sockaddr_dst);
-    close(sock);
-    return rv;
+    static bool enabled = false;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        int sock = socket(AF_MULTIPATH, SOCK_STREAM, 0);
+        if (sock < 0) {
+            return;
+        }
+        struct sockaddr* sockaddr_src = malloc(sizeof(struct sockaddr));
+        memset(sockaddr_src, 'A', sizeof(struct sockaddr));
+        sockaddr_src->sa_len = sizeof(struct sockaddr);
+        sockaddr_src->sa_family = AF_INET6;
+        struct sockaddr* sockaddr_dst = malloc(sizeof(struct sockaddr));
+        memset(sockaddr_dst, 'A', sizeof(struct sockaddr));
+        sockaddr_dst->sa_len = sizeof(struct sockaddr);
+        sockaddr_dst->sa_family = AF_INET;
+        sa_endpoints_t eps = {0};
+        eps.sae_srcif = 0;
+        eps.sae_srcaddr = sockaddr_src;
+        eps.sae_srcaddrlen = sizeof(struct sockaddr);
+        eps.sae_dstaddr = sockaddr_dst;
+        eps.sae_dstaddrlen = sizeof(struct sockaddr);
+        connectx(sock, &eps, SAE_ASSOCID_ANY, 0, NULL, 0, NULL, NULL);
+        enabled = (errno != EPERM);
+        free(sockaddr_src);
+        free(sockaddr_dst);
+        close(sock);
+    });
+    return enabled;
 }
 
 bool jailbreakEnabled() {
