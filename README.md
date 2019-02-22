@@ -50,16 +50,12 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Voucher Swap by Brandon Azad (11.2-12.1.2)
 * V1ntex by Tihmstar (11.2-11.4.1)
 
-## Switching from the other jailbreaks
-* The RootFS will automatically be restored
-
 ## Getting support
 * Use the built-in diagnostics tool
 * Tweet [@pwn20wnd](https://twitter.com/Pwn20wnd)
 
 ## Best practices
 * Perform a full restore with Rollectra before switching from the other jailbreaks
-* Turn on the AirPlane Mode before starting the jailbreak
 * Turn off Siri before starting the jailbreak
 * Wait at least one minute on the jailbreak screen
 
