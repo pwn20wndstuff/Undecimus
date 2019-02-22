@@ -1705,20 +1705,23 @@ void jailbreak()
         LOG("Successfully extracted bootstrap.");
         
         INSERTSTATUS(NSLocalizedString(@"Extracted Bootstrap.\n", nil));
+        
+        if (needStrap) {
+            NOTICE(NSLocalizedString(@"Bootstrap has been successfully extracted. The device will now be restarted.", nil), true, false);
+            _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
+        }
     }
     
     UPSTAGE();
     
     {
-        if (access("/.cydia_no_stash", F_OK) != ERR_SUCCESS) {
-            // Disable stashing.
-            
-            LOG("Disabling stashing...");
-            SETMESSAGE(NSLocalizedString(@"Failed to disable stashing.", nil));
-            _assert(create_file("/.cydia_no_stash", 0, 0644), message, true);
-            LOG("Successfully disabled stashing.");
-            INSERTSTATUS(NSLocalizedString(@"Disabled Stashing.\n", nil));
-        }
+        // Disable stashing.
+        
+        LOG("Disabling stashing...");
+        SETMESSAGE(NSLocalizedString(@"Failed to disable stashing.", nil));
+        _assert(ensure_file("/.cydia_no_stash", 0, 0644), message, true);
+        LOG("Successfully disabled stashing.");
+        INSERTSTATUS(NSLocalizedString(@"Disabled Stashing.\n", nil));
     }
     
     UPSTAGE();
@@ -1971,7 +1974,7 @@ void jailbreak()
     UPSTAGE();
     
     {
-        if (prefs.run_uicache) {
+        if (prefs.run_uicache || !canOpen("cydia://")) {
             // Run uicache.
             
             LOG("Running uicache...");

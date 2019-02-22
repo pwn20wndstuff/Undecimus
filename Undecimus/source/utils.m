@@ -20,6 +20,7 @@
 #include <netinet/in.h>
 #include <MobileGestalt.h>
 #import <inject.h>
+#include <UIKit/UIKit.h>
 #import "ArchiveFile.h"
 #import "utils.h"
 #import "KernelUtilities.h"
@@ -1217,4 +1218,17 @@ bool verifyECID(NSString *ecid) {
         return false;
     }
     return true;
+}
+
+bool canOpen(const char *URL) {
+    __block bool canOpenURL = false;
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@(URL)]]) {
+            canOpenURL = true;
+        }
+        dispatch_semaphore_signal(semaphore);
+    });
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    return canOpenURL;
 }

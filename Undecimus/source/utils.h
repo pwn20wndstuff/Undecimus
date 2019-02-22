@@ -123,6 +123,7 @@ bool canRead(const char *file);
 bool restartSpringBoard(void);
 bool uninstallRootLessJB(void);
 bool verifyECID(NSString *ecid);
+bool canOpen(const char *URL);
 
 extern NSData *lastSystemOutput;
 
