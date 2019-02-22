@@ -1422,7 +1422,7 @@ void jailbreak()
             [debsToInstall addObject:substrateDeb];
         }
         
-        NSArray *resourcesPkgs = [@[@"ldid", @"file", @"com.bingner.plutil"] arrayByAddingObjectsFromArray:resolveDepsForPkg((kCFCoreFoundationVersionNumber >= 1535.12) ? @"jailbreak-resources-with-cert" : @"jailbreak-resources", true)];
+        NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
         _assert(resourcesPkgs != nil, message, true);
         NSMutableArray *pkgsToRepair = [NSMutableArray new];
         LOG("Resource Pkgs: \"%@\".", resourcesPkgs);
@@ -1434,6 +1434,10 @@ void jailbreak()
                 LOG("Pkg \"%@\" verified.", pkg);
             } else {
                 LOG(@"Need to repair \"%@\".", pkg);
+                if ([pkg isEqualToString:@"signing-certificate"]) {
+                    // Hack to make sure it catches the Depends: version if it's already installed
+                    [debsToInstall addObject:debForPkg(@"jailbreak-resources")];
+                }
                 [pkgsToRepair addObject:pkg];
             }
         }
@@ -1691,9 +1695,6 @@ void jailbreak()
         
         // Make sure everything's at least as new as what we bundled
         _assert(aptUpgrade(), message, true);
-        
-        // Make sure Substrate is injected to the trust cache
-        _assert(injectTrustCache(@[@"/usr/libexec/substrate"], GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
         
         clean_file("/jb/tar");
         clean_file("/jb/lzma");
@@ -2013,11 +2014,12 @@ void jailbreak()
             SETMESSAGE(NSLocalizedString(@"Failed to load tweaks.", nil));
             if (prefs.reload_system_daemons) {
                 rv = system("nohup bash -c \""
+                             "sleep 1 ;"
                              "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
                              "sleep 2 && "
                              "ldrestart ;"
                              "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
-                             "\" 2>&1 >/dev/null &");
+                             "\" >/dev/null 2>&1 &");
             } else {
                 rv = system("launchctl stop com.apple.backboardd");
             }

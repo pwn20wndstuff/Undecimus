@@ -399,6 +399,7 @@ out:
         goto out;
     }
     while ((rv = archive_read_next_header(a, &entry)) == ARCHIVE_OK) {
+        const char *overwrite_temp = NULL;
         if (rv < ARCHIVE_OK) {
             NSLog(@"Archive \"%s\": %s", archive_entry_pathname(entry), archive_error_string(ext));
             if (rv < ARCHIVE_WARN)
@@ -406,7 +407,10 @@ out:
         }
         [self addEntry:entry];
         
-        const char *filename = archive_entry_pathname(entry);
+        NSString *filenameobj = @(archive_entry_pathname(entry));
+        const char *filename = filenameobj.UTF8String;
+        NSLog(@"Processing %s", filename);
+        
         struct stat st;
         rv = stat(filename, &st);
         if (rv == 0) {
@@ -417,12 +421,16 @@ out:
                     continue;
                 }
             }
-            if (S_ISREG(st.st_mode) && isInAMFIStaticCache(@(filename))) {
-                // --BootLoop
-                NSLog(@"Archive: cowardly refusing to overwrite stock file: %s", filename);
-                continue;
+            if (S_ISREG(st.st_mode)) {
+                if (isInAMFIStaticCache(filenameobj)) {
+                    // --BootLoop
+                    NSLog(@"Archive: cowardly refusing to overwrite stock file: %s", filename);
+                    continue;
+                }
+                NSLog(@"Archive: Overwriting file %s", filename);
+                overwrite_temp = [[filenameobj stringByAppendingString:@".archive-new"] UTF8String];
+                archive_entry_set_pathname(entry, overwrite_temp);
             }
-            NSLog(@"Archive: Overwriting file %s", filename);
         }
         rv = archive_write_header(ext, entry);
         if (rv < ARCHIVE_OK) {
@@ -441,6 +449,28 @@ out:
             NSLog(@"Archive \"%s\": %s", filename, archive_error_string(ext));
             if (rv < ARCHIVE_WARN)
                 goto out;
+        }
+        if (overwrite_temp) {
+            NSString *tmpFile = [filenameobj stringByAppendingString:@".archive-tmp"];
+            NSLog(@"renaming out for %s\n", filename);
+            if (rename(filename, tmpFile.UTF8String)) {
+                unlink(overwrite_temp);
+                NSLog(@"Archive: Unable to rename original file %s", filename);
+                goto out;
+            }
+            NSLog(@"renaming in for %s\n", filename);
+            if (rename(overwrite_temp, filename)) {
+                unlink(overwrite_temp);
+                NSLog(@"Archive: Unable to rename new file %s", filename);
+                rename(tmpFile.UTF8String, filename);
+                goto out;
+            }
+            NSLog(@"unlinking for %s\n", filename);
+            if (unlink(tmpFile.UTF8String)) {
+                NSLog(@"Archive: Unable to remove temp file %s", tmpFile.UTF8String);
+                goto out;
+            }
+            overwrite_temp = NULL;
         }
         NSLog(@"%s: OK", filename);
     }
