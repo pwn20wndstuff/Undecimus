@@ -897,6 +897,10 @@ void jailbreak()
         Shenanigans = ReadKernel64(GETOFFSET(shenanigans));
         LOG("Shenanigans = " ADDR, Shenanigans);
         _assert(ISADDR(Shenanigans), message, true);
+        if (Shenanigans != kernelCredAddr) {
+            LOG("Detected corrupted shenanigans pointer.");
+            Shenanigans = kernelCredAddr;
+        }
         WriteKernel64(GETOFFSET(shenanigans), ShenanigansPatch);
         myOriginalCredAddr = give_creds_to_process_at_addr(myProcAddr, kernelCredAddr);
         LOG("myOriginalCredAddr = " ADDR, myOriginalCredAddr);
@@ -2030,6 +2034,9 @@ void jailbreak()
         }
     }
 out:
+    LOG("Dropping kernel credentials...");
+    give_creds_to_process_at_addr(myProcAddr, myOriginalCredAddr);
+    WriteKernel64(GETOFFSET(shenanigans), Shenanigans);
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
     if (sharedController.canExit) {
