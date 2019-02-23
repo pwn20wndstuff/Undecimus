@@ -1191,7 +1191,7 @@ bool uninstallRootLessJB() {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSString *rootLessJBBootstrapMarkerFile = @"/var/containers/Bundle/.installed_rootlessJB3";
     NSArray *rootLessJBFileList = @[@"/var/LIB", @"/var/ulb", @"/var/bin", @"/var/sbin", @"/var/libexec", @"/var/containers/Bundle/tweaksupport/Applications", @"/var/Apps", @"/var/profile", @"/var/motd", @"/var/dropbear", @"/var/containers/Bundle/tweaksupport", @"/var/containers/Bundle/iosbinpack64", @"/var/log/testbin.log", @"/var/log/jailbreakd-stdout.log", @"/var/log/jailbreakd-stderr.log", @"/var/log/pspawn_payload_xpcproxy.log", @"/var/lib", @"/var/etc", @"/var/usr", rootLessJBBootstrapMarkerFile];
-    if ([fileManager fileExistsAtPath:rootLessJBBootstrapMarkerFile]) {
+    if ([fileManager fileExistsAtPath:rootLessJBBootstrapMarkerFile] || [fileManager fileExistsAtPath:@"/var/lib"]) {
         LOG("Found RootLessJB.");
         foundRootLessJB = YES;
     }
