@@ -1429,7 +1429,7 @@ void jailbreak()
             [debsToInstall addObject:substrateDeb];
         }
         
-        NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
+        NSArray *resourcesPkgs = [@[@"com.ps.letmeblock", @"com.parrotgeek.nobetaalert"] arrayByAddingObjectsFromArray:resolveDepsForPkg(@"jailbreak-resources", true)];
         _assert(resourcesPkgs != nil, message, true);
         NSMutableArray *pkgsToRepair = [NSMutableArray new];
         LOG("Resource Pkgs: \"%@\".", resourcesPkgs);
