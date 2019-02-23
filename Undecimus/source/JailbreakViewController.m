@@ -1476,7 +1476,7 @@ void jailbreak()
         NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/jailbreak/injectme.plist"];
         // If substrate is already running but was broken, skip injecting again
         if (!skipSubstrate) {
-            resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
+            resources = [@[@"/usr/libexec/substrate", @"/usr/libexec/substrated", @"/usr/lib/substrate/SubstrateBootstrap.dylib"] arrayByAddingObjectsFromArray:resources];
         }
         _assert(injectTrustCache(resources, GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
@@ -1988,6 +1988,7 @@ void jailbreak()
             LOG("Running uicache...");
             SETMESSAGE(NSLocalizedString(@"Failed to run uicache.", nil));
             _assert(runCommand("/usr/bin/uicache", NULL) == ERR_SUCCESS, message, true);
+            sleep(2);
             prefs.run_uicache = false;
             _assert(modifyPlist(prefsFile, ^(id plist) {
                 plist[K_REFRESH_ICON_CACHE] = @NO;
@@ -2021,13 +2022,16 @@ void jailbreak()
             SETMESSAGE(NSLocalizedString(@"Failed to load tweaks.", nil));
             if (prefs.reload_system_daemons) {
                 rv = system("nohup bash -c \""
+                             "sleep 1 ;"
                              "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
-                             "sleep 2 && "
                              "ldrestart ;"
                              "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
                              "\" >/dev/null 2>&1 &");
             } else {
-                rv = system("launchctl stop com.apple.backboardd");
+                rv = system("nohup bash -c \""
+                            "sleep 1 ;"
+                            "launchctl stop com.apple.backboardd"
+                            "\" >/dev/null 2>&1 &");
             }
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             LOG("Successfully loaded Tweaks.");
