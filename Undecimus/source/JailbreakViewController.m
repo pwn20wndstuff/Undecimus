@@ -2018,7 +2018,6 @@ void jailbreak()
             SETMESSAGE(NSLocalizedString(@"Failed to load tweaks.", nil));
             if (prefs.reload_system_daemons) {
                 rv = system("nohup bash -c \""
-                             "sleep 1 ;"
                              "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
                              "sleep 2 && "
                              "ldrestart ;"
