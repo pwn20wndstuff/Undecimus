@@ -1129,14 +1129,14 @@ void jailbreak()
             LOG("Mounting system snapshot...");
             SETMESSAGE(NSLocalizedString(@"Unable to mount system snapshot.", nil));
             _assert(!is_mountpoint("/var/MobileSoftwareUpdate/mnt1"),
-                    NSLocalizedString(@"RootFS already mounted, delete OTA file from Settings - Storage if present and reboot", nil), true);
+                    NSLocalizedString(@"RootFS already mounted, delete OTA file from Settings - Storage if present and reboot.", nil), true);
             const char *systemSnapshotMountPoint = "/private/var/tmp/jb/mnt1";
             if (is_mountpoint(systemSnapshotMountPoint)) {
                 _assert(unmount(systemSnapshotMountPoint, MNT_FORCE) == ERR_SUCCESS, message, true);
             }
             _assert(clean_file(systemSnapshotMountPoint), message, true);
             _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
-            const char *argv[] = {"/sbin/mount_apfs", "-o", "ro", thedisk, systemSnapshotMountPoint, NULL};
+            const char *argv[] = {"/sbin/mount_apfs", thedisk, systemSnapshotMountPoint, NULL};
             _assert(runCommandv(argv[0], 3, argv, ^(pid_t pid) {
                 uint64_t procStructAddr = get_proc_struct_for_pid(pid);
                 LOG("procStructAddr = " ADDR, procStructAddr);
@@ -1151,7 +1151,7 @@ void jailbreak()
             // Rename system snapshot.
             
             LOG("Renaming system snapshot...");
-            SETMESSAGE(NSLocalizedString(@"Unable to rename system snapshot.", nil));
+            SETMESSAGE(NSLocalizedString(@"Unable to rename system snapshot. Delete OTA file from Settings - Storage if present and reboot.", nil));
             rootfd = open(systemSnapshotMountPoint, O_RDONLY);
             _assert(rootfd > 0, message, true);
             snapshots = snapshot_list(rootfd);
@@ -1162,6 +1162,9 @@ void jailbreak()
             }
             free(snapshots);
             snapshots = NULL;
+            const char *test_snapshot = "test-snapshot";
+            _assert(fs_snapshot_create(rootfd, test_snapshot, 0) == ERR_SUCCESS, message, true);
+            _assert(fs_snapshot_delete(rootfd, test_snapshot, 0) == ERR_SUCCESS, message, true);
             char *systemSnapshot = copySystemSnapshot();
             _assert(systemSnapshot != NULL, message, true);
             uint64_t system_snapshot_vnode = 0;
