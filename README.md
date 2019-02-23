@@ -62,13 +62,13 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * <a href="https://youtu.be/TqHYjLHO0zs">https://youtu.be/TqHYjLHO0zs</a>
 
 ## To Do List
-* Contact [@saurik](https://twitter.com/saurik) to enable the Cydia Store purchases on iOS 11 and remove the empty front page ads in Cydia: Partially done
-* Completely switch to Cydia Substrate and ditch Substitute: Done
-* Make switching from other jailbreaks without wiping the device possible: Done
-* Fix a kernel panic that's triggered by a kernel data abort which is caused by a UaF bug in jailbreakd: Done
-* Chain [@_bazad](https://twitter.com/_bazad)'s [blanket](https://github.com/bazad/blanket) to bypass the developer certificate requirement for multi_path: Almost done
-* Enable the on-fly entitlement patching on iOS 11: Work in progress
-* WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1): Work in progress
+- [ ] Contact [@saurik](https://twitter.com/saurik) to enable the Cydia Store purchases on iOS 11 and remove the empty front page ads in Cydia: Partially done
+- [X] Completely switch to Cydia Substrate and ditch Substitute
+- [X] Make switching from other jailbreaks without wiping the device possible
+- [X] Fix a kernel panic that's triggered by a kernel data abort which is caused by a UaF bug in jailbreakd
+- [ ] Chain [@_bazad](https://twitter.com/_bazad)'s [blanket](https://github.com/bazad/blanket) to bypass the developer certificate requirement for multi_path: Almost done
+- [ ] Enable the on-fly entitlement patching on iOS 11: Work in progress
+- [ ] WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1): Work in progress
 
 ## Screenshots
 <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-1.PNG?token=AlyO4wXUInR6oHEgx0Tg31ri0t1q91frks5bx5ZbwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-2.PNG?token=AlyO48vs-YYcaKUgxXh8nIEUQQz_QEoqks5bx5ZqwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-3.PNG?token=AlyO44tYr5-jl7Pg0jup0tCqm3rSjUhiks5bx5Z4wA%3D%3D" width="281.25" height="609" />
