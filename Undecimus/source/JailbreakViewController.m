@@ -1033,7 +1033,6 @@ void jailbreak()
         LOG("Logging ECID...");
         SETMESSAGE(NSLocalizedString(@"Failed to log ECID.", nil));
         CFStringRef value = MGCopyAnswer(kMGUniqueChipID);
-        LOG("ECID = %@", value);
         _assert(value != nil, message, true);
         _assert(modifyPlist(prefsFile, ^(id plist) {
             plist[K_ECID] = CFBridgingRelease(value);
