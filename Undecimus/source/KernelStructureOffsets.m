@@ -64,7 +64,10 @@ int kstruct_offsets_11_0[] = {
     0x8f8, // KSTRUCT_OFFSET_MOUNT_MNT_DATA
 
     0x10, // KSTRUCT_OFFSET_HOST_SPECIAL
-
+    
+    0x18, // KSTRUCT_OFFSET_UCRED_CR_UID
+    0x78, // KSTRUCT_OFFSET_UCRED_CR_LABEL
+    
     0x6c, // KFREE_ADDR_OFFSET
 };
 
@@ -122,6 +125,9 @@ int kstruct_offsets_11_3[] = {
 
     0x10, // KSTRUCT_OFFSET_HOST_SPECIAL
 
+    0x18, // KSTRUCT_OFFSET_UCRED_CR_UID
+    0x78, // KSTRUCT_OFFSET_UCRED_CR_LABEL
+    
     0x7c, // KFREE_ADDR_OFFSET
 };
 
@@ -178,6 +184,9 @@ int kstruct_offsets_12_0[] = {
     0x8f8, // KSTRUCT_OFFSET_MOUNT_MNT_DATA
     
     0x10, // KSTRUCT_OFFSET_HOST_SPECIAL
+    
+    0x18, // KSTRUCT_OFFSET_UCRED_CR_UID
+    0x78, // KSTRUCT_OFFSET_UCRED_CR_LABEL
     
     0x7c, // KFREE_ADDR_OFFSET
 };

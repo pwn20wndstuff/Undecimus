@@ -902,7 +902,7 @@ void jailbreak()
             Shenanigans = kernelCredAddr;
         }
         WriteKernel64(GETOFFSET(shenanigans), ShenanigansPatch);
-        myOriginalCredAddr = give_creds_to_process_at_addr(myProcAddr, kernelCredAddr);
+        myOriginalCredAddr = myCredAddr = give_creds_to_process_at_addr(myProcAddr, kernelCredAddr);
         LOG("myOriginalCredAddr = " ADDR, myOriginalCredAddr);
         _assert(ISADDR(myOriginalCredAddr), message, true);
         _assert(setuid(0) == ERR_SUCCESS, message, true);
@@ -1399,6 +1399,21 @@ void jailbreak()
         }
     }
     
+    
+    UPSTAGE();
+    
+    {
+        // Drop kernel credentials.
+        
+        LOG("Dropping kernel credentials...");
+        SETMESSAGE(NSLocalizedString(@"Failed to drop kernel credentials.", nil));
+        give_creds_to_process_at_addr(myProcAddr, myOriginalCredAddr);
+        WriteKernel64(GETOFFSET(shenanigans), Shenanigans);
+        WriteKernel64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL), ReadKernel64(kernelCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL)));
+        WriteKernel64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_UID), 0);
+        LOG("Successfully dropped kernel credentials.");
+    }
+    
     UPSTAGE();
     
     {
@@ -1478,6 +1493,7 @@ void jailbreak()
         if (!skipSubstrate) {
             resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
         }
+        resources = [@[@"/usr/libexec/substrated"] arrayByAddingObjectsFromArray:resources];
         _assert(injectTrustCache(resources, GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
         INSERTSTATUS(NSLocalizedString(@"Injected trust cache.\n", nil));
@@ -2021,13 +2037,17 @@ void jailbreak()
             SETMESSAGE(NSLocalizedString(@"Failed to load tweaks.", nil));
             if (prefs.reload_system_daemons) {
                 rv = system("nohup bash -c \""
+                             "sleep 1 ;"
                              "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
-                             "sleep 2 && "
                              "ldrestart ;"
                              "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
                              "\" >/dev/null 2>&1 &");
             } else {
-                rv = system("launchctl stop com.apple.backboardd");
+                rv = system("nohup bash -c \""
+                             "sleep 1 ;"
+                             "launchctl stop com.apple.backboardd ;"
+                             "launchctl stop com.apple.mDNSResponder"
+                             "\" >/dev/null 2>&1 &");
             }
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
             LOG("Successfully loaded Tweaks.");
@@ -2036,9 +2056,6 @@ void jailbreak()
         }
     }
 out:
-    LOG("Dropping kernel credentials...");
-    give_creds_to_process_at_addr(myProcAddr, myOriginalCredAddr);
-    WriteKernel64(GETOFFSET(shenanigans), Shenanigans);
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
     if (sharedController.canExit) {
