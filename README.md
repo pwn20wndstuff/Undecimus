@@ -44,11 +44,11 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 
 ## Currently supported exploits
 
-* VFS(Empty_list) by lan beer (11-11.3.1)
-* MultiPath by lan beer (11.2-11.3.1)
-* Async_Wake by lan beer (11.1.2)
-* Voucher Swap by Brandon Azad (11.2-12.1.2)
-* V1ntex by Tihmstar (11.2-11.4.1)
+* VFS(Empty_list) by lan beer (11.0 - 11.3.1)
+* MultiPath by lan beer (11.2 - 11.3.1)
+* Async_Wake by lan beer (11.0 - 11.1.2)
+* Voucher Swap by Brandon Azad (11.2 - 12.1.2)
+* V1ntex by Tihmstar (11.2 - 11.4.1)
 
 ## Getting support
 * Use the built-in diagnostics tool
