@@ -640,7 +640,7 @@ kern_return_t v3ntex_callback(task_t tfp0, kptr_t kbase, void *data) {
 }
 
 void waitFor(int seconds) {
-    for (int i = 0; i <= seconds; i++) {
+    for (int i = 1; i <= seconds; i++) {
         LOG("Waiting (%d/%d)", i, seconds);
         sleep(1);
     }
@@ -2026,6 +2026,8 @@ void jailbreak()
             INSERTSTATUS(NSLocalizedString(@"Flushed preference cache.\n", nil));
         }
     }
+    
+    waitFor(2); // Don't remove this
     
     UPSTAGE();
     
