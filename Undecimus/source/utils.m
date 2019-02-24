@@ -21,6 +21,7 @@
 #include <MobileGestalt.h>
 #import <inject.h>
 #include <UIKit/UIKit.h>
+#include <SystemConfiguration/SystemConfiguration.h>
 #import "ArchiveFile.h"
 #import "utils.h"
 #import "KernelUtilities.h"
@@ -1232,3 +1233,23 @@ bool canOpen(const char *URL) {
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
     return canOpenURL;
 }
+
+bool airplaneModeEnabled() {
+    struct sockaddr_in zeroAddress;
+    bzero(&zeroAddress, sizeof(zeroAddress));
+    zeroAddress.sin_len = sizeof(zeroAddress);
+    zeroAddress.sin_family = AF_INET;
+    SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, (const struct sockaddr *)&zeroAddress);
+    if (reachability == NULL)
+        return false;
+    SCNetworkReachabilityFlags flags;
+    if (!SCNetworkReachabilityGetFlags(reachability, &flags)) {
+        return false;
+    }
+    if (flags == 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+

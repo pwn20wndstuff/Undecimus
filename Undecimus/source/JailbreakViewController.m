@@ -2104,7 +2104,9 @@ out:
         STATUS(NSLocalizedString(@"Unsupported", nil), false, true);
     }
     if (bundledResources == nil) {
-        showAlert(NSLocalizedString(@"Error", nil), NSLocalizedString(@"Bundled Resources version is missing. This build is invalid.", nil), false, false);
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+            showAlert(NSLocalizedString(@"Error", nil), NSLocalizedString(@"Bundled Resources version is missing. This build is invalid.", nil), false, false);
+        });
     }
 }
 

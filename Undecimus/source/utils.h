@@ -124,6 +124,7 @@ bool restartSpringBoard(void);
 bool uninstallRootLessJB(void);
 bool verifyECID(NSString *ecid);
 bool canOpen(const char *URL);
+bool airplaneModeEnabled(void);
 
 extern NSData *lastSystemOutput;
 

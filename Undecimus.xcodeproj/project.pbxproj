@@ -35,6 +35,7 @@
 		216FDA25220C68A60086D802 /* v1ntex_exploit.m in Sources */ = {isa = PBXBuildFile; fileRef = 216FDA24220C68A60086D802 /* v1ntex_exploit.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */; };
 		2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
+		2171C4012222E3BB004E45C7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2171C4002222E3BB004E45C7 /* SystemConfiguration.framework */; };
 		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
 		21A97FD12148103C00DC0023 /* KernelExecution.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC82148103B00DC0023 /* KernelExecution.m */; };
 		21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCC2148103B00DC0023 /* KernelUtilities.c */; };
@@ -122,6 +123,7 @@
 		216FDA21220C62C80086D802 /* v1ntex_offsets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = v1ntex_offsets.h; sourceTree = "<group>"; };
 		216FDA23220C68A60086D802 /* v1ntex_exploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = v1ntex_exploit.h; sourceTree = "<group>"; };
 		216FDA24220C68A60086D802 /* v1ntex_exploit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = v1ntex_exploit.m; sourceTree = "<group>"; };
+		2171C4002222E3BB004E45C7 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		21A97FC42148103A00DC0023 /* KernelExecution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KernelExecution.h; sourceTree = "<group>"; };
 		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
 		21A97FC62148103B00DC0023 /* remote_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_memory.c; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2171C4012222E3BB004E45C7 /* SystemConfiguration.framework in Frameworks */,
 				2253F711221020EB0031D809 /* libmagic.a in Frameworks */,
 				216FDA1E220C5F5C0086D802 /* libz.tbd in Frameworks */,
 				216FDA0D220C5C320086D802 /* libplist.a in Frameworks */,
@@ -300,6 +303,7 @@
 		21675B62214A68B700D20E2B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2171C4002222E3BB004E45C7 /* SystemConfiguration.framework */,
 				2253F710221020EA0031D809 /* libmagic.a */,
 				216FDA1D220C5F5C0086D802 /* libz.tbd */,
 				226689DC21EC1C5A00262F66 /* libarchive.2.tbd */,
