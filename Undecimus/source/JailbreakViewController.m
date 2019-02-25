@@ -1399,21 +1399,6 @@ void jailbreak()
         }
     }
     
-    
-    UPSTAGE();
-    
-    {
-        // Drop kernel credentials.
-        
-        LOG("Dropping kernel credentials...");
-        SETMESSAGE(NSLocalizedString(@"Failed to drop kernel credentials.", nil));
-        give_creds_to_process_at_addr(myProcAddr, myOriginalCredAddr);
-        WriteKernel64(GETOFFSET(shenanigans), Shenanigans);
-        WriteKernel64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL), ReadKernel64(kernelCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL)));
-        WriteKernel64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_UID), 0);
-        LOG("Successfully dropped kernel credentials.");
-    }
-    
     UPSTAGE();
     
     {
@@ -2007,6 +1992,7 @@ void jailbreak()
             LOG("Running uicache...");
             SETMESSAGE(NSLocalizedString(@"Failed to run uicache.", nil));
             _assert(runCommand("/usr/bin/uicache", NULL) == ERR_SUCCESS, message, true);
+            waitFor(2); // Don't remove this
             prefs.run_uicache = false;
             _assert(modifyPlist(prefsFile, ^(id plist) {
                 plist[K_REFRESH_ICON_CACHE] = @NO;
@@ -2044,6 +2030,8 @@ void jailbreak()
                 rv = system("nohup bash -c \""
                              "sleep 1 ;"
                              "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
+                             "rm -rf /var/root/Library/Caches/com.apple.coresymbolicationd && "
+                             "sleep 2 && "
                              "ldrestart ;"
                              "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
                              "\" >/dev/null 2>&1 &");
@@ -2062,6 +2050,9 @@ void jailbreak()
     }
 out:
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
+    LOG("Dropping kernel credentials...");
+    give_creds_to_process_at_addr(myProcAddr, myOriginalCredAddr);
+    WriteKernel64(GETOFFSET(shenanigans), Shenanigans);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
     if (sharedController.canExit) {
         if (prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort) {
