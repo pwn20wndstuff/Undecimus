@@ -10,6 +10,7 @@
 #define _UTILS_H
 #import <sys/types.h>
 #import <sys/stat.h>
+#import "ArchiveFile.h"
 
 #define system(x) _system(x)
 extern int logfd;
@@ -87,6 +88,8 @@ bool aptUpdate(void);
 bool aptInstall(NSArray <NSString*> *pkgs);
 bool aptUpgrade(void);
 bool runApt(NSArray <NSString*> *args);
+bool extractAptPkgList(NSString *path, ArchiveFile* listcache, id_t owner);
+bool ensureAptPkgLists(void);
 bool is_symlink(const char *filename);
 bool is_directory(const char *filename);
 bool is_mountpoint(const char *filename);

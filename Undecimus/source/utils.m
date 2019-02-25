@@ -368,6 +368,25 @@ bool aptUpgrade() {
     return runApt(@[@"-y", @"--allow-unauthenticated", @"--allow-downgrades", @"-f", @"dist-upgrade"]);
 }
 
+bool extractAptPkgList(NSString *path, ArchiveFile* listcache, id_t owner)
+{
+    struct stat buf;
+    if (stat(path.UTF8String, &buf) != ERR_SUCCESS || !S_ISDIR(buf.st_mode)) {
+        if (!ensure_directory(path.UTF8String, owner, 0755)) return false;
+        return [listcache extractToPath:path withOwner:owner andGroup:owner];
+    }
+    return true;
+}
+
+bool ensureAptPkgLists() {
+    NSString *lists = pathForResource(@"lists.tar.lzma");
+    if (!lists) return false;
+    ArchiveFile *listsArchive = [ArchiveFile archiveWithFile:lists];
+    if (!listsArchive) return false;
+    bool success = extractAptPkgList(@"/var/lib/apt/lists", listsArchive, 0);
+    return success && extractAptPkgList(@"/var/mobile/Library/Caches/com.saurik.Cydia/lists", listsArchive, 501);
+}
+
 bool is_symlink(const char *filename) {
     struct stat buf;
     if (lstat(filename, &buf) != ERR_SUCCESS) {

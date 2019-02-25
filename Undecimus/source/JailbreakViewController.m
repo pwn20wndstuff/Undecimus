@@ -1427,6 +1427,9 @@ void jailbreak()
         // Uninstall RootLessJB if it is found to prevent conflicts with dpkg.
         _assert(uninstallRootLessJB(), message, true);
         
+        // Make sure we have an apt packages cache
+        _assert(ensureAptPkgLists(), message, true);
+        
         needSubstrate = ( needStrap ||
                          (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) ||
                          !verifySums(@"/var/lib/dpkg/info/mobilesubstrate.md5sums", HASHTYPE_MD5)

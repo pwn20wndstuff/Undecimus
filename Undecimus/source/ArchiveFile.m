@@ -355,6 +355,11 @@ out:
     return [self extractToPath:path withFlags:DEFAULT_FLAGS];
 }
 
+-(BOOL)extractToPath:(NSString*)path withOwner:(id_t)owner andGroup:(id_t)group
+{
+    return [self extractToPath:path withFlags:DEFAULT_FLAGS overWriteDirectories:NO owner:owner andGroup:group];
+}
+
 -(BOOL)extractToPath:(NSString*)path overWriteDirectories:(BOOL)overwrite_dirs
 {
     return [self extractToPath:path withFlags:DEFAULT_FLAGS overWriteDirectories:overwrite_dirs];
@@ -366,6 +371,10 @@ out:
 }
 
 -(BOOL)extractToPath:(NSString*)path withFlags:(int)flags overWriteDirectories:(BOOL)overwrite_dirs
+{
+    return [self extractToPath:path withFlags:flags overWriteDirectories:overwrite_dirs owner:-1 andGroup:-1];
+}
+-(BOOL)extractToPath:(NSString*)path withFlags:(int)flags overWriteDirectories:(BOOL)overwrite_dirs owner:(id_t)owner andGroup:(id_t)group
 {
     BOOL result = NO;
 
@@ -404,6 +413,12 @@ out:
             NSLog(@"Archive \"%s\": %s", archive_entry_pathname(entry), archive_error_string(ext));
             if (rv < ARCHIVE_WARN)
                 goto out;
+        }
+        if (owner >= 0) {
+            archive_entry_set_uid(entry, owner);
+        }
+        if (group >= 0) {
+            archive_entry_set_gid(entry, group);
         }
         [self addEntry:entry];
         
