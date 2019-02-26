@@ -1672,6 +1672,11 @@ void jailbreak()
             _assert(removePkg("science.xnu.undecimus.resources", true), message, true);
         }
         
+        if (pkgIsInstalled("jailbreak-resources-with-cert")) {
+            LOG("Removing resources-with-cert...");
+            _assert(removePkg("jailbreak-resources-with-cert", true), message, true);
+        }
+            
         if ((pkgIsInstalled("apt7") && compareInstalledVersion("apt7", "lt", "1:0")) ||
             (pkgIsInstalled("apt7-lib") && compareInstalledVersion("apt7-lib", "lt", "1:0")) ||
             (pkgIsInstalled("apt7-key") && compareInstalledVersion("apt7-key", "lt", "1:0"))
