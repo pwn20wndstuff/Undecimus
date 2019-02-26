@@ -1161,8 +1161,8 @@ void jailbreak()
             
             LOG("Mounting system snapshot...");
             SETMESSAGE(NSLocalizedString(@"Unable to mount system snapshot.", nil));
-            _assert(!is_mountpoint("/var/MobileSoftwareUpdate/mnt1"),
-                    NSLocalizedString(@"RootFS already mounted, delete OTA file from Settings - Storage if present and reboot.", nil), true);
+            NSString *invalidRootMessage = NSLocalizedString(@"RootFS already mounted, delete OTA file from Settings - Storage if present and reboot.", nil);
+            _assert(!is_mountpoint("/var/MobileSoftwareUpdate/mnt1"), invalidRootMessage, true);
             const char *systemSnapshotMountPoint = "/private/var/tmp/jb/mnt1";
             if (is_mountpoint(systemSnapshotMountPoint)) {
                 _assert(unmount(systemSnapshotMountPoint, MNT_FORCE) == ERR_SUCCESS, message, true);
@@ -1179,6 +1179,14 @@ void jailbreak()
             _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
             const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
             _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
+            NSString *systemVersionPlist = @"/System/Library/CoreServices/SystemVersion.plist";
+            NSString *rootSystemVersionPlist = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:systemVersionPlist];
+            _assert(rootSystemVersionPlist != nil, message, true);
+            NSDictionary *shapshotSystemVersion = [NSDictionary dictionaryWithContentsOfFile:systemVersionPlist];
+            _assert(shapshotSystemVersion != nil, message, true);
+            NSDictionary *rootfsSystemVersion = [NSDictionary dictionaryWithContentsOfFile:rootSystemVersionPlist];
+            _assert(rootfsSystemVersion != nil, message, true);
+            _assert([rootfsSystemVersion[@"ProductBuildVersion"] isEqualToString:shapshotSystemVersion[@"ProductBuildVersion"]], invalidRootMessage, true);
             LOG("Successfully mounted system snapshot.");
             
             // Rename system snapshot.
