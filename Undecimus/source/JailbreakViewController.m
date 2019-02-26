@@ -874,9 +874,10 @@ void jailbreak()
         LOG("Finding offsets...");
 #define PF(x) do { \
         SETMESSAGE(NSLocalizedString(@"Failed to find " #x " offset.", nil)); \
-        SETOFFSET(x, find_ ##x() + kernel_slide); \
-        LOG(#x " = " ADDR " + " ADDR, GETOFFSET(x) - kernel_slide, kernel_slide); \
+        SETOFFSET(x, find_ ##x()); \
+        LOG(#x " = " ADDR " + " ADDR, GETOFFSET(x), kernel_slide); \
         _assert(ISADDR(GETOFFSET(x)), message, true); \
+        SETOFFSET(x, GETOFFSET(x) + kernel_slide); \
 } while (false)
         PF(trustcache);
         PF(OSBoolean_True);
@@ -2024,7 +2025,6 @@ void jailbreak()
             LOG("Running uicache...");
             SETMESSAGE(NSLocalizedString(@"Failed to run uicache.", nil));
             _assert(runCommand("/usr/bin/uicache", NULL) == ERR_SUCCESS, message, true);
-            waitFor(2); // Don't remove this
             prefs.run_uicache = false;
             _assert(modifyPlist(prefsFile, ^(id plist) {
                 plist[K_REFRESH_ICON_CACHE] = @NO;
@@ -2048,8 +2048,6 @@ void jailbreak()
         }
     }
     
-    waitFor(2); // Don't remove this
-    
     UPSTAGE();
     
     {
@@ -2060,16 +2058,13 @@ void jailbreak()
             SETMESSAGE(NSLocalizedString(@"Failed to load tweaks.", nil));
             if (prefs.reload_system_daemons) {
                 rv = system("nohup bash -c \""
-                             "sleep 1 ;"
                              "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
-                             "rm -rf /var/root/Library/Caches/com.apple.coresymbolicationd && "
                              "sleep 2 && "
                              "ldrestart ;"
                              "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
                              "\" >/dev/null 2>&1 &");
             } else {
                 rv = system("nohup bash -c \""
-                             "sleep 1 ;"
                              "launchctl stop com.apple.backboardd ;"
                              "launchctl stop com.apple.mDNSResponder"
                              "\" >/dev/null 2>&1 &");
