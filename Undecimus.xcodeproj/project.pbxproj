@@ -23,6 +23,7 @@
 		2150A9E022021348001C8677 /* parameters.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9D922021348001C8677 /* parameters.c */; };
 		2150A9E122021348001C8677 /* kernel_alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9DA22021348001C8677 /* kernel_alloc.c */; };
 		2150A9E222021348001C8677 /* kernel_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9DB22021348001C8677 /* kernel_memory.c */; };
+		2166453D22257E7900B37252 /* lzssdec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2166453B22257E7900B37252 /* lzssdec.cpp */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		216FDA04220C5BA90086D802 /* libfragmentzip.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA03220C5BA90086D802 /* libfragmentzip.a */; };
 		216FDA08220C5BDC0086D802 /* libgrabkernel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA07220C5BDC0086D802 /* libgrabkernel.a */; };
 		216FDA0D220C5C320086D802 /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA0B220C5C320086D802 /* libplist.a */; };
@@ -104,6 +105,8 @@
 		2150A9E322021381001C8677 /* mach_vm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mach_vm.h; sourceTree = "<group>"; };
 		2150A9E422021381001C8677 /* ipc_port.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ipc_port.h; sourceTree = "<group>"; };
 		2150A9E52202138A001C8677 /* IOKitLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IOKitLib.h; sourceTree = "<group>"; };
+		2166453B22257E7900B37252 /* lzssdec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lzssdec.cpp; sourceTree = "<group>"; };
+		2166453C22257E7900B37252 /* lzssdec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lzssdec.h; sourceTree = "<group>"; };
 		216FDA03220C5BA90086D802 /* libfragmentzip.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfragmentzip.a; sourceTree = "<group>"; };
 		216FDA06220C5BB80086D802 /* libfragmentzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libfragmentzip.h; sourceTree = "<group>"; };
 		216FDA07220C5BDC0086D802 /* libgrabkernel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libgrabkernel.a; sourceTree = "<group>"; };
@@ -300,6 +303,15 @@
 			name = voucher_swap;
 			sourceTree = "<group>";
 		};
+		2166453A22257E7000B37252 /* lzssdec */ = {
+			isa = PBXGroup;
+			children = (
+				2166453B22257E7900B37252 /* lzssdec.cpp */,
+				2166453C22257E7900B37252 /* lzssdec.h */,
+			);
+			name = lzssdec;
+			sourceTree = "<group>";
+		};
 		21675B62214A68B700D20E2B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -402,6 +414,7 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				2166453A22257E7000B37252 /* lzssdec */,
 				21E4052A2215E535006065CE /* v3ntex */,
 				216FDA1F220C62B20086D802 /* v1ntex */,
 				213E78222208652B00FDF3B7 /* necp */,
@@ -613,6 +626,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2166453D22257E7900B37252 /* lzssdec.cpp in Sources */,
 				21E4052D2215E543006065CE /* v3ntex_exploit.m in Sources */,
 				21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */,
 				2150A9E022021348001C8677 /* parameters.c in Sources */,
