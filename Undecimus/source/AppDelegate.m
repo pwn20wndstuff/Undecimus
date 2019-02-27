@@ -34,9 +34,10 @@
     char s[0x10000];
 
     ssize_t nread = read(infd, s, sizeof(s));
-    if (nread > 0) {
-        write(outfd, s, nread);
-    }
+    if (nread <= 0)
+        return nil;
+    
+    write(outfd, s, nread);
     if (logfd > 0) {
         if (write(logfd, s, nread) != nread) {
             write(_orig_stderr, "error writing to logfile\n", 26);
@@ -58,6 +59,8 @@
         rv = select(FD_SETSIZE, &fds, NULL, NULL, NULL);
         if (FD_ISSET(input_fd, &fds)) {
             NSString *read = [self readDataFromFD:input_fd toFD:_orig_stdout];
+            if (read == nil)
+                continue;
             [outline appendString:read];
             NSRange lastNewline = [read rangeOfString:@"\n" options:NSBackwardsSearch];
             if (lastNewline.location != NSNotFound) {
