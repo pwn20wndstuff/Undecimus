@@ -6,7 +6,9 @@ if [ -f ~/.profile ]; then
 fi
 
 if [[ "${CODE_SIGNING_REQUIRED}" == "NO" ]]; then
-  if which -s gnutar; then
+  if which -s gtar; then
+    TAR=gtar
+  elif which -s gnutar; then
     TAR=gnutar
   else
     TAR=tar
