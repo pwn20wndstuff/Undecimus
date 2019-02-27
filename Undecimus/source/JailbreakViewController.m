@@ -1439,6 +1439,10 @@ void jailbreak()
         }
     }
     
+    if (kCFCoreFoundationVersionNumber >= 1535.12 && vm_kernel_page_size == 0x1000) {
+        goto out;
+    }
+    
     UPSTAGE();
     
     {

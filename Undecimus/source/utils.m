@@ -980,12 +980,7 @@ bool supportsExploit(exploit_t exploit) {
             break;
         }
         case voucher_swap_exploit: {
-            vm_size_t vm_size = 0;
-            if (_host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS) {
-                LOG("Unable to determine page size.");
-                return false;
-            }
-            if (vm_size != 0x4000) {
+            if (vm_kernel_page_size != 0x4000) {
                 return false;
             }
             if (machineNameContains("iPad5,") && kCFCoreFoundationVersionNumber >= 1535.12) {
@@ -997,18 +992,13 @@ bool supportsExploit(exploit_t exploit) {
             break;
         }
         case v1ntex_exploit: {
-            vm_size_t vm_size = 0;
-            if (_host_page_size(mach_host_self(), &vm_size) != ERR_SUCCESS) {
-                LOG("Unable to determine page size.");
-                return false;
-            }
-            if (vm_size != 0x1000) {
+            if (vm_kernel_page_size != 0x1000) {
                 return false;
             }
             break;
         }
         case v3ntex_exploit: {
-            if (!machineNameContains("iPad5,")) {
+            if (vm_kernel_page_size != 0x1000 && !machineNameContains("iPad5,")) {
                 return false;
             }
             break;
