@@ -903,6 +903,9 @@ void jailbreak()
             PF(fs_lookup_snapshot_metadata_by_name_and_return_name);
             PF(apfs_jhash_getvnode);
         }
+        if (auth_ptrs) {
+            PF(pmap_load_trust_cache);
+        }
 #undef PF
         found_offsets = true;
         LOG("Successfully found offsets.");
@@ -1115,6 +1118,10 @@ void jailbreak()
             }), message, true);
             INSERTSTATUS(NSLocalizedString(@"Enabled Auto Updates.\n", nil));
         }
+    }
+    
+    if (auth_ptrs) {
+        goto out;
     }
     
     UPSTAGE();

@@ -1,6 +1,8 @@
 #ifndef KernelOffsets_h
 #define KernelOffsets_h
 
+extern int* offsets;
+
 enum kstruct_offset {
     /* struct task */
     KSTRUCT_OFFSET_TASK_LCK_MTX_TYPE,

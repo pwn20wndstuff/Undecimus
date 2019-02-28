@@ -24,6 +24,10 @@
 		2150A9E122021348001C8677 /* kernel_alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9DA22021348001C8677 /* kernel_alloc.c */; };
 		2150A9E222021348001C8677 /* kernel_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9DB22021348001C8677 /* kernel_memory.c */; };
 		2166453D22257E7900B37252 /* lzssdec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2166453B22257E7900B37252 /* lzssdec.cpp */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		216F3F3D2228776E007DC1BC /* kernel_call.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F362228776D007DC1BC /* kernel_call.c */; };
+		216F3F3E2228776E007DC1BC /* user_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F372228776D007DC1BC /* user_client.c */; };
+		216F3F3F2228776E007DC1BC /* pac.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F3A2228776D007DC1BC /* pac.c */; };
+		216F3F402228776E007DC1BC /* kc_parameters.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F3C2228776E007DC1BC /* kc_parameters.c */; };
 		216FDA04220C5BA90086D802 /* libfragmentzip.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA03220C5BA90086D802 /* libfragmentzip.a */; };
 		216FDA08220C5BDC0086D802 /* libgrabkernel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA07220C5BDC0086D802 /* libgrabkernel.a */; };
 		216FDA0D220C5C320086D802 /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA0B220C5C320086D802 /* libplist.a */; };
@@ -107,6 +111,14 @@
 		2150A9E52202138A001C8677 /* IOKitLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IOKitLib.h; sourceTree = "<group>"; };
 		2166453B22257E7900B37252 /* lzssdec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lzssdec.cpp; sourceTree = "<group>"; };
 		2166453C22257E7900B37252 /* lzssdec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lzssdec.h; sourceTree = "<group>"; };
+		216F3F352228776D007DC1BC /* user_client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = user_client.h; sourceTree = "<group>"; };
+		216F3F362228776D007DC1BC /* kernel_call.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kernel_call.c; sourceTree = "<group>"; };
+		216F3F372228776D007DC1BC /* user_client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = user_client.c; sourceTree = "<group>"; };
+		216F3F382228776D007DC1BC /* pac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pac.h; sourceTree = "<group>"; };
+		216F3F392228776D007DC1BC /* kernel_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kernel_call.h; sourceTree = "<group>"; };
+		216F3F3A2228776D007DC1BC /* pac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pac.c; sourceTree = "<group>"; };
+		216F3F3B2228776D007DC1BC /* kc_parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kc_parameters.h; sourceTree = "<group>"; };
+		216F3F3C2228776E007DC1BC /* kc_parameters.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kc_parameters.c; sourceTree = "<group>"; };
 		216FDA03220C5BA90086D802 /* libfragmentzip.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfragmentzip.a; sourceTree = "<group>"; };
 		216FDA06220C5BB80086D802 /* libfragmentzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libfragmentzip.h; sourceTree = "<group>"; };
 		216FDA07220C5BDC0086D802 /* libgrabkernel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libgrabkernel.a; sourceTree = "<group>"; };
@@ -325,6 +337,21 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		216F3F342228774D007DC1BC /* kernel_call */ = {
+			isa = PBXGroup;
+			children = (
+				216F3F3C2228776E007DC1BC /* kc_parameters.c */,
+				216F3F3B2228776D007DC1BC /* kc_parameters.h */,
+				216F3F362228776D007DC1BC /* kernel_call.c */,
+				216F3F392228776D007DC1BC /* kernel_call.h */,
+				216F3F3A2228776D007DC1BC /* pac.c */,
+				216F3F382228776D007DC1BC /* pac.h */,
+				216F3F372228776D007DC1BC /* user_client.c */,
+				216F3F352228776D007DC1BC /* user_client.h */,
+			);
+			name = kernel_call;
+			sourceTree = "<group>";
+		};
 		216FDA02220C5B620086D802 /* libs */ = {
 			isa = PBXGroup;
 			children = (
@@ -414,6 +441,7 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				216F3F342228774D007DC1BC /* kernel_call */,
 				2166453A22257E7000B37252 /* lzssdec */,
 				21E4052A2215E535006065CE /* v3ntex */,
 				216FDA1F220C62B20086D802 /* v1ntex */,
@@ -629,6 +657,7 @@
 				2166453D22257E7900B37252 /* lzssdec.cpp in Sources */,
 				21E4052D2215E543006065CE /* v3ntex_exploit.m in Sources */,
 				21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */,
+				216F3F3E2228776E007DC1BC /* user_client.c in Sources */,
 				2150A9E022021348001C8677 /* parameters.c in Sources */,
 				21A97FD12148103C00DC0023 /* KernelExecution.m in Sources */,
 				2150A9E122021348001C8677 /* kernel_alloc.c in Sources */,
@@ -638,6 +667,7 @@
 				216FDA22220C62C80086D802 /* v1ntex_offsets.mm in Sources */,
 				22C546AB21A8A8FD00EFC09C /* utils.m in Sources */,
 				2150A9DC22021348001C8677 /* log.c in Sources */,
+				216F3F3D2228776E007DC1BC /* kernel_call.c in Sources */,
 				22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */,
 				21A97FD42148103C00DC0023 /* remote_call.c in Sources */,
 				21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */,
@@ -653,11 +683,13 @@
 				212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */,
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
 				222AD59321FA731800DCBA2A /* FakeApt.m in Sources */,
+				216F3F3F2228776E007DC1BC /* pac.c in Sources */,
 				216FDA25220C68A60086D802 /* v1ntex_exploit.m in Sources */,
 				21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */,
 				21C0FC8A21369EE900849420 /* KernelStructureOffsets.m in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,
 				2150A9E222021348001C8677 /* kernel_memory.c in Sources */,
+				216F3F402228776E007DC1BC /* kc_parameters.c in Sources */,
 				2150A9DF22021348001C8677 /* kernel_slide.c in Sources */,
 				2101395521A09BB700F9C5F2 /* hideventsystem.c in Sources */,
 				21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */,

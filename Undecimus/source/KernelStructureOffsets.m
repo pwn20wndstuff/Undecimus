@@ -8,6 +8,7 @@
 
 #include "KernelStructureOffsets.h"
 #include <common.h>
+#include "utils.h"
 
 int* offsets = NULL;
 
@@ -139,7 +140,11 @@ int kstruct_offsets_12_0[] = {
     0x28, // KSTRUCT_OFFSET_TASK_NEXT
     0x30, // KSTRUCT_OFFSET_TASK_PREV
     0x300, // KSTRUCT_OFFSET_TASK_ITK_SPACE
+#if __arm64e__
+    0x368, // KSTRUCT_OFFSET_TASK_BSD_INFO
+#else
     0x358, // KSTRUCT_OFFSET_TASK_BSD_INFO
+#endif
     0x398, // KSTRUCT_OFFSET_TASK_ALL_IMAGE_INFO_ADDR
     0x3a0, // KSTRUCT_OFFSET_TASK_ALL_IMAGE_INFO_SIZE
     0x390, // KSTRUCT_OFFSET_TASK_TFLAGS
