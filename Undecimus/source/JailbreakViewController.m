@@ -863,6 +863,12 @@ void jailbreak()
             _assert(clean_file(decompressed_kernel_cache_path), message, true);
             _assert(false, message, true);
         }
+        if (auth_ptrs) {
+            LOG("Detected authentication pointers.");
+        }
+        if (monolithic_kernel) {
+            LOG("Detected monolithic kernel.");
+        }
         LOG("Successfully initialized patchfinder64.");
     }
     
@@ -1439,7 +1445,7 @@ void jailbreak()
         }
     }
     
-    if (kCFCoreFoundationVersionNumber >= 1535.12 && vm_kernel_page_size == 0x1000) {
+    if (monolithic_kernel) {
         goto out;
     }
     
@@ -2093,9 +2099,6 @@ void jailbreak()
     }
 out:
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
-    LOG("Dropping kernel credentials...");
-    give_creds_to_process_at_addr(myProcAddr, myOriginalCredAddr);
-    WriteKernel64(GETOFFSET(shenanigans), Shenanigans);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
     if (sharedController.canExit) {
         if (prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort) {
@@ -2110,6 +2113,7 @@ out:
 
 - (IBAction)tappedOnJailbreak:(id)sender
 {
+    STATUS(NSLocalizedString(@"Jailbreak", nil), false, false);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         _assert(bundledResources != nil, NSLocalizedString(@"Bundled Resources version missing.", nil), true);
         if (!jailbreakSupported()) {
