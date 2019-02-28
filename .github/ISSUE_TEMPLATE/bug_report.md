@@ -30,3 +30,6 @@ If applicable, add screenshots to help explain your problem.
  - [ ] this issue is present with all tweaks uninstalled(except for default packages) or disabled
  - [ ] this issue is present after a rootfs restore
  - [ ] this issue is present on the latest version of unc0ver
+
+**Logs**
+If applicable, add logs or error messages here.
