@@ -3,7 +3,7 @@
 #include "KernelStructureOffsets.h"
 #include "KernelUtilities.h"
 #include "find_port.h"
-#include "kernel_call/kernel_call.h"
+#include "kernel_call.h"
 #include <common.h>
 #include <iokit.h>
 #include <pthread.h>
