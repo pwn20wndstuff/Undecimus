@@ -1199,7 +1199,11 @@ void jailbreak()
             _assert(shapshotSystemVersion != nil, message, true);
             NSDictionary *rootfsSystemVersion = [NSDictionary dictionaryWithContentsOfFile:rootSystemVersionPlist];
             _assert(rootfsSystemVersion != nil, message, true);
-            _assert([rootfsSystemVersion[@"ProductBuildVersion"] isEqualToString:shapshotSystemVersion[@"ProductBuildVersion"]], invalidRootMessage, true);
+            if (![rootfsSystemVersion[@"ProductBuildVersion"] isEqualToString:shapshotSystemVersion[@"ProductBuildVersion"]]) {
+                LOG("snapshot VersionPlist: %@", shapshotSystemVersion);
+                LOG("rootfs VersionPlist: %@", rootfsSystemVersion);
+                _assert("BuildVersions match"==NULL, invalidRootMessage, true);
+            }
             LOG("Successfully mounted system snapshot.");
             
             // Rename system snapshot.
