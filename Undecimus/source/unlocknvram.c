@@ -19,6 +19,8 @@
 #include "KernelMemory.h"
 #include "find_port.h"
 
+static const size_t max_vtable_size = 0x1000;
+static const size_t kernel_buffer_size = 0x4000;
 // from vtable start in bytes
 unsigned VTB_IODTNVRAM__SEARCHNVRAMPROPERTY = 0x590;
 unsigned VTB_IODTNVRAM__GETOFVARIABLEPERM   = 0x558;
@@ -56,34 +58,18 @@ int unlocknvram(void) {
         return 1;
     }
 
-    uint64_t vtable_start = ReadKernel64(obj);
-
-    orig_vtable = vtable_start;
-
-    uint64_t vtable_end = vtable_start;
-    // Is vtable really guaranteed to end with 0 or was it just a coincidence?..
-    // should we just use some max value instead?
-    while (ReadKernel64(vtable_end) != 0) vtable_end += sizeof(uint64_t);
-
-    uint32_t vtable_len = (uint32_t) (vtable_end - vtable_start);
-
-    // copy vtable to userspace
-    uint64_t *buf = calloc(1, vtable_len);
-    rkbuffer(vtable_start, buf, vtable_len);
-
-    LOG("IODTNVRAM vtable: 0x%llx - 0x%llx", vtable_start, vtable_end);
-
-    for (int i = 0; i != vtable_len; i += sizeof(uint64_t)) {
-        LOG("\t[0x%03x]: 0x%llx", i, buf[i/sizeof(uint64_t)]);
-    }
-
+    orig_vtable = ReadKernel64(obj);
+    
+    uint64_t *buf = calloc(1, max_vtable_size);
+    kread(orig_vtable, buf, max_vtable_size);
+    
     // alter it
     buf[VTB_IODTNVRAM__GETOFVARIABLEPERM / sizeof(uint64_t)] = \
         buf[VTB_IODTNVRAM__SEARCHNVRAMPROPERTY / sizeof(uint64_t)];
 
     // allocate buffer in kernel and copy it back
-    uint64_t fake_vtable = kmem_alloc_wired(vtable_len);
-    wkbuffer(fake_vtable, buf, vtable_len);
+    uint64_t fake_vtable = kmem_alloc_wired(kernel_buffer_size);
+    wkbuffer(fake_vtable, buf, kernel_buffer_size);
 
     // replace vtable on IODTNVRAM object
     WriteKernel64(obj, fake_vtable);
