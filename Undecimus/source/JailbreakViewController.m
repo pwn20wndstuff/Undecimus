@@ -1540,6 +1540,13 @@ void jailbreak()
             [debsToInstall addObjectsFromArray:debsToRepair];
         }
         
+        // Ensure ldid's symlink isn't missing
+        // (it's created by update-alternatives which may not have been called yet)
+        if (access("/usr/bin/ldid", F_OK) != ERR_SUCCESS) {
+            _assert(access("/usr/libexec/ldid", F_OK) == ERR_SUCCESS, message, true);
+            _assert(ensure_symlink("../libexec/ldid", "/usr/bin/ldid"), message, true);
+        }
+
         // These don't need to lay around
         clean_file("/Library/LaunchDaemons/jailbreakd.plist");
         clean_file("/jb/jailbreakd.plist");
