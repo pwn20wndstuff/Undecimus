@@ -686,6 +686,7 @@ void jailbreak()
     NSString *temporaryDirectory = NSTemporaryDirectory();
     NSMutableArray *debsToInstall = [NSMutableArray new];
     NSMutableString *status = [NSMutableString string];
+    bool betaFirmware = false;
 #define INSERTSTATUS(x) do { \
     [status appendString:[[NSString alloc] initWithFormat:x]]; \
 } while (false)
@@ -1489,8 +1490,27 @@ void jailbreak()
             [debsToInstall addObject:substrateDeb];
         }
         
-        NSArray *resourcesPkgs = [@[@"com.ps.letmeblock", @"com.parrotgeek.nobetaalert"] arrayByAddingObjectsFromArray:resolveDepsForPkg(@"jailbreak-resources", true)];
+        char *osversion = NULL;
+        size_t size = 0;
+        _assert(sysctlbyname("kern.osversion", NULL, &size, NULL, 0) == ERR_SUCCESS, message, true);
+        osversion = malloc(size);
+        _assert(osversion != NULL, message, true);
+        _assert(sysctlbyname("kern.osversion", osversion, &size, NULL, 0) == ERR_SUCCESS, message, true);
+        if (strlen(osversion) > 6) {
+            betaFirmware = true;
+            LOG("Detected beta firmware.");
+        }
+        free(osversion);
+        osversion = NULL;
+        NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
         _assert(resourcesPkgs != nil, message, true);
+        if (betaFirmware) {
+            resourcesPkgs = [@[@"com.parrotgeek.nobetaalert"] arrayByAddingObjectsFromArray:resourcesPkgs];
+        }
+        if (kCFCoreFoundationVersionNumber >= 1535.12) {
+            resourcesPkgs = [@[@"com.ps.letmeblock"] arrayByAddingObjectsFromArray:resourcesPkgs];
+        }
+
         NSMutableArray *pkgsToRepair = [NSMutableArray new];
         LOG("Resource Pkgs: \"%@\".", resourcesPkgs);
         for (NSString *pkg in resourcesPkgs) {
@@ -1760,6 +1780,17 @@ void jailbreak()
             }
             _assert(aptInstall(@[@"mobilesubstrate"]), message, true);
         }
+        if (!betaFirmware) {
+            if (pkgIsInstalled("com.parrotgeek.nobetaalert")) {
+                _assert(removePkg("com.parrotgeek.nobetaalert", true), message, true);
+            }
+        }
+        if (!(kCFCoreFoundationVersionNumber >= 1535.12)) {
+            if (pkgIsInstalled("com.ps.letmeblock")) {
+                _assert(removePkg("com.ps.letmeblock", true), message, true);
+            }
+        }
+        
         NSData *file_data = [[NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber] dataUsingEncoding:NSUTF8StringEncoding];
         if (![[NSData dataWithContentsOfFile:@"/.installed_unc0ver"] isEqual:file_data]) {
             _assert(clean_file("/.installed_unc0ver"), message, true);
