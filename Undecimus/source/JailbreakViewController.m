@@ -58,6 +58,8 @@
 #include "v1ntex_exploit.h"
 #include "v3ntex_exploit.h"
 #include "lzssdec.h"
+#include "machswap_pwn.h"
+#include "machswap_offsets.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -819,6 +821,17 @@ void jailbreak()
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR(kernel_base) &&
                         ISADDR(kernel_slide)) {
+                        exploit_success = true;
+                    }
+                    break;
+                }
+                case mach_swap_exploit: {
+                    machswap_offsets_t *machswap_offsets = NULL;
+                    if ((machswap_offsets = get_machswap_offsets()) != NULL &&
+                        machswap_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
+                        MACH_PORT_VALID(tfp0) &&
+                        ISADDR(kernel_base) &&
+                        ISADDR((kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)))) {
                         exploit_success = true;
                     }
                     break;
@@ -2156,9 +2169,9 @@ void jailbreak()
     }
 out:
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
-    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
+    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString((prefs.exploit == v3ntex_exploit || prefs.exploit == mach_swap_exploit) && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
     if (sharedController.canExit) {
-        if (prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort) {
+        if ((prefs.exploit == v3ntex_exploit || prefs.exploit == mach_swap_exploit) && !usedPersistedKernelTaskPort) {
             _assert(restartSpringBoard(), message, true);
         } else {
             exit(EXIT_SUCCESS);

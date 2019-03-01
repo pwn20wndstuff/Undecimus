@@ -28,6 +28,8 @@
 		216F3F3E2228776E007DC1BC /* user_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F372228776D007DC1BC /* user_client.c */; };
 		216F3F3F2228776E007DC1BC /* pac.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F3A2228776D007DC1BC /* pac.c */; };
 		216F3F402228776E007DC1BC /* kc_parameters.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F3C2228776E007DC1BC /* kc_parameters.c */; };
+		216F3F4D2229826F007DC1BC /* machswap_pwn.m in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F492229826F007DC1BC /* machswap_pwn.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		216F3F4E2229826F007DC1BC /* machswap_offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F4A2229826F007DC1BC /* machswap_offsets.m */; };
 		216FDA04220C5BA90086D802 /* libfragmentzip.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA03220C5BA90086D802 /* libfragmentzip.a */; };
 		216FDA08220C5BDC0086D802 /* libgrabkernel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA07220C5BDC0086D802 /* libgrabkernel.a */; };
 		216FDA0D220C5C320086D802 /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA0B220C5C320086D802 /* libplist.a */; };
@@ -119,6 +121,10 @@
 		216F3F3A2228776D007DC1BC /* pac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pac.c; sourceTree = "<group>"; };
 		216F3F3B2228776D007DC1BC /* kc_parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kc_parameters.h; sourceTree = "<group>"; };
 		216F3F3C2228776E007DC1BC /* kc_parameters.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kc_parameters.c; sourceTree = "<group>"; };
+		216F3F492229826F007DC1BC /* machswap_pwn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = machswap_pwn.m; sourceTree = "<group>"; };
+		216F3F4A2229826F007DC1BC /* machswap_offsets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = machswap_offsets.m; sourceTree = "<group>"; };
+		216F3F4B2229826F007DC1BC /* machswap_offsets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machswap_offsets.h; sourceTree = "<group>"; };
+		216F3F4C2229826F007DC1BC /* machswap_pwn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machswap_pwn.h; sourceTree = "<group>"; };
 		216FDA03220C5BA90086D802 /* libfragmentzip.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfragmentzip.a; sourceTree = "<group>"; };
 		216FDA06220C5BB80086D802 /* libfragmentzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libfragmentzip.h; sourceTree = "<group>"; };
 		216FDA07220C5BDC0086D802 /* libgrabkernel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libgrabkernel.a; sourceTree = "<group>"; };
@@ -352,6 +358,17 @@
 			name = kernel_call;
 			sourceTree = "<group>";
 		};
+		216F3F482229825F007DC1BC /* machswap */ = {
+			isa = PBXGroup;
+			children = (
+				216F3F4B2229826F007DC1BC /* machswap_offsets.h */,
+				216F3F4A2229826F007DC1BC /* machswap_offsets.m */,
+				216F3F4C2229826F007DC1BC /* machswap_pwn.h */,
+				216F3F492229826F007DC1BC /* machswap_pwn.m */,
+			);
+			name = machswap;
+			sourceTree = "<group>";
+		};
 		216FDA02220C5B620086D802 /* libs */ = {
 			isa = PBXGroup;
 			children = (
@@ -441,6 +458,7 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				216F3F482229825F007DC1BC /* machswap */,
 				216F3F342228774D007DC1BC /* kernel_call */,
 				2166453A22257E7000B37252 /* lzssdec */,
 				21E4052A2215E535006065CE /* v3ntex */,
@@ -680,6 +698,7 @@
 				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* KernelMemory.c in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
+				216F3F4E2229826F007DC1BC /* machswap_offsets.m in Sources */,
 				212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */,
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
 				222AD59321FA731800DCBA2A /* FakeApt.m in Sources */,
@@ -695,6 +714,7 @@
 				21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */,
 				2150A9CD22021330001C8677 /* voucher_swap.c in Sources */,
 				21C0FC6C21369EB700849420 /* AppDelegate.m in Sources */,
+				216F3F4D2229826F007DC1BC /* machswap_pwn.m in Sources */,
 				225D142221E052960045493D /* ArchiveFile.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
