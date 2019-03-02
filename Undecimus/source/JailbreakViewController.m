@@ -1172,17 +1172,17 @@ void jailbreak()
             
             // Mount system snapshot.
             
-            LOG("Mounting system snapshot...");
-            SETMESSAGE(NSLocalizedString(@"Unable to mount system snapshot.", nil));
+            LOG("Mounting rootfs...");
+            SETMESSAGE(NSLocalizedString(@"Unable to mount rootfs.", nil));
             NSString *invalidRootMessage = NSLocalizedString(@"RootFS already mounted, delete OTA file from Settings - Storage if present and reboot.", nil);
             _assert(!is_mountpoint("/var/MobileSoftwareUpdate/mnt1"), invalidRootMessage, true);
-            const char *systemSnapshotMountPoint = "/private/var/tmp/jb/mnt1";
-            if (is_mountpoint(systemSnapshotMountPoint)) {
-                _assert(unmount(systemSnapshotMountPoint, MNT_FORCE) == ERR_SUCCESS, message, true);
+            const char *rootFsMountPoint = "/private/var/tmp/jb/mnt1";
+            if (is_mountpoint(rootFsMountPoint)) {
+                _assert(unmount(rootFsMountPoint, MNT_FORCE) == ERR_SUCCESS, message, true);
             }
-            _assert(clean_file(systemSnapshotMountPoint), message, true);
-            _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), message, true);
-            const char *argv[] = {"/sbin/mount_apfs", thedisk, systemSnapshotMountPoint, NULL};
+            _assert(clean_file(rootFsMountPoint), message, true);
+            _assert(ensure_directory(rootFsMountPoint, 0, 0755), message, true);
+            const char *argv[] = {"/sbin/mount_apfs", thedisk, rootFsMountPoint, NULL};
             _assert(runCommandv(argv[0], 3, argv, ^(pid_t pid) {
                 uint64_t procStructAddr = get_proc_struct_for_pid(pid);
                 LOG("procStructAddr = " ADDR, procStructAddr);
@@ -1190,10 +1190,26 @@ void jailbreak()
                 give_creds_to_process_at_addr(procStructAddr, kernelCredAddr);
             }) == ERR_SUCCESS, message, true);
             _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
-            const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
+            const char *systemSnapshotLaunchdPath = [@(rootFsMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
             _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
+            LOG("Successfully mounted rootfs.");
+            
+            // Rename system snapshot.
+            
+            LOG("Renaming system snapshot...");
+            SETMESSAGE(NSLocalizedString(@"Unable to rename system snapshot. Delete OTA file from Settings - Storage if present and reboot.", nil));
+            rootfd = open(rootFsMountPoint, O_RDONLY);
+            _assert(rootfd > 0, message, true);
+            snapshots = snapshot_list(rootfd);
+            _assert(snapshots != NULL, message, true);
+            LOG("Snapshots on newly mounted RootFS:");
+            for (const char **snapshot = snapshots; *snapshot; snapshot++) {
+                LOG("\t%s", *snapshot);
+            }
+            free(snapshots);
+            snapshots = NULL;
             NSString *systemVersionPlist = @"/System/Library/CoreServices/SystemVersion.plist";
-            NSString *rootSystemVersionPlist = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:systemVersionPlist];
+            NSString *rootSystemVersionPlist = [@(rootFsMountPoint) stringByAppendingPathComponent:systemVersionPlist];
             _assert(rootSystemVersionPlist != nil, message, true);
             NSDictionary *shapshotSystemVersion = [NSDictionary dictionaryWithContentsOfFile:systemVersionPlist];
             _assert(shapshotSystemVersion != nil, message, true);
@@ -1204,22 +1220,6 @@ void jailbreak()
                 LOG("rootfs VersionPlist: %@", rootfsSystemVersion);
                 _assert("BuildVersions match"==NULL, invalidRootMessage, true);
             }
-            LOG("Successfully mounted system snapshot.");
-            
-            // Rename system snapshot.
-            
-            LOG("Renaming system snapshot...");
-            SETMESSAGE(NSLocalizedString(@"Unable to rename system snapshot. Delete OTA file from Settings - Storage if present and reboot.", nil));
-            rootfd = open(systemSnapshotMountPoint, O_RDONLY);
-            _assert(rootfd > 0, message, true);
-            snapshots = snapshot_list(rootfd);
-            _assert(snapshots != NULL, message, true);
-            LOG("Snapshots on newly mounted RootFS:");
-            for (const char **snapshot = snapshots; *snapshot; snapshot++) {
-                LOG("\t%s", *snapshot);
-            }
-            free(snapshots);
-            snapshots = NULL;
             const char *test_snapshot = "test-snapshot";
             _assert(fs_snapshot_create(rootfd, test_snapshot, 0) == ERR_SUCCESS, message, true);
             _assert(fs_snapshot_delete(rootfd, test_snapshot, 0) == ERR_SUCCESS, message, true);
