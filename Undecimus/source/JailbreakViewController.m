@@ -1028,6 +1028,7 @@ void jailbreak()
             _assert(unlocknvram() == ERR_SUCCESS, message, true);
             LOG("Successfully unlocked nvram.");
             
+            _assert(runCommand("/usr/sbin/nvram", "-p", NULL) == ERR_SUCCESS, message, true);
             const char *bootNonceKey = "com.apple.System.boot-nonce";
             if (runCommand("/usr/sbin/nvram", bootNonceKey, NULL) != ERR_SUCCESS ||
                 strstr(lastSystemOutput.bytes, prefs.boot_nonce) == NULL) {
@@ -1039,6 +1040,7 @@ void jailbreak()
                 _assert(runCommand("/usr/sbin/nvram", [NSString stringWithFormat:@"%s=%s", kIONVRAMForceSyncNowPropertyKey, bootNonceKey].UTF8String, NULL) == ERR_SUCCESS, message, true);
                 LOG("Successfully set boot-nonce.");
             }
+            _assert(runCommand("/usr/sbin/nvram", "-p", NULL) == ERR_SUCCESS, message, true);
             
             // Lock nvram.
             
@@ -1808,6 +1810,8 @@ void jailbreak()
         }
         
         // Make sure everything's at least as new as what we bundled
+        rv = system("dpkg --configure -a");
+        _assert(WEXITSTATUS(rv) == ERR_SUCCESS, message, true);
         _assert(aptUpgrade(), message, true);
         
         clean_file("/jb/tar");

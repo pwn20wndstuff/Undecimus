@@ -88,7 +88,7 @@ static inline void showAlert(NSString *title, NSString *message, Boolean wait, B
         outputIsHidden = [[[JailbreakViewController sharedController] outputView] isHidden];
     };
 
-    if ([NSThread mainThread]) {
+    if ([[NSThread currentThread] isMainThread]) {
         checkOutput();
     } else {
         dispatch_sync(dispatch_get_main_queue(), checkOutput);
