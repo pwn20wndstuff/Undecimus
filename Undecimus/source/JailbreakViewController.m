@@ -1211,12 +1211,12 @@ void jailbreak()
             NSString *systemVersionPlist = @"/System/Library/CoreServices/SystemVersion.plist";
             NSString *rootSystemVersionPlist = [@(rootFsMountPoint) stringByAppendingPathComponent:systemVersionPlist];
             _assert(rootSystemVersionPlist != nil, message, true);
-            NSDictionary *shapshotSystemVersion = [NSDictionary dictionaryWithContentsOfFile:systemVersionPlist];
-            _assert(shapshotSystemVersion != nil, message, true);
+            NSDictionary *snapshotSystemVersion = [NSDictionary dictionaryWithContentsOfFile:systemVersionPlist];
+            _assert(snapshotSystemVersion != nil, message, true);
             NSDictionary *rootfsSystemVersion = [NSDictionary dictionaryWithContentsOfFile:rootSystemVersionPlist];
             _assert(rootfsSystemVersion != nil, message, true);
-            if (![rootfsSystemVersion[@"ProductBuildVersion"] isEqualToString:shapshotSystemVersion[@"ProductBuildVersion"]]) {
-                LOG("snapshot VersionPlist: %@", shapshotSystemVersion);
+            if (![rootfsSystemVersion[@"ProductBuildVersion"] isEqualToString:snapshotSystemVersion[@"ProductBuildVersion"]]) {
+                LOG("snapshot VersionPlist: %@", snapshotSystemVersion);
                 LOG("rootfs VersionPlist: %@", rootfsSystemVersion);
                 _assert("BuildVersions match"==NULL, invalidRootMessage, true);
             }
