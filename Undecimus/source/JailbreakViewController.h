@@ -83,9 +83,15 @@ static inline void showAlertWithCancel(NSString *title, NSString *message, Boole
 }
 
 static inline void showAlert(NSString *title, NSString *message, Boolean wait, Boolean destructive) {
-    static bool outputIsHidden;
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    __block bool outputIsHidden;
+    dispatch_block_t checkOutput = ^{
         outputIsHidden = [[[JailbreakViewController sharedController] outputView] isHidden];
-    });
+    };
+
+    if ([NSThread mainThread]) {
+        checkOutput();
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), checkOutput);
+    }
     showAlertWithCancel(title, message, wait, destructive, outputIsHidden?nil:@"View Log");
 }
