@@ -86,7 +86,6 @@ bool wkbuffer(uint64_t kaddr, void* buffer, size_t length)
 {
     if (tfp0 == MACH_PORT_NULL) {
         LOG("attempt to write to kernel memory before any kernel memory write primitives available");
-        sleep(3);
         return false;
     }
 
@@ -102,7 +101,6 @@ void WriteKernel32(uint64_t kaddr, uint32_t val)
 {
     if (tfp0 == MACH_PORT_NULL) {
         LOG("attempt to write to kernel memory before any kernel memory write primitives available");
-        sleep(3);
         return;
     }
     wkbuffer(kaddr, &val, sizeof(val));
@@ -112,7 +110,6 @@ void WriteKernel64(uint64_t kaddr, uint64_t val)
 {
     if (tfp0 == MACH_PORT_NULL) {
         LOG("attempt to write to kernel memory before any kernel memory write primitives available");
-        sleep(3);
         return;
     }
     wkbuffer(kaddr, &val, sizeof(val));
@@ -123,7 +120,6 @@ uint32_t rk32_via_kmem_read_port(uint64_t kaddr)
     kern_return_t err;
     if (kmem_read_port == MACH_PORT_NULL) {
         LOG("kmem_read_port not set, have you called prepare_rk?");
-        sleep(10);
         exit(EXIT_FAILURE);
     }
 
@@ -131,7 +127,6 @@ uint32_t rk32_via_kmem_read_port(uint64_t kaddr)
     err = mach_port_set_context(mach_task_self(), kmem_read_port, context);
     if (err != KERN_SUCCESS) {
         LOG("error setting context off of dangling port: %x %s", err, mach_error_string(err));
-        sleep(10);
         exit(EXIT_FAILURE);
     }
 
@@ -140,7 +135,6 @@ uint32_t rk32_via_kmem_read_port(uint64_t kaddr)
     err = pid_for_task(kmem_read_port, (int*)&val);
     if (err != KERN_SUCCESS) {
         LOG("error calling pid_for_task %x %s", err, mach_error_string(err));
-        sleep(10);
         exit(EXIT_FAILURE);
     }
 
@@ -180,7 +174,6 @@ uint32_t ReadKernel32(uint64_t kaddr)
     }
 
     LOG("attempt to read kernel memory but no kernel memory read primitives available");
-    sleep(3);
 
     return 0;
 }
@@ -196,7 +189,6 @@ uint64_t ReadKernel64(uint64_t kaddr)
     }
 
     LOG("attempt to read kernel memory but no kernel memory read primitives available");
-    sleep(3);
 
     return 0;
 }
@@ -217,7 +209,6 @@ uint64_t kmem_alloc(uint64_t size)
 {
     if (tfp0 == MACH_PORT_NULL) {
         LOG("attempt to allocate kernel memory before any kernel memory write primitives available");
-        sleep(3);
         return 0;
     }
 
@@ -227,7 +218,6 @@ uint64_t kmem_alloc(uint64_t size)
     err = mach_vm_allocate(tfp0, &addr, ksize, VM_FLAGS_ANYWHERE);
     if (err != KERN_SUCCESS) {
         LOG("unable to allocate kernel memory via tfp0: %s %x", mach_error_string(err), err);
-        sleep(3);
         return 0;
     }
     return addr;
@@ -237,7 +227,6 @@ uint64_t kmem_alloc_wired(uint64_t size)
 {
     if (tfp0 == MACH_PORT_NULL) {
         LOG("attempt to allocate kernel memory before any kernel memory write primitives available");
-        sleep(3);
         return 0;
     }
 
@@ -250,7 +239,6 @@ uint64_t kmem_alloc_wired(uint64_t size)
     err = mach_vm_allocate(tfp0, &addr, ksize + 0x4000, VM_FLAGS_ANYWHERE);
     if (err != KERN_SUCCESS) {
         LOG("unable to allocate kernel memory via tfp0: %s %x", mach_error_string(err), err);
-        sleep(3);
         return 0;
     }
 
@@ -264,7 +252,6 @@ uint64_t kmem_alloc_wired(uint64_t size)
     err = mach_vm_wire(fake_host_priv(), tfp0, addr, ksize, VM_PROT_READ | VM_PROT_WRITE);
     if (err != KERN_SUCCESS) {
         LOG("unable to wire kernel memory via tfp0: %s %x", mach_error_string(err), err);
-        sleep(3);
         return 0;
     }
     return addr;
@@ -274,7 +261,6 @@ void kmem_free(uint64_t kaddr, uint64_t size)
 {
     if (tfp0 == MACH_PORT_NULL) {
         LOG("attempt to deallocate kernel memory before any kernel memory write primitives available");
-        sleep(3);
         return;
     }
 
@@ -283,7 +269,6 @@ void kmem_free(uint64_t kaddr, uint64_t size)
     err = mach_vm_deallocate(tfp0, kaddr, ksize);
     if (err != KERN_SUCCESS) {
         LOG("unable to deallocate kernel memory via tfp0: %s %x", mach_error_string(err), err);
-        sleep(3);
         return;
     }
 }
@@ -292,14 +277,12 @@ void kmem_protect(uint64_t kaddr, uint32_t size, int prot)
 {
     if (tfp0 == MACH_PORT_NULL) {
         LOG("attempt to change protection of kernel memory before any kernel memory write primitives available");
-        sleep(3);
         return;
     }
     kern_return_t err;
     err = mach_vm_protect(tfp0, (mach_vm_address_t)kaddr, (mach_vm_size_t)size, 0, (vm_prot_t)prot);
     if (err != KERN_SUCCESS) {
         LOG("unable to change protection of kernel memory via tfp0: %s %x", mach_error_string(err), err);
-        sleep(3);
         return;
     }
 }
