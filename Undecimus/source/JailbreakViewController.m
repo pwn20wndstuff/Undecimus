@@ -1592,7 +1592,6 @@ void jailbreak()
         dictionary[@"VfsContextCurrent"] = ADDRSTRING(GETOFFSET(vfs_context_current));
         dictionary[@"VnodeLookup"] = ADDRSTRING(GETOFFSET(vnode_lookup));
         dictionary[@"VnodePut"] = ADDRSTRING(GETOFFSET(vnode_put));
-        dictionary[@"KernProc"] = ADDRSTRING(ReadKernel64(GETOFFSET(kernel_task))  + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
         dictionary[@"KernelTask"] = ADDRSTRING(GETOFFSET(kernel_task));
         dictionary[@"Shenanigans"] = ADDRSTRING(GETOFFSET(shenanigans));
         dictionary[@"LckMtxLock"] = ADDRSTRING(GETOFFSET(lck_mtx_lock));
