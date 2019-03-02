@@ -1020,7 +1020,7 @@ void jailbreak()
     UPSTAGE();
     
     {
-        if (prefs.overwrite_boot_nonce) {
+        if (prefs.overwrite_boot_nonce && !auth_ptrs) {
             // Unlock nvram.
             
             LOG("Unlocking nvram...");
