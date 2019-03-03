@@ -35,7 +35,6 @@
 #include <sched.h>
 #import "JailbreakViewController.h"
 #include "KernelStructureOffsets.h"
-#include "empty_list_sploit.h"
 #include "KernelMemory.h"
 #include "KernelExecution.h"
 #include "KernelUtilities.h"
@@ -43,23 +42,13 @@
 #include "remote_call.h"
 #include "unlocknvram.h"
 #include "SettingsTableViewController.h"
-#include "multi_path_sploit.h"
-#include "async_wake.h"
 #include "utils.h"
 #include "ArchiveFile.h"
 #include "../../patchfinder64/patchfinder64.h" // Work around Xcode 9
 #include "CreditsTableViewController.h"
 #include "FakeApt.h"
-#include "voucher_swap.h"
-#include "kernel_memory.h"
-#include "kernel_slide.h"
-#include "find_port.h"
-#include "v1ntex_offsets.h"
-#include "v1ntex_exploit.h"
-#include "v3ntex_exploit.h"
-#include "lzssdec.h"
-#include "machswap_pwn.h"
-#include "machswap_offsets.h"
+#include "lzssdec/lzssdec.h"
+#include "exploits/exploits.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;

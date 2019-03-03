@@ -90,6 +90,7 @@
 		213E78252208654700FDF3B7 /* necp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = necp.c; sourceTree = "<group>"; };
 		213E7827220865A100FDF3B7 /* voucher_swap-poc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "voucher_swap-poc.c"; sourceTree = "<group>"; };
 		213E7829220865BF00FDF3B7 /* voucher_swap-poc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "voucher_swap-poc.h"; sourceTree = "<group>"; };
+		2142D0D1222C676000172C60 /* exploits.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = exploits.h; sourceTree = "<group>"; };
 		214D283B22146EC70058933D /* libmagic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmagic.a; sourceTree = "<group>"; };
 		214D283D22146EE60058933D /* magic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = magic.h; sourceTree = "<group>"; };
 		2150A9CB22021330001C8677 /* voucher_swap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = voucher_swap.h; sourceTree = "<group>"; };
@@ -247,56 +248,71 @@
 			path = sys;
 			sourceTree = "<group>";
 		};
-		213E78222208652B00FDF3B7 /* necp */ = {
+		2142D0C3222C629600172C60 /* machswap */ = {
+			isa = PBXGroup;
+			children = (
+				216F3F4B2229826F007DC1BC /* machswap_offsets.h */,
+				216F3F4A2229826F007DC1BC /* machswap_offsets.m */,
+				216F3F4C2229826F007DC1BC /* machswap_pwn.h */,
+				216F3F492229826F007DC1BC /* machswap_pwn.m */,
+			);
+			path = machswap;
+			sourceTree = "<group>";
+		};
+		2142D0C5222C62A600172C60 /* kernel_call */ = {
+			isa = PBXGroup;
+			children = (
+				216F3F3C2228776E007DC1BC /* kc_parameters.c */,
+				216F3F3B2228776D007DC1BC /* kc_parameters.h */,
+				216F3F362228776D007DC1BC /* kernel_call.c */,
+				216F3F392228776D007DC1BC /* kernel_call.h */,
+				216F3F3A2228776D007DC1BC /* pac.c */,
+				216F3F382228776D007DC1BC /* pac.h */,
+				216F3F372228776D007DC1BC /* user_client.c */,
+				216F3F352228776D007DC1BC /* user_client.h */,
+			);
+			path = kernel_call;
+			sourceTree = "<group>";
+		};
+		2142D0C6222C62AC00172C60 /* lzssdec */ = {
+			isa = PBXGroup;
+			children = (
+				2166453B22257E7900B37252 /* lzssdec.cpp */,
+				2166453C22257E7900B37252 /* lzssdec.h */,
+			);
+			path = lzssdec;
+			sourceTree = "<group>";
+		};
+		2142D0C7222C62B300172C60 /* v3ntex */ = {
+			isa = PBXGroup;
+			children = (
+				21E4052B2215E543006065CE /* v3ntex_exploit.h */,
+				21E4052C2215E543006065CE /* v3ntex_exploit.m */,
+			);
+			path = v3ntex;
+			sourceTree = "<group>";
+		};
+		2142D0C8222C62B800172C60 /* v1ntex */ = {
+			isa = PBXGroup;
+			children = (
+				216FDA20220C62C80086D802 /* v1ntex_offsets.mm */,
+				216FDA21220C62C80086D802 /* v1ntex_offsets.h */,
+				216FDA23220C68A60086D802 /* v1ntex_exploit.h */,
+				216FDA24220C68A60086D802 /* v1ntex_exploit.m */,
+			);
+			path = v1ntex;
+			sourceTree = "<group>";
+		};
+		2142D0C9222C62BC00172C60 /* necp */ = {
 			isa = PBXGroup;
 			children = (
 				213E78242208654700FDF3B7 /* necp.h */,
 				213E78252208654700FDF3B7 /* necp.c */,
 			);
-			name = necp;
+			path = necp;
 			sourceTree = "<group>";
 		};
-		2150A9C6220212A6001C8677 /* empty_list */ = {
-			isa = PBXGroup;
-			children = (
-				21C0FC8521369EE900849420 /* empty_list_sploit.c */,
-				21C0FC8121369EE900849420 /* empty_list_sploit.h */,
-			);
-			name = empty_list;
-			sourceTree = "<group>";
-		};
-		2150A9C7220212BC001C8677 /* multi_path */ = {
-			isa = PBXGroup;
-			children = (
-				21C13117214D268F0021AA9D /* multi_path_sploit.c */,
-				21C13118214D268F0021AA9D /* multi_path_sploit.h */,
-			);
-			name = multi_path;
-			sourceTree = "<group>";
-		};
-		2150A9C8220212D1001C8677 /* async_wake */ = {
-			isa = PBXGroup;
-			children = (
-				212D8849216E4EBE00A36DA5 /* async_wake.c */,
-				212D8848216E4EBE00A36DA5 /* async_wake.h */,
-				212D8846216E4DF600A36DA5 /* early_kalloc.c */,
-				212D8845216E4DF600A36DA5 /* early_kalloc.h */,
-				212D8842216E4C4700A36DA5 /* find_port.c */,
-				212D8843216E4C4700A36DA5 /* find_port.h */,
-			);
-			name = async_wake;
-			sourceTree = "<group>";
-		};
-		2150A9C9220212E6001C8677 /* deja_xnu */ = {
-			isa = PBXGroup;
-			children = (
-				2101395421A09BB700F9C5F2 /* hideventsystem.h */,
-				2101395321A09BB700F9C5F2 /* hideventsystem.c */,
-			);
-			name = deja_xnu;
-			sourceTree = "<group>";
-		};
-		2150A9CA220212F8001C8677 /* voucher_swap */ = {
+		2142D0CA222C62C100172C60 /* voucher_swap */ = {
 			isa = PBXGroup;
 			children = (
 				2150A9DA22021348001C8677 /* kernel_alloc.c */,
@@ -315,19 +331,76 @@
 				2150A9D222021347001C8677 /* platform.h */,
 				2150A9CC22021330001C8677 /* voucher_swap.c */,
 				2150A9CB22021330001C8677 /* voucher_swap.h */,
+			);
+			path = voucher_swap;
+			sourceTree = "<group>";
+		};
+		2142D0CB222C62C600172C60 /* deja_xnu */ = {
+			isa = PBXGroup;
+			children = (
+				2101395421A09BB700F9C5F2 /* hideventsystem.h */,
+				2101395321A09BB700F9C5F2 /* hideventsystem.c */,
+			);
+			path = deja_xnu;
+			sourceTree = "<group>";
+		};
+		2142D0CC222C62CB00172C60 /* async_wake */ = {
+			isa = PBXGroup;
+			children = (
+				212D8849216E4EBE00A36DA5 /* async_wake.c */,
+				212D8848216E4EBE00A36DA5 /* async_wake.h */,
+				212D8846216E4DF600A36DA5 /* early_kalloc.c */,
+				212D8845216E4DF600A36DA5 /* early_kalloc.h */,
+				212D8842216E4C4700A36DA5 /* find_port.c */,
+				212D8843216E4C4700A36DA5 /* find_port.h */,
+			);
+			path = async_wake;
+			sourceTree = "<group>";
+		};
+		2142D0CD222C62D000172C60 /* multi_path */ = {
+			isa = PBXGroup;
+			children = (
+				21C13117214D268F0021AA9D /* multi_path_sploit.c */,
+				21C13118214D268F0021AA9D /* multi_path_sploit.h */,
+			);
+			path = multi_path;
+			sourceTree = "<group>";
+		};
+		2142D0CE222C62D600172C60 /* empty_list */ = {
+			isa = PBXGroup;
+			children = (
+				21C0FC8521369EE900849420 /* empty_list_sploit.c */,
+				21C0FC8121369EE900849420 /* empty_list_sploit.h */,
+			);
+			path = empty_list;
+			sourceTree = "<group>";
+		};
+		2142D0CF222C62EF00172C60 /* exploits */ = {
+			isa = PBXGroup;
+			children = (
+				2142D0D0222C645700172C60 /* voucher_swap-poc */,
+				2142D0CE222C62D600172C60 /* empty_list */,
+				2142D0CD222C62D000172C60 /* multi_path */,
+				2142D0CC222C62CB00172C60 /* async_wake */,
+				2142D0CB222C62C600172C60 /* deja_xnu */,
+				2142D0CA222C62C100172C60 /* voucher_swap */,
+				2142D0C9222C62BC00172C60 /* necp */,
+				2142D0C8222C62B800172C60 /* v1ntex */,
+				2142D0C7222C62B300172C60 /* v3ntex */,
+				2142D0C5222C62A600172C60 /* kernel_call */,
+				2142D0C3222C629600172C60 /* machswap */,
+				2142D0D1222C676000172C60 /* exploits.h */,
+			);
+			path = exploits;
+			sourceTree = "<group>";
+		};
+		2142D0D0222C645700172C60 /* voucher_swap-poc */ = {
+			isa = PBXGroup;
+			children = (
 				213E7827220865A100FDF3B7 /* voucher_swap-poc.c */,
 				213E7829220865BF00FDF3B7 /* voucher_swap-poc.h */,
 			);
-			name = voucher_swap;
-			sourceTree = "<group>";
-		};
-		2166453A22257E7000B37252 /* lzssdec */ = {
-			isa = PBXGroup;
-			children = (
-				2166453B22257E7900B37252 /* lzssdec.cpp */,
-				2166453C22257E7900B37252 /* lzssdec.h */,
-			);
-			name = lzssdec;
+			path = "voucher_swap-poc";
 			sourceTree = "<group>";
 		};
 		21675B62214A68B700D20E2B /* Frameworks */ = {
@@ -341,32 +414,6 @@
 				211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		216F3F342228774D007DC1BC /* kernel_call */ = {
-			isa = PBXGroup;
-			children = (
-				216F3F3C2228776E007DC1BC /* kc_parameters.c */,
-				216F3F3B2228776D007DC1BC /* kc_parameters.h */,
-				216F3F362228776D007DC1BC /* kernel_call.c */,
-				216F3F392228776D007DC1BC /* kernel_call.h */,
-				216F3F3A2228776D007DC1BC /* pac.c */,
-				216F3F382228776D007DC1BC /* pac.h */,
-				216F3F372228776D007DC1BC /* user_client.c */,
-				216F3F352228776D007DC1BC /* user_client.h */,
-			);
-			name = kernel_call;
-			sourceTree = "<group>";
-		};
-		216F3F482229825F007DC1BC /* machswap */ = {
-			isa = PBXGroup;
-			children = (
-				216F3F4B2229826F007DC1BC /* machswap_offsets.h */,
-				216F3F4A2229826F007DC1BC /* machswap_offsets.m */,
-				216F3F4C2229826F007DC1BC /* machswap_pwn.h */,
-				216F3F492229826F007DC1BC /* machswap_pwn.m */,
-			);
-			name = machswap;
 			sourceTree = "<group>";
 		};
 		216FDA02220C5B620086D802 /* libs */ = {
@@ -412,17 +459,6 @@
 			path = liboffsetfinder64;
 			sourceTree = "<group>";
 		};
-		216FDA1F220C62B20086D802 /* v1ntex */ = {
-			isa = PBXGroup;
-			children = (
-				216FDA20220C62C80086D802 /* v1ntex_offsets.mm */,
-				216FDA21220C62C80086D802 /* v1ntex_offsets.h */,
-				216FDA23220C68A60086D802 /* v1ntex_exploit.h */,
-				216FDA24220C68A60086D802 /* v1ntex_exploit.m */,
-			);
-			name = v1ntex;
-			sourceTree = "<group>";
-		};
 		2170BD3421B192750059BD10 /* include */ = {
 			isa = PBXGroup;
 			children = (
@@ -458,17 +494,8 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
-				216F3F482229825F007DC1BC /* machswap */,
-				216F3F342228774D007DC1BC /* kernel_call */,
-				2166453A22257E7000B37252 /* lzssdec */,
-				21E4052A2215E535006065CE /* v3ntex */,
-				216FDA1F220C62B20086D802 /* v1ntex */,
-				213E78222208652B00FDF3B7 /* necp */,
-				2150A9CA220212F8001C8677 /* voucher_swap */,
-				2150A9C9220212E6001C8677 /* deja_xnu */,
-				2150A9C8220212D1001C8677 /* async_wake */,
-				2150A9C7220212BC001C8677 /* multi_path */,
-				2150A9C6220212A6001C8677 /* empty_list */,
+				2142D0CF222C62EF00172C60 /* exploits */,
+				2142D0C6222C62AC00172C60 /* lzssdec */,
 				21F4D70B21FC7A490070D5E0 /* patchfinder64 */,
 				22F91CDC21E02D0B00B2FCAE /* snappy */,
 				22F91CD821E02CC700B2FCAE /* injector */,
@@ -545,15 +572,6 @@
 				21C0FC7821369EB800849420 /* Info.plist */,
 			);
 			path = Undecimus;
-			sourceTree = "<group>";
-		};
-		21E4052A2215E535006065CE /* v3ntex */ = {
-			isa = PBXGroup;
-			children = (
-				21E4052B2215E543006065CE /* v3ntex_exploit.h */,
-				21E4052C2215E543006065CE /* v3ntex_exploit.m */,
-			);
-			name = v3ntex;
 			sourceTree = "<group>";
 		};
 		21F4D70B21FC7A490070D5E0 /* patchfinder64 */ = {

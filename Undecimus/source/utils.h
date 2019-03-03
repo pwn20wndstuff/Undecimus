@@ -27,7 +27,8 @@ typedef enum {
     v3ntex_exploit,
     mach_swap_exploit,
     deja_xnu_exploit,
-    necp_exploit
+    necp_exploit,
+    voucher_swap_poc_exploit,
 } exploit_t;
 
 enum hashtype {
