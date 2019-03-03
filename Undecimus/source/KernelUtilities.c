@@ -101,7 +101,7 @@ mach_port_t fake_host_priv()
 
 uint64_t get_proc_struct_for_pid(pid_t pid)
 {
-    uint64_t proc = ReadKernel64(ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
+    uint64_t proc = ReadKernel64(GETOFFSET(kernproc));
     while (proc) {
         if (ReadKernel32(proc + koffset(KSTRUCT_OFFSET_PROC_PID)) == pid)
             return proc;
@@ -124,7 +124,7 @@ uint64_t get_address_of_port(pid_t pid, mach_port_t port)
 
 uint64_t get_kernel_cred_addr()
 {
-    uint64_t kernel_proc_struct_addr = ReadKernel64(ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
+    uint64_t kernel_proc_struct_addr = ReadKernel64(GETOFFSET(kernproc));
     return ReadKernel64(kernel_proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_UCRED));
 }
 

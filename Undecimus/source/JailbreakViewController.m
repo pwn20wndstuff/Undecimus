@@ -908,6 +908,10 @@ void jailbreak()
             PF(pmap_load_trust_cache);
         }
 #undef PF
+        uint64_t kernproc = ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO);
+        _assert(ISADDR(kernproc), message, true);
+        SETOFFSET(kernproc, kernproc);
+        LOG("kernproc = " ADDR, GETOFFSET(kernproc) - kernel_slide);
         found_offsets = true;
         LOG("Successfully found offsets.");
     }
@@ -1601,6 +1605,7 @@ void jailbreak()
         dictionary[@"VnodeGetSnapshot"] = ADDRSTRING(GETOFFSET(vnode_get_snapshot));
         dictionary[@"FsLookupSnapshotMetadataByNameAndReturnName"] = ADDRSTRING(GETOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name));
         dictionary[@"APFSJhashGetVnode"] = ADDRSTRING(GETOFFSET(apfs_jhash_getvnode));
+        dictionary[@"KernProc"] = ADDRSTRING(GETOFFSET(kernproc));
         if (![[NSMutableDictionary dictionaryWithContentsOfFile:offsetsFile] isEqual:dictionary]) {
             // Log offsets.
             
