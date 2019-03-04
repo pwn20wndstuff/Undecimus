@@ -1463,10 +1463,6 @@ void jailbreak()
         }
     }
     
-    if (monolithic_kernel) {
-        goto out;
-    }
-    
     UPSTAGE();
     
     {
