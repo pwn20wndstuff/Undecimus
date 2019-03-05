@@ -1121,7 +1121,9 @@ bool supportsExploit(exploit_t exploit) {
             break;
         }
         case mach_swap_exploit: {
-            if (vm_kernel_page_size != 0x1000 && !machineNameContains("iPad5,")) {
+            if ((vm_kernel_page_size != 0x1000 && !machineNameContains("iPad5,"))||
+                (vm_kernel_page_size != 0x1000 && !machineNameContains("iPhone8,"))||
+                (vm_kernel_page_size != 0x1000 && !machineNameContains("iPad6,"))){
                 return false;
             }
             if (get_machswap_offsets() == NULL) {
