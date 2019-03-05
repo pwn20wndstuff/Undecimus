@@ -844,6 +844,7 @@ void jailbreak()
         PF(vnode_lookup);
         PF(vnode_put);
         PF(kernel_task);
+        PF(kernproc);
         PF(shenanigans);
         PF(lck_mtx_lock);
         PF(lck_mtx_unlock);
@@ -856,10 +857,6 @@ void jailbreak()
             PF(pmap_load_trust_cache);
         }
 #undef PF
-        uint64_t kernproc = ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO);
-        _assert(ISADDR(kernproc), message, true);
-        SETOFFSET(kernproc, kernproc);
-        LOG("kernproc = " ADDR, GETOFFSET(kernproc) - kernel_slide);
         found_offsets = true;
         LOG("Successfully found offsets.");
     }
