@@ -31,7 +31,6 @@
 #include <reboot.h>
 #import <snappy.h>
 #import <inject.h>
-#include <libgrabkernel/libgrabkernel.h>
 #include <sched.h>
 #import "JailbreakViewController.h"
 #include "KernelStructureOffsets.h"
@@ -54,10 +53,9 @@
 #include "kernel_memory.h"
 #include "kernel_slide.h"
 #include "find_port.h"
-#include "v1ntex_offsets.h"
-#include "v1ntex_exploit.h"
-#include "v3ntex_exploit.h"
 #include "lzssdec.h"
+#include "machswap_offsets.h"
+#include "machswap_pwn.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -625,21 +623,6 @@ bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
     return true;
 }
 
-kern_return_t exploit_callback_common(task_t kernel_task, kptr_t kbase, void *data) {
-    prepare_for_rw_with_fake_tfp0(kernel_task);
-    kernel_base = kbase;
-    kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS);
-    return KERN_SUCCESS;
-}
-
-kern_return_t v1ntex_callback(task_t kernel_task, kptr_t kbase, void *data) {
-    return exploit_callback_common(kernel_task, kbase, data);
-}
-
-kern_return_t v3ntex_callback(task_t tfp0, kptr_t kbase, void *data) {
-    return exploit_callback_common(tfp0, kbase, data);
-}
-
 void waitFor(int seconds) {
     for (int i = 1; i <= seconds; i++) {
         LOG("Waiting (%d/%d)", i, seconds);
@@ -777,48 +760,13 @@ void jailbreak()
                     }
                     break;
                 }
-                case v1ntex_exploit: {
-                    const char *kernelCacheDownloadPath = [temporaryDirectory stringByAppendingPathComponent:@"kernel"].UTF8String;
-                    LOG("kernelCacheDownloadPath = %s", kernelCacheDownloadPath);
-                    const char *kernelCacheDownloadedPath = [homeDirectory stringByAppendingPathComponent:@"Documents/kernel"].UTF8String;
-                    LOG("kernelCacheDownloadedPath = %s", kernelCacheDownloadedPath);
-                    const char *kernelCacheFilesystemPath = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
-                    LOG("kernelCacheFilesystemPath = %s", kernelCacheFilesystemPath);
-                    _assert(clean_file(kernelCacheDownloadPath), message, true);
-                    const char *kernelCachePath = NULL;
-                    if (canRead(kernelCacheFilesystemPath)) {
-                        kernelCachePath = kernelCacheFilesystemPath;
-                        LOG("Found kernelcache in filesystem.");
-                    } else if (canRead(kernelCacheDownloadedPath)) {
-                        kernelCachePath = kernelCacheDownloadedPath;
-                        LOG("Found kernelcache in documents.");
-                    } else {
-                        LOG("Downloading kernelcache from Apple...");
-                        NOTICE(NSLocalizedString(@"Downloading kernelcache from Apple. This may take a while.", nil), false, false);
-                        _assert(grabkernel((char *)kernelCacheDownloadPath) == ERR_SUCCESS, message, true);
-                        _assert(rename(kernelCacheDownloadPath, kernelCacheDownloadedPath) == ERR_SUCCESS, message, true);
-                        kernelCachePath = kernelCacheDownloadedPath;
-                        LOG("Successfully downloaded kernelcache from Apple.");
-                    }
-                    LOG("kernelCachePath = %s", kernelCachePath);
-                    v1ntex_offsets *v1ntex_offs = NULL;
-                    if ((v1ntex_offs = get_v1ntex_offsets(kernelCachePath)) == NULL) {
-                        _assert(clean_file(kernelCacheDownloadedPath), message, true);
-                        _assert(false, message, true);
-                    }
-                    if (v1ntex(v1ntex_callback, NULL, v1ntex_offs) == ERR_SUCCESS &&
+                case mach_swap_exploit: {
+                    machswap_offsets_t *machswap_offsets = NULL;
+                    if ((machswap_offsets = get_machswap_offsets()) != NULL &&
+                        machswap_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR(kernel_base) &&
-                        ISADDR(kernel_slide)) {
-                        exploit_success = true;
-                    }
-                    break;
-                }
-                case v3ntex_exploit: {
-                    if (v3ntex(v3ntex_callback, NULL) == ERR_SUCCESS &&
-                        MACH_PORT_VALID(tfp0) &&
-                        ISADDR(kernel_base) &&
-                        ISADDR(kernel_slide)) {
+                        ISADDR((kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)))) {
                         exploit_success = true;
                     }
                     break;
@@ -2152,9 +2100,9 @@ void jailbreak()
     }
 out:
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
-    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString(prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
+    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString((prefs.exploit == mach_swap_exploit) && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
     if (sharedController.canExit) {
-        if (prefs.exploit == v3ntex_exploit && !usedPersistedKernelTaskPort) {
+        if ((prefs.exploit == mach_swap_exploit) && !usedPersistedKernelTaskPort) {
             _assert(restartSpringBoard(), message, true);
         } else {
             exit(EXIT_SUCCESS);

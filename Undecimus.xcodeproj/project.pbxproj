@@ -28,16 +28,7 @@
 		216F3F3E2228776E007DC1BC /* user_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F372228776D007DC1BC /* user_client.c */; };
 		216F3F3F2228776E007DC1BC /* pac.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F3A2228776D007DC1BC /* pac.c */; };
 		216F3F402228776E007DC1BC /* kc_parameters.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F3C2228776E007DC1BC /* kc_parameters.c */; };
-		216FDA04220C5BA90086D802 /* libfragmentzip.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA03220C5BA90086D802 /* libfragmentzip.a */; };
-		216FDA08220C5BDC0086D802 /* libgrabkernel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA07220C5BDC0086D802 /* libgrabkernel.a */; };
-		216FDA0D220C5C320086D802 /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA0B220C5C320086D802 /* libplist.a */; };
-		216FDA0E220C5C320086D802 /* libplist++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA0C220C5C320086D802 /* libplist++.a */; };
-		216FDA10220C5C3E0086D802 /* libimg4tool.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA0F220C5C3E0086D802 /* libimg4tool.a */; };
-		216FDA12220C5C530086D802 /* liboffsetfinder64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA11220C5C530086D802 /* liboffsetfinder64.a */; };
-		216FDA1A220C5EAD0086D802 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA19220C5EAD0086D802 /* libcurl.a */; };
 		216FDA1E220C5F5C0086D802 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 216FDA1D220C5F5C0086D802 /* libz.tbd */; };
-		216FDA22220C62C80086D802 /* v1ntex_offsets.mm in Sources */ = {isa = PBXBuildFile; fileRef = 216FDA20220C62C80086D802 /* v1ntex_offsets.mm */; };
-		216FDA25220C68A60086D802 /* v1ntex_exploit.m in Sources */ = {isa = PBXBuildFile; fileRef = 216FDA24220C68A60086D802 /* v1ntex_exploit.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */; };
 		2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		2171C4012222E3BB004E45C7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2171C4002222E3BB004E45C7 /* SystemConfiguration.framework */; };
@@ -55,9 +46,10 @@
 		21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130EA214C03690021AA9D /* CreditsTableViewController.m */; };
 		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
-		21E4052D2215E543006065CE /* v3ntex_exploit.m in Sources */ = {isa = PBXBuildFile; fileRef = 21E4052C2215E543006065CE /* v3ntex_exploit.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21F4D70E21FC7A590070D5E0 /* patchfinder64.c in Sources */ = {isa = PBXBuildFile; fileRef = 21F4D70C21FC7A590070D5E0 /* patchfinder64.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		21FFE0F8222E4C0600EC59B2 /* machswap_offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FFE0F6222E4C0600EC59B2 /* machswap_offsets.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		21FFE0F9222E4C0600EC59B2 /* machswap_pwn.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FFE0F7222E4C0600EC59B2 /* machswap_pwn.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		222AD59321FA731800DCBA2A /* FakeApt.m in Sources */ = {isa = PBXBuildFile; fileRef = 222AD59221FA731800DCBA2A /* FakeApt.m */; };
 		2253F711221020EB0031D809 /* libmagic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2253F710221020EA0031D809 /* libmagic.a */; };
 		225D142221E052960045493D /* ArchiveFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 225D142121E052960045493D /* ArchiveFile.m */; };
@@ -119,25 +111,7 @@
 		216F3F3A2228776D007DC1BC /* pac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pac.c; sourceTree = "<group>"; };
 		216F3F3B2228776D007DC1BC /* kc_parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kc_parameters.h; sourceTree = "<group>"; };
 		216F3F3C2228776E007DC1BC /* kc_parameters.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kc_parameters.c; sourceTree = "<group>"; };
-		216FDA03220C5BA90086D802 /* libfragmentzip.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfragmentzip.a; sourceTree = "<group>"; };
-		216FDA06220C5BB80086D802 /* libfragmentzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libfragmentzip.h; sourceTree = "<group>"; };
-		216FDA07220C5BDC0086D802 /* libgrabkernel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libgrabkernel.a; sourceTree = "<group>"; };
-		216FDA0A220C5BE50086D802 /* libgrabkernel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libgrabkernel.h; sourceTree = "<group>"; };
-		216FDA0B220C5C320086D802 /* libplist.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplist.a; sourceTree = "<group>"; };
-		216FDA0C220C5C320086D802 /* libplist++.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libplist++.a"; sourceTree = "<group>"; };
-		216FDA0F220C5C3E0086D802 /* libimg4tool.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libimg4tool.a; sourceTree = "<group>"; };
-		216FDA11220C5C530086D802 /* liboffsetfinder64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liboffsetfinder64.a; sourceTree = "<group>"; };
-		216FDA14220C5C620086D802 /* insn.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = insn.hpp; sourceTree = "<group>"; };
-		216FDA15220C5C620086D802 /* liboffsetfinder64.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = liboffsetfinder64.hpp; sourceTree = "<group>"; };
-		216FDA16220C5C620086D802 /* patch.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = patch.hpp; sourceTree = "<group>"; };
-		216FDA17220C5C620086D802 /* liboffsetfinder64_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = liboffsetfinder64_common.h; sourceTree = "<group>"; };
-		216FDA18220C5C620086D802 /* exception.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = exception.hpp; sourceTree = "<group>"; };
-		216FDA19220C5EAD0086D802 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcurl.a; sourceTree = "<group>"; };
 		216FDA1D220C5F5C0086D802 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		216FDA20220C62C80086D802 /* v1ntex_offsets.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = v1ntex_offsets.mm; sourceTree = "<group>"; };
-		216FDA21220C62C80086D802 /* v1ntex_offsets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = v1ntex_offsets.h; sourceTree = "<group>"; };
-		216FDA23220C68A60086D802 /* v1ntex_exploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = v1ntex_exploit.h; sourceTree = "<group>"; };
-		216FDA24220C68A60086D802 /* v1ntex_exploit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = v1ntex_exploit.m; sourceTree = "<group>"; };
 		2171C4002222E3BB004E45C7 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		21A97FC42148103A00DC0023 /* KernelExecution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KernelExecution.h; sourceTree = "<group>"; };
 		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
@@ -174,12 +148,14 @@
 		21C13117214D268F0021AA9D /* multi_path_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = multi_path_sploit.c; sourceTree = "<group>"; };
 		21C13118214D268F0021AA9D /* multi_path_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multi_path_sploit.h; sourceTree = "<group>"; };
 		21C1312E214D5A710021AA9D /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
-		21E4052B2215E543006065CE /* v3ntex_exploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = v3ntex_exploit.h; sourceTree = "<group>"; };
-		21E4052C2215E543006065CE /* v3ntex_exploit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = v3ntex_exploit.m; sourceTree = "<group>"; };
 		21E9642421A1DD6F000625F7 /* NSTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSTask.h; sourceTree = "<group>"; };
 		21F4D70C21FC7A590070D5E0 /* patchfinder64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = patchfinder64.c; path = patchfinder64/patchfinder64.c; sourceTree = SOURCE_ROOT; };
 		21F4D70D21FC7A590070D5E0 /* patchfinder64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = patchfinder64.h; path = patchfinder64/patchfinder64.h; sourceTree = SOURCE_ROOT; };
 		21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Painting_With_Chocolate.ttf; sourceTree = "<group>"; };
+		21FFE0F4222E4C0600EC59B2 /* machswap_pwn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machswap_pwn.h; sourceTree = "<group>"; };
+		21FFE0F5222E4C0600EC59B2 /* machswap_offsets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machswap_offsets.h; sourceTree = "<group>"; };
+		21FFE0F6222E4C0600EC59B2 /* machswap_offsets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = machswap_offsets.m; sourceTree = "<group>"; };
+		21FFE0F7222E4C0600EC59B2 /* machswap_pwn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = machswap_pwn.m; sourceTree = "<group>"; };
 		222AD59221FA731800DCBA2A /* FakeApt.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FakeApt.m; sourceTree = "<group>"; };
 		222AD59421FA732A00DCBA2A /* FakeApt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FakeApt.h; sourceTree = "<group>"; };
 		2253F710221020EA0031D809 /* libmagic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmagic.a; path = Undecimus/libs/libmagic.a; sourceTree = "<group>"; };
@@ -206,18 +182,11 @@
 				2171C4012222E3BB004E45C7 /* SystemConfiguration.framework in Frameworks */,
 				2253F711221020EB0031D809 /* libmagic.a in Frameworks */,
 				216FDA1E220C5F5C0086D802 /* libz.tbd in Frameworks */,
-				216FDA0D220C5C320086D802 /* libplist.a in Frameworks */,
-				216FDA10220C5C3E0086D802 /* libimg4tool.a in Frameworks */,
 				226689DD21EC1C5A00262F66 /* libarchive.2.tbd in Frameworks */,
 				22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */,
-				216FDA12220C5C530086D802 /* liboffsetfinder64.a in Frameworks */,
 				214D283C22146EC70058933D /* libmagic.a in Frameworks */,
 				2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */,
-				216FDA0E220C5C320086D802 /* libplist++.a in Frameworks */,
 				2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */,
-				216FDA08220C5BDC0086D802 /* libgrabkernel.a in Frameworks */,
-				216FDA04220C5BA90086D802 /* libfragmentzip.a in Frameworks */,
-				216FDA1A220C5EAD0086D802 /* libcurl.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,63 +325,14 @@
 			isa = PBXGroup;
 			children = (
 				214D283B22146EC70058933D /* libmagic.a */,
-				216FDA03220C5BA90086D802 /* libfragmentzip.a */,
-				216FDA07220C5BDC0086D802 /* libgrabkernel.a */,
-				216FDA0B220C5C320086D802 /* libplist.a */,
-				216FDA0C220C5C320086D802 /* libplist++.a */,
-				216FDA0F220C5C3E0086D802 /* libimg4tool.a */,
-				216FDA11220C5C530086D802 /* liboffsetfinder64.a */,
-				216FDA19220C5EAD0086D802 /* libcurl.a */,
 			);
 			path = libs;
-			sourceTree = "<group>";
-		};
-		216FDA05220C5BB80086D802 /* libfragmentzip */ = {
-			isa = PBXGroup;
-			children = (
-				216FDA06220C5BB80086D802 /* libfragmentzip.h */,
-			);
-			path = libfragmentzip;
-			sourceTree = "<group>";
-		};
-		216FDA09220C5BE50086D802 /* libgrabkernel */ = {
-			isa = PBXGroup;
-			children = (
-				216FDA0A220C5BE50086D802 /* libgrabkernel.h */,
-			);
-			path = libgrabkernel;
-			sourceTree = "<group>";
-		};
-		216FDA13220C5C620086D802 /* liboffsetfinder64 */ = {
-			isa = PBXGroup;
-			children = (
-				216FDA14220C5C620086D802 /* insn.hpp */,
-				216FDA15220C5C620086D802 /* liboffsetfinder64.hpp */,
-				216FDA16220C5C620086D802 /* patch.hpp */,
-				216FDA17220C5C620086D802 /* liboffsetfinder64_common.h */,
-				216FDA18220C5C620086D802 /* exception.hpp */,
-			);
-			path = liboffsetfinder64;
-			sourceTree = "<group>";
-		};
-		216FDA1F220C62B20086D802 /* v1ntex */ = {
-			isa = PBXGroup;
-			children = (
-				216FDA20220C62C80086D802 /* v1ntex_offsets.mm */,
-				216FDA21220C62C80086D802 /* v1ntex_offsets.h */,
-				216FDA23220C68A60086D802 /* v1ntex_exploit.h */,
-				216FDA24220C68A60086D802 /* v1ntex_exploit.m */,
-			);
-			name = v1ntex;
 			sourceTree = "<group>";
 		};
 		2170BD3421B192750059BD10 /* include */ = {
 			isa = PBXGroup;
 			children = (
 				214D283D22146EE60058933D /* magic.h */,
-				216FDA13220C5C620086D802 /* liboffsetfinder64 */,
-				216FDA09220C5BE50086D802 /* libgrabkernel */,
-				216FDA05220C5BB80086D802 /* libfragmentzip */,
 				2150A9E322021381001C8677 /* mach_vm.h */,
 				2150A9E422021381001C8677 /* ipc_port.h */,
 				2150A9E52202138A001C8677 /* IOKitLib.h */,
@@ -441,10 +361,9 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				21FFE0F3222E4B1600EC59B2 /* machswap */,
 				216F3F342228774D007DC1BC /* kernel_call */,
 				2166453A22257E7000B37252 /* lzssdec */,
-				21E4052A2215E535006065CE /* v3ntex */,
-				216FDA1F220C62B20086D802 /* v1ntex */,
 				213E78222208652B00FDF3B7 /* necp */,
 				2150A9CA220212F8001C8677 /* voucher_swap */,
 				2150A9C9220212E6001C8677 /* deja_xnu */,
@@ -529,15 +448,6 @@
 			path = Undecimus;
 			sourceTree = "<group>";
 		};
-		21E4052A2215E535006065CE /* v3ntex */ = {
-			isa = PBXGroup;
-			children = (
-				21E4052B2215E543006065CE /* v3ntex_exploit.h */,
-				21E4052C2215E543006065CE /* v3ntex_exploit.m */,
-			);
-			name = v3ntex;
-			sourceTree = "<group>";
-		};
 		21F4D70B21FC7A490070D5E0 /* patchfinder64 */ = {
 			isa = PBXGroup;
 			children = (
@@ -545,6 +455,17 @@
 				21F4D70D21FC7A590070D5E0 /* patchfinder64.h */,
 			);
 			name = patchfinder64;
+			sourceTree = "<group>";
+		};
+		21FFE0F3222E4B1600EC59B2 /* machswap */ = {
+			isa = PBXGroup;
+			children = (
+				21FFE0F5222E4C0600EC59B2 /* machswap_offsets.h */,
+				21FFE0F6222E4C0600EC59B2 /* machswap_offsets.m */,
+				21FFE0F4222E4C0600EC59B2 /* machswap_pwn.h */,
+				21FFE0F7222E4C0600EC59B2 /* machswap_pwn.m */,
+			);
+			name = machswap;
 			sourceTree = "<group>";
 		};
 		22F91CD821E02CC700B2FCAE /* injector */ = {
@@ -655,7 +576,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2166453D22257E7900B37252 /* lzssdec.cpp in Sources */,
-				21E4052D2215E543006065CE /* v3ntex_exploit.m in Sources */,
 				21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */,
 				216F3F3E2228776E007DC1BC /* user_client.c in Sources */,
 				2150A9E022021348001C8677 /* parameters.c in Sources */,
@@ -664,7 +584,6 @@
 				2150A9DD22021348001C8677 /* platform_match.c in Sources */,
 				212D8844216E4C4800A36DA5 /* find_port.c in Sources */,
 				213E78262208654700FDF3B7 /* necp.c in Sources */,
-				216FDA22220C62C80086D802 /* v1ntex_offsets.mm in Sources */,
 				22C546AB21A8A8FD00EFC09C /* utils.m in Sources */,
 				2150A9DC22021348001C8677 /* log.c in Sources */,
 				216F3F3D2228776E007DC1BC /* kernel_call.c in Sources */,
@@ -684,9 +603,10 @@
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
 				222AD59321FA731800DCBA2A /* FakeApt.m in Sources */,
 				216F3F3F2228776E007DC1BC /* pac.c in Sources */,
-				216FDA25220C68A60086D802 /* v1ntex_exploit.m in Sources */,
 				21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */,
 				21C0FC8A21369EE900849420 /* KernelStructureOffsets.m in Sources */,
+				21FFE0F9222E4C0600EC59B2 /* machswap_pwn.m in Sources */,
+				21FFE0F8222E4C0600EC59B2 /* machswap_offsets.m in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,
 				2150A9E222021348001C8677 /* kernel_memory.c in Sources */,
 				216F3F402228776E007DC1BC /* kc_parameters.c in Sources */,

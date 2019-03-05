@@ -847,8 +847,17 @@ bool supportsExploit(exploit_t exploit) {
                    @"4903.240.8~8",
                    @"4903.232.2~1"],
                  
-                 // V1ntex
-                 @[@"4570.20.55~10",
+                 // Mach Swap
+                 @[@"4397.0.0.2.4~1",
+                   @"4481.0.0.2.1~1",
+                   @"4532.0.0.0.1~30",
+                   @"4556.0.0.2.5~1",
+                   @"4570.1.24.2.3~1",
+                   @"4570.2.3~8",
+                   @"4570.2.5~84",
+                   @"4570.2.5~167",
+                   @"4570.7.2~3",
+                   @"4570.20.55~10",
                    @"4570.20.62~9",
                    @"4570.20.62~4",
                    @"4570.30.79~22",
@@ -872,10 +881,8 @@ bool supportsExploit(exploit_t exploit) {
                    @"4570.70.14~16",
                    @"4570.70.19~13",
                    @"4570.70.24~9",
-                   @"4570.70.24~3"],
-                 
-                 // V3ntex
-                 @[@"4903.200.199.12.3~1",
+                   @"4570.70.24~3",
+                   @"4903.200.199.12.3~1",
                    @"4903.200.249.22.3~1",
                    @"4903.200.274.32.3~1",
                    @"4903.200.304.42.1~1",
@@ -991,13 +998,7 @@ bool supportsExploit(exploit_t exploit) {
             }
             break;
         }
-        case v1ntex_exploit: {
-            if (vm_kernel_page_size != 0x1000) {
-                return false;
-            }
-            break;
-        }
-        case v3ntex_exploit: {
+        case mach_swap_exploit: {
             if (vm_kernel_page_size != 0x1000 && !machineNameContains("iPad5,")) {
                 return false;
             }
@@ -1034,8 +1035,7 @@ bool jailbreakSupported() {
     supportsExploit(multi_path_exploit) ||
     supportsExploit(async_wake_exploit) ||
     supportsExploit(voucher_swap_exploit) ||
-    supportsExploit(v1ntex_exploit) ||
-    supportsExploit(v3ntex_exploit);
+    supportsExploit(mach_swap_exploit);
 }
 
 bool respringSupported() {
@@ -1048,18 +1048,16 @@ bool restartSupported() {
 }
 
 NSInteger recommendedJailbreakSupport() {
-    if (supportsExploit(async_wake_exploit))
+    if (supportsExploit(mach_swap_exploit)) {
+        return mach_swap_exploit;
+    } else if (supportsExploit(async_wake_exploit))
         return async_wake_exploit;
     else if (supportsExploit(voucher_swap_exploit))
         return voucher_swap_exploit;
     else if (supportsExploit(multi_path_exploit))
         return multi_path_exploit;
-    else if (supportsExploit(v1ntex_exploit))
-        return v1ntex_exploit;
     else if (supportsExploit(empty_list_exploit))
         return empty_list_exploit;
-    else if (supportsExploit(v3ntex_exploit))
-        return v3ntex_exploit;
     else
         return -1;
 }
