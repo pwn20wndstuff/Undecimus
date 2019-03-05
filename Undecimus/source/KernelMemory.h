@@ -63,11 +63,11 @@ bool rkbuffer(uint64_t kaddr, void* buffer, size_t length);
 
 void kmemcpy(uint64_t dest, uint64_t src, uint32_t length);
 
-void kmem_protect(uint64_t kaddr, uint32_t size, int prot);
+bool kmem_protect(uint64_t kaddr, uint32_t size, int prot);
 
 uint64_t kmem_alloc(uint64_t size);
 uint64_t kmem_alloc_wired(uint64_t size);
-void kmem_free(uint64_t kaddr, uint64_t size);
+bool kmem_free(uint64_t kaddr, uint64_t size);
 
 void prepare_rk_via_kmem_read_port(mach_port_t port);
 void prepare_rwk_via_tfp0(mach_port_t port);

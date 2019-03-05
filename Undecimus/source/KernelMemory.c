@@ -257,11 +257,11 @@ uint64_t kmem_alloc_wired(uint64_t size)
     return addr;
 }
 
-void kmem_free(uint64_t kaddr, uint64_t size)
+bool kmem_free(uint64_t kaddr, uint64_t size)
 {
     if (tfp0 == MACH_PORT_NULL) {
         LOG("attempt to deallocate kernel memory before any kernel memory write primitives available");
-        return;
+        return false;
     }
 
     kern_return_t err;
@@ -269,20 +269,22 @@ void kmem_free(uint64_t kaddr, uint64_t size)
     err = mach_vm_deallocate(tfp0, kaddr, ksize);
     if (err != KERN_SUCCESS) {
         LOG("unable to deallocate kernel memory via tfp0: %s %x", mach_error_string(err), err);
-        return;
+        return false;
     }
+    return true;
 }
 
-void kmem_protect(uint64_t kaddr, uint32_t size, int prot)
+bool kmem_protect(uint64_t kaddr, uint32_t size, int prot)
 {
     if (tfp0 == MACH_PORT_NULL) {
         LOG("attempt to change protection of kernel memory before any kernel memory write primitives available");
-        return;
+        return false;
     }
     kern_return_t err;
     err = mach_vm_protect(tfp0, (mach_vm_address_t)kaddr, (mach_vm_size_t)size, 0, (vm_prot_t)prot);
     if (err != KERN_SUCCESS) {
         LOG("unable to change protection of kernel memory via tfp0: %s %x", mach_error_string(err), err);
-        return;
+        return false;
     }
+    return true;
 }
