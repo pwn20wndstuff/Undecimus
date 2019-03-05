@@ -399,7 +399,7 @@ port_drain_messages(mach_port_t port, void (^message_handler)(mach_msg_header_t 
 		| MACH_RCV_TRAILER_TYPE(MACH_MSG_TRAILER_FORMAT_0)
 		| MACH_RCV_TRAILER_ELEMENTS(MACH_RCV_TRAILER_NULL);
 	// Allocate an initial message buffer.
-	mach_msg_size_t msg_size = (mach_msg_size_t)page_size;
+	mach_msg_size_t msg_size = 0x4000;
 	mach_msg_base_t *msg = malloc(msg_size);
 	assert(msg != NULL);
 	// Loop through all the messages queued on the port.

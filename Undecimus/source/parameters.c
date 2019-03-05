@@ -70,7 +70,7 @@ offsets__iphone11_8__16C50() {
 	OFFSET(ipc_entry, ie_request) = 16;
 
 	SIZE(ipc_port)                  =   0xa8;
-	BLOCK_SIZE(ipc_port)            = page_size;
+	BLOCK_SIZE(ipc_port)            = 0x4000;
 	OFFSET(ipc_port, ip_bits)       =   0;
 	OFFSET(ipc_port, ip_references) =   4;
 	OFFSET(ipc_port, waitq_flags)   =  24;
@@ -91,7 +91,7 @@ offsets__iphone11_8__16C50() {
 	OFFSET(ipc_space, is_table)      = 0x20;
 
 	SIZE(ipc_voucher)       =   0x50;
-	BLOCK_SIZE(ipc_voucher) = page_size;
+	BLOCK_SIZE(ipc_voucher) = 0x4000;
 
 	OFFSET(proc, p_pid)   = 0x60;
 	OFFSET(proc, p_ucred) = 0xf8;
@@ -129,7 +129,7 @@ offsets__iphone9_3__15E302() {
     OFFSET(ipc_entry, ie_request) = 16;
     
     SIZE(ipc_port)                  =   0xa8;
-    BLOCK_SIZE(ipc_port)            = page_size;
+    BLOCK_SIZE(ipc_port)            = 0x4000;
     OFFSET(ipc_port, ip_bits)       =   0;
     OFFSET(ipc_port, ip_references) =   4;
     OFFSET(ipc_port, waitq_flags)   =  24;
@@ -150,7 +150,7 @@ offsets__iphone9_3__15E302() {
     OFFSET(ipc_space, is_table)      = 0x20;
     
     SIZE(ipc_voucher)       =   0x50;
-    BLOCK_SIZE(ipc_voucher) = page_size;
+    BLOCK_SIZE(ipc_voucher) = 0x4000;
     
     OFFSET(proc, p_pid)   = 0x10;
     OFFSET(proc, p_ucred) = 0x100;
