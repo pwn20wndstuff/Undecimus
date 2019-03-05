@@ -35,6 +35,7 @@
 		21A97FD12148103C00DC0023 /* KernelExecution.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC82148103B00DC0023 /* KernelExecution.m */; };
 		21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCC2148103B00DC0023 /* KernelUtilities.c */; };
 		21A97FD42148103C00DC0023 /* remote_call.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCD2148103B00DC0023 /* remote_call.c */; };
+		21BB9804222F05C40012AF40 /* machswap2_pwn.m in Sources */ = {isa = PBXBuildFile; fileRef = 21BB9802222F05C40012AF40 /* machswap2_pwn.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21C0FC6C21369EB700849420 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6B21369EB700849420 /* AppDelegate.m */; };
 		21C0FC7421369EB800849420 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7321369EB800849420 /* Assets.xcassets */; };
 		21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7521369EB800849420 /* LaunchScreen.storyboard */; };
@@ -117,6 +118,8 @@
 		21A97FCC2148103B00DC0023 /* KernelUtilities.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = KernelUtilities.c; sourceTree = "<group>"; };
 		21A97FCD2148103B00DC0023 /* remote_call.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_call.c; sourceTree = "<group>"; };
 		21A97FCE2148103C00DC0023 /* remote_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_memory.h; sourceTree = "<group>"; };
+		21BB9802222F05C40012AF40 /* machswap2_pwn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = machswap2_pwn.m; sourceTree = "<group>"; };
+		21BB9803222F05C40012AF40 /* machswap2_pwn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machswap2_pwn.h; sourceTree = "<group>"; };
 		21C0FC6721369EB700849420 /* Undecimus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Undecimus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		21C0FC6A21369EB700849420 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		21C0FC6B21369EB700849420 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -446,6 +449,8 @@
 				21FFE0F6222E4C0600EC59B2 /* machswap_offsets.m */,
 				21FFE0F4222E4C0600EC59B2 /* machswap_pwn.h */,
 				21FFE0F7222E4C0600EC59B2 /* machswap_pwn.m */,
+				21BB9803222F05C40012AF40 /* machswap2_pwn.h */,
+				21BB9802222F05C40012AF40 /* machswap2_pwn.m */,
 			);
 			name = machswap;
 			sourceTree = "<group>";
@@ -590,6 +595,7 @@
 				21FFE0F9222E4C0600EC59B2 /* machswap_pwn.m in Sources */,
 				21FFE0F8222E4C0600EC59B2 /* machswap_offsets.m in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,
+				21BB9804222F05C40012AF40 /* machswap2_pwn.m in Sources */,
 				2150A9E222021348001C8677 /* kernel_memory.c in Sources */,
 				216F3F402228776E007DC1BC /* kc_parameters.c in Sources */,
 				2150A9DF22021348001C8677 /* kernel_slide.c in Sources */,

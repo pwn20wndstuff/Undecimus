@@ -883,6 +883,64 @@ bool supportsExploit(exploit_t exploit) {
                    @"4903.240.8~8",
                    @"4903.232.2~1"],
                  
+                 // Mach Swap 2
+                 @[@"4397.0.0.2.4~1",
+                   @"4481.0.0.2.1~1",
+                   @"4532.0.0.0.1~30",
+                   @"4556.0.0.2.5~1",
+                   @"4570.1.24.2.3~1",
+                   @"4570.2.3~8",
+                   @"4570.2.5~84",
+                   @"4570.2.5~167",
+                   @"4570.7.2~3",
+                   @"4570.20.55~10",
+                   @"4570.20.62~9",
+                   @"4570.20.62~4",
+                   @"4570.30.79~22",
+                   @"4570.30.85~18",
+                   @"4570.32.1~2",
+                   @"4570.32.1~1",
+                   @"4570.40.6~8",
+                   @"4570.40.9~7",
+                   @"4570.40.9~1",
+                   @"4570.50.243~9",
+                   @"4570.50.257~6",
+                   @"4570.50.279~9",
+                   @"4570.50.294~5",
+                   @"4570.52.2~3",
+                   @"4570.52.2~8",
+                   @"4570.60.10.0.1~16",
+                   @"4570.60.16~9",
+                   @"4570.60.19~25",
+                   @"4570.60.21~7",
+                   @"4570.60.21~3",
+                   @"4570.70.14~16",
+                   @"4570.70.19~13",
+                   @"4570.70.24~9",
+                   @"4570.70.24~3",
+                   @"4903.200.199.12.3~1",
+                   @"4903.200.249.22.3~1",
+                   @"4903.200.274.32.3~1",
+                   @"4903.200.304.42.1~1",
+                   @"4903.200.327.52.1~1",
+                   @"4903.200.342.62.3~1",
+                   @"4903.200.354~11",
+                   @"4903.202.1~2",
+                   @"4903.202.2~2",
+                   @"4903.202.2~1",
+                   @"4903.220.42~21",
+                   @"4903.220.48~40",
+                   @"4903.222.1~7",
+                   @"4903.222.4~3",
+                   @"4903.222.5~3",
+                   @"4903.222.5~1",
+                   @"4903.230.15~8",
+                   @"4903.232.1~3",
+                   @"4903.232.2~2",
+                   @"4903.232.2~1",
+                   @"4903.240.8~8",
+                   @"4903.232.2~1"],
+                 
                  // Deja Xnu
                  @[@"4397.0.0.2.4~1",
                    @"4481.0.0.2.1~1",
@@ -983,6 +1041,12 @@ bool supportsExploit(exploit_t exploit) {
             }
             break;
         }
+        case mach_swap_2_exploit: {
+            if (machineNameContains("iPhone11,") || machineNameContains("iPad8,")) {
+                return false;
+            }
+            break;
+        }
         case deja_xnu_exploit: {
             if (jailbreakEnabled())
                 return false;
@@ -1014,7 +1078,8 @@ bool jailbreakSupported() {
     supportsExploit(multi_path_exploit) ||
     supportsExploit(async_wake_exploit) ||
     supportsExploit(voucher_swap_exploit) ||
-    supportsExploit(mach_swap_exploit);
+    supportsExploit(mach_swap_exploit) ||
+    supportsExploit(mach_swap_2_exploit);
 }
 
 bool respringSupported() {
@@ -1031,6 +1096,8 @@ NSInteger recommendedJailbreakSupport() {
         return mach_swap_exploit;
     else if (supportsExploit(async_wake_exploit))
         return async_wake_exploit;
+    else if (supportsExploit(mach_swap_2_exploit))
+        return mach_swap_2_exploit;
     else if (supportsExploit(voucher_swap_exploit))
         return voucher_swap_exploit;
     else if (supportsExploit(multi_path_exploit))

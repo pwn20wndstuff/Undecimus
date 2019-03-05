@@ -795,9 +795,9 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="6Xx-ol-UYF">
-                                                    <rect key="frame" x="238" y="8" width="129" height="29"/>
+                                                    <rect key="frame" x="212" y="8" width="155" height="29"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="width" constant="129" id="TF2-Tk-s34"/>
+                                                        <constraint firstAttribute="width" constant="155" id="TF2-Tk-s34"/>
                                                         <constraint firstAttribute="height" constant="28" id="iH5-4V-9vm"/>
                                                     </constraints>
                                                     <segments>
@@ -805,7 +805,8 @@
                                                         <segment title="MP"/>
                                                         <segment title="AW"/>
                                                         <segment title="VS"/>
-                                                        <segment title="MS"/>
+                                                        <segment title="M1"/>
+                                                        <segment title="M2"/>
                                                     </segments>
                                                     <connections>
                                                         <action selector="KernelExploitSegmentedControl:" destination="ScN-Hx-Um8" eventType="valueChanged" id="Lgd-u2-qmM"/>
@@ -972,7 +973,7 @@
                                         <rect key="frame" x="0.0" y="1042.6666666666667" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="2Iu-w9-x4b" id="t4K-YB-H8y">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cVO-Jp-zmf">

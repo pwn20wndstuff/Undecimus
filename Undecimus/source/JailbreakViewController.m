@@ -56,6 +56,7 @@
 #include "lzssdec.h"
 #include "machswap_offsets.h"
 #include "machswap_pwn.h"
+#include "machswap2_pwn.h"
 
 @interface NSUserDefaults ()
 - (id)objectForKey:(id)arg1 inDomain:(id)arg2;
@@ -730,6 +731,17 @@ void jailbreak()
                     machswap_offsets_t *machswap_offsets = NULL;
                     if ((machswap_offsets = get_machswap_offsets()) != NULL &&
                         machswap_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
+                        MACH_PORT_VALID(tfp0) &&
+                        ISADDR(kernel_base) &&
+                        ISADDR((kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)))) {
+                        exploit_success = true;
+                    }
+                    break;
+                }
+                case mach_swap_2_exploit: {
+                    machswap_offsets_t *machswap_offsets = NULL;
+                    if ((machswap_offsets = get_machswap_offsets()) != NULL &&
+                        machswap2_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR(kernel_base) &&
                         ISADDR((kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)))) {

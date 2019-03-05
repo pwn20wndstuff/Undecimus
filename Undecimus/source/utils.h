@@ -24,6 +24,7 @@ typedef enum {
     async_wake_exploit,
     voucher_swap_exploit,
     mach_swap_exploit,
+    mach_swap_2_exploit,
     deja_xnu_exploit,
     necp_exploit
 } exploit_t;
