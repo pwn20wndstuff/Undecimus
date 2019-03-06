@@ -990,16 +990,21 @@ bool supportsExploit(exploit_t exploit) {
             if (vm_kernel_page_size != 0x4000) {
                 return false;
             }
-            if (machineNameContains("iPad5,") && kCFCoreFoundationVersionNumber >= 1535.12) {
+            if (machineNameContains("iPad5,") &&
+                kCFCoreFoundationVersionNumber >= 1535.12) {
                 return false;
             }
-            if (machineNameContains("iPhone11,") || machineNameContains("iPad8,")) {
+            if (machineNameContains("iPhone11,") ||
+                machineNameContains("iPad8,")) {
                 return false;
             }
             break;
         }
         case mach_swap_exploit: {
-            if (vm_kernel_page_size != 0x1000 && !machineNameContains("iPad5,")) {
+            if (vm_kernel_page_size != 0x1000 &&
+                !machineNameContains("iPad5,") &&
+                !machineNameContains("iPhone8,") &&
+                !machineNameContains("iPad6,")) {
                 return false;
             }
             break;
