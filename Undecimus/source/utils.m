@@ -1048,9 +1048,9 @@ bool restartSupported() {
 }
 
 NSInteger recommendedJailbreakSupport() {
-    if (supportsExploit(mach_swap_exploit)) {
+    if (supportsExploit(mach_swap_exploit))
         return mach_swap_exploit;
-    } else if (supportsExploit(async_wake_exploit))
+    else if (supportsExploit(async_wake_exploit))
         return async_wake_exploit;
     else if (supportsExploit(voucher_swap_exploit))
         return voucher_swap_exploit;
