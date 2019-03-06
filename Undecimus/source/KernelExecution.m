@@ -9,6 +9,7 @@
 #include <pthread.h>
 #import <patchfinder64.h>
 
+#if !__arm64e__
 mach_port_t prepare_user_client()
 {
     kern_return_t err;
@@ -37,6 +38,7 @@ static uint64_t IOSurfaceRootUserClient_addr;
 static uint64_t fake_vtable;
 static uint64_t fake_client;
 const int fake_kalloc_size = 0x1000;
+#endif
 
 void init_kexecute()
 {

@@ -28,6 +28,9 @@ _pthread_set_self(
 
 uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
 {
+#if __arm64e__
+    return 0;
+#else
     if (n_params > MAX_REMOTE_ARGS || n_params < 0) {
         LOG("unsupported number of arguments to remote function (%d)", n_params);
         return 0;
@@ -221,11 +224,15 @@ uint64_t call_remote(mach_port_t task_port, void* fptr, int n_params, ...)
     remote_free(task_port, remote_stack_base, remote_stack_size);
 
     return ret_val;
+#endif
 }
 
 // thread should be suspended already; will return suspended
 uint64_t thread_call_remote(mach_port_t thread_port, void* fptr, int n_params, ...)
 {
+#if __arm64e__
+    return 0;
+#else
     if (n_params > MAX_REMOTE_ARGS || n_params < 0) {
         LOG("unsupported number of arguments to remote function (%d)", n_params);
         return 0;
@@ -363,4 +370,5 @@ uint64_t thread_call_remote(mach_port_t thread_port, void* fptr, int n_params, .
     uint64_t ret_val = fcall_thread_state.__x[0];
 
     return ret_val;
+#endif
 }

