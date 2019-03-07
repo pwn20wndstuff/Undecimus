@@ -102,6 +102,14 @@ mach_port_t fake_host_priv()
 uint64_t get_proc_struct_for_pid(pid_t pid)
 {
     uint64_t proc = ReadKernel64(ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
+    LOG("proc = " ADDR, proc);
+    if (proc == 0) {
+        LOG("failed to get proc!");
+        return 0;
+    }
+    if (pid == 0) {
+        return proc;
+    }
     while (proc) {
         if (ReadKernel32(proc + koffset(KSTRUCT_OFFSET_PROC_PID)) == pid)
             return proc;
@@ -113,24 +121,65 @@ uint64_t get_proc_struct_for_pid(pid_t pid)
 uint64_t get_address_of_port(pid_t pid, mach_port_t port)
 {
     uint64_t proc_struct_addr = get_proc_struct_for_pid(pid);
+    LOG("proc_struct_addr = " ADDR, proc_struct_addr);
+    if (proc_struct_addr == 0) {
+        LOG("failed to get proc_struct_addr!");
+        return 0;
+    }
     uint64_t task_addr = ReadKernel64(proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_TASK));
+    LOG("task_addr = " ADDR, task_addr);
+    if (task_addr == 0) {
+        LOG("failed to get task_addr!");
+        return 0;
+    }
     uint64_t itk_space = ReadKernel64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+    LOG("itk_space = " ADDR, itk_space);
+    if (itk_space == 0) {
+        LOG("failed to get itk_space!");
+        return 0;
+    }
     uint64_t is_table = ReadKernel64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+    LOG("is_table = " ADDR, is_table);
+    if (is_table == 0) {
+        LOG("failed to get is_table!");
+        return 0;
+    }
     uint32_t port_index = port >> 8;
     const int sizeof_ipc_entry_t = 0x18;
     uint64_t port_addr = ReadKernel64(is_table + (port_index * sizeof_ipc_entry_t));
+    LOG("port_addr = " ADDR, port_addr);
+    if (port_addr == 0) {
+        LOG("failed to get port_addr!");
+        return 0;
+    }
     return port_addr;
 }
 
 uint64_t get_kernel_cred_addr()
 {
-    uint64_t kernel_proc_struct_addr = ReadKernel64(ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
-    return ReadKernel64(kernel_proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_UCRED));
+    uint64_t kernel_proc_struct_addr = get_proc_struct_for_pid(0);
+    LOG("kernel_proc_struct_addr = " ADDR, kernel_proc_struct_addr);
+    if (kernel_proc_struct_addr == 0) {
+        LOG("failed to get kernel_proc_struct_addr!");
+        return 0;
+    }
+    uint64_t kernel_ucred_struct_addr = ReadKernel64(kernel_proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_UCRED));
+    LOG("kernel_ucred_struct_addr = " ADDR, kernel_ucred_struct_addr);
+    if (kernel_ucred_struct_addr == 0) {
+        LOG("failed to get kernel_ucred_struct_addr!");
+        return 0;
+    }
+    return kernel_ucred_struct_addr;
 }
 
 uint64_t give_creds_to_process_at_addr(uint64_t proc, uint64_t cred_addr)
 {
     uint64_t orig_creds = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_UCRED));
+    LOG("orig_creds = " ADDR, orig_creds);
+    if (orig_creds == 0) {
+        LOG("failed to get orig_creds!");
+        return 0;
+    }
     WriteKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_UCRED), cred_addr);
     return orig_creds;
 }
@@ -138,6 +187,11 @@ uint64_t give_creds_to_process_at_addr(uint64_t proc, uint64_t cred_addr)
 void set_platform_binary(uint64_t proc)
 {
     uint64_t task_struct_addr = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_TASK));
+    LOG("task_struct_addr = " ADDR, task_struct_addr);
+    if (task_struct_addr == 0) {
+        LOG("failed to get task_struct_addr!");
+        return;
+    }
     uint32_t task_t_flags = ReadKernel32(task_struct_addr + koffset(KSTRUCT_OFFSET_TASK_TFLAGS));
     task_t_flags |= TF_PLATFORM;
     WriteKernel32(task_struct_addr + koffset(KSTRUCT_OFFSET_TASK_TFLAGS), task_t_flags);
