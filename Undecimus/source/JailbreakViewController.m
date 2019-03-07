@@ -844,7 +844,6 @@ void jailbreak()
         PF(vnode_lookup);
         PF(vnode_put);
         PF(kernel_task);
-        PF(kernproc);
         PF(shenanigans);
         PF(lck_mtx_lock);
         PF(lck_mtx_unlock);
@@ -1546,7 +1545,6 @@ void jailbreak()
         dictionary[@"VnodeGetSnapshot"] = ADDRSTRING(GETOFFSET(vnode_get_snapshot));
         dictionary[@"FsLookupSnapshotMetadataByNameAndReturnName"] = ADDRSTRING(GETOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name));
         dictionary[@"APFSJhashGetVnode"] = ADDRSTRING(GETOFFSET(apfs_jhash_getvnode));
-        dictionary[@"KernProc"] = ADDRSTRING(GETOFFSET(kernproc));
         if (![[NSMutableDictionary dictionaryWithContentsOfFile:offsetsFile] isEqual:dictionary]) {
             // Log offsets.
             
