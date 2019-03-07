@@ -10,7 +10,7 @@
 #import <patchfinder64.h>
 
 #if !__arm64e__
-mach_port_t prepare_user_client()
+static mach_port_t prepare_user_client()
 {
     kern_return_t err;
     mach_port_t user_client;
@@ -31,13 +31,13 @@ mach_port_t prepare_user_client()
     return user_client;
 }
 
-pthread_mutex_t kexecute_lock;
+static pthread_mutex_t kexecute_lock;
 static mach_port_t user_client;
 static uint64_t IOSurfaceRootUserClient_port;
 static uint64_t IOSurfaceRootUserClient_addr;
 static uint64_t fake_vtable;
 static uint64_t fake_client;
-const int fake_kalloc_size = 0x1000;
+static const int fake_kalloc_size = 0x1000;
 #endif
 
 void init_kexecute()
