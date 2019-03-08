@@ -53,6 +53,11 @@ if [[ "${CODE_SIGNING_REQUIRED}" == "NO" ]]; then
   popd
   rm -rf lists lists-packaged
   popd
+else
+  pushd "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}"
+  echo "Signing libmagic"
+  codesign --force --verbose --sign "${CODE_SIGN_IDENTITY}" --entitlements "${CODE_SIGN_ENTITLEMENTS}" libmagic.1.dylib
+  popd
 fi # CODE_SIGNING_REQUIRED == NO
 
 rm -rf "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/apt"

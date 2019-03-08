@@ -14,7 +14,6 @@
 		212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8849216E4EBE00A36DA5 /* async_wake.c */; };
 		213E78262208654700FDF3B7 /* necp.c in Sources */ = {isa = PBXBuildFile; fileRef = 213E78252208654700FDF3B7 /* necp.c */; settings = {COMPILER_FLAGS = "-Wno-deprecated-declarations"; }; };
 		213E7828220865A100FDF3B7 /* voucher_swap-poc.c in Sources */ = {isa = PBXBuildFile; fileRef = 213E7827220865A100FDF3B7 /* voucher_swap-poc.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
-		214D283C22146EC70058933D /* libmagic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 214D283B22146EC70058933D /* libmagic.a */; };
 		2150A9CD22021330001C8677 /* voucher_swap.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CC22021330001C8677 /* voucher_swap.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		2150A9DC22021348001C8677 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CE22021347001C8677 /* log.c */; };
 		2150A9DD22021348001C8677 /* platform_match.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CF22021347001C8677 /* platform_match.c */; };
@@ -51,7 +50,8 @@
 		21FFE0F8222E4C0600EC59B2 /* machswap_offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FFE0F6222E4C0600EC59B2 /* machswap_offsets.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21FFE0F9222E4C0600EC59B2 /* machswap_pwn.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FFE0F7222E4C0600EC59B2 /* machswap_pwn.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		222AD59321FA731800DCBA2A /* FakeApt.m in Sources */ = {isa = PBXBuildFile; fileRef = 222AD59221FA731800DCBA2A /* FakeApt.m */; };
-		2253F711221020EB0031D809 /* libmagic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2253F710221020EA0031D809 /* libmagic.a */; };
+		2249C2D9223261B2003B2837 /* libmagic.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2249C2D8223261B2003B2837 /* libmagic.1.dylib */; };
+		2249C2DA223261E4003B2837 /* libmagic.1.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 2249C2D8223261B2003B2837 /* libmagic.1.dylib */; };
 		225D142221E052960045493D /* ArchiveFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 225D142121E052960045493D /* ArchiveFile.m */; };
 		226689DD21EC1C5A00262F66 /* libarchive.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 226689DC21EC1C5A00262F66 /* libarchive.2.tbd */; };
 		22C546AB21A8A8FD00EFC09C /* utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C546AA21A8A8FD00EFC09C /* utils.m */; };
@@ -80,7 +80,6 @@
 		213E78252208654700FDF3B7 /* necp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = necp.c; sourceTree = "<group>"; };
 		213E7827220865A100FDF3B7 /* voucher_swap-poc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "voucher_swap-poc.c"; sourceTree = "<group>"; };
 		213E7829220865BF00FDF3B7 /* voucher_swap-poc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "voucher_swap-poc.h"; sourceTree = "<group>"; };
-		214D283B22146EC70058933D /* libmagic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmagic.a; sourceTree = "<group>"; };
 		214D283D22146EE60058933D /* magic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = magic.h; sourceTree = "<group>"; };
 		2150A9CB22021330001C8677 /* voucher_swap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = voucher_swap.h; sourceTree = "<group>"; };
 		2150A9CC22021330001C8677 /* voucher_swap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = voucher_swap.c; sourceTree = "<group>"; };
@@ -158,7 +157,7 @@
 		21FFE0F7222E4C0600EC59B2 /* machswap_pwn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = machswap_pwn.m; sourceTree = "<group>"; };
 		222AD59221FA731800DCBA2A /* FakeApt.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FakeApt.m; sourceTree = "<group>"; };
 		222AD59421FA732A00DCBA2A /* FakeApt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FakeApt.h; sourceTree = "<group>"; };
-		2253F710221020EA0031D809 /* libmagic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmagic.a; path = Undecimus/libs/libmagic.a; sourceTree = "<group>"; };
+		2249C2D8223261B2003B2837 /* libmagic.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libmagic.1.dylib; sourceTree = "<group>"; };
 		225D142121E052960045493D /* ArchiveFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ArchiveFile.m; sourceTree = "<group>"; };
 		225D142321E055E90045493D /* ArchiveFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArchiveFile.h; sourceTree = "<group>"; };
 		226689DA21EC145000262F66 /* archive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = archive.h; sourceTree = "<group>"; };
@@ -179,12 +178,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2249C2D9223261B2003B2837 /* libmagic.1.dylib in Frameworks */,
 				2171C4012222E3BB004E45C7 /* SystemConfiguration.framework in Frameworks */,
-				2253F711221020EB0031D809 /* libmagic.a in Frameworks */,
 				216FDA1E220C5F5C0086D802 /* libz.tbd in Frameworks */,
 				226689DD21EC1C5A00262F66 /* libarchive.2.tbd in Frameworks */,
 				22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */,
-				214D283C22146EC70058933D /* libmagic.a in Frameworks */,
 				2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */,
 				2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */,
 			);
@@ -297,7 +295,6 @@
 			isa = PBXGroup;
 			children = (
 				2171C4002222E3BB004E45C7 /* SystemConfiguration.framework */,
-				2253F710221020EA0031D809 /* libmagic.a */,
 				216FDA1D220C5F5C0086D802 /* libz.tbd */,
 				226689DC21EC1C5A00262F66 /* libarchive.2.tbd */,
 				22CFED9121CDFE6B00A216BE /* libmis.tbd */,
@@ -324,7 +321,7 @@
 		216FDA02220C5B620086D802 /* libs */ = {
 			isa = PBXGroup;
 			children = (
-				214D283B22146EC70058933D /* libmagic.a */,
+				2249C2D8223261B2003B2837 /* libmagic.1.dylib */,
 			);
 			path = libs;
 			sourceTree = "<group>";
@@ -545,6 +542,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2249C2DA223261E4003B2837 /* libmagic.1.dylib in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
 				8D592A68218E47F60035D2BC /* Main.storyboard in Resources */,
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
