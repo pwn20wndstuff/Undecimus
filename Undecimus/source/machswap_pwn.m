@@ -242,7 +242,7 @@ static void trigger_gc_please()
             the idea here is to look for a longer spray which signals that GC may have
             taken place
         */
-        if (avgTime && tdelta - avgTime > avgTime/2)
+        if (avgTime && tdelta - avgTime > avgTime)
         {
             LOG("got gc at %d -- breaking", i);
             gc_ports_max = i;
