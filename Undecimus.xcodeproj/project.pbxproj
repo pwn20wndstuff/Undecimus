@@ -349,7 +349,6 @@
 		2170BD3621B192B90059BD10 /* resources */ = {
 			isa = PBXGroup;
 			children = (
-				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
 				21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */,
 			);
 			path = resources;
@@ -441,6 +440,7 @@
 				21C0FC7321369EB800849420 /* Assets.xcassets */,
 				21C0FC7521369EB800849420 /* LaunchScreen.storyboard */,
 				21C0FC7821369EB800849420 /* Info.plist */,
+				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
 			);
 			path = Undecimus;
 			sourceTree = "<group>";
@@ -747,7 +747,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/resources/multi_path.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/multi_path.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
@@ -792,7 +792,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/resources/multi_path.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/multi_path.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
