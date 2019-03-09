@@ -1,0 +1,14 @@
+language: OBJECTIVE-C
+os: osx
+before-install:
+- brew tap stek29/homebrew-idevice
+- brew install ldid2
+branches:
+  only:
+  - develop
+git:
+  submodules: true
+  depth: false
+env:
+  global:
+    - MAKEFLAGS="-j 10"
