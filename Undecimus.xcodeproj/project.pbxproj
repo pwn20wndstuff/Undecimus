@@ -50,8 +50,6 @@
 		21FFE0F8222E4C0600EC59B2 /* machswap_offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FFE0F6222E4C0600EC59B2 /* machswap_offsets.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21FFE0F9222E4C0600EC59B2 /* machswap_pwn.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FFE0F7222E4C0600EC59B2 /* machswap_pwn.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		222AD59321FA731800DCBA2A /* FakeApt.m in Sources */ = {isa = PBXBuildFile; fileRef = 222AD59221FA731800DCBA2A /* FakeApt.m */; };
-		2249C2D9223261B2003B2837 /* libmagic.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2249C2D8223261B2003B2837 /* libmagic.1.dylib */; };
-		2249C2DA223261E4003B2837 /* libmagic.1.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 2249C2D8223261B2003B2837 /* libmagic.1.dylib */; };
 		225D142221E052960045493D /* ArchiveFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 225D142121E052960045493D /* ArchiveFile.m */; };
 		226689DD21EC1C5A00262F66 /* libarchive.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 226689DC21EC1C5A00262F66 /* libarchive.2.tbd */; };
 		22C546AB21A8A8FD00EFC09C /* utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C546AA21A8A8FD00EFC09C /* utils.m */; };
@@ -80,7 +78,6 @@
 		213E78252208654700FDF3B7 /* necp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = necp.c; sourceTree = "<group>"; };
 		213E7827220865A100FDF3B7 /* voucher_swap-poc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "voucher_swap-poc.c"; sourceTree = "<group>"; };
 		213E7829220865BF00FDF3B7 /* voucher_swap-poc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "voucher_swap-poc.h"; sourceTree = "<group>"; };
-		214D283D22146EE60058933D /* magic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = magic.h; sourceTree = "<group>"; };
 		2150A9CB22021330001C8677 /* voucher_swap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = voucher_swap.h; sourceTree = "<group>"; };
 		2150A9CC22021330001C8677 /* voucher_swap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = voucher_swap.c; sourceTree = "<group>"; };
 		2150A9CE22021347001C8677 /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
@@ -157,7 +154,6 @@
 		21FFE0F7222E4C0600EC59B2 /* machswap_pwn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = machswap_pwn.m; sourceTree = "<group>"; };
 		222AD59221FA731800DCBA2A /* FakeApt.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FakeApt.m; sourceTree = "<group>"; };
 		222AD59421FA732A00DCBA2A /* FakeApt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FakeApt.h; sourceTree = "<group>"; };
-		2249C2D8223261B2003B2837 /* libmagic.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libmagic.1.dylib; sourceTree = "<group>"; };
 		225D142121E052960045493D /* ArchiveFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ArchiveFile.m; sourceTree = "<group>"; };
 		225D142321E055E90045493D /* ArchiveFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArchiveFile.h; sourceTree = "<group>"; };
 		226689DA21EC145000262F66 /* archive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = archive.h; sourceTree = "<group>"; };
@@ -178,7 +174,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2249C2D9223261B2003B2837 /* libmagic.1.dylib in Frameworks */,
 				2171C4012222E3BB004E45C7 /* SystemConfiguration.framework in Frameworks */,
 				216FDA1E220C5F5C0086D802 /* libz.tbd in Frameworks */,
 				226689DD21EC1C5A00262F66 /* libarchive.2.tbd in Frameworks */,
@@ -318,18 +313,9 @@
 			name = kernel_call;
 			sourceTree = "<group>";
 		};
-		216FDA02220C5B620086D802 /* libs */ = {
-			isa = PBXGroup;
-			children = (
-				2249C2D8223261B2003B2837 /* libmagic.1.dylib */,
-			);
-			path = libs;
-			sourceTree = "<group>";
-		};
 		2170BD3421B192750059BD10 /* include */ = {
 			isa = PBXGroup;
 			children = (
-				214D283D22146EE60058933D /* magic.h */,
 				2150A9E322021381001C8677 /* mach_vm.h */,
 				2150A9E422021381001C8677 /* ipc_port.h */,
 				2150A9E52202138A001C8677 /* IOKitLib.h */,
@@ -431,7 +417,6 @@
 		21C0FC6921369EB700849420 /* Undecimus */ = {
 			isa = PBXGroup;
 			children = (
-				216FDA02220C5B620086D802 /* libs */,
 				2170BDCC21B330210059BD10 /* frameworks */,
 				2170BDCB21B32FF10059BD10 /* source */,
 				2170BD3621B192B90059BD10 /* resources */,
@@ -542,7 +527,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2249C2DA223261E4003B2837 /* libmagic.1.dylib in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
 				8D592A68218E47F60035D2BC /* Main.storyboard in Resources */,
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
@@ -745,6 +729,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = (
+					arm64e,
+					arm64,
+				);
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/multi_path.entitlements";
@@ -772,6 +760,7 @@
 					"$(PROJECT_DIR)/Undecimus",
 					"$(PROJECT_DIR)/Undecimus/libs",
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "";
 				"OTHER_CFLAGS[arch=*]" = "-DUNDECIMUS";
 				OTHER_LDFLAGS = (
@@ -783,6 +772,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e";
 			};
 			name = Debug;
 		};
@@ -790,6 +780,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = (
+					arm64e,
+					arm64,
+				);
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Undecimus/multi_path.entitlements";
@@ -828,6 +822,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e";
 			};
 			name = Release;
 		};

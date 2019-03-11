@@ -10,7 +10,6 @@
 #import <sys/sysctl.h>
 #import <Foundation/Foundation.h>
 #import <CommonCrypto/CommonDigest.h>
-#import <magic.h>
 #import <spawn.h>
 #include <copyfile.h>
 #include <common.h>
@@ -33,23 +32,12 @@ NSData *lastSystemOutput=nil;
 void injectDir(NSString *dir) {
     NSFileManager *fm = [NSFileManager defaultManager];
     NSMutableArray *toInject = [NSMutableArray new];
-    magic_t cookie = magic_open(MAGIC_MIME_TYPE);
-    NSString *magicFile = pathForResource(@"macho.mgc");
-    if (cookie && magic_load(cookie, magicFile.UTF8String)==0) {
-        const char *magic=NULL;
-        for (NSString *filename in [fm contentsOfDirectoryAtPath:dir error:nil]) {
-            NSString *file = [dir stringByAppendingPathComponent:filename];
-            if ((magic = magic_file(cookie, file.UTF8String)))
-            {
-                if (strcmp(magic, "application/x-mach-binary")==0) {
-                    [toInject addObject:file];
-                }
-            }
+    for (NSString *filename in [fm contentsOfDirectoryAtPath:dir error:nil]) {
+        NSString *file = [dir stringByAppendingPathComponent:filename];
+        if (cdhashFor(file) != nil) {
+            [toInject addObject:file];
         }
-    } else {
-        LOG("Error opening or loading magic");
     }
-    magic_close(cookie);
     LOG("Injecting %lu files for %@", (unsigned long)toInject.count, dir);
     if (toInject.count > 0) {
         injectTrustCache(toInject, GETOFFSET(trustcache));
@@ -266,29 +254,11 @@ bool extractDeb(NSString *debPath) {
         chdir("/");
         NSMutableArray *toInject = [NSMutableArray new];
         NSDictionary *files = tar.files;
-        magic_t cookie = magic_open(MAGIC_MIME_TYPE);
-        LOG("Opened magic");
-        NSString *magicFile = pathForResource(@"macho.mgc");
-        LOG("MagicFile: %@", magicFile);
-        if (cookie && magic_load(cookie, magicFile.UTF8String)==0) {
-            LOG("Opened magic");
-            const char *magic=NULL;
-            for (NSString *file in files.allKeys) {
-                mode_t mode = [files[file][@"mode"] integerValue];
-                if (!S_ISDIR(mode)) {
-                    if ((magic = magic_file(cookie, file.UTF8String)))
-                    {
-                        LOG("%@: %s", file, magic);
-                        if (strcmp(magic, "application/x-mach-binary")==0) {
-                            [toInject addObject:file];
-                        }
-                    }
-                }
+        for (NSString *file in files.allKeys) {
+            if (cdhashFor(file) != nil) {
+                [toInject addObject:file];
             }
-        } else {
-            LOG("Error opening or loading magic");
         }
-        magic_close(cookie);
         LOG("Injecting %lu files for %@", (unsigned long)toInject.count, debPath);
         if (toInject.count > 0) {
             injectTrustCache(toInject, GETOFFSET(trustcache));
@@ -992,10 +962,6 @@ bool supportsExploit(exploit_t exploit) {
             }
             if (machineNameContains("iPad5,") &&
                 kCFCoreFoundationVersionNumber >= 1535.12) {
-                return false;
-            }
-            if (machineNameContains("iPhone11,") ||
-                machineNameContains("iPad8,")) {
                 return false;
             }
             break;

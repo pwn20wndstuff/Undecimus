@@ -9,6 +9,7 @@
 #include "log.h"
 #include "platform.h"
 #include "platform_match.h"
+#include "KernelUtilities.h"
 
 // ---- Initialization routines -------------------------------------------------------------------
 
@@ -64,136 +65,28 @@ static struct initialization offsets[] = {
 #define SLIDE(address)		(address == 0 ? 0 : address + kernel_slide)
 
 static void
-addresses__iphone11_8__16C50() {
-	ADDRESS(paciza_pointer__l2tp_domain_module_start)       = SLIDE(0xfffffff008f3ce30);
-	ADDRESS(paciza_pointer__l2tp_domain_module_stop)        = SLIDE(0xfffffff008f3ce38);
-	ADDRESS(l2tp_domain_inited)                             = SLIDE(0xfffffff0090b72a0);
-	ADDRESS(sysctl__net_ppp_l2tp)                           = SLIDE(0xfffffff008f3cd18);
-	ADDRESS(sysctl_unregister_oid)                          = SLIDE(0xfffffff007ebd1f0);
-	ADDRESS(mov_x0_x4__br_x5)                               = SLIDE(0xfffffff0087f7cd8);
-	ADDRESS(mov_x9_x0__br_x1)                               = SLIDE(0xfffffff00882912c);
-	ADDRESS(mov_x10_x3__br_x6)                              = SLIDE(0xfffffff0087e82dc);
-	ADDRESS(kernel_forge_pacia_gadget)                      = SLIDE(0xfffffff007b66d38);
-	ADDRESS(kernel_forge_pacda_gadget)                      = SLIDE(0xfffffff007b66d60);
-	ADDRESS(IOUserClient__vtable)                           = SLIDE(0xfffffff0077b4e28);
-	ADDRESS(IORegistryEntry__getRegistryEntryID)            = SLIDE(0xfffffff0080158f0);
-
-	SIZE(kernel_forge_pacxa_gadget_buffer)                  = 0x110;
-	OFFSET(kernel_forge_pacxa_gadget_buffer, first_access)  = 0xe8;
-	OFFSET(kernel_forge_pacxa_gadget_buffer, pacia_result)  = 0xf0;
-	OFFSET(kernel_forge_pacxa_gadget_buffer, pacda_result)  = 0xe8;
-}
-
-static void
-addresses__iphone11_2__16C50() {
-	ADDRESS(paciza_pointer__l2tp_domain_module_start)       = SLIDE(0xfffffff008fd8be8);
-	ADDRESS(paciza_pointer__l2tp_domain_module_stop)        = SLIDE(0xfffffff008fd8bf0);
-	ADDRESS(l2tp_domain_inited)                             = SLIDE(0xfffffff009154688);
-	ADDRESS(sysctl__net_ppp_l2tp)                           = SLIDE(0xfffffff008fd8ad0);
-	ADDRESS(sysctl_unregister_oid)                          = SLIDE(0xfffffff007eed1f0);
-	ADDRESS(mov_x0_x4__br_x5)                               = SLIDE(0xfffffff00885b230);
-	ADDRESS(mov_x9_x0__br_x1)                               = SLIDE(0xfffffff00888c684);
-	ADDRESS(mov_x10_x3__br_x6)                              = SLIDE(0xfffffff00884b834);
-	ADDRESS(kernel_forge_pacia_gadget)                      = SLIDE(0xfffffff007b96d38);
-	ADDRESS(kernel_forge_pacda_gadget)                      = SLIDE(0xfffffff007b96d60);
-	SIZE(kernel_forge_pacxa_gadget_buffer)                  = 0x110;
-	OFFSET(kernel_forge_pacxa_gadget_buffer, first_access)  = 0xe8;
-	OFFSET(kernel_forge_pacxa_gadget_buffer, pacia_result)  = 0xf0;
-	OFFSET(kernel_forge_pacxa_gadget_buffer, pacda_result)  = 0xe8;
-	ADDRESS(IOUserClient__vtable)                           = SLIDE(0xfffffff0077d4e28);
-	ADDRESS(IORegistryEntry__getRegistryEntryID)            = SLIDE(0xfffffff0080458f0);
-}
-
-static void
-addresses__iphone10_1__16B92() {
-	ADDRESS(IOUserClient__vtable)                           = SLIDE(0xfffffff0070cc668);
-	ADDRESS(IORegistryEntry__getRegistryEntryID)            = SLIDE(0xfffffff007594f04);
-}
-
-static void
-addresses__iphone11_6__16B92(){
-  // Thx SparkDev_
-  ADDRESS(paciza_pointer__l2tp_domain_module_start)       = SLIDE(0xfffffff008ff8d38);
-  ADDRESS(paciza_pointer__l2tp_domain_module_stop)        = SLIDE(0xfffffff008ff8d40);
-
-  ADDRESS(l2tp_domain_inited)                             = SLIDE(0xfffffff009174760);
-
-  ADDRESS(sysctl__net_ppp_l2tp)                           = SLIDE(0xfffffff008ff8c20);
-  ADDRESS(sysctl_unregister_oid)                          = SLIDE(0xfffffff007f0ffb0);
-
-  ADDRESS(mov_x0_x4__br_x5)                               = SLIDE(0xfffffff00887b5f0);
-  ADDRESS(mov_x9_x0__br_x1)                               = SLIDE(0xfffffff0088aca44);
-  ADDRESS(mov_x10_x3__br_x6)                              = SLIDE(0xfffffff00886bbf4);
-
-  ADDRESS(kernel_forge_pacia_gadget)                      = SLIDE(0xfffffff007bb9278);
-  ADDRESS(kernel_forge_pacda_gadget)                      = SLIDE(0xfffffff007bb92a0);
-  ADDRESS(IOUserClient__vtable)                           = SLIDE(0xfffffff0077f8e48);
-
-  ADDRESS(IORegistryEntry__getRegistryEntryID)            = SLIDE(0xfffffff008068334);
-
-  SIZE(kernel_forge_pacxa_gadget_buffer)                  = 0x110;
-  OFFSET(kernel_forge_pacxa_gadget_buffer, first_access)  = 0xe8;
-  OFFSET(kernel_forge_pacxa_gadget_buffer, pacia_result)  = 0xf0;
-  OFFSET(kernel_forge_pacxa_gadget_buffer, pacda_result)  = 0xe8;
-}
-
-static void
-addresses__iphone10_1__16C101() {
-	ADDRESS(IOUserClient__vtable)                           = SLIDE(0xfffffff0070cc648);
-	ADDRESS(IORegistryEntry__getRegistryEntryID)            = SLIDE(0xfffffff00759424c);
-}
-
-static void
-addresses__iphone11_6__16A405() {
-  // string com.apple.driver.AppleSynopsysOTGDevice
-  ADDRESS(paciza_pointer__l2tp_domain_module_start)       = SLIDE(0xfffffff008fe4c80);
-  ADDRESS(paciza_pointer__l2tp_domain_module_stop)        = SLIDE(0xfffffff008fe4c88);
-
-  // Go to *(module start)
-  // look for _IOLog("L2TP domain init : can't add proto to l2tp domain, err : %d\n");
-  // call before that does bzero on l2tp_domain_inited + 8
-  ADDRESS(l2tp_domain_inited)                             = SLIDE(0xfffffff0091607e8);
-
-  // sysctl_unregister_oid(sysctl__net_ppp_l2tp) is called in the end of *(module start/stop)
-  // Right after
-  // _IOLog("L2TP domain terminate : PF_PPP domain does not exist...\n");
-  ADDRESS(sysctl__net_ppp_l2tp)                           = SLIDE(0xfffffff008fe4b68);
-  ADDRESS(sysctl_unregister_oid)                          = SLIDE(0xfffffff007f098a0);
-  // Either search for exact match in hex editor
-  // Or dump whole fairplayiokit and look for gadgets in it
-  ADDRESS(mov_x0_x4__br_x5)                               = SLIDE(0xfffffff00886c278);
-  ADDRESS(mov_x9_x0__br_x1)                               = SLIDE(0xfffffff00889d6cc);
-  ADDRESS(mov_x10_x3__br_x6)                              = SLIDE(0xfffffff00885c87c);
-  ADDRESS(kernel_forge_pacia_gadget)                      = SLIDE(0xfffffff007bb2c58);
-  ADDRESS(kernel_forge_pacda_gadget)                      = SLIDE(0xfffffff007bb2c80);
-
-  // Start disassembling whole kernel
-  // look for __ZN11OSMetaClassC2EPKcPKS_j(ARG-1,"IOUserClient",...);
-  // there would be two occurencies
-  // between them vtable would be referenced twice
-  // in two identical functions following each other
-  ADDRESS(IOUserClient__vtable)                           = SLIDE(0xfffffff0077f0e48);
-
-  // Look for __ZNK15IORegistryEntry16copyPropertyKeysEv in
-  // jtool2 ((beta 1, TLV) compiled on Jan 31 2019 14:42:24)
-  // companion file -- it's two lines below
-  // verify that second destructor calls zfree
-  ADDRESS(IORegistryEntry__getRegistryEntryID)            = SLIDE(0xfffffff008061b90);
-
-  SIZE(kernel_forge_pacxa_gadget_buffer)                  = 0x110;
-  OFFSET(kernel_forge_pacxa_gadget_buffer, first_access)  = 0xe8;
-  OFFSET(kernel_forge_pacxa_gadget_buffer, pacia_result)  = 0xf0;
-  OFFSET(kernel_forge_pacxa_gadget_buffer, pacda_result)  = 0xe8;
+addresses__iphone11_2__16A366() {
+    ADDRESS(paciza_pointer__l2tp_domain_module_start)       = GETOFFSET(paciza_pointer__l2tp_domain_module_start);
+    ADDRESS(paciza_pointer__l2tp_domain_module_stop)        = GETOFFSET(paciza_pointer__l2tp_domain_module_stop);
+    ADDRESS(l2tp_domain_inited)                             = GETOFFSET(l2tp_domain_inited);
+    ADDRESS(sysctl__net_ppp_l2tp)                           = GETOFFSET(sysctl__net_ppp_l2tp);
+    ADDRESS(sysctl_unregister_oid)                          = GETOFFSET(sysctl_unregister_oid);
+    ADDRESS(mov_x0_x4__br_x5)                               = GETOFFSET(mov_x0_x4__br_x5);
+    ADDRESS(mov_x9_x0__br_x1)                               = GETOFFSET(mov_x9_x0__br_x1);
+    ADDRESS(mov_x10_x3__br_x6)                              = GETOFFSET(mov_x10_x3__br_x6);
+    ADDRESS(kernel_forge_pacia_gadget)                      = GETOFFSET(kernel_forge_pacia_gadget);
+    ADDRESS(kernel_forge_pacda_gadget)                      = GETOFFSET(kernel_forge_pacda_gadget);
+    SIZE(kernel_forge_pacxa_gadget_buffer)                  = 0x110;
+    OFFSET(kernel_forge_pacxa_gadget_buffer, first_access)  = 0xe8;
+    OFFSET(kernel_forge_pacxa_gadget_buffer, pacia_result)  = 0xf0;
+    OFFSET(kernel_forge_pacxa_gadget_buffer, pacda_result)  = 0xe8;
+    ADDRESS(IOUserClient__vtable)                           = GETOFFSET(IOUserClient__vtable);
+    ADDRESS(IORegistryEntry__getRegistryEntryID)            = GETOFFSET(IORegistryEntry__getRegistryEntryID);
 }
 
 // A list of address initializations by platform.
 static struct initialization addresses[] = {
-	{ "iPhone11,8", "16C50-16C104", addresses__iphone11_8__16C50  },
-	{ "iPhone11,2", "16C50-16C104", addresses__iphone11_2__16C50  },
-	{ "iPhone10,1", "16B92",        addresses__iphone10_1__16B92  },
-  { "iPhone11,6", "16B92",        addresses__iphone11_6__16B92  },
-  { "iPhone10,1", "16C101",       addresses__iphone10_1__16C101 },
-  { "iPhone11,6", "16A405",       addresses__iphone11_6__16A405 },
+	{ "*", "16A366-16D5024a", addresses__iphone11_2__16A366  },
 };
 
 // ---- PAC initialization ------------------------------------------------------------------------
@@ -258,7 +151,7 @@ pac__iphone11_8__16C50() {
 
 // A list of PAC initializations by platform.
 static struct initialization pac_codes[] = {
-	{ "iPhone11,*", "*", pac__iphone11_8__16C50 },
+	{ "*", "*", pac__iphone11_8__16C50 },
 };
 
 #endif // __arm64e__

@@ -101,12 +101,16 @@ mach_port_t fake_host_priv()
 
 uint64_t get_proc_struct_for_pid(pid_t pid)
 {
-    uint64_t proc = ReadKernel64(ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
-    LOG("proc = " ADDR, proc);
-    if (proc == 0) {
-        LOG("failed to get proc!");
-        return 0;
+    static uint64_t kernproc = 0;
+    if (kernproc == 0) {
+        kernproc = ReadKernel64(ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
+        LOG("kernproc = " ADDR, kernproc);
+        if (kernproc == 0) {
+            LOG("failed to get kernproc!");
+            return 0;
+        }
     }
+    uint64_t proc = kernproc;
     if (pid == 0) {
         return proc;
     }
@@ -120,29 +124,42 @@ uint64_t get_proc_struct_for_pid(pid_t pid)
 
 uint64_t get_address_of_port(pid_t pid, mach_port_t port)
 {
-    uint64_t proc_struct_addr = get_proc_struct_for_pid(pid);
-    LOG("proc_struct_addr = " ADDR, proc_struct_addr);
+    
+    static uint64_t proc_struct_addr = 0;
+    static uint64_t task_addr = 0;
+    static uint64_t itk_space = 0;
+    static uint64_t is_table = 0;
     if (proc_struct_addr == 0) {
-        LOG("failed to get proc_struct_addr!");
-        return 0;
+        proc_struct_addr = get_proc_struct_for_pid(pid);
+        LOG("proc_struct_addr = " ADDR, proc_struct_addr);
+        if (proc_struct_addr == 0) {
+            LOG("failed to get proc_struct_addr!");
+            return 0;
+        }
     }
-    uint64_t task_addr = ReadKernel64(proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_TASK));
-    LOG("task_addr = " ADDR, task_addr);
     if (task_addr == 0) {
-        LOG("failed to get task_addr!");
-        return 0;
+        task_addr = ReadKernel64(proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_TASK));
+        LOG("task_addr = " ADDR, task_addr);
+        if (task_addr == 0) {
+            LOG("failed to get task_addr!");
+            return 0;
+        }
     }
-    uint64_t itk_space = ReadKernel64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
-    LOG("itk_space = " ADDR, itk_space);
     if (itk_space == 0) {
-        LOG("failed to get itk_space!");
-        return 0;
+        itk_space = ReadKernel64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
+        LOG("itk_space = " ADDR, itk_space);
+        if (itk_space == 0) {
+            LOG("failed to get itk_space!");
+            return 0;
+        }
     }
-    uint64_t is_table = ReadKernel64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
-    LOG("is_table = " ADDR, is_table);
     if (is_table == 0) {
-        LOG("failed to get is_table!");
-        return 0;
+        is_table = ReadKernel64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
+        LOG("is_table = " ADDR, is_table);
+        if (is_table == 0) {
+            LOG("failed to get is_table!");
+            return 0;
+        }
     }
     uint32_t port_index = port >> 8;
     const int sizeof_ipc_entry_t = 0x18;
@@ -157,17 +174,23 @@ uint64_t get_address_of_port(pid_t pid, mach_port_t port)
 
 uint64_t get_kernel_cred_addr()
 {
-    uint64_t kernel_proc_struct_addr = get_proc_struct_for_pid(0);
-    LOG("kernel_proc_struct_addr = " ADDR, kernel_proc_struct_addr);
+    static uint64_t kernel_proc_struct_addr = 0;
+    static uint64_t kernel_ucred_struct_addr = 0;
     if (kernel_proc_struct_addr == 0) {
-        LOG("failed to get kernel_proc_struct_addr!");
-        return 0;
+        kernel_proc_struct_addr = get_proc_struct_for_pid(0);
+        LOG("kernel_proc_struct_addr = " ADDR, kernel_proc_struct_addr);
+        if (kernel_proc_struct_addr == 0) {
+            LOG("failed to get kernel_proc_struct_addr!");
+            return 0;
+        }
     }
-    uint64_t kernel_ucred_struct_addr = ReadKernel64(kernel_proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_UCRED));
-    LOG("kernel_ucred_struct_addr = " ADDR, kernel_ucred_struct_addr);
     if (kernel_ucred_struct_addr == 0) {
-        LOG("failed to get kernel_ucred_struct_addr!");
-        return 0;
+        kernel_ucred_struct_addr = ReadKernel64(kernel_proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_UCRED));
+        LOG("kernel_ucred_struct_addr = " ADDR, kernel_ucred_struct_addr);
+        if (kernel_ucred_struct_addr == 0) {
+            LOG("failed to get kernel_ucred_struct_addr!");
+            return 0;
+        }
     }
     return kernel_ucred_struct_addr;
 }
@@ -184,7 +207,7 @@ uint64_t give_creds_to_process_at_addr(uint64_t proc, uint64_t cred_addr)
     return orig_creds;
 }
 
-void set_platform_binary(uint64_t proc)
+void set_platform_binary(uint64_t proc, bool set)
 {
     uint64_t task_struct_addr = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_TASK));
     LOG("task_struct_addr = " ADDR, task_struct_addr);
@@ -193,6 +216,46 @@ void set_platform_binary(uint64_t proc)
         return;
     }
     uint32_t task_t_flags = ReadKernel32(task_struct_addr + koffset(KSTRUCT_OFFSET_TASK_TFLAGS));
-    task_t_flags |= TF_PLATFORM;
+    if (set) {
+        task_t_flags |= TF_PLATFORM;
+    } else {
+        task_t_flags &= ~(TF_PLATFORM);
+    }
     WriteKernel32(task_struct_addr + koffset(KSTRUCT_OFFSET_TASK_TFLAGS), task_t_flags);
+}
+
+// thx Siguza
+typedef struct {
+    uint64_t prev;
+    uint64_t next;
+    uint64_t start;
+    uint64_t end;
+} kmap_hdr_t;
+
+uint64_t zm_fix_addr(uint64_t addr) {
+    static kmap_hdr_t zm_hdr = {0, 0, 0, 0};
+    if (zm_hdr.start == 0) {
+        // xxx ReadKernel64(0) ?!
+        // uint64_t zone_map_ref = find_zone_map_ref();
+        LOG("zone_map_ref: %llx ", GETOFFSET(zone_map_ref));
+        uint64_t zone_map = ReadKernel64(GETOFFSET(zone_map_ref));
+        LOG("zone_map: %llx ", zone_map);
+        // hdr is at offset 0x10, mutexes at start
+        size_t r = kread(zone_map + 0x10, &zm_hdr, sizeof(zm_hdr));
+        LOG("zm_range: 0x%llx - 0x%llx (read 0x%zx, exp 0x%zx)", zm_hdr.start, zm_hdr.end, r, sizeof(zm_hdr));
+        
+        if (r != sizeof(zm_hdr) || zm_hdr.start == 0 || zm_hdr.end == 0) {
+            LOG("kread of zone_map failed!");
+            exit(EXIT_FAILURE);
+        }
+        
+        if (zm_hdr.end - zm_hdr.start > 0x100000000) {
+            LOG("zone_map is too big, sorry.");
+            exit(EXIT_FAILURE);
+        }
+    }
+    
+    uint64_t zm_tmp = (zm_hdr.start & 0xffffffff00000000) | ((addr) & 0xffffffff);
+    
+    return zm_tmp < zm_hdr.start ? zm_tmp + 0x100000000 : zm_tmp;
 }

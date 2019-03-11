@@ -8,6 +8,9 @@
 #include <iokit.h>
 #include <pthread.h>
 #import <patchfinder64.h>
+#include "parameters.h"
+#include "kc_parameters.h"
+#include "kernel_memory.h"
 
 #if !__arm64e__
 static mach_port_t prepare_user_client()
@@ -43,6 +46,10 @@ static const int fake_kalloc_size = 0x1000;
 void init_kexecute()
 {
 #if __arm64e__
+    parameters_init();
+    kernel_task_port = tfp0;
+    current_task = ReadKernel64(task_self_addr() + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
+    kernel_task = ReadKernel64(GETOFFSET(kernel_task));
     kernel_call_init();
 #else
     user_client = prepare_user_client();
@@ -100,7 +107,8 @@ void term_kexecute()
 uint64_t kexecute(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4, uint64_t x5, uint64_t x6)
 {
 #if __arm64e__
-    return kernel_call_7(addr, x0, x1, x2, x3, x4, x5, x6);
+    
+    return kernel_call_7(addr, 7, x0, x1, x2, x3, x4, x5, x6);
 #else
     pthread_mutex_lock(&kexecute_lock);
 
