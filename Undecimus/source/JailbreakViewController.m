@@ -1317,7 +1317,11 @@ void jailbreak()
                 const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
                 _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
                 _assert(extractDebsForPkg(@"rsync", nil, false), message, true);
+#if __arm64e__
+                _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(trustcache), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
+#else
                 _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
+#endif
                 _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, message, true);
                 unmount(systemSnapshotMountPoint, MNT_FORCE);
             } else {
@@ -1493,7 +1497,11 @@ void jailbreak()
             resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
         }
         resources = [@[@"/usr/libexec/substrated"] arrayByAddingObjectsFromArray:resources];
+#if __arm64e__
+        _assert(injectTrustCache(resources, GETOFFSET(trustcache), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
+#else
         _assert(injectTrustCache(resources, GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
+#endif
         LOG("Successfully injected trust cache.");
         INSERTSTATUS(NSLocalizedString(@"Injected trust cache.\n", nil));
     }
