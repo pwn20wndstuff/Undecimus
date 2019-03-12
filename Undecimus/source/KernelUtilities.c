@@ -259,3 +259,31 @@ uint64_t zm_fix_addr(uint64_t addr) {
     
     return zm_tmp < zm_hdr.start ? zm_tmp + 0x100000000 : zm_tmp;
 }
+
+bool verify_tfp0() {
+    size_t test_size = sizeof(uint64_t);
+    uint64_t test_kptr = kmem_alloc(test_size);
+    if (test_kptr == 0) {
+        LOG("failed to allocate kernel memory!");
+        return false;
+    }
+    uint64_t test_write_data = 0x4141414141414141;
+    if (!wkbuffer(test_kptr, (void *)&test_write_data, test_size)) {
+        LOG("failed to write to kernel memory!");
+        return false;
+    }
+    uint64_t test_read_data = 0;
+    if (!rkbuffer(test_kptr, (void *)&test_read_data, test_size)) {
+        LOG("failed to read kernel memory!");
+        return false;
+    }
+    if (test_write_data != test_read_data) {
+        LOG("failed to verify kernel memory read data!");
+        return false;
+    }
+    if (!kmem_free(test_kptr, test_size)) {
+        LOG("failed to deallocate kernel memory!");
+        return false;
+    }
+    return true;
+}

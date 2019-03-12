@@ -67,4 +67,6 @@ void set_platform_binary(uint64_t proc, bool set);
 
 uint64_t zm_fix_addr(uint64_t addr);
 
+bool verify_tfp0(void);
+
 #endif /* kutils_h */

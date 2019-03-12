@@ -752,6 +752,10 @@ void jailbreak()
         LOG("tfp0: 0x%x", tfp0);
         LOG("kernel_base: " ADDR, kernel_base);
         LOG("kernel_slide: " ADDR, kernel_slide);
+        if (!verify_tfp0()) {
+            LOG("Failed to verify TFP0.");
+            exploit_success = false;
+        }
         if (!exploit_success) {
             NOTICE(NSLocalizedString(@"Failed to exploit kernel_task. This is not an error. Reboot and try again.", nil), true, false);
             exit(EXIT_FAILURE);
