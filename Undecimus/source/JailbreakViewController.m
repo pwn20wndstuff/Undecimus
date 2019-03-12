@@ -323,11 +323,11 @@ void blockDomainWithName(const char *name) {
     hostsFile = [NSString stringWithContentsOfFile:@"/etc/hosts" encoding:NSUTF8StringEncoding error:nil];
     newHostsFile = hostsFile;
     newLine = [NSString stringWithFormat:@"\n127.0.0.1 %s\n", name];
-    if ([hostsFile rangeOfString:newLine].location == NSNotFound) {
+    if (![hostsFile containsString:newLine]) {
         newHostsFile = [newHostsFile stringByAppendingString:newLine];
     }
     newLine = [NSString stringWithFormat:@"\n::1 %s\n", name];
-    if ([hostsFile rangeOfString:newLine].location == NSNotFound) {
+    if (![hostsFile containsString:newLine]) {
         newHostsFile = [newHostsFile stringByAppendingString:newLine];
     }
     if (![newHostsFile isEqual:hostsFile]) {
@@ -343,19 +343,19 @@ void unblockDomainWithName(const char *name) {
     hostsFile = [NSString stringWithContentsOfFile:@"/etc/hosts" encoding:NSUTF8StringEncoding error:nil];
     newHostsFile = hostsFile;
     newLine = [NSString stringWithFormat:@"\n127.0.0.1 %s\n", name];
-    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+    if ([hostsFile containsString:newLine]) {
         newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
     }
     newLine = [NSString stringWithFormat:@"\n0.0.0.0 %s\n", name];
-    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+    if ([hostsFile containsString:newLine]) {
         newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
     }
     newLine = [NSString stringWithFormat:@"\n0.0.0.0    %s\n", name];
-    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+    if ([hostsFile containsString:newLine]) {
         newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
     }
     newLine = [NSString stringWithFormat:@"\n::1 %s\n", name];
-    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+    if ([hostsFile containsString:newLine]) {
         newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
     }
     if (![newHostsFile isEqual:hostsFile]) {
@@ -1583,7 +1583,7 @@ void jailbreak()
         
         // Make sure firmware-sbin package is not corrupted.
         NSString *file = [NSString stringWithContentsOfFile:@"/var/lib/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil];
-        if ([file rangeOfString:@"/sbin/fstyp"].location != NSNotFound || [file rangeOfString:@"\n\n"].location != NSNotFound) {
+        if ([file containsString:@"/sbin/fstyp"] || [file containsString:@"\n\n"]) {
             // This is not a stock file for iOS11+
             file = [file stringByReplacingOccurrencesOfString:@"/sbin/fstyp\n" withString:@""];
             file = [file stringByReplacingOccurrencesOfString:@"\n\n" withString:@"\n"];
