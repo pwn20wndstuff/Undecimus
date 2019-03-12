@@ -77,6 +77,7 @@
     // Override point for customization after application launch.
     [self initPrefs];
     [self initShortcuts];
+    UIApplication.sharedApplication.idleTimerDisabled = TRUE;
     return YES;
 }
 
