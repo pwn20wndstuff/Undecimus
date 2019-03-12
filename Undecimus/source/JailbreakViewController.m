@@ -782,7 +782,10 @@ void jailbreak()
             _assert(lzssdec(5, args) == ERR_SUCCESS, message, true);
             fclose(original_kernel_cache);
         }
-        if (init_kernel(NULL, 0, decompressed_kernel_cache_path) != ERR_SUCCESS) {
+        struct utsname u = { 0 };
+        _assert(uname(&u) == ERR_SUCCESS, message, true);
+        if (init_kernel(NULL, 0, decompressed_kernel_cache_path) != ERR_SUCCESS ||
+            find_strref(u.version, 1, string_base_const, true) == 0) {
             _assert(clean_file(decompressed_kernel_cache_path), message, true);
             _assert(false, message, true);
         }
