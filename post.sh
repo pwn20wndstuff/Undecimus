@@ -1,5 +1,6 @@
 #!/bin/sh
 # Get path for dpkg
+set -e
 if [ -f ~/.profile ]; then
     . ~/.profile
 fi
