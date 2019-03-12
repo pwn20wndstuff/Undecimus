@@ -1,4 +1,4 @@
-# unc0ver
+# unc0ver [![Build Status](https://travis-ci.org/ethanpepro/Undecimus.svg?branch=travis)](https://travis-ci.org/ethanpepro/Undecimus)
 ### The most advanced jailbreak tool
 ![unc0ver logo](https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Undecimus/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png?token=AlyO4xDujoguob2DCFfUbNI8jO82OyCgks5bx5ZPwA%3D%3D)
 
