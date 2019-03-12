@@ -15,8 +15,8 @@ branches:
   - travis
 
 before_install:
+  - ssh-keyscan github.com >> ~/.ssh/known_hosts
   - git submodule update --init
   - brew install dpkg ldid
-  - ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 script: make
