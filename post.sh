@@ -1,9 +1,13 @@
 #!/bin/sh
 # Get path for dpkg
-set -e
 if [ -f ~/.profile ]; then
     . ~/.profile
 fi
+
+# 'set -e' has to be included after (and not before!) .profile's logic or else this happens:
+# /Users/travis/.travis/functions: line 221: syntax error near unexpected token `<'
+# /Users/travis/.travis/functions: line 221: `  done < <('
+set -e
 
 echo Using Source Root: ${SOURCE_ROOT}
 
