@@ -5,7 +5,7 @@ if [ -f ~/.profile ]; then
     . ~/.profile
 fi
 
-echo ${SOURCE_ROOT}
+echo Using Source Root: ${SOURCE_ROOT}
 
 if [[ "${CODE_SIGNING_REQUIRED}" == "NO" ]]; then
   if which -s gtar; then
@@ -15,7 +15,7 @@ if [[ "${CODE_SIGNING_REQUIRED}" == "NO" ]]; then
   else
     TAR=tar
   fi
-  echo ${TAR}
+  echo Using tar: ${TAR}
   LISTSRC="${SOURCE_ROOT}/Undecimus/resources/lists.tar.lzma"
   pushd "${TEMP_DIR}"
   rm -rf lists
