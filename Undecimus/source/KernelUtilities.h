@@ -69,4 +69,6 @@ uint64_t zm_fix_addr(uint64_t addr);
 
 bool verify_tfp0(void);
 
+int _pmap_load_trust_cache(uint64_t kernel_trust);
+
 #endif /* kutils_h */

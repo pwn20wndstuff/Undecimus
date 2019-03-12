@@ -11,6 +11,7 @@
 #include "KernelStructureOffsets.h"
 #include "KernelUtilities.h"
 #include "find_port.h"
+#include "KernelExecution.h"
 
 #define TF_PLATFORM 0x00000400 /* task is a platform binary */
 
@@ -286,4 +287,8 @@ bool verify_tfp0() {
         return false;
     }
     return true;
+}
+
+int _pmap_load_trust_cache(uint64_t kernel_trust) {
+    return (int)kexecute(GETOFFSET(pmap_load_trust_cache), kernel_trust, 0, 0, 0, 0, 0, 0);
 }
