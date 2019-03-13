@@ -831,6 +831,7 @@ void jailbreak()
         }
         if (auth_ptrs) {
             PF(pmap_load_trust_cache);
+            PF(pmap_loaded_trust_caches);
             PF(paciza_pointer__l2tp_domain_module_start);
             PF(paciza_pointer__l2tp_domain_module_stop);
             PF(l2tp_domain_inited);
@@ -1324,7 +1325,7 @@ void jailbreak()
                 _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
                 _assert(extractDebsForPkg(@"rsync", nil, false), message, true);
 #if __arm64e__
-                _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(trustcache), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
+                _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(pmap_loaded_trust_caches), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
 #else
                 _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
 #endif
@@ -1504,7 +1505,7 @@ void jailbreak()
         }
         resources = [@[@"/usr/libexec/substrated"] arrayByAddingObjectsFromArray:resources];
 #if __arm64e__
-        _assert(injectTrustCache(resources, GETOFFSET(trustcache), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
+        _assert(injectTrustCache(resources, GETOFFSET(pmap_loaded_trust_caches), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
 #else
         _assert(injectTrustCache(resources, GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
 #endif

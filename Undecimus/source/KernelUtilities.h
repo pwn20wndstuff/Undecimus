@@ -40,6 +40,7 @@ typedef struct {
     kptr_t kernel_forge_pacda_gadget;
     kptr_t IOUserClient__vtable;
     kptr_t IORegistryEntry__getRegistryEntryID;
+    kptr_t pmap_loaded_trust_caches;
 } offsets_t;
 
 extern offsets_t offs;
