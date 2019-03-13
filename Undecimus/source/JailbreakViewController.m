@@ -781,7 +781,7 @@ void jailbreak()
         struct utsname u = { 0 };
         _assert(uname(&u) == ERR_SUCCESS, message, true);
         if (init_kernel(NULL, 0, decompressed_kernel_cache_path) != ERR_SUCCESS ||
-            find_strref(u.version, 1, string_base_const, true) == 0) {
+            find_strref(u.version, 1, string_base_const, true, false) == 0) {
             _assert(clean_file(decompressed_kernel_cache_path), message, true);
             _assert(false, message, true);
         }
@@ -830,6 +830,7 @@ void jailbreak()
             PF(apfs_jhash_getvnode);
         }
         if (auth_ptrs) {
+            PF(pmap_load_trust_cache);
             PF(paciza_pointer__l2tp_domain_module_start);
             PF(paciza_pointer__l2tp_domain_module_stop);
             PF(l2tp_domain_inited);
