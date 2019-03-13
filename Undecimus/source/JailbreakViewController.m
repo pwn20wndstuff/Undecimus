@@ -1253,14 +1253,14 @@ void jailbreak()
     UPSTAGE();
     
     {
-        if (prefs.disable_app_revokes) {
+        NSArray <NSString *> *array = @[@"/var/Keychains/ocspcache.sqlite3",
+                                        @"/var/Keychains/ocspcache.sqlite3-shm",
+                                        @"/var/Keychains/ocspcache.sqlite3-wal"];
+        if (prefs.disable_app_revokes && kCFCoreFoundationVersionNumber < 1535.12) {
             // Disable app revokes.
             LOG("Disabling app revokes...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable app revokes.", nil));
             blockDomainWithName("ocsp.apple.com");
-            NSArray <NSString *> *array = @[@"/var/Keychains/ocspcache.sqlite3",
-                                            @"/var/Keychains/ocspcache.sqlite3-shm",
-                                            @"/var/Keychains/ocspcache.sqlite3-wal"];
             for (NSString *path in array) {
                 ensure_symlink("/dev/null", path.UTF8String);
             }
@@ -1271,6 +1271,11 @@ void jailbreak()
             LOG("Enabling app revokes...");
             SETMESSAGE(NSLocalizedString(@"Failed to enable app revokes.", nil));
             unblockDomainWithName("ocsp.apple.com");
+            for (NSString *path in array) {
+                if (is_symlink(path.UTF8String)) {
+                    clean_file(path.UTF8String);
+                }
+            }
             LOG("Successfully enabled app revokes.");
             INSERTSTATUS(NSLocalizedString(@"Enabled App Revokes.\n", nil));
         }
@@ -2075,13 +2080,14 @@ void jailbreak()
             SETMESSAGE(NSLocalizedString(@"Failed to load tweaks.", nil));
             if (prefs.reload_system_daemons) {
                 rv = system("nohup bash -c \""
+                             "sleep 1 ;"
                              "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
-                             "sleep 2 && "
                              "ldrestart ;"
                              "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
                              "\" >/dev/null 2>&1 &");
             } else {
                 rv = system("nohup bash -c \""
+                             "sleep 1 ;"
                              "launchctl stop com.apple.mDNSResponder ;"
                              "launchctl stop com.apple.backboardd"
                              "\" >/dev/null 2>&1 &");
