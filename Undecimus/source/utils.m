@@ -1042,9 +1042,6 @@ bool supportsExploit(exploit_t exploit) {
             break;
         }
         case mach_swap_2_exploit: {
-            if (machineNameContains("iPhone11,") || machineNameContains("iPad8,")) {
-                return false;
-            }
             break;
         }
         case deja_xnu_exploit: {

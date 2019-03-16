@@ -234,7 +234,7 @@ static void trigger_gc_please()
 {
     // size = 100 * 16,384 * 256 = 419,430,400 = ~420mb (max)
 
-    const int gc_ports_cnt = 100;
+    const int gc_ports_cnt = 500;
     int gc_ports_max = gc_ports_cnt;
     mach_port_t gc_ports[gc_ports_cnt] = { 0 };
     
