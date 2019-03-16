@@ -814,7 +814,8 @@ void jailbreak()
         LOG("Finding offsets...");
 #define PF(x) do { \
         SETMESSAGE(NSLocalizedString(@"Failed to find " #x " offset.", nil)); \
-        SETOFFSET(x, find_ ##x()); \
+        SETOFFSET(x, find_symbol("_" #x)); \
+        if (GETOFFSET(x) == 0) SETOFFSET(x, find_ ##x()); \
         LOG(#x " = " ADDR " + " ADDR, GETOFFSET(x), kernel_slide); \
         _assert(ISADDR(GETOFFSET(x)), message, true); \
         SETOFFSET(x, GETOFFSET(x) + kernel_slide); \
