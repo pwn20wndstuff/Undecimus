@@ -43,7 +43,7 @@ void injectDir(NSString *dir) {
 #if __arm64e__
         injectTrustCache(toInject, GETOFFSET(pmap_loaded_trust_caches), _pmap_load_trust_cache);
 #else
-        injectTrustCache(toInject, GETOFFSET(trustcache));
+        injectTrustCache(toInject, GETOFFSET(trustcache), _pmap_load_trust_cache);
 #endif
     }
 }
@@ -268,7 +268,7 @@ bool extractDeb(NSString *debPath) {
 #if __arm64e__
             injectTrustCache(toInject, GETOFFSET(pmap_loaded_trust_caches), _pmap_load_trust_cache);
 #else
-            injectTrustCache(toInject, GETOFFSET(trustcache));
+            injectTrustCache(toInject, GETOFFSET(trustcache), _pmap_load_trust_cache);
 #endif
         }
     }

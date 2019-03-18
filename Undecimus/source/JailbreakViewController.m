@@ -842,8 +842,8 @@ void jailbreak()
             PF(fs_lookup_snapshot_metadata_by_name_and_return_name);
             PF(apfs_jhash_getvnode);
         }
+        PF(pmap_load_trust_cache);
         if (auth_ptrs) {
-            PF(pmap_load_trust_cache);
             PF(pmap_loaded_trust_caches);
             PF(paciza_pointer__l2tp_domain_module_start);
             PF(paciza_pointer__l2tp_domain_module_stop);
@@ -1340,7 +1340,7 @@ void jailbreak()
 #if __arm64e__
                 _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(pmap_loaded_trust_caches), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
 #else
-                _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
+                _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(trustcache), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
 #endif
                 _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, message, true);
                 unmount(systemSnapshotMountPoint, MNT_FORCE);
@@ -1520,7 +1520,7 @@ void jailbreak()
 #if __arm64e__
         _assert(injectTrustCache(resources, GETOFFSET(pmap_loaded_trust_caches), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
 #else
-        _assert(injectTrustCache(resources, GETOFFSET(trustcache)) == ERR_SUCCESS, message, true);
+        _assert(injectTrustCache(resources, GETOFFSET(trustcache), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
 #endif
         LOG("Successfully injected trust cache.");
         INSERTSTATUS(NSLocalizedString(@"Injected trust cache.\n", nil));
