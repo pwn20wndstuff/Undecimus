@@ -24,9 +24,6 @@ typedef struct {
     kptr_t apfs_jhash_getvnode;
     kptr_t vnode_get_snapshot;
     kptr_t fs_lookup_snapshot_metadata_by_name_and_return_name;
-    kptr_t extension_create_file;
-    kptr_t extension_add;
-    kptr_t extension_release;
     kptr_t pmap_load_trust_cache;
     kptr_t paciza_pointer__l2tp_domain_module_start;
     kptr_t paciza_pointer__l2tp_domain_module_stop;
@@ -46,6 +43,7 @@ typedef struct {
 extern offsets_t offs;
 extern uint64_t kernel_base;
 extern uint64_t kernel_slide;
+extern uint64_t trust_chain;
 
 extern uint64_t cached_task_self_addr;
 extern bool found_offsets;

@@ -40,11 +40,7 @@ void injectDir(NSString *dir) {
     }
     LOG("Injecting %lu files for %@", (unsigned long)toInject.count, dir);
     if (toInject.count > 0) {
-#if __arm64e__
-        injectTrustCache(toInject, GETOFFSET(pmap_loaded_trust_caches), _pmap_load_trust_cache);
-#else
-        injectTrustCache(toInject, GETOFFSET(trustcache), _pmap_load_trust_cache);
-#endif
+        injectTrustCache(toInject, trust_chain, _pmap_load_trust_cache);
     }
 }
 
@@ -265,11 +261,7 @@ bool extractDeb(NSString *debPath) {
         }
         LOG("Injecting %lu files for %@", (unsigned long)toInject.count, debPath);
         if (toInject.count > 0) {
-#if __arm64e__
-            injectTrustCache(toInject, GETOFFSET(pmap_loaded_trust_caches), _pmap_load_trust_cache);
-#else
-            injectTrustCache(toInject, GETOFFSET(trustcache), _pmap_load_trust_cache);
-#endif
+            injectTrustCache(toInject, trust_chain, _pmap_load_trust_cache);
         }
     }
     return result;

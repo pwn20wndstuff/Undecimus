@@ -17,6 +17,7 @@
 
 uint64_t the_realhost;
 uint64_t kernel_base;
+uint64_t trust_chain;
 offsets_t offs;
 bool found_offsets = false;
 

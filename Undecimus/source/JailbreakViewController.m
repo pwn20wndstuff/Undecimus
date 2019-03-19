@@ -858,6 +858,11 @@ void jailbreak()
             PF(IOUserClient__vtable);
             PF(IORegistryEntry__getRegistryEntryID);
         }
+        if (auth_ptrs) {
+            trust_chain = GETOFFSET(pmap_loaded_trust_caches);
+        } else {
+            trust_chain = GETOFFSET(trustcache);
+        }
 #undef PF
         found_offsets = true;
         LOG("Successfully found offsets.");
@@ -1337,11 +1342,7 @@ void jailbreak()
                 const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
                 _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
                 _assert(extractDebsForPkg(@"rsync", nil, false), message, true);
-#if __arm64e__
-                _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(pmap_loaded_trust_caches), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
-#else
-                _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(trustcache), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
-#endif
+                _assert(injectTrustCache(@[@"/usr/bin/rsync"], trust_chain, _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
                 _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, message, true);
                 unmount(systemSnapshotMountPoint, MNT_FORCE);
             } else {
@@ -1517,11 +1518,7 @@ void jailbreak()
             resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
         }
         resources = [@[@"/usr/libexec/substrated"] arrayByAddingObjectsFromArray:resources];
-#if __arm64e__
-        _assert(injectTrustCache(resources, GETOFFSET(pmap_loaded_trust_caches), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
-#else
-        _assert(injectTrustCache(resources, GETOFFSET(trustcache), _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
-#endif
+        _assert(injectTrustCache(resources, trust_chain, _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
         INSERTSTATUS(NSLocalizedString(@"Injected trust cache.\n", nil));
     }
@@ -1531,49 +1528,54 @@ void jailbreak()
     {
         NSString *offsetsFile = @"/jb/offsets.plist";
         NSMutableDictionary *dictionary = [NSMutableDictionary new];
-        dictionary[@"KernelBase"] = ADDRSTRING(kernel_base);
-        dictionary[@"KernelSlide"] = ADDRSTRING(kernel_slide);
-        dictionary[@"TrustChain"] = ADDRSTRING(GETOFFSET(trustcache));
-        dictionary[@"OSBooleanTrue"] = ADDRSTRING(ReadKernel64(GETOFFSET(OSBoolean_True)));
-        dictionary[@"OSBooleanFalse"] = ADDRSTRING(ReadKernel64(GETOFFSET(OSBoolean_True)) + 0x8);
-        dictionary[@"OSUnserializeXML"] = ADDRSTRING(GETOFFSET(osunserializexml));
-        dictionary[@"Smalloc"] = ADDRSTRING(GETOFFSET(smalloc));
-        dictionary[@"AddRetGadget"] = ADDRSTRING(GETOFFSET(add_x0_x0_0x40_ret));
-        dictionary[@"ZoneMapOffset"] = ADDRSTRING(GETOFFSET(zone_map_ref));
-        dictionary[@"VfsContextCurrent"] = ADDRSTRING(GETOFFSET(vfs_context_current));
-        dictionary[@"VnodeLookup"] = ADDRSTRING(GETOFFSET(vnode_lookup));
-        dictionary[@"VnodePut"] = ADDRSTRING(GETOFFSET(vnode_put));
-        dictionary[@"KernelTask"] = ADDRSTRING(GETOFFSET(kernel_task));
-        dictionary[@"Shenanigans"] = ADDRSTRING(GETOFFSET(shenanigans));
-        dictionary[@"LckMtxLock"] = ADDRSTRING(GETOFFSET(lck_mtx_lock));
-        dictionary[@"LckMtxUnlock"] = ADDRSTRING(GETOFFSET(lck_mtx_unlock));
-        dictionary[@"VnodeGetSnapshot"] = ADDRSTRING(GETOFFSET(vnode_get_snapshot));
-        dictionary[@"FsLookupSnapshotMetadataByNameAndReturnName"] = ADDRSTRING(GETOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name));
-        dictionary[@"APFSJhashGetVnode"] = ADDRSTRING(GETOFFSET(apfs_jhash_getvnode));
-        dictionary[@"PacizaPointerL2TPDomainModuleStart"] = ADDRSTRING(GETOFFSET(paciza_pointer__l2tp_domain_module_start));
-        dictionary[@"PacizaPointerL2TPDomainModuleStop"] = ADDRSTRING(GETOFFSET(paciza_pointer__l2tp_domain_module_stop));
-        dictionary[@"L2TPDomainInited"] = ADDRSTRING(GETOFFSET(l2tp_domain_inited));
-        dictionary[@"SysctlNetPPPL2TP"] = ADDRSTRING(GETOFFSET(sysctl__net_ppp_l2tp));
-        dictionary[@"SysctlUnregisterOid"] = ADDRSTRING(GETOFFSET(sysctl_unregister_oid));
-        dictionary[@"MovX0X4BrX5"] = ADDRSTRING(GETOFFSET(mov_x0_x4__br_x5));
-        dictionary[@"MovX9X0BrX1"] = ADDRSTRING(GETOFFSET(mov_x9_x0__br_x1));
-        dictionary[@"MovX10X3BrX6"] = ADDRSTRING(GETOFFSET(mov_x10_x3__br_x6));
-        dictionary[@"KernelForgePaciaGadget"] = ADDRSTRING(GETOFFSET(kernel_forge_pacia_gadget));
-        dictionary[@"KernelForgePacdaGadget"] = ADDRSTRING(GETOFFSET(kernel_forge_pacda_gadget));
-        dictionary[@"IOUserClientVtable"] = ADDRSTRING(GETOFFSET(IOUserClient__vtable));
-        dictionary[@"IORegistryEntryGetRegistryEntryID"] = ADDRSTRING(GETOFFSET(IORegistryEntry__getRegistryEntryID));
-        dictionary[@"PmapLoadTrustCache"] = ADDRSTRING(GETOFFSET(pmap_load_trust_cache));
-        dictionary[@"PmapLoadedTrustCaches"] = ADDRSTRING(GETOFFSET(pmap_loaded_trust_caches));
-        
+#define CACHEADDR(value, name) do { \
+    dictionary[@(name)] = ADDRSTRING(value); \
+} while (false)
+#define CACHEOFFSET(offset, name) CACHEADDR(GETOFFSET(offset), name)
+        CACHEADDR(kernel_base, "KernelBase");
+        CACHEADDR(kernel_slide, "KernelSlide");
+        CACHEOFFSET(trustcache, "TrustChain");
+        CACHEADDR(ReadKernel64(GETOFFSET(OSBoolean_True)), "OSBooleanTrue");
+        CACHEADDR(ReadKernel64(GETOFFSET(OSBoolean_True)) + 0x8, "OSBooleanFalse");
+        CACHEOFFSET(osunserializexml, "OSUnserializeXML");
+        CACHEOFFSET(smalloc, "Smalloc");
+        CACHEOFFSET(add_x0_x0_0x40_ret, "AddRetGadget");
+        CACHEOFFSET(zone_map_ref, "ZoneMapOffset");
+        CACHEOFFSET(vfs_context_current, "VfsContextCurrent");
+        CACHEOFFSET(vnode_lookup, "VnodeLookup");
+        CACHEOFFSET(vnode_put, "VnodePut");
+        CACHEOFFSET(kernel_task, "KernelTask");
+        CACHEOFFSET(shenanigans, "Shenanigans");
+        CACHEOFFSET(lck_mtx_lock, "LckMtxLock");
+        CACHEOFFSET(lck_mtx_unlock, "LckMtxUnlock");
+        CACHEOFFSET(vnode_get_snapshot, "VnodeGetSnapshot");
+        CACHEOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name, "FsLookupSnapshotMetadataByNameAndReturnName");
+        CACHEOFFSET(pmap_load_trust_cache, "PmapLoadTrustCache");
+        CACHEOFFSET(apfs_jhash_getvnode, "APFSJhashGetVnode");
+        CACHEOFFSET(paciza_pointer__l2tp_domain_module_start, "PacizaPointerL2TPDomainModuleStart");
+        CACHEOFFSET(paciza_pointer__l2tp_domain_module_stop, "PacizaPointerL2TPDomainModuleStop");
+        CACHEOFFSET(l2tp_domain_inited, "L2TPDomainInited");
+        CACHEOFFSET(sysctl__net_ppp_l2tp, "SysctlNetPPPL2TP");
+        CACHEOFFSET(sysctl_unregister_oid, "SysctlUnregisterOid");
+        CACHEOFFSET(mov_x0_x4__br_x5, "MovX0X4BrX5");
+        CACHEOFFSET(mov_x9_x0__br_x1, "MovX9X0BrX1");
+        CACHEOFFSET(mov_x10_x3__br_x6, "MovX10X3BrX6");
+        CACHEOFFSET(kernel_forge_pacia_gadget, "KernelForgePaciaGadget");
+        CACHEOFFSET(kernel_forge_pacda_gadget, "KernelForgePacdaGadget");
+        CACHEOFFSET(IOUserClient__vtable, "IOUserClientVtable");
+        CACHEOFFSET(IORegistryEntry__getRegistryEntryID, "IORegistryEntryGetRegistryEntryID");
+        CACHEOFFSET(pmap_loaded_trust_caches, "PmapLoadedTrustCaches");
+#undef CACHEOFFSET
+#undef CACHEADDR
         if (![[NSMutableDictionary dictionaryWithContentsOfFile:offsetsFile] isEqual:dictionary]) {
-            // Log offsets.
+            // Cache offsets.
             
-            LOG("Logging offsets...");
-            SETMESSAGE(NSLocalizedString(@"Failed to log offsets.", nil));
+            LOG("Caching offsets...");
+            SETMESSAGE(NSLocalizedString(@"Failed to cache offsets.", nil));
             _assert(([dictionary writeToFile:offsetsFile atomically:YES]), message, true);
             _assert(init_file(offsetsFile.UTF8String, 0, 0644), message, true);
-            LOG("Successfully logged offsets.");
-            INSERTSTATUS(NSLocalizedString(@"Logged Offsets.\n", nil));
+            LOG("Successfully cached offsets.");
+            INSERTSTATUS(NSLocalizedString(@"Cached Offsets.\n", nil));
         }
     }
     
