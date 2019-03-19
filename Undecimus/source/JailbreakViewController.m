@@ -1562,6 +1562,8 @@ void jailbreak()
         dictionary[@"KernelForgePacdaGadget"] = ADDRSTRING(GETOFFSET(kernel_forge_pacda_gadget));
         dictionary[@"IOUserClientVtable"] = ADDRSTRING(GETOFFSET(IOUserClient__vtable));
         dictionary[@"IORegistryEntryGetRegistryEntryID"] = ADDRSTRING(GETOFFSET(IORegistryEntry__getRegistryEntryID));
+        dictionary[@"PmapLoadTrustCache"] = ADDRSTRING(GETOFFSET(pmap_load_trust_cache));
+        dictionary[@"PmapLoadedTrustCaches"] = ADDRSTRING(GETOFFSET(pmap_loaded_trust_caches));
         
         if (![[NSMutableDictionary dictionaryWithContentsOfFile:offsetsFile] isEqual:dictionary]) {
             // Log offsets.
