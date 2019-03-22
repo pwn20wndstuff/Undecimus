@@ -820,9 +820,7 @@ void jailbreak()
         _assert(ISADDR(GETOFFSET(x)), message, true); \
         SETOFFSET(x, GETOFFSET(x) + kernel_slide); \
 } while (false)
-        if (!auth_ptrs) {
-            PF(trustcache);
-        }
+        PF(trustcache);
         PF(OSBoolean_True);
         PF(osunserializexml);
         PF(smalloc);
@@ -843,8 +841,10 @@ void jailbreak()
             PF(apfs_jhash_getvnode);
         }
         PF(pmap_load_trust_cache);
+        if (GETOFFSET(pmap_load_trust_cache)) {
+            pmap_load_trust_cache = _pmap_load_trust_cache;
+        }
         if (auth_ptrs) {
-            PF(pmap_loaded_trust_caches);
             PF(paciza_pointer__l2tp_domain_module_start);
             PF(paciza_pointer__l2tp_domain_module_stop);
             PF(l2tp_domain_inited);
@@ -857,11 +857,6 @@ void jailbreak()
             PF(kernel_forge_pacda_gadget);
             PF(IOUserClient__vtable);
             PF(IORegistryEntry__getRegistryEntryID);
-        }
-        if (auth_ptrs) {
-            trust_chain = GETOFFSET(pmap_loaded_trust_caches);
-        } else {
-            trust_chain = GETOFFSET(trustcache);
         }
 #undef PF
         found_offsets = true;
@@ -1354,7 +1349,6 @@ void jailbreak()
         CACHEOFFSET(kernel_forge_pacda_gadget, "KernelForgePacdaGadget");
         CACHEOFFSET(IOUserClient__vtable, "IOUserClientVtable");
         CACHEOFFSET(IORegistryEntry__getRegistryEntryID, "IORegistryEntryGetRegistryEntryID");
-        CACHEOFFSET(pmap_loaded_trust_caches, "PmapLoadedTrustCaches");
 #undef CACHEOFFSET
 #undef CACHEADDR
         if (![[NSMutableDictionary dictionaryWithContentsOfFile:offsetsFile] isEqual:dictionary]) {
@@ -1398,7 +1392,7 @@ void jailbreak()
                 const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
                 _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, message, true);
                 _assert(extractDebsForPkg(@"rsync", nil, false), message, true);
-                _assert(injectTrustCache(@[@"/usr/bin/rsync"], trust_chain, _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
+                _assert(injectTrustCache(@[@"/usr/bin/rsync"], GETOFFSET(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, message, true);
                 _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, message, true);
                 unmount(systemSnapshotMountPoint, MNT_FORCE);
             } else {
@@ -1574,7 +1568,7 @@ void jailbreak()
             resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
         }
         resources = [@[@"/usr/libexec/substrated"] arrayByAddingObjectsFromArray:resources];
-        _assert(injectTrustCache(resources, trust_chain, _pmap_load_trust_cache) == ERR_SUCCESS, message, true);
+        _assert(injectTrustCache(resources, GETOFFSET(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, message, true);
         LOG("Successfully injected trust cache.");
         INSERTSTATUS(NSLocalizedString(@"Injected trust cache.\n", nil));
     }

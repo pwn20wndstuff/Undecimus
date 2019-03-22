@@ -37,13 +37,11 @@ typedef struct {
     kptr_t kernel_forge_pacda_gadget;
     kptr_t IOUserClient__vtable;
     kptr_t IORegistryEntry__getRegistryEntryID;
-    kptr_t pmap_loaded_trust_caches;
 } offsets_t;
 
 extern offsets_t offs;
 extern uint64_t kernel_base;
 extern uint64_t kernel_slide;
-extern uint64_t trust_chain;
 
 extern uint64_t cached_task_self_addr;
 extern bool found_offsets;
@@ -68,6 +66,7 @@ uint64_t zm_fix_addr(uint64_t addr);
 
 bool verify_tfp0(void);
 
+extern int (*pmap_load_trust_cache)(uint64_t kernel_trust, size_t length);
 int _pmap_load_trust_cache(uint64_t kernel_trust, size_t length);
 
 #endif /* kutils_h */

@@ -17,7 +17,6 @@
 
 uint64_t the_realhost;
 uint64_t kernel_base;
-uint64_t trust_chain;
 offsets_t offs;
 bool found_offsets = false;
 
@@ -290,6 +289,7 @@ bool verify_tfp0() {
     return true;
 }
 
+int (*pmap_load_trust_cache)(uint64_t kernel_trust, size_t length) = NULL;
 int _pmap_load_trust_cache(uint64_t kernel_trust, size_t length) {
     return (int)kexecute(GETOFFSET(pmap_load_trust_cache), kernel_trust, length, 0, 0, 0, 0, 0);
 }
