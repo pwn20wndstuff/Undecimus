@@ -1939,7 +1939,7 @@ void exploit()
     LOG("unc0ver Version: %@", appVersion());
     LOG("Bundled Resources Version: %@", bundledResources);
     if (jailbreakEnabled()) {
-        STATUS(NSLocalizedString(@"Re-Jailbreak", nil), true, true);
+        STATUS(NSLocalizedString(@"Re-Jailbreak with selected Exploit", nil), true, true);
     } else if (!jailbreakSupported()) {
         STATUS(NSLocalizedString(@"Unsupported", nil), false, true);
     }
