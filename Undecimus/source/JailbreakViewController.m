@@ -636,6 +636,7 @@ void jailbreak()
     NSMutableArray *debsToInstall = [NSMutableArray new];
     NSMutableString *status = [NSMutableString string];
     bool betaFirmware = false;
+    bool sshOnly = false;
 #define INSERTSTATUS(x) do { \
     [status appendString:[[NSString alloc] initWithFormat:x]]; \
 } while (false)
@@ -799,6 +800,9 @@ void jailbreak()
         }
         if (auth_ptrs) {
             LOG("Detected authentication pointers.");
+#if CAN_HAS_EXPERIMENTS
+            sshOnly = true;
+#endif
         }
         if (monolithic_kernel) {
             LOG("Detected monolithic kernel.");
@@ -1455,7 +1459,96 @@ void jailbreak()
         }
     }
     
-    if (auth_ptrs) {
+    UPSTAGE();
+    
+    {
+        // Allow SpringBoard to show non-default system apps.
+        
+        LOG("Allowing SpringBoard to show non-default system apps...");
+        SETMESSAGE(NSLocalizedString(@"Failed to allow SpringBoard to show non-default system apps.", nil));
+        _assert(modifyPlist(@"/var/mobile/Library/Preferences/com.apple.springboard.plist", ^(id plist) {
+            plist[@"SBShowNonDefaultSystemApps"] = @YES;
+        }), message, true);
+        LOG("Successfully allowed SpringBoard to show non-default system apps.");
+        INSERTSTATUS(NSLocalizedString(@"Allowed SpringBoard to show non-default system apps.\n", nil));
+    }
+    
+    UPSTAGE();
+    
+    if (sshOnly) {
+        LOG("Enabling SSH...");
+        SETMESSAGE(NSLocalizedString(@"Failed to enable SSH.", nil));
+        NSMutableArray *toInject = [NSMutableArray new];
+        if (!verifySums(pathForResource(@"binpack64-256.md5sums"), HASHTYPE_MD5)) {
+            ArchiveFile *binpack64 = [ArchiveFile archiveWithFile:pathForResource(@"binpack64-256.tar.lzma")];
+            _assert(binpack64 != nil, message, true);
+            _assert([binpack64 extractToPath:@"/jb"], message, true);
+            for (NSString *file in binpack64.files.allKeys) {
+                if (cdhashFor(file) != nil) {
+                    [toInject addObject:file];
+                }
+            }
+        }
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtURL:[NSURL URLWithString:@"/jb"] includingPropertiesForKeys:@[NSURLIsDirectoryKey] options:0 errorHandler:nil];
+        _assert(directoryEnumerator != nil, message, true);
+        for (NSURL *URL in directoryEnumerator) {
+            NSString *path = [URL path];
+            if (cdhashFor(path) != nil) {
+                [toInject addObject:path];
+            }
+        }
+        if (toInject.count > 0) {
+            _assert(injectTrustCache(toInject, GETOFFSET(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, message, true);
+        }
+        _assert(ensure_symlink("/jb/usr/bin/scp", "/usr/bin/scp"), message, true);
+        _assert(ensure_directory("/usr/local/lib", 0, 0755), message, true);
+        _assert(ensure_directory("/usr/local/lib/zsh", 0, 0755), message, true);
+        _assert(ensure_directory("/usr/local/lib/zsh/5.0.8", 0, 0755), message, true);
+        _assert(ensure_symlink("/jb/usr/local/lib/zsh/5.0.8/zsh", "/usr/local/lib/zsh/5.0.8/zsh"), message, true);
+        _assert(ensure_symlink("/jb/bin/zsh", "/bin/zsh"), message, true);
+        _assert(ensure_symlink("/jb/etc/zshrc", "/etc/zshrc"), message, true);
+        _assert(ensure_symlink("/jb/usr/share/terminfo", "/usr/share/terminfo"), message, true);
+        _assert(ensure_symlink("/jb/usr/local/bin", "/usr/local/bin"), message, true);
+        _assert(ensure_symlink("/jb/etc/profile", "/etc/profile"), message, true);
+        _assert(ensure_directory("/etc/dropbear", 0, 0755), message, true);
+        _assert(ensure_directory("/jb/Library", 0, 0755), message, true);
+        _assert(ensure_directory("/jb/Library/LaunchDaemons", 0, 0755), message, true);
+        _assert(ensure_directory("/jb/etc/rc.d", 0, 0755), message, true);
+        if (access("/jb/Library/LaunchDaemons/dropbear.plist", F_OK) != ERR_SUCCESS) {
+            NSMutableDictionary *dropbear_plist = [NSMutableDictionary new];
+            _assert(dropbear_plist, message, true);
+            dropbear_plist[@"Program"] = @"/jb/usr/local/bin/dropbear";
+            dropbear_plist[@"RunAtLoad"] = @YES;
+            dropbear_plist[@"Label"] = @"ShaiHulud";
+            dropbear_plist[@"KeepAlive"] = @YES;
+            dropbear_plist[@"ProgramArguments"] = [NSMutableArray new];
+            dropbear_plist[@"ProgramArguments"][0] = @"/usr/local/bin/dropbear";
+            dropbear_plist[@"ProgramArguments"][1] = @"-F";
+            dropbear_plist[@"ProgramArguments"][2] = @"-R";
+            dropbear_plist[@"ProgramArguments"][3] = @"--shell";
+            dropbear_plist[@"ProgramArguments"][4] = @"/jb/bin/bash";
+            dropbear_plist[@"ProgramArguments"][5] = @"-p";
+            dropbear_plist[@"ProgramArguments"][6] = @"22";
+            _assert([dropbear_plist writeToFile:@"/jb/Library/LaunchDaemons/dropbear.plist" atomically:YES], message, true);
+            _assert(init_file("/jb/Library/LaunchDaemons/dropbear.plist", 0, 0644), message, true);
+        }
+        for (NSString *file in [fileManager contentsOfDirectoryAtPath:@"/jb/Library/LaunchDaemons" error:nil]) {
+            NSString *path = [@"/jb/Library/LaunchDaemons" stringByAppendingPathComponent:file];
+            runCommand("/jb/bin/launchctl", "load", path.UTF8String, NULL);
+        }
+        for (NSString *file in [fileManager contentsOfDirectoryAtPath:@"/jb/etc/rc.d" error:nil]) {
+            NSString *path = [@"/jb/etc/rc.d" stringByAppendingPathComponent:file];
+            if ([fileManager isExecutableFileAtPath:path]) {
+                runCommand("/jb/bin/bash", "-c", path.UTF8String, NULL);
+            }
+        }
+        _assert(runCommand("/jb/bin/launchctl", "stop", "com.apple.cfprefsd.xpc.daemon", NULL) == ERR_SUCCESS, message, true);
+        LOG("Successfully enabled SSH.");
+        SETMESSAGE(NSLocalizedString(@"Enabled SSH.\n", nil));
+    }
+    
+    if (auth_ptrs || sshOnly) {
         goto out;
     }
     
@@ -1801,20 +1894,6 @@ void jailbreak()
         _assert(ensure_file("/.cydia_no_stash", 0, 0644), message, true);
         LOG("Successfully disabled stashing.");
         INSERTSTATUS(NSLocalizedString(@"Disabled Stashing.\n", nil));
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Allow SpringBoard to show non-default system apps.
-        
-        LOG("Allowing SpringBoard to show non-default system apps...");
-        SETMESSAGE(NSLocalizedString(@"Failed to allow SpringBoard to show non-default system apps.", nil));
-        _assert(modifyPlist(@"/var/mobile/Library/Preferences/com.apple.springboard.plist", ^(id plist) {
-            plist[@"SBShowNonDefaultSystemApps"] = @YES;
-        }), message, true);
-        LOG("Successfully allowed SpringBoard to show non-default system apps.");
-        INSERTSTATUS(NSLocalizedString(@"Allowed SpringBoard to show non-default system apps.\n", nil));
     }
     
     UPSTAGE();
