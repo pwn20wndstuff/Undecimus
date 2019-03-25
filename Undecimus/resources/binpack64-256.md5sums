@@ -22,7 +22,9 @@ e4e05c7bf0831c52dd409dbe0d2f660e  ./usr/bin/uicache
 b902b099b0b3f067165fe0baef133a69  ./usr/bin/reset
 4f01671c0ae2083b07d1ecdea264964b  ./usr/bin/wc
 fd17aa563a90ced7ef7d2342aec7e280  ./usr/bin/gzip
+f89a4d1a23bc10e6e10c8f1b1bcaa652  ./usr/bin/ldid3
 2629d71e6c09495a482270544c60b5a5  ./usr/bin/printf
+c653ea9550bad9b55c97d3b1e90b8f69  ./usr/bin/ldid2
 42c0b3b435c28cec0a707dc9802cfed7  ./usr/bin/tail
 b86021f1c7316b66acd50abfedd594c2  ./usr/bin/grep
 e92491131960f0005f3f7ca416ee9236  ./usr/bin/script
@@ -40,6 +42,7 @@ cdb0f23de81daad4e560ebd59c8de355  ./usr/bin/screen
 50b64b8b88be46ef32d56f081542aa8c  ./usr/bin/cut
 0a740c42b89808c236a07a51fe5a814d  ./usr/bin/xargs
 4433ef936563f2838b09305737851015  ./usr/bin/what
+7786eabe3fe5b6b4180ced0cf4602502  ./usr/bin/ldid
 c41791441994916f3346f2f669f7bca2  ./usr/bin/chflags
 a97084e55faa35ff653099171312bb9b  ./usr/bin/id
 80b33297033bd59ae090ebba1ec9b67a  ./usr/bin/find
@@ -219,7 +222,7 @@ e49122999d1ba9ccbe2f7f56d706e897  ./usr/share/terminfo/76/vt100-nam
 846bea1b765ff91b190735acc298a355  ./usr/share/terminfo/76/vt100-bm
 0ba872cd880784a95b7af42a83c48949  ./usr/share/terminfo/78/xterm-256color
 29fb028ed95c62344e4c7481dcd29073  ./bin/cat
-5fec432ff23172a92feff42b5e466891  ./bin/launchctl
+6fc19a7da30a530781ee4273f2a522e9  ./bin/launchctl
 466ef7ee8a34ba8440e3acb80fa71c87  ./bin/pwd
 b341e08776130c4bbeacb3c5440a3c8a  ./bin/sleep
 eef9a9be2cbabea493244700f9ae1a74  ./bin/stty
