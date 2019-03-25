@@ -800,9 +800,7 @@ void jailbreak()
         }
         if (auth_ptrs) {
             LOG("Detected authentication pointers.");
-#if CAN_HAS_EXPERIMENTS
             sshOnly = true;
-#endif
         }
         if (monolithic_kernel) {
             LOG("Detected monolithic kernel.");

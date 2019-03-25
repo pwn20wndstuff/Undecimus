@@ -248,7 +248,7 @@ static void trigger_gc_please()
          taken place
          */
         // TODO: Remove this log before merging to develop
-        LOG("%d: T:%lld avg T:%lld D:%lld max D:%lld avg D:%lld", i, tdelta, avgTime, deviation, maxDeviation, avgDeviation);
+        // LOG("%d: T:%lld avg T:%lld D:%lld max D:%lld avg D:%lld", i, tdelta, avgTime, deviation, maxDeviation, avgDeviation);
         
         if (tdelta - avgTime > avgTime*2 ||
             (deviation > MAX(avgDeviation * 2, 0x10000)) )
