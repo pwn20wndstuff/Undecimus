@@ -1498,6 +1498,20 @@ void jailbreak()
                 [toInject addObject:path];
             }
         }
+        for (NSString *file in [fileManager contentsOfDirectoryAtPath:@"/Applications" error:nil]) {
+            NSString *path = [@"/Applications" stringByAppendingPathComponent:file];
+            NSMutableDictionary *info_plist = [NSMutableDictionary dictionaryWithContentsOfFile:[path stringByAppendingPathComponent:@"Info.plist"]];
+            if (info_plist == nil) continue;
+            if ([info_plist[@"CFBundleIdentifier"] hasPrefix:@"com.apple."]) continue;
+            directoryEnumerator = [fileManager enumeratorAtURL:[NSURL URLWithString:path] includingPropertiesForKeys:@[NSURLIsDirectoryKey] options:0 errorHandler:nil];
+            if (directoryEnumerator == nil) continue;
+            for (NSURL *URL in directoryEnumerator) {
+                NSString *path = [URL path];
+                if (cdhashFor(path) != nil) {
+                    [toInject addObject:path];
+                }
+            }
+        }
         if (toInject.count > 0) {
             _assert(injectTrustCache(toInject, GETOFFSET(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, message, true);
         }
