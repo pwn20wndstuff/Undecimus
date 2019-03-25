@@ -1555,7 +1555,7 @@ void jailbreak()
         }
         _assert(runCommand("/jb/bin/launchctl", "stop", "com.apple.cfprefsd.xpc.daemon", NULL) == ERR_SUCCESS, message, true);
         LOG("Successfully enabled SSH.");
-        SETMESSAGE(NSLocalizedString(@"Enabled SSH.\n", nil));
+        INSERTSTATUS(NSLocalizedString(@"Enabled SSH.\n", nil));
     }
     
     if (auth_ptrs || sshOnly) {
