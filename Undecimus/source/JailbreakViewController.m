@@ -842,11 +842,9 @@ void jailbreak()
             PF(fs_lookup_snapshot_metadata_by_name_and_return_name);
             PF(apfs_jhash_getvnode);
         }
-        PF(pmap_load_trust_cache);
-        if (GETOFFSET(pmap_load_trust_cache)) {
-            pmap_load_trust_cache = _pmap_load_trust_cache;
-        }
         if (auth_ptrs) {
+            PF(pmap_load_trust_cache);
+            pmap_load_trust_cache = _pmap_load_trust_cache;
             PF(paciza_pointer__l2tp_domain_module_start);
             PF(paciza_pointer__l2tp_domain_module_stop);
             PF(l2tp_domain_inited);
