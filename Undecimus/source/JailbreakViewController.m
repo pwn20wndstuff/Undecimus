@@ -112,7 +112,7 @@ typedef struct {
     int exploit;
 } prefs_t;
 
-#define ISADDR(val)            (val != 0 && val != HUGE_VAL && val != -HUGE_VAL)
+#define ISADDR(val)            (val >= 0xffff000000000000)
 #define ADDRSTRING(val)        [NSString stringWithFormat:@ADDR, val]
 
 static NSString *bundledResources = nil;
@@ -665,7 +665,7 @@ void jailbreak()
             MACH_PORT_VALID(persisted_kernel_task_port) &&
             task_info(persisted_kernel_task_port, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS &&
             ISADDR((persisted_kernel_base = dyld_info.all_image_info_addr)) &&
-            ISADDR((persisted_kernel_slide = dyld_info.all_image_info_size))) {
+            (persisted_kernel_slide = dyld_info.all_image_info_size) != 0) {
             prepare_for_rw_with_fake_tfp0(persisted_kernel_task_port);
             kernel_base = persisted_kernel_base;
             kernel_slide = persisted_kernel_slide;
@@ -678,7 +678,7 @@ void jailbreak()
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR((kernel_base = find_kernel_base())) &&
                         ReadKernel32(kernel_base) == MACH_HEADER_MAGIC &&
-                        ISADDR((kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)))) {
+                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != 0) {
                         exploit_success = true;
                     }
                     break;
@@ -688,7 +688,7 @@ void jailbreak()
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR((kernel_base = find_kernel_base())) &&
                         ReadKernel32(kernel_base) == MACH_HEADER_MAGIC &&
-                        ISADDR((kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)))) {
+                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != 0) {
                         exploit_success = true;
                     }
                     break;
@@ -698,7 +698,7 @@ void jailbreak()
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR((kernel_base = find_kernel_base())) &&
                         ReadKernel32(kernel_base) == MACH_HEADER_MAGIC &&
-                        ISADDR((kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)))) {
+                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != 0) {
                         exploit_success = true;
                     }
                     break;
@@ -708,9 +708,9 @@ void jailbreak()
                     prepare_for_rw_with_fake_tfp0(kernel_task_port);
                     if (MACH_PORT_VALID(tfp0) &&
                         kernel_slide_init() &&
-                        ISADDR((kernel_slide) &&
+                        kernel_slide != 0 &&
                         ISADDR((kernel_base = (kernel_slide + KERNEL_SEARCH_ADDRESS))) &&
-                        ReadKernel32(kernel_base) == MACH_HEADER_MAGIC)) {
+                        ReadKernel32(kernel_base) == MACH_HEADER_MAGIC) {
                         exploit_success = true;
                     }
                     break;
@@ -721,7 +721,7 @@ void jailbreak()
                         machswap_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR(kernel_base) &&
-                        ISADDR((kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)))) {
+                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != 0) {
                         exploit_success = true;
                     }
                     break;
@@ -732,7 +732,7 @@ void jailbreak()
                         machswap2_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR(kernel_base) &&
-                        ISADDR((kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)))) {
+                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != 0) {
                         exploit_success = true;
                     }
                     break;
