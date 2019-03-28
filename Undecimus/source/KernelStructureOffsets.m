@@ -69,6 +69,8 @@ int kstruct_offsets_11_0[] = {
     0x18, // KSTRUCT_OFFSET_UCRED_CR_UID
     0x78, // KSTRUCT_OFFSET_UCRED_CR_LABEL
     
+    0x18, // KSTRUCT_SIZE_IPC_ENTRY
+    
     0x6c, // KFREE_ADDR_OFFSET
 };
 
@@ -129,7 +131,9 @@ int kstruct_offsets_11_3[] = {
     0x18, // KSTRUCT_OFFSET_UCRED_CR_UID
     0x78, // KSTRUCT_OFFSET_UCRED_CR_LABEL
     
-    0x7c, // KFREE_ADDR_OFFSET
+    0x18, // KSTRUCT_SIZE_IPC_ENTRY
+    
+    0x6c, // KFREE_ADDR_OFFSET
 };
 
 int kstruct_offsets_12_0[] = {
@@ -205,7 +209,9 @@ int kstruct_offsets_12_0[] = {
     0x18, // KSTRUCT_OFFSET_UCRED_CR_UID
     0x78, // KSTRUCT_OFFSET_UCRED_CR_LABEL
     
-    0x7c, // KFREE_ADDR_OFFSET
+    0x18, // KSTRUCT_SIZE_IPC_ENTRY
+    
+    0x6c, // KFREE_ADDR_OFFSET
 };
 
 int koffset(enum kstruct_offset offset)

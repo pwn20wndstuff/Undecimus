@@ -15,6 +15,11 @@
 
 #define TF_PLATFORM 0x00000400 /* task is a platform binary */
 
+#define IO_ACTIVE 0x80000000
+
+#define IKOT_HOST 3
+#define IKOT_HOST_PRIV 4
+
 uint64_t the_realhost;
 uint64_t kernel_base;
 offsets_t offs;
@@ -37,13 +42,18 @@ uint64_t ipc_space_kernel()
 
 uint64_t current_thread()
 {
-    uint64_t thread_port = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), mach_thread_self()) : find_port_address(mach_thread_self(), MACH_MSG_TYPE_COPY_SEND);
+    thread_t thread = mach_thread_self();
+    uint64_t thread_port = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), thread) : find_port_address(thread, MACH_MSG_TYPE_COPY_SEND);
+    mach_port_deallocate(mach_task_self(), thread);
+    thread = THREAD_NULL;
     return ReadKernel64(thread_port + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
 }
 
 uint64_t find_kernel_base()
 {
-    uint64_t hostport_addr = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), mach_host_self()) : find_port_address(mach_host_self(), MACH_MSG_TYPE_COPY_SEND);
+    host_t host = mach_host_self();
+    uint64_t hostport_addr = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), host) : find_port_address(host, MACH_MSG_TYPE_COPY_SEND);
+    mach_port_deallocate(mach_task_self(), host);
     uint64_t realhost = ReadKernel64(hostport_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
     the_realhost = realhost;
 
@@ -66,7 +76,9 @@ mach_port_t fake_host_priv()
         return fake_host_priv_port;
     }
     // get the address of realhost:
-    uint64_t hostport_addr = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), mach_host_self()) : find_port_address(mach_host_self(), MACH_MSG_TYPE_COPY_SEND);
+    host_t host = mach_host_self();
+    uint64_t hostport_addr = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), host) : find_port_address(host, MACH_MSG_TYPE_COPY_SEND);
+    mach_port_deallocate(mach_task_self(), host);
     uint64_t realhost = ReadKernel64(hostport_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
 
     // allocate a port
@@ -85,8 +97,6 @@ mach_port_t fake_host_priv()
     uint64_t port_addr = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), port) : find_port_address(port, MACH_MSG_TYPE_COPY_SEND);
 
     // change the type of the port
-#define IKOT_HOST_PRIV 4
-#define IO_ACTIVE 0x80000000
     WriteKernel32(port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_ACTIVE | IKOT_HOST_PRIV);
 
     // change the space of the port
@@ -162,9 +172,7 @@ uint64_t get_address_of_port(pid_t pid, mach_port_t port)
             return 0;
         }
     }
-    uint32_t port_index = port >> 8;
-    const int sizeof_ipc_entry_t = 0x18;
-    uint64_t port_addr = ReadKernel64(is_table + (port_index * sizeof_ipc_entry_t));
+    uint64_t port_addr = ReadKernel64(is_table + (MACH_PORT_INDEX(port) * koffset(KSTRUCT_SIZE_IPC_ENTRY)));
     LOG("port_addr = " ADDR, port_addr);
     if (port_addr == 0) {
         LOG("failed to get port_addr!");
@@ -292,4 +300,23 @@ bool verify_tfp0() {
 int (*pmap_load_trust_cache)(uint64_t kernel_trust, size_t length) = NULL;
 int _pmap_load_trust_cache(uint64_t kernel_trust, size_t length) {
     return (int)kexecute(GETOFFSET(pmap_load_trust_cache), kernel_trust, length, 0, 0, 0, 0, 0);
+}
+
+void set_host_type(host_t host, uint32_t type) {
+    uint64_t hostport_addr = get_address_of_port(getpid(), host);
+    uint32_t old = ReadKernel32(hostport_addr);
+    LOG("old host type: 0x%08x", old);
+    if ((old & type) != type) {
+        WriteKernel32(hostport_addr, type);
+        uint32_t new = ReadKernel32(hostport_addr);
+        LOG("new host type: 0x%08x", new);
+    }
+}
+
+void make_host_into_host_priv(host_t host) {
+    set_host_type(host, IO_ACTIVE | IKOT_HOST_PRIV);
+}
+
+void make_host_priv_into_host(host_t host) {
+    set_host_type(host, IO_ACTIVE | IKOT_HOST);
 }

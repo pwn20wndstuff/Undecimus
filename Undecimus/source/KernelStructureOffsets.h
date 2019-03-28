@@ -74,6 +74,9 @@ enum kstruct_offset {
     KSTRUCT_OFFSET_UCRED_CR_UID,
     KSTRUCT_OFFSET_UCRED_CR_LABEL,
     
+    /* struct ipc_entry */
+    KSTRUCT_SIZE_IPC_ENTRY,
+    
     KFREE_ADDR_OFFSET,
 };
 

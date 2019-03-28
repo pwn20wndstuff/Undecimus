@@ -352,19 +352,23 @@ static void* do_thread(void* arg)
     mach_port_t exception_port = (mach_port_t)arg;
 
     kern_return_t err;
+    thread_t thread = mach_thread_self();
     err = thread_set_exception_ports(
-        mach_thread_self(),
+        thread,
         EXC_MASK_ALL,
         exception_port,
         EXCEPTION_STATE_IDENTITY, // catch_exception_raise_state_identity messages
         ARM_THREAD_STATE64);
-
+    mach_port_deallocate(mach_task_self(), thread);
+    
     if (err != KERN_SUCCESS) {
         LOG("failed to set exception port");
     }
 
     // make the thread port which gets sent in the message actually be the host port
-    err = thread_set_special_port(mach_thread_self(), THREAD_KERNEL_PORT, mach_host_self());
+    host_t host = mach_host_self();
+    err = thread_set_special_port(host, THREAD_KERNEL_PORT, host);
+    mach_port_deallocate(mach_task_self(), host);
     if (err != KERN_SUCCESS) {
         LOG("failed to set THREAD_KERNEL_PORT");
     }

