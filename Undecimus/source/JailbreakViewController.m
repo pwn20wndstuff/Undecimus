@@ -1468,8 +1468,11 @@ void jailbreak()
             _assert(binpack64 != nil, message, true);
             _assert([binpack64 extractToPath:@"/jb"], message, true);
             for (NSString *file in binpack64.files.allKeys) {
-                if (cdhashFor(file) != nil) {
-                    [toInject addObject:file];
+                NSString *path = [@"/jb" stringByAppendingPathComponent:file];
+                if (cdhashFor(path) != nil) {
+                    if (![toInject containsObject:path]) {
+                        [toInject addObject:path];
+                    }
                 }
             }
         }
@@ -1479,7 +1482,9 @@ void jailbreak()
         for (NSURL *URL in directoryEnumerator) {
             NSString *path = [URL path];
             if (cdhashFor(path) != nil) {
-                [toInject addObject:path];
+                if (![toInject containsObject:path]) {
+                    [toInject addObject:path];
+                }
             }
         }
         for (NSString *file in [fileManager contentsOfDirectoryAtPath:@"/Applications" error:nil]) {
@@ -1492,7 +1497,9 @@ void jailbreak()
             for (NSURL *URL in directoryEnumerator) {
                 NSString *path = [URL path];
                 if (cdhashFor(path) != nil) {
-                    [toInject addObject:path];
+                    if (![toInject containsObject:path]) {
+                        [toInject addObject:path];
+                    }
                 }
             }
         }
