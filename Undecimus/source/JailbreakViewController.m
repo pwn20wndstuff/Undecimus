@@ -1882,11 +1882,6 @@ void jailbreak()
         LOG("Successfully extracted bootstrap.");
         
         INSERTSTATUS(NSLocalizedString(@"Extracted Bootstrap.\n", nil));
-        
-        if (needStrap) {
-            NOTICE(NSLocalizedString(@"Bootstrap has been successfully extracted. The device will now be restarted.", nil), true, false);
-            _assert(reboot(RB_QUICK) == ERR_SUCCESS, message, true);
-        }
     }
     
     UPSTAGE();
