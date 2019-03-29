@@ -32,6 +32,9 @@
 #import <snappy.h>
 #import <inject.h>
 #include <sched.h>
+#import <patchfinder64.h>
+#import <offsetcache.h>
+#import <kerneldec.h>
 #import "JailbreakViewController.h"
 #include "KernelStructureOffsets.h"
 #include "empty_list_sploit.h"
@@ -46,15 +49,12 @@
 #include "async_wake.h"
 #include "utils.h"
 #include "ArchiveFile.h"
-#include <patchfinder64.h>
-#include <offsetcache.h>
 #include "CreditsTableViewController.h"
 #include "FakeApt.h"
 #include "voucher_swap.h"
 #include "kernel_memory.h"
 #include "kernel_slide.h"
 #include "find_port.h"
-#include "lzssdec.h"
 #include "machswap_offsets.h"
 #include "machswap_pwn.h"
 #include "machswap2_pwn.h"
@@ -801,10 +801,10 @@ void jailbreak()
             if (!canRead(decompressed_kernel_cache_path)) {
                 FILE *original_kernel_cache = fopen(original_kernel_cache_path, "rb");
                 _assert(original_kernel_cache != NULL, message, true);
-                uint32_t macho_header_offset = find_macho_header(original_kernel_cache);
-                _assert(macho_header_offset != 0, message, true);
-                char *args[5] = { "lzssdec", "-o", (char *)[NSString stringWithFormat:@"0x%x", macho_header_offset].UTF8String, (char *)original_kernel_cache_path, (char *)decompressed_kernel_cache_path};
-                _assert(lzssdec(5, args) == ERR_SUCCESS, message, true);
+                FILE *decompressed_kernel_cache = fopen(decompressed_kernel_cache_path, "w+b");
+                _assert(decompressed_kernel_cache != NULL, message, true);
+                _assert(decompress_kernel(original_kernel_cache, decompressed_kernel_cache, NULL, true) == ERR_SUCCESS, message, true);
+                fclose(decompressed_kernel_cache);
                 fclose(original_kernel_cache);
             }
             struct utsname u = { 0 };

@@ -14,6 +14,8 @@
 		212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8849216E4EBE00A36DA5 /* async_wake.c */; };
 		213E78262208654700FDF3B7 /* necp.c in Sources */ = {isa = PBXBuildFile; fileRef = 213E78252208654700FDF3B7 /* necp.c */; settings = {COMPILER_FLAGS = "-Wno-deprecated-declarations"; }; };
 		213E7828220865A100FDF3B7 /* voucher_swap-poc.c in Sources */ = {isa = PBXBuildFile; fileRef = 213E7827220865A100FDF3B7 /* voucher_swap-poc.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		214A1776224EBE5400588EC4 /* lzssdec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 214A1773224EBE5400588EC4 /* lzssdec.cpp */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		214A1777224EBE5400588EC4 /* kerneldec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 214A1774224EBE5400588EC4 /* kerneldec.cpp */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		2150A9CD22021330001C8677 /* voucher_swap.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CC22021330001C8677 /* voucher_swap.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		2150A9DC22021348001C8677 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CE22021347001C8677 /* log.c */; };
 		2150A9DD22021348001C8677 /* platform_match.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9CF22021347001C8677 /* platform_match.c */; };
@@ -22,7 +24,6 @@
 		2150A9E022021348001C8677 /* parameters.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9D922021348001C8677 /* parameters.c */; };
 		2150A9E122021348001C8677 /* kernel_alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9DA22021348001C8677 /* kernel_alloc.c */; };
 		2150A9E222021348001C8677 /* kernel_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 2150A9DB22021348001C8677 /* kernel_memory.c */; };
-		2166453D22257E7900B37252 /* lzssdec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2166453B22257E7900B37252 /* lzssdec.cpp */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		216F3F3D2228776E007DC1BC /* kernel_call.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F362228776D007DC1BC /* kernel_call.c */; };
 		216F3F3E2228776E007DC1BC /* user_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F372228776D007DC1BC /* user_client.c */; };
 		216F3F3F2228776E007DC1BC /* pac.c in Sources */ = {isa = PBXBuildFile; fileRef = 216F3F3A2228776D007DC1BC /* pac.c */; };
@@ -80,6 +81,10 @@
 		213E78252208654700FDF3B7 /* necp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = necp.c; sourceTree = "<group>"; };
 		213E7827220865A100FDF3B7 /* voucher_swap-poc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "voucher_swap-poc.c"; sourceTree = "<group>"; };
 		213E7829220865BF00FDF3B7 /* voucher_swap-poc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "voucher_swap-poc.h"; sourceTree = "<group>"; };
+		214A1772224EBE5400588EC4 /* kerneldec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = kerneldec.h; path = kerneldec/kerneldec.h; sourceTree = SOURCE_ROOT; };
+		214A1773224EBE5400588EC4 /* lzssdec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lzssdec.cpp; path = kerneldec/lzssdec.cpp; sourceTree = SOURCE_ROOT; };
+		214A1774224EBE5400588EC4 /* kerneldec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = kerneldec.cpp; path = kerneldec/kerneldec.cpp; sourceTree = SOURCE_ROOT; };
+		214A1775224EBE5400588EC4 /* lzssdec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lzssdec.h; path = kerneldec/lzssdec.h; sourceTree = SOURCE_ROOT; };
 		2150A9CB22021330001C8677 /* voucher_swap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = voucher_swap.h; sourceTree = "<group>"; };
 		2150A9CC22021330001C8677 /* voucher_swap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = voucher_swap.c; sourceTree = "<group>"; };
 		2150A9CE22021347001C8677 /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
@@ -99,8 +104,6 @@
 		2150A9E322021381001C8677 /* mach_vm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mach_vm.h; sourceTree = "<group>"; };
 		2150A9E422021381001C8677 /* ipc_port.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ipc_port.h; sourceTree = "<group>"; };
 		2150A9E52202138A001C8677 /* IOKitLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IOKitLib.h; sourceTree = "<group>"; };
-		2166453B22257E7900B37252 /* lzssdec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lzssdec.cpp; sourceTree = "<group>"; };
-		2166453C22257E7900B37252 /* lzssdec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lzssdec.h; sourceTree = "<group>"; };
 		216F3F352228776D007DC1BC /* user_client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = user_client.h; sourceTree = "<group>"; };
 		216F3F362228776D007DC1BC /* kernel_call.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kernel_call.c; sourceTree = "<group>"; };
 		216F3F372228776D007DC1BC /* user_client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = user_client.c; sourceTree = "<group>"; };
@@ -218,6 +221,17 @@
 			name = necp;
 			sourceTree = "<group>";
 		};
+		214A1771224EBE4900588EC4 /* kerneldec */ = {
+			isa = PBXGroup;
+			children = (
+				214A1774224EBE5400588EC4 /* kerneldec.cpp */,
+				214A1772224EBE5400588EC4 /* kerneldec.h */,
+				214A1773224EBE5400588EC4 /* lzssdec.cpp */,
+				214A1775224EBE5400588EC4 /* lzssdec.h */,
+			);
+			name = kerneldec;
+			sourceTree = "<group>";
+		};
 		2150A9C6220212A6001C8677 /* empty_list */ = {
 			isa = PBXGroup;
 			children = (
@@ -283,15 +297,6 @@
 			name = voucher_swap;
 			sourceTree = "<group>";
 		};
-		2166453A22257E7000B37252 /* lzssdec */ = {
-			isa = PBXGroup;
-			children = (
-				2166453B22257E7900B37252 /* lzssdec.cpp */,
-				2166453C22257E7900B37252 /* lzssdec.h */,
-			);
-			name = lzssdec;
-			sourceTree = "<group>";
-		};
 		21675B62214A68B700D20E2B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -349,10 +354,10 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				214A1771224EBE4900588EC4 /* kerneldec */,
 				21FF63C8224E5FCE008B76D9 /* offset-cache */,
 				21FFE0F3222E4B1600EC59B2 /* machswap */,
 				216F3F342228774D007DC1BC /* kernel_call */,
-				2166453A22257E7000B37252 /* lzssdec */,
 				213E78222208652B00FDF3B7 /* necp */,
 				2150A9CA220212F8001C8677 /* voucher_swap */,
 				2150A9C9220212E6001C8677 /* deja_xnu */,
@@ -513,7 +518,7 @@
 		21C0FC5F21369EB700849420 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = Pwn20wnd;
 				TargetAttributes = {
 					21C0FC6621369EB700849420 = {
@@ -575,7 +580,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2166453D22257E7900B37252 /* lzssdec.cpp in Sources */,
 				21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */,
 				216F3F3E2228776E007DC1BC /* user_client.c in Sources */,
 				2150A9E022021348001C8677 /* parameters.c in Sources */,
@@ -591,6 +595,7 @@
 				21A97FD42148103C00DC0023 /* remote_call.c in Sources */,
 				21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */,
 				21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */,
+				214A1777224EBE5400588EC4 /* kerneldec.cpp in Sources */,
 				2116449A21737F9500250744 /* JailbreakViewController.m in Sources */,
 				21F4D70E21FC7A590070D5E0 /* patchfinder64.c in Sources */,
 				2150A9DE22021348001C8677 /* platform.c in Sources */,
@@ -610,6 +615,7 @@
 				21FFE0F8222E4C0600EC59B2 /* machswap_offsets.m in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,
 				21BB9804222F05C40012AF40 /* machswap2_pwn.m in Sources */,
+				214A1776224EBE5400588EC4 /* lzssdec.cpp in Sources */,
 				2150A9E222021348001C8677 /* kernel_memory.c in Sources */,
 				216F3F402228776E007DC1BC /* kc_parameters.c in Sources */,
 				2150A9DF22021348001C8677 /* kernel_slide.c in Sources */,
@@ -772,6 +778,7 @@
 					"$(PROJECT_DIR)/snappy",
 					"$(PROJECT_DIR)/Injector",
 					"$(PROJECT_DIR)/offset-cache",
+					"$(PROJECT_DIR)/kerneldec",
 				);
 				INFOPLIST_FILE = Undecimus/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -824,6 +831,7 @@
 					"$(PROJECT_DIR)/snappy",
 					"$(PROJECT_DIR)/Injector",
 					"$(PROJECT_DIR)/offset-cache",
+					"$(PROJECT_DIR)/kerneldec",
 				);
 				INFOPLIST_FILE = Undecimus/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;

@@ -10,3 +10,6 @@
 [submodule "offset-cache"]
 	path = offset-cache
 	url = https://github.com/sbingner/offset-cache.git
+[submodule "kerneldec"]
+	path = kerneldec
+	url = https://github.com/sbingner/kerneldec.git
