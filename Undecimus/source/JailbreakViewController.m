@@ -215,6 +215,13 @@ void set_all_image_info_addr(uint64_t kernel_task_kaddr) {
     _assert(task_info(tfp0, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS, message, true);
     LOG("Will save offsets to all_image_info_addr");
     if (dyld_info.all_image_info_addr && dyld_info.all_image_info_addr != kernel_base && dyld_info.all_image_info_addr > kernel_base) {
+        size_t blob_size = rk64(dyld_info.all_image_info_addr);
+        struct cache_blob *blob = create_cache_blob(blob_size);
+        _assert(rkbuffer(dyld_info.all_image_info_addr, blob, blob_size), message, true);
+        // Adds any entries that are in kernel but we don't have
+        merge_cache_blob(blob);
+        free(blob);
+
         // Free old offset cache - didn't bother comparing because it's faster to just replace it if it's the same
         kmem_free(dyld_info.all_image_info_addr, rk64(rk64(dyld_info.all_image_info_addr)));
     }
@@ -685,6 +692,7 @@ void jailbreak()
                 struct cache_blob *blob = create_cache_blob(blob_size);
                 _assert(rkbuffer(persisted_cache_blob, blob, blob_size), message, true);
                 import_cache_blob(blob);
+                free(blob);
                 _assert(GETOFFSET(kernel_slide) == persisted_kernel_slide, message, true);
                 found_offsets = true;
             }
@@ -782,46 +790,47 @@ void jailbreak()
     
     UPSTAGE();
     
-    if (!found_offsets) {
-        // Initialize patchfinder64.
-        
-        LOG("Initializing patchfinder64...");
-        SETMESSAGE(NSLocalizedString(@"Failed to initialize patchfinder64.", nil));
-        const char *original_kernel_cache_path = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
-        const char *decompressed_kernel_cache_path = [homeDirectory stringByAppendingPathComponent:@"Documents/kernelcache.dec"].UTF8String;
-        if (!canRead(decompressed_kernel_cache_path)) {
-            FILE *original_kernel_cache = fopen(original_kernel_cache_path, "rb");
-            _assert(original_kernel_cache != NULL, message, true);
-            uint32_t macho_header_offset = find_macho_header(original_kernel_cache);
-            _assert(macho_header_offset != 0, message, true);
-            char *args[5] = { "lzssdec", "-o", (char *)[NSString stringWithFormat:@"0x%x", macho_header_offset].UTF8String, (char *)original_kernel_cache_path, (char *)decompressed_kernel_cache_path};
-            _assert(lzssdec(5, args) == ERR_SUCCESS, message, true);
-            fclose(original_kernel_cache);
-        }
-        struct utsname u = { 0 };
-        _assert(uname(&u) == ERR_SUCCESS, message, true);
-        if (init_kernel(NULL, 0, decompressed_kernel_cache_path) != ERR_SUCCESS ||
-            find_strref(u.version, 1, string_base_const, true, false) == 0) {
-            _assert(clean_file(decompressed_kernel_cache_path), message, true);
-            _assert(false, message, true);
+    {
+        if (!found_offsets) {
+            // Initialize patchfinder64.
+            
+            LOG("Initializing patchfinder64...");
+            SETMESSAGE(NSLocalizedString(@"Failed to initialize patchfinder64.", nil));
+            const char *original_kernel_cache_path = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
+            const char *decompressed_kernel_cache_path = [homeDirectory stringByAppendingPathComponent:@"Documents/kernelcache.dec"].UTF8String;
+            if (!canRead(decompressed_kernel_cache_path)) {
+                FILE *original_kernel_cache = fopen(original_kernel_cache_path, "rb");
+                _assert(original_kernel_cache != NULL, message, true);
+                uint32_t macho_header_offset = find_macho_header(original_kernel_cache);
+                _assert(macho_header_offset != 0, message, true);
+                char *args[5] = { "lzssdec", "-o", (char *)[NSString stringWithFormat:@"0x%x", macho_header_offset].UTF8String, (char *)original_kernel_cache_path, (char *)decompressed_kernel_cache_path};
+                _assert(lzssdec(5, args) == ERR_SUCCESS, message, true);
+                fclose(original_kernel_cache);
+            }
+            struct utsname u = { 0 };
+            _assert(uname(&u) == ERR_SUCCESS, message, true);
+            if (init_kernel(NULL, 0, decompressed_kernel_cache_path) != ERR_SUCCESS ||
+                find_strref(u.version, 1, string_base_const, true, false) == 0) {
+                _assert(clean_file(decompressed_kernel_cache_path), message, true);
+                _assert(false, message, true);
+            }
+            LOG("Successfully initialized patchfinder64.");
+        } else {
+            auth_ptrs = GETOFFSET(auth_ptrs);
+            monolithic_kernel = GETOFFSET(monolithic_kernel);
         }
         if (auth_ptrs) {
             SETOFFSET(auth_ptrs, true);
             LOG("Detected authentication pointers.");
+            pmap_load_trust_cache = auth_ptrs ? _pmap_load_trust_cache : NULL;
             sshOnly = true;
         }
         if (monolithic_kernel) {
             SETOFFSET(monolithic_kernel, true);
             LOG("Detected monolithic kernel.");
         }
-        LOG("Successfully initialized patchfinder64.");
-    } else {
-        auth_ptrs = GETOFFSET(auth_ptrs) == true ? true : false;
-        monolithic_kernel = GETOFFSET(monolithic_kernel) == true ? true : false;
-        pmap_load_trust_cache = auth_ptrs ? _pmap_load_trust_cache : NULL;
-        sshOnly |= auth_ptrs ? true : false;
     }
-    
+
     UPSTAGE();
     
     if (!found_offsets) {
@@ -878,17 +887,9 @@ void jailbreak()
 #undef PF
         found_offsets = true;
         LOG("Successfully found offsets.");
-    }
-    
-    UPSTAGE();
-    
-    {
+
         // Deinitialize patchfinder64.
-        
-        LOG("Deinitializing patchfinder64...");
-        SETMESSAGE(NSLocalizedString(@"Failed to deinitialize patchfinder64.", nil));
         term_kernel();
-        LOG("Successfully deinitialized patchfinder64.");
     }
     
     UPSTAGE();
