@@ -246,7 +246,7 @@ static void trigger_gc_please()
     uint64_t maxTime = 0;
     uint64_t avgDeviation = 0;
     uint64_t maxDeviation = 0;
-    int gc_count = 2;
+    int extra_gc_count = 2;
     
     for (int i = 0; i < gc_ports_cnt; i++)
     {
@@ -273,7 +273,7 @@ static void trigger_gc_please()
             (deviation > MAX(avgDeviation * 2, 0x10000)) )
         {
             LOG("got gc at %d", i);
-            if (gc_count-- > 0) {
+            if (extra_gc_count-- > 0) {
                 continue;
             }
             LOG("breaking");
