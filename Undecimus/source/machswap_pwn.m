@@ -255,8 +255,8 @@ static void trigger_gc_please()
         if (tdelta - avgTime > avgTime*2 ||
             (deviation > MAX(avgDeviation * 2, 0x10000)) )
         {
+            LOG("got gc at %d", i);
             if (gc_count-- > 0) {
-                LOG("got gc at %d", i);
                 continue;
             }
             LOG("breaking");
