@@ -942,14 +942,14 @@ void jailbreak()
             // Export kernel task port.
             LOG("Exporting kernel task port...");
             SETMESSAGE(NSLocalizedString(@"Failed to export kernel task port.", nil));
-            make_host_into_host_priv(myOriginalHost);
+            export_tfp0(myOriginalHost);
             LOG("Successfully exported kernel task port.");
             INSERTSTATUS(NSLocalizedString(@"Exported kernel task port.\n", nil));
         } else {
             // Unexport kernel task port.
             LOG("Unexporting kernel task port...");
             SETMESSAGE(NSLocalizedString(@"Failed to unexport kernel task port.", nil));
-            make_host_priv_into_host(myOriginalHost);
+            unexport_tfp0(myOriginalHost);
             LOG("Successfully unexported kernel task port.");
             INSERTSTATUS(NSLocalizedString(@"Unexported kernel task port.\n", nil));
         }

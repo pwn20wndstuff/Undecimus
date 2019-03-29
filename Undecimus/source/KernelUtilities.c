@@ -312,10 +312,10 @@ void set_host_type(host_t host, uint32_t type) {
     }
 }
 
-void make_host_into_host_priv(host_t host) {
+void export_tfp0(host_t host) {
     set_host_type(host, IO_ACTIVE | IKOT_HOST_PRIV);
 }
 
-void make_host_priv_into_host(host_t host) {
+void unexport_tfp0(host_t host) {
     set_host_type(host, IO_ACTIVE | IKOT_HOST);
 }

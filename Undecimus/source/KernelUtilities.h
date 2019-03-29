@@ -40,7 +40,7 @@ extern int (*pmap_load_trust_cache)(uint64_t kernel_trust, size_t length);
 int _pmap_load_trust_cache(uint64_t kernel_trust, size_t length);
 
 void set_host_type(host_t host, uint32_t type);
-void make_host_into_host_priv(host_t host);
-void make_host_priv_into_host(host_t host);
+void export_tfp0(host_t host);
+void unexport_tfp0(host_t host);
 
 #endif /* kutils_h */
