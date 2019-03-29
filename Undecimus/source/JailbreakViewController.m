@@ -870,7 +870,6 @@ void jailbreak()
         }
         if (auth_ptrs) {
             PF(pmap_load_trust_cache);
-            pmap_load_trust_cache = _pmap_load_trust_cache;
             PF(paciza_pointer__l2tp_domain_module_start);
             PF(paciza_pointer__l2tp_domain_module_stop);
             PF(l2tp_domain_inited);
