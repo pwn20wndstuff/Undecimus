@@ -115,7 +115,7 @@ uint64_t get_proc_struct_for_pid(pid_t pid)
     if (kernproc == 0) {
         kernproc = ReadKernel64(ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
         LOG("kernproc = " ADDR, kernproc);
-        if (kernproc == 0) {
+        if (!ISADDR(kernproc)) {
             LOG("failed to get kernproc!");
             return 0;
         }
@@ -142,7 +142,7 @@ uint64_t get_address_of_port(pid_t pid, mach_port_t port)
     if (proc_struct_addr == 0) {
         proc_struct_addr = get_proc_struct_for_pid(pid);
         LOG("proc_struct_addr = " ADDR, proc_struct_addr);
-        if (proc_struct_addr == 0) {
+        if (!ISADDR(proc_struct_addr)) {
             LOG("failed to get proc_struct_addr!");
             return 0;
         }
@@ -150,7 +150,7 @@ uint64_t get_address_of_port(pid_t pid, mach_port_t port)
     if (task_addr == 0) {
         task_addr = ReadKernel64(proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_TASK));
         LOG("task_addr = " ADDR, task_addr);
-        if (task_addr == 0) {
+        if (!ISADDR(task_addr)) {
             LOG("failed to get task_addr!");
             return 0;
         }
@@ -158,7 +158,7 @@ uint64_t get_address_of_port(pid_t pid, mach_port_t port)
     if (itk_space == 0) {
         itk_space = ReadKernel64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
         LOG("itk_space = " ADDR, itk_space);
-        if (itk_space == 0) {
+        if (!ISADDR(itk_space)) {
             LOG("failed to get itk_space!");
             return 0;
         }
@@ -166,14 +166,14 @@ uint64_t get_address_of_port(pid_t pid, mach_port_t port)
     if (is_table == 0) {
         is_table = ReadKernel64(itk_space + koffset(KSTRUCT_OFFSET_IPC_SPACE_IS_TABLE));
         LOG("is_table = " ADDR, is_table);
-        if (is_table == 0) {
+        if (!ISADDR(is_table)) {
             LOG("failed to get is_table!");
             return 0;
         }
     }
     uint64_t port_addr = ReadKernel64(is_table + (MACH_PORT_INDEX(port) * koffset(KSTRUCT_SIZE_IPC_ENTRY)));
     LOG("port_addr = " ADDR, port_addr);
-    if (port_addr == 0) {
+    if (!ISADDR(port_addr)) {
         LOG("failed to get port_addr!");
         return 0;
     }
@@ -187,7 +187,7 @@ uint64_t get_kernel_cred_addr()
     if (kernel_proc_struct_addr == 0) {
         kernel_proc_struct_addr = get_proc_struct_for_pid(0);
         LOG("kernel_proc_struct_addr = " ADDR, kernel_proc_struct_addr);
-        if (kernel_proc_struct_addr == 0) {
+        if (!ISADDR(kernel_proc_struct_addr)) {
             LOG("failed to get kernel_proc_struct_addr!");
             return 0;
         }
@@ -195,7 +195,7 @@ uint64_t get_kernel_cred_addr()
     if (kernel_ucred_struct_addr == 0) {
         kernel_ucred_struct_addr = ReadKernel64(kernel_proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_UCRED));
         LOG("kernel_ucred_struct_addr = " ADDR, kernel_ucred_struct_addr);
-        if (kernel_ucred_struct_addr == 0) {
+        if (!ISADDR(kernel_ucred_struct_addr)) {
             LOG("failed to get kernel_ucred_struct_addr!");
             return 0;
         }
@@ -207,7 +207,7 @@ uint64_t give_creds_to_process_at_addr(uint64_t proc, uint64_t cred_addr)
 {
     uint64_t orig_creds = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_UCRED));
     LOG("orig_creds = " ADDR, orig_creds);
-    if (orig_creds == 0) {
+    if (!ISADDR(orig_creds)) {
         LOG("failed to get orig_creds!");
         return 0;
     }
@@ -219,7 +219,7 @@ void set_platform_binary(uint64_t proc, bool set)
 {
     uint64_t task_struct_addr = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_TASK));
     LOG("task_struct_addr = " ADDR, task_struct_addr);
-    if (task_struct_addr == 0) {
+    if (!ISADDR(task_struct_addr)) {
         LOG("failed to get task_struct_addr!");
         return;
     }
@@ -271,7 +271,7 @@ uint64_t zm_fix_addr(uint64_t addr) {
 bool verify_tfp0() {
     size_t test_size = sizeof(uint64_t);
     uint64_t test_kptr = kmem_alloc(test_size);
-    if (test_kptr == 0) {
+    if (!ISADDR(test_kptr)) {
         LOG("failed to allocate kernel memory!");
         return false;
     }

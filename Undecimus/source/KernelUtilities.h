@@ -3,10 +3,12 @@
 
 #include <common.h>
 #include <mach/mach.h>
-#include "../../offset-cache/offsetcache.h"
+#include <offsetcache.h>
 
 #define SETOFFSET(offset, val) set_offset(#offset, val)
 #define GETOFFSET(offset) get_offset(#offset)
+
+#define ISADDR(val) (val >= 0xffff000000000000)
 
 extern uint64_t kernel_base;
 extern uint64_t kernel_slide;

@@ -9,4 +9,4 @@
 	url = https://github.com/pwn20wndstuff/patchfinder64.git
 [submodule "offset-cache"]
 	path = offset-cache
-	url = git@github.com:sbingner/offset-cache.git
+	url = https://github.com/sbingner/offset-cache.git

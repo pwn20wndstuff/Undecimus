@@ -48,6 +48,7 @@
 		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		21F4D70E21FC7A590070D5E0 /* patchfinder64.c in Sources */ = {isa = PBXBuildFile; fileRef = 21F4D70C21FC7A590070D5E0 /* patchfinder64.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		21FF63CB224E5FDC008B76D9 /* offsetcache.c in Sources */ = {isa = PBXBuildFile; fileRef = 21FF63C9224E5FDC008B76D9 /* offsetcache.c */; };
 		21FFE0F8222E4C0600EC59B2 /* machswap_offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FFE0F6222E4C0600EC59B2 /* machswap_offsets.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21FFE0F9222E4C0600EC59B2 /* machswap_pwn.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FFE0F7222E4C0600EC59B2 /* machswap_pwn.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		222AD59321FA731800DCBA2A /* FakeApt.m in Sources */ = {isa = PBXBuildFile; fileRef = 222AD59221FA731800DCBA2A /* FakeApt.m */; };
@@ -151,6 +152,8 @@
 		21F4D70C21FC7A590070D5E0 /* patchfinder64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = patchfinder64.c; path = patchfinder64/patchfinder64.c; sourceTree = SOURCE_ROOT; };
 		21F4D70D21FC7A590070D5E0 /* patchfinder64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = patchfinder64.h; path = patchfinder64/patchfinder64.h; sourceTree = SOURCE_ROOT; };
 		21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Painting_With_Chocolate.ttf; sourceTree = "<group>"; };
+		21FF63C9224E5FDC008B76D9 /* offsetcache.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = offsetcache.c; path = "offset-cache/offsetcache.c"; sourceTree = SOURCE_ROOT; };
+		21FF63CA224E5FDC008B76D9 /* offsetcache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = offsetcache.h; path = "offset-cache/offsetcache.h"; sourceTree = SOURCE_ROOT; };
 		21FFE0F4222E4C0600EC59B2 /* machswap_pwn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machswap_pwn.h; sourceTree = "<group>"; };
 		21FFE0F5222E4C0600EC59B2 /* machswap_offsets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machswap_offsets.h; sourceTree = "<group>"; };
 		21FFE0F6222E4C0600EC59B2 /* machswap_offsets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = machswap_offsets.m; sourceTree = "<group>"; };
@@ -346,6 +349,7 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				21FF63C8224E5FCE008B76D9 /* offset-cache */,
 				21FFE0F3222E4B1600EC59B2 /* machswap */,
 				216F3F342228774D007DC1BC /* kernel_call */,
 				2166453A22257E7000B37252 /* lzssdec */,
@@ -440,6 +444,15 @@
 				21F4D70D21FC7A590070D5E0 /* patchfinder64.h */,
 			);
 			name = patchfinder64;
+			sourceTree = "<group>";
+		};
+		21FF63C8224E5FCE008B76D9 /* offset-cache */ = {
+			isa = PBXGroup;
+			children = (
+				21FF63C9224E5FDC008B76D9 /* offsetcache.c */,
+				21FF63CA224E5FDC008B76D9 /* offsetcache.h */,
+			);
+			name = "offset-cache";
 			sourceTree = "<group>";
 		};
 		21FFE0F3222E4B1600EC59B2 /* machswap */ = {
@@ -589,6 +602,7 @@
 				212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */,
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
 				222AD59321FA731800DCBA2A /* FakeApt.m in Sources */,
+				21FF63CB224E5FDC008B76D9 /* offsetcache.c in Sources */,
 				216F3F3F2228776E007DC1BC /* pac.c in Sources */,
 				21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */,
 				21C0FC8A21369EE900849420 /* KernelStructureOffsets.m in Sources */,
@@ -757,6 +771,7 @@
 					"$(PROJECT_DIR)/patchfinder64",
 					"$(PROJECT_DIR)/snappy",
 					"$(PROJECT_DIR)/Injector",
+					"$(PROJECT_DIR)/offset-cache",
 				);
 				INFOPLIST_FILE = Undecimus/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -808,6 +823,7 @@
 					"$(PROJECT_DIR)/patchfinder64",
 					"$(PROJECT_DIR)/snappy",
 					"$(PROJECT_DIR)/Injector",
+					"$(PROJECT_DIR)/offset-cache",
 				);
 				INFOPLIST_FILE = Undecimus/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;

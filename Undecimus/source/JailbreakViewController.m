@@ -46,8 +46,8 @@
 #include "async_wake.h"
 #include "utils.h"
 #include "ArchiveFile.h"
-#include "../../patchfinder64/patchfinder64.h" // Work around Xcode 9
-#include "../../offset-cache/offsetcache.h"
+#include <patchfinder64.h>
+#include <offsetcache.h>
 #include "CreditsTableViewController.h"
 #include "FakeApt.h"
 #include "voucher_swap.h"
@@ -113,7 +113,6 @@ typedef struct {
     int exploit;
 } prefs_t;
 
-#define ISADDR(val)            (val >= 0xffff000000000000)
 #define ADDRSTRING(val)        [NSString stringWithFormat:@ADDR, val]
 
 static NSString *bundledResources = nil;
@@ -817,10 +816,10 @@ void jailbreak()
         }
         LOG("Successfully initialized patchfinder64.");
     } else {
-        auth_ptrs = GETOFFSET(auth_ptrs);
-        monolithic_kernel = GETOFFSET(monolithic_kernel);
-        SETOFFSET(OSBooleanTrue, ReadKernel64(GETOFFSET(OSBoolean_True)));
-        SETOFFSET(OSBooleanFalse, ReadKernel64(GETOFFSET(OSBoolean_True)) + 0x8);
+        auth_ptrs = GETOFFSET(auth_ptrs) == true ? true : false;
+        monolithic_kernel = GETOFFSET(monolithic_kernel) == true ? true : false;
+        pmap_load_trust_cache = auth_ptrs ? _pmap_load_trust_cache : NULL;
+        sshOnly |= auth_ptrs ? true : false;
     }
     
     UPSTAGE();
@@ -975,7 +974,7 @@ void jailbreak()
         
         LOG("Initializing kexecute...");
         SETMESSAGE(NSLocalizedString(@"Failed to initialize kexecute.", nil));
-        init_kexecute();
+        _assert(init_kexecute(), message, true);
         LOG("Successfully initialized kexecute.");
     }
     
@@ -1340,7 +1339,7 @@ void jailbreak()
         CACHEADDR(kernel_slide, "KernelSlide");
         CACHEOFFSET(trustcache, "TrustChain");
         CACHEADDR(ReadKernel64(GETOFFSET(OSBoolean_True)), "OSBooleanTrue");
-        CACHEADDR(ReadKernel64(GETOFFSET(OSBoolean_True)) + 0x8, "OSBooleanFalse");
+        CACHEADDR(ReadKernel64(GETOFFSET(OSBoolean_True)) + sizeof(void *), "OSBooleanFalse");
         CACHEOFFSET(osunserializexml, "OSUnserializeXML");
         CACHEOFFSET(smalloc, "Smalloc");
         CACHEOFFSET(add_x0_x0_0x40_ret, "AddRetGadget");

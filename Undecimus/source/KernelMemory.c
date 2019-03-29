@@ -29,12 +29,12 @@ void prepare_for_rw_with_fake_tfp0(mach_port_t fake_tfp0)
 
 bool have_kmem_read()
 {
-    return (kmem_read_port != MACH_PORT_NULL) || (tfp0 != MACH_PORT_NULL);
+    return MACH_PORT_VALID(kmem_read_port) || MACH_PORT_VALID(tfp0);
 }
 
 bool have_kmem_write()
 {
-    return (tfp0 != MACH_PORT_NULL);
+    return MACH_PORT_VALID(tfp0);
 }
 
 size_t kread(uint64_t where, void* p, size_t size)
@@ -84,16 +84,21 @@ size_t kwrite(uint64_t where, const void* p, size_t size)
 
 bool wkbuffer(uint64_t kaddr, void* buffer, size_t length)
 {
-    if (tfp0 == MACH_PORT_NULL) {
+    if (!MACH_PORT_VALID(tfp0)) {
         LOG("attempt to write to kernel memory before any kernel memory write primitives available");
         return false;
     }
-
+    
     return (kwrite(kaddr, buffer, length) == length);
 }
 
 bool rkbuffer(uint64_t kaddr, void* buffer, size_t length)
 {
+    if (!MACH_PORT_VALID(tfp0)) {
+        LOG("attempt to read kernel memory but no kernel memory read primitives available");
+        return 0;
+    }
+    
     return (kread(kaddr, buffer, length) == length);
 }
 
@@ -103,6 +108,7 @@ void WriteKernel32(uint64_t kaddr, uint32_t val)
         LOG("attempt to write to kernel memory before any kernel memory write primitives available");
         return;
     }
+    
     wkbuffer(kaddr, &val, sizeof(val));
 }
 
@@ -112,6 +118,7 @@ void WriteKernel64(uint64_t kaddr, uint64_t val)
         LOG("attempt to write to kernel memory before any kernel memory write primitives available");
         return;
     }
+    
     wkbuffer(kaddr, &val, sizeof(val));
 }
 
@@ -165,32 +172,26 @@ uint64_t rk64_via_tfp0(uint64_t kaddr)
 
 uint32_t ReadKernel32(uint64_t kaddr)
 {
-    if (tfp0 != MACH_PORT_NULL) {
+    if (MACH_PORT_VALID(tfp0)) {
         return rk32_via_tfp0(kaddr);
-    }
-
-    if (kmem_read_port != MACH_PORT_NULL) {
+    } else if (MACH_PORT_VALID(kmem_read_port)) {
         return rk32_via_kmem_read_port(kaddr);
+    } else {
+        LOG("attempt to read kernel memory but no kernel memory read primitives available");
+        return 0;
     }
-
-    LOG("attempt to read kernel memory but no kernel memory read primitives available");
-
-    return 0;
 }
 
 uint64_t ReadKernel64(uint64_t kaddr)
 {
-    if (tfp0 != MACH_PORT_NULL) {
+    if (MACH_PORT_VALID(tfp0)) {
         return rk64_via_tfp0(kaddr);
-    }
-
-    if (kmem_read_port != MACH_PORT_NULL) {
+    } else if (MACH_PORT_VALID(kmem_read_port)) {
         return rk64_via_kmem_read_port(kaddr);
+    } else {
+        LOG("attempt to read kernel memory but no kernel memory read primitives available");
+        return 0;
     }
-
-    LOG("attempt to read kernel memory but no kernel memory read primitives available");
-
-    return 0;
 }
 
 const uint64_t kernel_address_space_base = 0xffff000000000000;
@@ -207,7 +208,7 @@ void kmemcpy(uint64_t dest, uint64_t src, uint32_t length)
 
 uint64_t kmem_alloc(uint64_t size)
 {
-    if (tfp0 == MACH_PORT_NULL) {
+    if (!MACH_PORT_VALID(tfp0)) {
         LOG("attempt to allocate kernel memory before any kernel memory write primitives available");
         return 0;
     }
@@ -220,12 +221,13 @@ uint64_t kmem_alloc(uint64_t size)
         LOG("unable to allocate kernel memory via tfp0: %s %x", mach_error_string(err), err);
         return 0;
     }
+    
     return addr;
 }
 
 uint64_t kmem_alloc_wired(uint64_t size)
 {
-    if (tfp0 == MACH_PORT_NULL) {
+    if (!MACH_PORT_VALID(tfp0)) {
         LOG("attempt to allocate kernel memory before any kernel memory write primitives available");
         return 0;
     }
@@ -254,16 +256,17 @@ uint64_t kmem_alloc_wired(uint64_t size)
         LOG("unable to wire kernel memory via tfp0: %s %x", mach_error_string(err), err);
         return 0;
     }
+    
     return addr;
 }
 
 bool kmem_free(uint64_t kaddr, uint64_t size)
 {
-    if (tfp0 == MACH_PORT_NULL) {
+    if (!MACH_PORT_VALID(tfp0)) {
         LOG("attempt to deallocate kernel memory before any kernel memory write primitives available");
         return false;
     }
-
+    
     kern_return_t err;
     mach_vm_size_t ksize = round_page_kernel(size);
     err = mach_vm_deallocate(tfp0, kaddr, ksize);
@@ -271,20 +274,23 @@ bool kmem_free(uint64_t kaddr, uint64_t size)
         LOG("unable to deallocate kernel memory via tfp0: %s %x", mach_error_string(err), err);
         return false;
     }
+    
     return true;
 }
 
 bool kmem_protect(uint64_t kaddr, uint32_t size, int prot)
 {
-    if (tfp0 == MACH_PORT_NULL) {
+    if (!MACH_PORT_VALID(tfp0)) {
         LOG("attempt to change protection of kernel memory before any kernel memory write primitives available");
         return false;
     }
+    
     kern_return_t err;
     err = mach_vm_protect(tfp0, (mach_vm_address_t)kaddr, (mach_vm_size_t)size, 0, (vm_prot_t)prot);
     if (err != KERN_SUCCESS) {
         LOG("unable to change protection of kernel memory via tfp0: %s %x", mach_error_string(err), err);
         return false;
     }
+    
     return true;
 }
