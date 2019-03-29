@@ -47,6 +47,7 @@
 #include "utils.h"
 #include "ArchiveFile.h"
 #include "../../patchfinder64/patchfinder64.h" // Work around Xcode 9
+#include "../../offset-cache/offsetcache.h"
 #include "CreditsTableViewController.h"
 #include "FakeApt.h"
 #include "voucher_swap.h"
@@ -209,19 +210,28 @@ uint64_t make_fake_task(uint64_t vm_map) {
     return fake_task_kaddr;
 }
 
-void set_all_image_info_addr(uint64_t kernel_task_kaddr, uint64_t all_image_info_addr) {
+void set_all_image_info_addr(uint64_t kernel_task_kaddr) {
     struct task_dyld_info dyld_info = { 0 };
     mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
     _assert(task_info(tfp0, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS, message, true);
-    LOG("Will set all_image_info_addr to: " ADDR, all_image_info_addr);
-    if (dyld_info.all_image_info_addr != all_image_info_addr) {
-        LOG("Setting all_image_info_addr...");
-        WriteKernel64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_ALL_IMAGE_INFO_ADDR), all_image_info_addr);
-        _assert(task_info(tfp0, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS, message, true);
-        _assert(dyld_info.all_image_info_addr == all_image_info_addr, message, true);
-    } else {
-        LOG("All_image_info_addr already set.");
+    LOG("Will save offsets to all_image_info_addr");
+    if (dyld_info.all_image_info_addr && dyld_info.all_image_info_addr != kernel_base && dyld_info.all_image_info_addr > kernel_base) {
+        // Free old offset cache - didn't bother comparing because it's faster to just replace it if it's the same
+        kmem_free(dyld_info.all_image_info_addr, rk64(rk64(dyld_info.all_image_info_addr)));
     }
+    struct cache_blob *cache;
+    size_t cache_size = export_cache_blob(&cache);
+    _assert(cache_size > sizeof(struct cache_blob), message, true);
+    LOG("Setting all_image_info_addr...");
+    SETOFFSET(kernel_base, kernel_base);
+    SETOFFSET(kernel_slide, kernel_slide);
+    uint64_t kernel_cache_blob = kmem_alloc_wired(cache_size);
+    blob_rebase(cache, (uint64_t)cache, kernel_cache_blob);
+    wkbuffer(kernel_cache_blob, cache, cache_size);
+    free(cache);
+    WriteKernel64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_ALL_IMAGE_INFO_ADDR), kernel_cache_blob);
+    _assert(task_info(tfp0, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS, message, true);
+    _assert(dyld_info.all_image_info_addr == kernel_cache_blob, message, true);
 }
 
 void set_all_image_info_size(uint64_t kernel_task_kaddr, uint64_t all_image_info_size) {
@@ -313,7 +323,7 @@ void remap_tfp0_set_hsp4(mach_port_t *port) {
     uint64_t host_priv_kaddr = get_address_of_port(getpid(), host);
     uint64_t realhost_kaddr = ReadKernel64(host_priv_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
     WriteKernel64(realhost_kaddr + koffset(KSTRUCT_OFFSET_HOST_SPECIAL) + 4 * sizeof(void *), port_kaddr);
-    set_all_image_info_addr(kernel_task_kaddr, kernel_base);
+    set_all_image_info_addr(kernel_task_kaddr);
     set_all_image_info_size(kernel_task_kaddr, kernel_slide);
     mach_port_deallocate(mach_task_self(), host);
 }
@@ -656,7 +666,7 @@ void jailbreak()
         mach_port_t persisted_kernel_task_port = MACH_PORT_NULL;
         struct task_dyld_info dyld_info = { 0 };
         mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
-        uint64_t persisted_kernel_base = 0;
+        uint64_t persisted_cache_blob = 0;
         uint64_t persisted_kernel_slide = 0;
         myHost = mach_host_self();
         _assert(MACH_PORT_VALID(myHost), message, true);
@@ -664,11 +674,22 @@ void jailbreak()
         if (host_get_special_port(myHost, 0, 4, &persisted_kernel_task_port) == KERN_SUCCESS &&
             MACH_PORT_VALID(persisted_kernel_task_port) &&
             task_info(persisted_kernel_task_port, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS &&
-            ISADDR((persisted_kernel_base = dyld_info.all_image_info_addr)) &&
+            ISADDR((persisted_cache_blob = dyld_info.all_image_info_addr)) &&
             (persisted_kernel_slide = dyld_info.all_image_info_size) != 0) {
             prepare_for_rw_with_fake_tfp0(persisted_kernel_task_port);
-            kernel_base = persisted_kernel_base;
+            kernel_base = KERNEL_SEARCH_ADDRESS + persisted_kernel_slide;
             kernel_slide = persisted_kernel_slide;
+
+            if (persisted_cache_blob != KERNEL_SEARCH_ADDRESS + persisted_kernel_slide) {
+                size_t blob_size = rk64(persisted_cache_blob);
+                LOG("Restoring persisted offsets cache");
+                struct cache_blob *blob = create_cache_blob(blob_size);
+                _assert(rkbuffer(persisted_cache_blob, blob, blob_size), message, true);
+                import_cache_blob(blob);
+                _assert(GETOFFSET(kernel_slide) == persisted_kernel_slide, message, true);
+                found_offsets = true;
+            }
+            
             usedPersistedKernelTaskPort = true;
             exploit_success = true;
         } else {
@@ -762,7 +783,7 @@ void jailbreak()
     
     UPSTAGE();
     
-    {
+    if (!found_offsets) {
         // Initialize patchfinder64.
         
         LOG("Initializing patchfinder64...");
@@ -786,21 +807,31 @@ void jailbreak()
             _assert(false, message, true);
         }
         if (auth_ptrs) {
+            SETOFFSET(auth_ptrs, true);
             LOG("Detected authentication pointers.");
             sshOnly = true;
         }
         if (monolithic_kernel) {
+            SETOFFSET(monolithic_kernel, true);
             LOG("Detected monolithic kernel.");
         }
         LOG("Successfully initialized patchfinder64.");
+    } else {
+        auth_ptrs = GETOFFSET(auth_ptrs);
+        monolithic_kernel = GETOFFSET(monolithic_kernel);
+        SETOFFSET(OSBooleanTrue, ReadKernel64(GETOFFSET(OSBoolean_True)));
+        SETOFFSET(OSBooleanFalse, ReadKernel64(GETOFFSET(OSBoolean_True)) + 0x8);
     }
     
     UPSTAGE();
     
-    {
+    if (!found_offsets) {
         // Find offsets.
         
         LOG("Finding offsets...");
+        SETOFFSET(kernel_base, kernel_base);
+        SETOFFSET(kernel_slide, kernel_slide);
+        
 #define PF(x) do { \
         SETMESSAGE(NSLocalizedString(@"Failed to find " #x " offset.", nil)); \
         SETOFFSET(x, find_symbol("_" #x)); \

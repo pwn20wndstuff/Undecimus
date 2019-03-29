@@ -7,3 +7,6 @@
 [submodule "patchfinder64"]
 	path = patchfinder64
 	url = https://github.com/pwn20wndstuff/patchfinder64.git
+[submodule "offset-cache"]
+	path = offset-cache
+	url = git@github.com:sbingner/offset-cache.git
