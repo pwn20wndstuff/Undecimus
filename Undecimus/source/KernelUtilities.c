@@ -13,6 +13,9 @@
 #include "find_port.h"
 #include "KernelExecution.h"
 
+#define CS_PLATFORM_BINARY 0x4000000 /* this is a platform binary */
+#define CS_GET_TASK_ALLOW 0x0000004 /* has get-task-allow entitlement */
+
 #define TF_PLATFORM 0x00000400 /* task is a platform binary */
 
 #define IO_ACTIVE 0x80000000
@@ -319,3 +322,18 @@ void export_tfp0(host_t host) {
 void unexport_tfp0(host_t host) {
     set_host_type(host, IO_ACTIVE | IKOT_HOST);
 }
+
+void set_csflags(uint64_t proc, uint32_t flags, bool value) {
+    uint32_t csflags = ReadKernel32(proc + koffset(KSTRUCT_OFFSET_PROC_P_CSFLAGS));
+    if (value == true) {
+        csflags |= flags;
+    } else {
+        csflags &= ~flags;
+    }
+    WriteKernel32(proc + koffset(KSTRUCT_OFFSET_PROC_P_CSFLAGS), csflags);
+}
+
+void set_cs_platform_binary(uint64_t proc, bool value) {
+    set_csflags(proc, CS_PLATFORM_BINARY, value);
+}
+

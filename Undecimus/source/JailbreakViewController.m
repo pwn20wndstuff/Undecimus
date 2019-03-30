@@ -920,6 +920,7 @@ void jailbreak()
         _assert(getuid() == 0, message, true);
         myHost = mach_host_self();
         set_platform_binary(myProcAddr, true);
+        set_cs_platform_binary(myProcAddr, true);
         LOG("Successfully escaped Sandbox.");
     }
     
@@ -2224,6 +2225,7 @@ out:
     term_kexecute();
     LOG("Unplatformizing...");
     set_platform_binary(myProcAddr, false);
+    set_cs_platform_binary(myProcAddr, false);
     LOG("Sandboxing...");
     _assert(give_creds_to_process_at_addr(myProcAddr, myOriginalCredAddr) == kernelCredAddr, message, true);
     LOG("Downgrading host port...");
