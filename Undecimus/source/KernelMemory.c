@@ -251,7 +251,10 @@ uint64_t kmem_alloc_wired(uint64_t size)
 
     LOG("address to wire: %llx", addr);
 
-    err = mach_vm_wire(fake_host_priv(), tfp0, addr, ksize, VM_PROT_READ | VM_PROT_WRITE);
+    host_t host = mach_host_self();
+    err = mach_vm_wire(host, tfp0, addr, ksize, VM_PROT_READ | VM_PROT_WRITE);
+    mach_port_deallocate(mach_task_self(), host);
+    host = HOST_NULL;
     if (err != KERN_SUCCESS) {
         LOG("unable to wire kernel memory via tfp0: %s %x", mach_error_string(err), err);
         return 0;
