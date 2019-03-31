@@ -383,9 +383,11 @@ void unblockDomainWithName(const char *name) {
 }
 
 uint64_t _vfs_context() {
-    // vfs_context_t vfs_context_current(void)
-    uint64_t vfs_context = kexecute(GETOFFSET(vfs_context_current), 1, 0, 0, 0, 0, 0, 0);
-    vfs_context = zm_fix_addr(vfs_context);
+    static uint64_t vfs_context = 0;
+    if (vfs_context == 0) {
+        vfs_context = kexecute(GETOFFSET(vfs_context_current), 1, 0, 0, 0, 0, 0, 0);
+        vfs_context = zm_fix_addr(vfs_context);
+    }
     return vfs_context;
 }
 
