@@ -681,7 +681,7 @@ void jailbreak()
             MACH_PORT_VALID(persisted_kernel_task_port) &&
             task_info(persisted_kernel_task_port, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS &&
             ISADDR((persisted_cache_blob = dyld_info.all_image_info_addr)) &&
-            (persisted_kernel_slide = dyld_info.all_image_info_size) != 0) {
+            (persisted_kernel_slide = dyld_info.all_image_info_size) != -1) {
             prepare_for_rw_with_fake_tfp0(persisted_kernel_task_port);
             kernel_base = KERNEL_SEARCH_ADDRESS + persisted_kernel_slide;
             kernel_slide = persisted_kernel_slide;
@@ -706,7 +706,7 @@ void jailbreak()
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR((kernel_base = find_kernel_base())) &&
                         ReadKernel32(kernel_base) == MACH_HEADER_MAGIC &&
-                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != 0) {
+                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != -1) {
                         exploit_success = true;
                     }
                     break;
@@ -716,7 +716,7 @@ void jailbreak()
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR((kernel_base = find_kernel_base())) &&
                         ReadKernel32(kernel_base) == MACH_HEADER_MAGIC &&
-                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != 0) {
+                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != -1) {
                         exploit_success = true;
                     }
                     break;
@@ -726,7 +726,7 @@ void jailbreak()
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR((kernel_base = find_kernel_base())) &&
                         ReadKernel32(kernel_base) == MACH_HEADER_MAGIC &&
-                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != 0) {
+                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != -1) {
                         exploit_success = true;
                     }
                     break;
@@ -736,7 +736,7 @@ void jailbreak()
                     prepare_for_rw_with_fake_tfp0(kernel_task_port);
                     if (MACH_PORT_VALID(tfp0) &&
                         kernel_slide_init() &&
-                        kernel_slide != 0 &&
+                        kernel_slide != -1 &&
                         ISADDR((kernel_base = (kernel_slide + KERNEL_SEARCH_ADDRESS))) &&
                         ReadKernel32(kernel_base) == MACH_HEADER_MAGIC) {
                         exploit_success = true;
@@ -749,7 +749,7 @@ void jailbreak()
                         machswap_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR(kernel_base) &&
-                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != 0) {
+                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != -1) {
                         exploit_success = true;
                     }
                     break;
@@ -760,7 +760,7 @@ void jailbreak()
                         machswap2_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR(kernel_base) &&
-                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != 0) {
+                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != -1) {
                         exploit_success = true;
                     }
                     break;
@@ -1059,10 +1059,13 @@ void jailbreak()
         LOG("Logging ECID...");
         SETMESSAGE(NSLocalizedString(@"Failed to log ECID.", nil));
         CFStringRef value = MGCopyAnswer(kMGUniqueChipID);
-        _assert(value != nil, message, true);
-        _assert(modifyPlist(prefsFile, ^(id plist) {
-            plist[K_ECID] = CFBridgingRelease(value);
-        }), message, true);
+        if (value != nil) {
+            _assert(modifyPlist(prefsFile, ^(id plist) {
+                plist[K_ECID] = CFBridgingRelease(value);
+            }), message, true);
+        } else {
+            LOG("I couldn't get the ECID... Am I running on a real device?");
+        }
         LOG("Successfully logged ECID.");
         INSERTSTATUS(NSLocalizedString(@"Logged ECID.\n", nil));
     }

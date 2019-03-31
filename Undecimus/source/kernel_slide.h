@@ -8,10 +8,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef KERNEL_SLIDE_EXTERN
-#define extern KERNEL_SLIDE_EXTERN
-#endif
-
 /*
  * kernel_slide
  *
