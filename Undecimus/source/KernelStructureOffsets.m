@@ -10,9 +10,9 @@
 #include <common.h>
 #include "utils.h"
 
-int* offsets = NULL;
+uint32_t* offsets = NULL;
 
-int kstruct_offsets_11_0[] = {
+uint32_t kstruct_offsets_11_0[] = {
     0xb, // KSTRUCT_OFFSET_TASK_LCK_MTX_TYPE
     0x10, // KSTRUCT_OFFSET_TASK_REF_COUNT
     0x14, // KSTRUCT_OFFSET_TASK_ACTIVE
@@ -75,7 +75,7 @@ int kstruct_offsets_11_0[] = {
     0x6c, // KFREE_ADDR_OFFSET
 };
 
-int kstruct_offsets_11_3[] = {
+uint32_t kstruct_offsets_11_3[] = {
     0xb, // KSTRUCT_OFFSET_TASK_LCK_MTX_TYPE
     0x10, // KSTRUCT_OFFSET_TASK_REF_COUNT
     0x14, // KSTRUCT_OFFSET_TASK_ACTIVE
@@ -138,7 +138,7 @@ int kstruct_offsets_11_3[] = {
     0x6c, // KFREE_ADDR_OFFSET
 };
 
-int kstruct_offsets_12_0[] = {
+uint32_t kstruct_offsets_12_0[] = {
     0xb, // KSTRUCT_OFFSET_TASK_LCK_MTX_TYPE
     0x10, // KSTRUCT_OFFSET_TASK_REF_COUNT
     0x14, // KSTRUCT_OFFSET_TASK_ACTIVE
@@ -217,7 +217,7 @@ int kstruct_offsets_12_0[] = {
     0x6c, // KFREE_ADDR_OFFSET
 };
 
-int koffset(enum kstruct_offset offset)
+uint32_t koffset(enum kstruct_offset offset)
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -233,7 +233,7 @@ int koffset(enum kstruct_offset offset)
             offsets = kstruct_offsets_11_0;
         } else {
             LOG("iOS version too low, 11.0 required");
-            exit(EXIT_FAILURE);
+            offsets = NULL;
         }
     });
     if (offsets == NULL) {

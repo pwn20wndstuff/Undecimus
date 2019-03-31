@@ -1,7 +1,7 @@
 #ifndef KernelOffsets_h
 #define KernelOffsets_h
 
-extern int* offsets;
+extern uint32_t* offsets;
 
 enum kstruct_offset {
     /* struct task */
@@ -81,6 +81,6 @@ enum kstruct_offset {
     KFREE_ADDR_OFFSET,
 };
 
-int koffset(enum kstruct_offset offset);
+uint32_t koffset(enum kstruct_offset offset);
 
 #endif
