@@ -75,7 +75,7 @@ kernel_slide_init_with_kernel_image_address(uint64_t address) {
 	base = base + ((address - base) / kernel_slide_step) * kernel_slide_step;
 	// Now walk backwards from that kernel base one kernel slide at a time until we find the
 	// real kernel base.
-	while (base > STATIC_ADDRESS(kernel_base)) {
+	while (base >= STATIC_ADDRESS(kernel_base)) {
 		bool found = is_kernel_base(base);
 		if (found) {
 			kernel_slide = base - STATIC_ADDRESS(kernel_base);

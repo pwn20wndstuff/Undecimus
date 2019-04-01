@@ -8,7 +8,7 @@
 #define SETOFFSET(offset, val) set_offset(#offset, val)
 #define GETOFFSET(offset) get_offset(#offset)
 
-#define ISADDR(val) (val >= 0xffff000000000000)
+#define ISADDR(val) ((val) >= 0xffff000000000000 && (val) != 0xffffffffffffffff)
 
 extern uint64_t kernel_base;
 extern uint64_t kernel_slide;

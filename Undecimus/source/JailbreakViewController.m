@@ -706,9 +706,7 @@ void jailbreak()
                 case empty_list_exploit: {
                     if (vfs_sploit() &&
                         MACH_PORT_VALID(tfp0) &&
-                        ISADDR((kernel_base = find_kernel_base())) &&
-                        ReadKernel32(kernel_base) == MACH_HEADER_MAGIC &&
-                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != -1) {
+                        ISADDR(kernel_base = find_kernel_base())) {
                         exploit_success = true;
                     }
                     break;
@@ -716,9 +714,7 @@ void jailbreak()
                 case multi_path_exploit: {
                     if (mptcp_go() &&
                         MACH_PORT_VALID(tfp0) &&
-                        ISADDR((kernel_base = find_kernel_base())) &&
-                        ReadKernel32(kernel_base) == MACH_HEADER_MAGIC &&
-                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != -1) {
+                        ISADDR(kernel_base = find_kernel_base())) {
                         exploit_success = true;
                     }
                     break;
@@ -726,9 +722,7 @@ void jailbreak()
                 case async_wake_exploit: {
                     if (async_wake_go() &&
                         MACH_PORT_VALID(tfp0) &&
-                        ISADDR((kernel_base = find_kernel_base())) &&
-                        ReadKernel32(kernel_base) == MACH_HEADER_MAGIC &&
-                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != -1) {
+                        ISADDR(kernel_base = find_kernel_base())) {
                         exploit_success = true;
                     }
                     break;
@@ -739,8 +733,7 @@ void jailbreak()
                     if (MACH_PORT_VALID(tfp0) &&
                         kernel_slide_init() &&
                         kernel_slide != -1 &&
-                        ISADDR((kernel_base = (kernel_slide + KERNEL_SEARCH_ADDRESS))) &&
-                        ReadKernel32(kernel_base) == MACH_HEADER_MAGIC) {
+                        ISADDR(kernel_base = (kernel_slide + KERNEL_SEARCH_ADDRESS))) {
                         exploit_success = true;
                     }
                     break;
@@ -750,8 +743,7 @@ void jailbreak()
                     if ((machswap_offsets = get_machswap_offsets()) != NULL &&
                         machswap_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
-                        ISADDR(kernel_base) &&
-                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != -1) {
+                        ISADDR(kernel_base)) {
                         exploit_success = true;
                     }
                     break;
@@ -761,8 +753,7 @@ void jailbreak()
                     if ((machswap_offsets = get_machswap_offsets()) != NULL &&
                         machswap2_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
-                        ISADDR(kernel_base) &&
-                        (kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS)) != -1) {
+                        ISADDR(kernel_base)) {
                         exploit_success = true;
                     }
                     break;
@@ -775,11 +766,16 @@ void jailbreak()
                 }
             }
         }
+        if (kernel_slide == -1 && kernel_base != -1) kernel_slide = (kernel_base - KERNEL_SEARCH_ADDRESS);
         LOG("tfp0: 0x%x", tfp0);
         LOG("kernel_base: " ADDR, kernel_base);
         LOG("kernel_slide: " ADDR, kernel_slide);
-        if (!verify_tfp0()) {
+        if (exploit_success && !verify_tfp0()) {
             LOG("Failed to verify TFP0.");
+            exploit_success = false;
+        }
+        if (exploit_success && ReadKernel32(kernel_base) != MACH_HEADER_MAGIC) {
+            LOG("Failed to verify kernel_base.");
             exploit_success = false;
         }
         if (!exploit_success) {

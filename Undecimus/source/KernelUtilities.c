@@ -24,7 +24,7 @@
 #define IKOT_HOST_PRIV 4
 
 uint64_t the_realhost;
-uint64_t kernel_base;
+uint64_t kernel_base = -1;
 bool found_offsets = false;
 
 uint64_t cached_task_self_addr = 0;
