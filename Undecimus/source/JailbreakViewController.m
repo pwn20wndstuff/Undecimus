@@ -229,8 +229,6 @@ void set_all_image_info_addr(uint64_t kernel_task_kaddr) {
     size_t cache_size = export_cache_blob(&cache);
     _assert(cache_size > sizeof(struct cache_blob), message, true);
     LOG("Setting all_image_info_addr...");
-    SETOFFSET(kernel_base, kernel_base);
-    SETOFFSET(kernel_slide, kernel_slide);
     uint64_t kernel_cache_blob = kmem_alloc_wired(cache_size);
     blob_rebase(cache, (uint64_t)cache, kernel_cache_blob);
     wkbuffer(kernel_cache_blob, cache, cache_size);
@@ -827,6 +825,13 @@ void jailbreak()
             SETOFFSET(monolithic_kernel, true);
             LOG("Detected monolithic kernel.");
         }
+        offset_options = GETOFFSET(unrestrict-options);
+        if (!offset_options) {
+            offset_options = kmem_alloc(sizeof(uint64_t));
+            wk64(offset_options, 0);
+            SETOFFSET(unrestrict-options, offset_options);
+        }
+        // TODO: Save any options set in GUI here via SETOPT(name)
     }
 
     UPSTAGE();
@@ -905,7 +910,7 @@ void jailbreak()
         _assert(ISADDR(kernelCredAddr), message, true);
         Shenanigans = ReadKernel64(GETOFFSET(shenanigans));
         LOG("Shenanigans = " ADDR, Shenanigans);
-        _assert(ISADDR(Shenanigans), message, true);
+        _assert(ISADDR(Shenanigans) || Shenanigans == ShenanigansPatch, message, true);
         if (Shenanigans != kernelCredAddr) {
             LOG("Detected corrupted shenanigans pointer.");
             Shenanigans = kernelCredAddr;
