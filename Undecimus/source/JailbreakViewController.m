@@ -214,6 +214,7 @@ void set_all_image_info_addr(uint64_t kernel_task_kaddr) {
     mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
     _assert(task_info(tfp0, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS, message, true);
     LOG("Will save offsets to all_image_info_addr");
+    SETOFFSET(kernel_task_offset_all_image_info_addr, koffset(KSTRUCT_OFFSET_TASK_ALL_IMAGE_INFO_ADDR));
     if (dyld_info.all_image_info_addr && dyld_info.all_image_info_addr != kernel_base && dyld_info.all_image_info_addr > kernel_base) {
         size_t blob_size = rk64(dyld_info.all_image_info_addr);
         struct cache_blob *blob = create_cache_blob(blob_size);
