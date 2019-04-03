@@ -826,7 +826,7 @@ void jailbreak()
             SETOFFSET(monolithic_kernel, true);
             LOG("Detected monolithic kernel.");
         }
-        uint64_t offset_options = GETOFFSET(unrestrict-options);
+        offset_options = GETOFFSET(unrestrict-options);
         if (!offset_options) {
             offset_options = kmem_alloc(sizeof(uint64_t));
             wk64(offset_options, 0);
@@ -1789,6 +1789,10 @@ void jailbreak()
         if (pkgIsBy("CoolStar", "lzma")) {
             removePkg("lzma", true);
             extractDebsForPkg(@"lzma", debsToInstall, false);
+        }
+        
+        if (pkgIsInstalled("openssl") && compareInstalledVersion("openssl", "lt", "1.0.2q")) {
+            removePkg("openssl", true);
         }
         // Test dpkg
         if (!pkgIsConfigured("dpkg") || pkgIsBy("CoolStar", "dpkg")) {

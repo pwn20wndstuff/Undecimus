@@ -25,6 +25,7 @@
 
 uint64_t the_realhost;
 uint64_t kernel_base = -1;
+uint64_t offset_options = 0;
 bool found_offsets = false;
 
 uint64_t cached_task_self_addr = 0;
