@@ -1641,8 +1641,10 @@ void jailbreak()
         }
         free(osversion);
         osversion = NULL;
+        
         NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
         _assert(resourcesPkgs != nil, message, true);
+        resourcesPkgs = [@[@"system-memory-reset-fix"] arrayByAddingObjectsFromArray:resourcesPkgs];
         if (betaFirmware) {
             resourcesPkgs = [@[@"com.parrotgeek.nobetaalert"] arrayByAddingObjectsFromArray:resourcesPkgs];
         }
