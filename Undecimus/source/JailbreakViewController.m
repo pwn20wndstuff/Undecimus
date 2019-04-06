@@ -678,9 +678,11 @@ void jailbreak()
         myHost = mach_host_self();
         _assert(MACH_PORT_VALID(myHost), message, true);
         myOriginalHost = myHost;
+        pid_t pid = 0;
         if ((task_for_pid(mach_task_self(), 0, &persisted_kernel_task_port) == KERN_SUCCESS ||
             host_get_special_port(myHost, 0, 4, &persisted_kernel_task_port) == KERN_SUCCESS) &&
             MACH_PORT_VALID(persisted_kernel_task_port) &&
+            pid_for_task(persisted_kernel_task_port, &pid) == KERN_SUCCESS && pid == 0 &&
             task_info(persisted_kernel_task_port, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS &&
             ISADDR((persisted_cache_blob = dyld_info.all_image_info_addr)) &&
             (persisted_kernel_slide = dyld_info.all_image_info_size) != -1) {
