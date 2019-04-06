@@ -1778,6 +1778,10 @@ void jailbreak()
         // Run substrate
         LOG("Starting Substrate...");
         SETMESSAGE(NSLocalizedString(skipSubstrate?@"Failed to restart Substrate":@"Failed to start Substrate.", nil));
+        if (!is_symlink("/usr/lib/substrate")) {
+            _assert([[NSFileManager defaultManager] moveItemAtPath:@"/usr/lib/substrate" toPath:@"/Library/substrate" error:nil], message, true);
+            _assert(ensure_symlink("/Library/substrate", "/usr/lib/substrate"), message, true);
+        }
         _assert(runCommand("/usr/libexec/substrate", NULL) == ERR_SUCCESS, message, skipSubstrate?false:true);
         LOG("Successfully started Substrate.");
         
