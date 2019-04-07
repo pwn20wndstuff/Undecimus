@@ -414,19 +414,19 @@ void unblockDomainWithName(const char *name) {
     hostsFile = [NSString stringWithContentsOfFile:@"/etc/hosts" encoding:NSUTF8StringEncoding error:nil];
     newHostsFile = hostsFile;
     newLine = [NSString stringWithFormat:@"\n127.0.0.1 %s\n", name];
-    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+    if ([hostsFile containsString:newLine]) {
         newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
     }
     newLine = [NSString stringWithFormat:@"\n0.0.0.0 %s\n", name];
-    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+    if ([hostsFile containsString:newLine]) {
         newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
     }
     newLine = [NSString stringWithFormat:@"\n0.0.0.0    %s\n", name];
-    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+    if ([hostsFile containsString:newLine]) {
         newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
     }
     newLine = [NSString stringWithFormat:@"\n::1 %s\n", name];
-    if ([hostsFile rangeOfString:newLine].location != NSNotFound) {
+    if ([hostsFile containsString:newLine]) {
         newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
     }
     if (![newHostsFile isEqual:hostsFile]) {
