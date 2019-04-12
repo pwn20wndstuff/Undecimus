@@ -113,8 +113,7 @@ mach_port_t fake_host_priv()
     return port;
 }
 
-uint64_t get_proc_struct_for_pid(pid_t pid)
-{
+uint64_t get_kernel_proc_struct_addr() {
     static uint64_t kernproc = 0;
     if (kernproc == 0) {
         kernproc = ReadKernel64(ReadKernel64(GETOFFSET(kernel_task)) + koffset(KSTRUCT_OFFSET_TASK_BSD_INFO));
@@ -124,16 +123,37 @@ uint64_t get_proc_struct_for_pid(pid_t pid)
             return 0;
         }
     }
-    uint64_t proc = kernproc;
-    if (pid == 0) {
-        return proc;
+    return kernproc;
+}
+
+void iterate_proc_list(void (^handler)(uint64_t, pid_t, bool *)) {
+    assert(handler != NULL);
+    uint64_t proc = get_kernel_proc_struct_addr();
+    if (proc == 0) {
+        LOG("failed to get proc!");
+        return;
     }
-    while (proc) {
-        if (ReadKernel32(proc + koffset(KSTRUCT_OFFSET_PROC_PID)) == pid)
-            return proc;
+    bool iterate = true;
+    while (proc && iterate) {
+        pid_t pid = ReadKernel32(proc + koffset(KSTRUCT_OFFSET_PROC_PID));
+        handler(proc, pid, &iterate);
+        if (!iterate) {
+            break;
+        }
         proc = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_P_LIST));
     }
-    return 0;
+}
+
+uint64_t get_proc_struct_for_pid(pid_t pid)
+{
+    __block uint64_t proc = 0;
+    iterate_proc_list(^(uint64_t found_proc, pid_t found_pid, bool *iterate) {
+        if (found_pid == pid) {
+            proc = found_proc;
+            *iterate = false;
+        }
+    });
+    return proc;
 }
 
 uint64_t get_address_of_port(pid_t pid, mach_port_t port)
