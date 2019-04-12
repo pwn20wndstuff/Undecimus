@@ -28,6 +28,9 @@
 extern char **environ;
 int logfd=-1;
 
+bool injectedToTrustCache = false;
+NSMutableArray *toInjectToTrustCache = nil;
+
 NSData *lastSystemOutput=nil;
 void injectDir(NSString *dir) {
     NSFileManager *fm = [NSFileManager defaultManager];
@@ -38,9 +41,17 @@ void injectDir(NSString *dir) {
             [toInject addObject:file];
         }
     }
-    LOG("Injecting %lu files for %@", (unsigned long)toInject.count, dir);
+    LOG("Will inject %lu files for %@", (unsigned long)toInject.count, dir);
     if (toInject.count > 0) {
-        injectTrustCache(toInject, GETOFFSET(trustcache), pmap_load_trust_cache);
+        if (injectedToTrustCache) {
+            LOG("Can't inject files - Trust cache already injected");
+        } else {
+            for (NSString *path in toInject) {
+                if (![toInjectToTrustCache containsObject:path]) {
+                    [toInjectToTrustCache addObject:path];
+                }
+            }
+        }
     }
 }
 
@@ -255,13 +266,22 @@ bool extractDeb(NSString *debPath) {
         NSMutableArray *toInject = [NSMutableArray new];
         NSDictionary *files = tar.files;
         for (NSString *file in files.allKeys) {
-            if (cdhashFor(file) != nil) {
-                [toInject addObject:file];
+            NSString *path = [@"/" stringByAppendingString:file];
+            if (cdhashFor(path) != nil) {
+                [toInject addObject:path];
             }
         }
-        LOG("Injecting %lu files for %@", (unsigned long)toInject.count, debPath);
+        LOG("Will inject %lu files for %@", (unsigned long)toInject.count, debPath);
         if (toInject.count > 0) {
-            injectTrustCache(toInject, GETOFFSET(trustcache), pmap_load_trust_cache);
+            if (injectedToTrustCache) {
+                LOG("Can't inject files - Trust cache already injected");
+            } else {
+                for (NSString *path in toInject) {
+                    if (![toInjectToTrustCache containsObject:path]) {
+                        [toInjectToTrustCache addObject:path];
+                    }
+                }
+            }
         }
     }
     return result;
@@ -1295,3 +1315,7 @@ bool airplaneModeEnabled() {
     }
 }
 
+__attribute__((constructor))
+static void ctor() {
+    toInjectToTrustCache = [NSMutableArray new];
+}

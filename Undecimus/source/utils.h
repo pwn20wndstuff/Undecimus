@@ -14,6 +14,8 @@
 
 #define system(x) _system(x)
 extern int logfd;
+extern bool injectedToTrustCache;
+extern NSMutableArray *toInjectToTrustCache;
 
 #define DEFAULT_VERSION_STRING "Hacked"
 #define SLIDE_FILE "/var/tmp/slide.txt"
