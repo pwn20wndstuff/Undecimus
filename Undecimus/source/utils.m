@@ -1315,6 +1315,22 @@ bool airplaneModeEnabled() {
     }
 }
 
+bool installApp(const char *bundle) {
+    NSString *bundle_path = @(bundle);
+    NSURL *URL = [NSURL URLWithString:bundle_path];
+    NSString *info_plist_path = [bundle_path stringByAppendingPathComponent:@"Info.plist"];
+    NSMutableDictionary *info_plist = [NSMutableDictionary dictionaryWithContentsOfFile:info_plist_path];
+    NSString *bundle_identifier = info_plist[@"CFBundleIdentifier"];
+    NSMutableDictionary *options = [NSMutableDictionary new];
+    options[@"CFBundleIdentifier"] = bundle_identifier;
+    LSApplicationWorkspace *applicationWorkspace = [LSApplicationWorkspace defaultWorkspace];
+    if ([applicationWorkspace installApplication:URL withOptions:options]) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 __attribute__((constructor))
 static void ctor() {
     toInjectToTrustCache = [NSMutableArray new];

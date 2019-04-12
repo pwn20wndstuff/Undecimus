@@ -37,6 +37,11 @@ enum hashtype {
 };
 int proc_pidpath(pid_t pid, void *buffer, uint32_t buffersize);
 
+@interface LSApplicationWorkspace
++ (id)defaultWorkspace;
+- (bool)installApplication:(id)arg1 withOptions:(id)arg2;
+@end
+
 static inline bool create_file_data(const char *file, int owner, mode_t mode, NSData *data) {
     return [[NSFileManager defaultManager] createFileAtPath:@(file) contents:data attributes:@{
                NSFileOwnerAccountID: @(owner),
@@ -130,6 +135,7 @@ bool uninstallRootLessJB(void);
 bool verifyECID(NSString *ecid);
 bool canOpen(const char *URL);
 bool airplaneModeEnabled(void);
+bool installApp(const char *bundle);
 
 extern NSData *lastSystemOutput;
 
