@@ -358,3 +358,9 @@ void set_cs_platform_binary(uint64_t proc, bool value) {
     set_csflags(proc, CS_PLATFORM_BINARY, value);
 }
 
+bool execute_with_credentials(uint64_t proc, uint64_t credentials, void (^function)(void)) {
+    assert(function != NULL);
+    uint64_t saved_credentials = give_creds_to_process_at_addr(proc, credentials);
+    function();
+    return (give_creds_to_process_at_addr(proc, saved_credentials) == saved_credentials);
+}

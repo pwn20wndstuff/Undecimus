@@ -48,4 +48,6 @@ void unexport_tfp0(host_t host);
 void set_csflags(uint64_t proc, uint32_t flags, bool value);
 void set_cs_platform_binary(uint64_t proc, bool value);
 
+bool execute_with_credentials(uint64_t proc, uint64_t credentials, void (^function)(void));
+
 #endif /* kutils_h */
