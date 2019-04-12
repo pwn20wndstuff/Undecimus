@@ -1125,9 +1125,12 @@ void jailbreak()
         int rootfd = open("/", O_RDONLY);
         _assert(rootfd > 0, message, true);
         const char **snapshots = snapshot_list(rootfd);
-        const char *origfs = "orig-fs";
-        bool has_origfs = false;
+        char *systemSnapshot = copySystemSnapshot();
+        _assert(systemSnapshot != NULL, message, true);
+        const char *original_snapshot = [@(systemSnapshot) stringByAppendingString:@".disabled"].UTF8String;
+        bool has_original_snapshot = false;
         const char *thedisk = "/dev/disk0s1s1";
+        const char *oldest_snapshot = *snapshots;
         _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
         if (snapshots == NULL) {
             close(rootfd);
@@ -1202,8 +1205,6 @@ void jailbreak()
             const char *test_snapshot = "test-snapshot";
             _assert(fs_snapshot_create(rootfd, test_snapshot, 0) == ERR_SUCCESS, message, true);
             _assert(fs_snapshot_delete(rootfd, test_snapshot, 0) == ERR_SUCCESS, message, true);
-            char *systemSnapshot = copySystemSnapshot();
-            _assert(systemSnapshot != NULL, message, true);
             uint64_t system_snapshot_vnode = 0;
             uint64_t system_snapshot_vnode_v_data = 0;
             uint32_t system_snapshot_vnode_v_data_flag = 0;
@@ -1218,13 +1219,11 @@ void jailbreak()
                 LOG("system_snapshot_vnode_v_data_flag = 0x%x", system_snapshot_vnode_v_data_flag);
                 WriteKernel32(system_snapshot_vnode_v_data + 49, system_snapshot_vnode_v_data_flag & ~0x40);
             }
-            _assert(fs_snapshot_rename(rootfd, systemSnapshot, origfs, 0) == ERR_SUCCESS, message, true);
+            _assert(fs_snapshot_rename(rootfd, systemSnapshot, original_snapshot, 0) == ERR_SUCCESS, message, true);
             if (kCFCoreFoundationVersionNumber >= 1535.12) {
                 WriteKernel32(system_snapshot_vnode_v_data + 49, system_snapshot_vnode_v_data_flag);
                 _assert(_vnode_put(system_snapshot_vnode) == ERR_SUCCESS, message, true);
             }
-            free(systemSnapshot);
-            systemSnapshot = NULL;
             LOG("Successfully renamed system snapshot.");
             
             // Reboot.
@@ -1238,8 +1237,8 @@ void jailbreak()
         } else {
             LOG("APFS Snapshots:");
             for (const char **snapshot = snapshots; *snapshot; snapshot++) {
-                if (strcmp(origfs, *snapshot) == 0) {
-                    has_origfs = true;
+                if (strcmp(original_snapshot, *snapshot) == 0) {
+                    has_original_snapshot = true;
                 }
                 LOG("%s", *snapshot);
             }
@@ -1268,15 +1267,17 @@ void jailbreak()
                     && access("/electra", F_OK) != ERR_SUCCESS;
         if (needStrap)
             LOG("We need strap.");
-        if (snapshots != NULL && needStrap && !has_origfs) {
-            // Create system snapshot.
-            
-            LOG("Creating system snapshot...");
-            SETMESSAGE(NSLocalizedString(@"Unable to create system snapshot.  Delete OTA file from Settings - Storage if present", nil));
-            _assert(fs_snapshot_create(rootfd, origfs, 0) == ERR_SUCCESS, message, true);
-            _assert(snapshot_check(rootfd, origfs), message, true);
-            LOG("Successfully created system snapshot.");
+        if (!has_original_snapshot) {
+            if (oldest_snapshot != NULL) {
+                _assert(fs_snapshot_rename(rootfd, oldest_snapshot, original_snapshot, 0) == ERR_SUCCESS, message, true);
+            } else if (needStrap) {
+                _assert(fs_snapshot_create(rootfd, original_snapshot, 0) == ERR_SUCCESS, message, true);
+            }
         }
+        free(systemSnapshot);
+        systemSnapshot = NULL;
+        free(snapshots);
+        snapshots = NULL;
         close(rootfd);
         LOG("Successfully remounted RootFS.");
         INSERTSTATUS(NSLocalizedString(@"Remounted RootFS.\n", nil));
