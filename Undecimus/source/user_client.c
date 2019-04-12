@@ -71,10 +71,6 @@ stage0_create_user_client() {
 		ERROR("could not find services matching %s", "IOAudio2Device");
 		goto fail_0;
 	}
-	// Assume the kernel's credentials in order to look up the user client. Otherwise we'd be
-	// denied with a sandbox error.
-	uint64_t ucred_field, ucred;
-	assume_kernel_credentials(&ucred_field, &ucred);
 	// Now try to open each service in turn.
 	for (;;) {
 		// Get the service.
@@ -97,8 +93,6 @@ stage0_create_user_client() {
 		DEBUG_TRACE(2, "%s returned 0x%x: %s", "IOServiceOpen", kr, mach_error_string(kr));
 		DEBUG_TRACE(2, "could not open %s", "IOAudio2DeviceUserClient");
 	}
-	// Restore the credentials.
-	restore_credentials(ucred_field, ucred);
 fail_1:
 	IOObjectRelease(iter);
 fail_0:
