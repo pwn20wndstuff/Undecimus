@@ -160,6 +160,10 @@
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_RESET_CYDIA_CACHE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_SSH_ONLY] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_SSH_ONLY];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
 }
 
 - (void)initShortcuts {

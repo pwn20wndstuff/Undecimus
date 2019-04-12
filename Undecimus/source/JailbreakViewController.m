@@ -110,6 +110,7 @@ typedef struct {
     bool install_openssh;
     bool reload_system_daemons;
     bool reset_cydia_cache;
+    bool ssh_only;
     int exploit;
 } prefs_t;
 
@@ -582,6 +583,7 @@ bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
     prefs->install_openssh = [defaults[K_INSTALL_OPENSSH] boolValue];
     prefs->reload_system_daemons = [defaults[K_RELOAD_SYSTEM_DAEMONS] boolValue];
     prefs->reset_cydia_cache = [defaults[K_RESET_CYDIA_CACHE] boolValue];
+    prefs->ssh_only = [defaults[K_SSH_ONLY] boolValue];
     prefs->exploit = [defaults[K_EXPLOIT] intValue];
     return true;
 }
@@ -636,7 +638,6 @@ void jailbreak()
     NSMutableArray *debsToInstall = [NSMutableArray new];
     NSMutableString *status = [NSMutableString string];
     bool betaFirmware = false;
-    bool sshOnly = false;
     time_t start_time = time(NULL);
 #define INSERTSTATUS(x) do { \
     [status appendString:x]; \
@@ -822,8 +823,8 @@ void jailbreak()
         if (auth_ptrs) {
             SETOFFSET(auth_ptrs, true);
             LOG("Detected authentication pointers.");
-            pmap_load_trust_cache = auth_ptrs ? _pmap_load_trust_cache : NULL;
-            sshOnly = true;
+            pmap_load_trust_cache = _pmap_load_trust_cache;
+            prefs.ssh_only = true;
         }
         if (monolithic_kernel) {
             SETOFFSET(monolithic_kernel, true);
@@ -1501,7 +1502,7 @@ void jailbreak()
     
     UPSTAGE();
     
-    if (sshOnly) {
+    if (prefs.ssh_only && !needStrap) {
         LOG("Enabling SSH...");
         SETMESSAGE(NSLocalizedString(@"Failed to enable SSH.", nil));
         NSMutableArray *toInject = [NSMutableArray new];
@@ -1595,7 +1596,7 @@ void jailbreak()
         INSERTSTATUS(NSLocalizedString(@"Enabled SSH.\n", nil));
     }
     
-    if (auth_ptrs || sshOnly) {
+    if (auth_ptrs || prefs.ssh_only) {
         goto out;
     }
     
