@@ -266,7 +266,7 @@ bool extractDeb(NSString *debPath) {
         NSMutableArray *toInject = [NSMutableArray new];
         NSDictionary *files = tar.files;
         for (NSString *file in files.allKeys) {
-            NSString *path = [@"/" stringByAppendingString:file];
+            NSString *path = [@"/" stringByAppendingString:[file stringByStandardizingPath]];
             if (cdhashFor(path) != nil) {
                 [toInject addObject:path];
             }
