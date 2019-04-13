@@ -1507,7 +1507,7 @@ void jailbreak()
     
     UPSTAGE();
     
-    if (prefs.ssh_only && !needStrap) {
+    if (prefs.ssh_only && needStrap) {
         LOG("Enabling SSH...");
         SETMESSAGE(NSLocalizedString(@"Failed to enable SSH.", nil));
         NSMutableArray *toInject = [NSMutableArray new];
