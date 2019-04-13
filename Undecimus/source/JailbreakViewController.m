@@ -1131,7 +1131,7 @@ void jailbreak()
         const char *original_snapshot = [@(systemSnapshot) stringByAppendingString:@".disabled"].UTF8String;
         bool has_original_snapshot = false;
         const char *thedisk = "/dev/disk0s1s1";
-        const char *oldest_snapshot = *snapshots;
+        const char *oldest_snapshot = NULL;
         _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
         if (snapshots == NULL) {
             close(rootfd);
@@ -1238,6 +1238,9 @@ void jailbreak()
         } else {
             LOG("APFS Snapshots:");
             for (const char **snapshot = snapshots; *snapshot; snapshot++) {
+                if (oldest_snapshot == NULL) {
+                    oldest_snapshot = *snapshot;
+                }
                 if (strcmp(original_snapshot, *snapshot) == 0) {
                     has_original_snapshot = true;
                 }
