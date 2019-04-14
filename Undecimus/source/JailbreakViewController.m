@@ -2009,7 +2009,7 @@ void jailbreak()
             LOG("Successfully increased memory limit.");
             INSERTSTATUS(NSLocalizedString(@"Increased Memory Limit.\n", nil));
         } else {
-            // Restored memory limit.
+            // Restore memory limit.
             
             LOG("Restoring memory limit...");
             SETMESSAGE(NSLocalizedString(@"Failed to restore memory limit.", nil));
