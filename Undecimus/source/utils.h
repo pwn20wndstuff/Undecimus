@@ -37,9 +37,14 @@ enum hashtype {
 };
 int proc_pidpath(pid_t pid, void *buffer, uint32_t buffersize);
 
-@interface LSApplicationWorkspace
-+ (id)defaultWorkspace;
-- (bool)installApplication:(id)arg1 withOptions:(id)arg2;
+@interface LSApplicationWorkspace : NSObject
++ (id) defaultWorkspace;
+- (BOOL) registerApplication:(id)application;
+- (BOOL) unregisterApplication:(id)application;
+- (BOOL) invalidateIconCache:(id)bundle;
+- (BOOL) registerApplicationDictionary:(id)application;
+- (BOOL) installApplication:(id)application withOptions:(id)options;
+- (BOOL) _LSPrivateRebuildApplicationDatabasesForSystemApps:(BOOL)system internal:(BOOL)internal user:(BOOL)user;
 @end
 
 static inline bool create_file_data(const char *file, int owner, mode_t mode, NSData *data) {
@@ -136,6 +141,7 @@ bool verifyECID(NSString *ecid);
 bool canOpen(const char *URL);
 bool airplaneModeEnabled(void);
 bool installApp(const char *bundle);
+bool rebuildApplicationDatabases(void);
 
 extern NSData *lastSystemOutput;
 

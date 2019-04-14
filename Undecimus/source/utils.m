@@ -1327,6 +1327,17 @@ bool installApp(const char *bundle) {
     if ([applicationWorkspace installApplication:URL withOptions:options]) {
         return true;
     } else {
+        LOG("Failed to install application");
+        return false;
+    }
+}
+
+bool rebuildApplicationDatabases() {
+    LSApplicationWorkspace *applicationWorkspace = [LSApplicationWorkspace defaultWorkspace];
+    if ([applicationWorkspace _LSPrivateRebuildApplicationDatabasesForSystemApps:YES internal:YES user:NO]) {
+        return true;
+    } else {
+        LOG("Failed to rebuild application databases");
         return false;
     }
 }
