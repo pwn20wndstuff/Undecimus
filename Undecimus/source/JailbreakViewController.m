@@ -1256,8 +1256,8 @@ void jailbreak()
         LOG("v_mount = " ADDR, v_mount);
         _assert(ISADDR(v_mount), message, true);
         uint32_t v_flag = ReadKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG));
-        if ((v_flag & (MNT_RDONLY | MNT_NOSUID))) {
-            v_flag = v_flag & ~(MNT_RDONLY | MNT_NOSUID);
+        if ((v_flag & MNT_RDONLY) || (v_flag & MNT_NOSUID)) {
+            v_flag &= ~(MNT_RDONLY | MNT_NOSUID);
             WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag & ~MNT_ROOTFS);
             _assert(runCommand("/sbin/mount", "-u", thedisk, NULL) == ERR_SUCCESS, message, true);
             WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag);
