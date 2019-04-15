@@ -258,7 +258,7 @@
     [self.HideLogWindowSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_HIDE_LOG_WINDOW]];
     [self.ResetCydiaCacheSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_RESET_CYDIA_CACHE]];
     [self.SSHOnlySwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_SSH_ONLY]];
-    [self.EnableGetTaskAllowSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_ENABLE_GET_TEASK_ALLOW]];
+    [self.EnableGetTaskAllowSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_ENABLE_GET_TASK_ALLOW]];
     [self.SetCSDebuggedSwitch setOn:[[NSUserDefaults standardUserDefaults] boolForKey:K_SET_CS_DEBUGGED]];
     [self.RestartSpringBoardButton setEnabled:respringSupported()];
     [self.restartButton setEnabled:restartSupported()];
@@ -492,7 +492,7 @@
 }
 
 - (IBAction)enableGetTaskAllowSwitchTriggered:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:[self.EnableGetTaskAllowSwitch isOn] forKey:K_ENABLE_GET_TEASK_ALLOW];
+    [[NSUserDefaults standardUserDefaults] setBool:[self.EnableGetTaskAllowSwitch isOn] forKey:K_ENABLE_GET_TASK_ALLOW];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self reloadData];
 }

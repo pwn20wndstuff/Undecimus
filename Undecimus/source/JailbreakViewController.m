@@ -588,7 +588,7 @@ bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
     prefs->reload_system_daemons = [defaults[K_RELOAD_SYSTEM_DAEMONS] boolValue];
     prefs->reset_cydia_cache = [defaults[K_RESET_CYDIA_CACHE] boolValue];
     prefs->ssh_only = [defaults[K_SSH_ONLY] boolValue];
-    prefs->enable_get_task_allow = [defaults[K_ENABLE_GET_TEASK_ALLOW] boolValue];
+    prefs->enable_get_task_allow = [defaults[K_ENABLE_GET_TASK_ALLOW] boolValue];
     prefs->set_cs_debugged = [defaults[K_SET_CS_DEBUGGED] boolValue];
     prefs->exploit = [defaults[K_EXPLOIT] intValue];
     return true;
