@@ -164,6 +164,14 @@
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_SSH_ONLY];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_ENABLE_GET_TEASK_ALLOW] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_ENABLE_GET_TEASK_ALLOW];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_SET_CS_DEBUGGED] == nil) {
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_SET_CS_DEBUGGED];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
 }
 
 - (void)initShortcuts {

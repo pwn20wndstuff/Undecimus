@@ -29,6 +29,8 @@
 #define K_HIDE_LOG_WINDOW          @"HideLogWindow"
 #define K_RESET_CYDIA_CACHE        @"ResetCydiaCache"
 #define K_SSH_ONLY                 @"SSHOnly"
+#define K_ENABLE_GET_TEASK_ALLOW   @"EnableGetTaskAllow"
+#define K_SET_CS_DEBUGGED          @"SetCSDebugged"
 
 @interface SettingsTableViewController : UITableViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UISwitch *TweakInjectionSwitch;
@@ -57,6 +59,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *HideLogWindowSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *ResetCydiaCacheSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *SSHOnlySwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *EnableGetTaskAllowSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *SetCSDebuggedSwitch;
 
 + (NSDictionary *)_provisioningProfileAtPath:(NSString *)path;
 
