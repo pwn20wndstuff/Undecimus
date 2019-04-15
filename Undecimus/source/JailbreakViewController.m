@@ -943,6 +943,7 @@ void jailbreak()
             LOG("Found process at "ADDR" with pid 0x%x (path %s)", found_proc, found_pid, path_buf);
             set_platform_binary(found_proc, true);
             modify_csflags(found_proc, ^(uint32_t *flags) {
+                *flags |= CS_VALID;
                 *flags |= CS_PLATFORM_BINARY;
                 if (prefs.enable_get_task_allow) {
                     *flags |= CS_GET_TASK_ALLOW;
