@@ -45,8 +45,7 @@ void set_host_type(host_t host, uint32_t type);
 void export_tfp0(host_t host);
 void unexport_tfp0(host_t host);
 
-void set_csflags(uint64_t proc, uint32_t flags, bool value);
-void set_cs_platform_binary(uint64_t proc, bool value);
+void modify_csflags(uint64_t proc, void (^function)(uint32_t *flags));
 
 bool execute_with_credentials(uint64_t proc, uint64_t credentials, void (^function)(void));
 

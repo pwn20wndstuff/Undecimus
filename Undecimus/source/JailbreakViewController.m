@@ -35,6 +35,8 @@
 #import <patchfinder64.h>
 #import <offsetcache.h>
 #import <kerneldec.h>
+#include <cs_blobs.h>
+#include <libproc.h>
 #import "JailbreakViewController.h"
 #include "KernelStructureOffsets.h"
 #include "empty_list_sploit.h"
@@ -931,8 +933,28 @@ void jailbreak()
         _assert(setuid(0) == ERR_SUCCESS, message, true);
         _assert(getuid() == 0, message, true);
         myHost = mach_host_self();
-        set_platform_binary(myProcAddr, true);
-        set_cs_platform_binary(myProcAddr, true);
+        iterate_proc_list(^(uint64_t found_proc, pid_t found_pid, bool *iterate) {
+            if (found_pid == 0) {
+                return;
+            }
+            char path_buf[PROC_PIDPATHINFO_MAXSIZE];
+            bzero(path_buf, PROC_PIDPATHINFO_MAXSIZE);
+            proc_pidpath(found_pid, path_buf, sizeof(path_buf));
+            LOG("Found process at "ADDR" with pid 0x%x (path %s)", found_proc, found_pid, path_buf);
+            set_platform_binary(found_proc, true);
+            modify_csflags(found_proc, ^(uint32_t *flags) {
+                *flags |= CS_PLATFORM_BINARY;
+                if (prefs.enable_get_task_allow) {
+                    *flags |= CS_GET_TASK_ALLOW;
+                    *flags |= CS_INSTALLER;
+                }
+                if (prefs.set_cs_debugged) {
+                    *flags |= CS_DEBUGGED;
+                    *flags &= ~CS_HARD;
+                    *flags &= ~CS_KILL;
+                }
+            });
+        });
         LOG("Successfully escaped Sandbox.");
     }
     
@@ -2270,9 +2292,6 @@ void jailbreak()
 out:
     LOG("Deinitializing kexecute...");
     term_kexecute();
-    LOG("Unplatformizing...");
-    set_platform_binary(myProcAddr, false);
-    set_cs_platform_binary(myProcAddr, false);
     LOG("Sandboxing...");
     myCredAddr = myOriginalCredAddr;
     _assert(give_creds_to_process_at_addr(myProcAddr, myCredAddr) == kernelCredAddr, message, true);
