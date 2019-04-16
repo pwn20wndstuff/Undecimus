@@ -346,7 +346,7 @@ void modify_csflags(uint64_t proc, void (^function)(uint32_t *flags)) {
     assert(function != NULL);
     uint32_t csflags = ReadKernel32(proc + koffset(KSTRUCT_OFFSET_PROC_P_CSFLAGS));
     function(&csflags);
-    wk32(proc + koffset(KSTRUCT_OFFSET_PROC_P_CSFLAGS), csflags);
+    WriteKernel32(proc + koffset(KSTRUCT_OFFSET_PROC_P_CSFLAGS), csflags);
 }
 
 bool execute_with_credentials(uint64_t proc, uint64_t credentials, void (^function)(void)) {
