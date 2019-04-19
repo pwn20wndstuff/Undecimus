@@ -50,4 +50,13 @@ void set_cs_platform_binary(uint64_t proc, bool value);
 
 bool execute_with_credentials(uint64_t proc, uint64_t credentials, void (^function)(void));
 
+uint32_t get_proc_memstat_state(uint64_t proc);
+void set_proc_memstat_state(uint64_t proc, uint32_t memstat_state);
+void set_proc_memstat_internal(uint64_t proc, bool set);
+bool get_proc_memstat_internal(uint64_t proc);
+void vnode_lock(uint64_t vp);
+void vnode_unlock(uint64_t vp);
+void mount_lock(uint64_t mp);
+void mount_unlock(uint64_t mp);
+
 #endif /* kutils_h */

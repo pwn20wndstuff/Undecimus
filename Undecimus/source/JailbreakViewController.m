@@ -586,7 +586,7 @@ bool load_prefs(prefs_t *prefs, NSDictionary *defaults) {
     prefs->reload_system_daemons = [defaults[K_RELOAD_SYSTEM_DAEMONS] boolValue];
     prefs->reset_cydia_cache = [defaults[K_RESET_CYDIA_CACHE] boolValue];
     prefs->ssh_only = [defaults[K_SSH_ONLY] boolValue];
-    prefs->enable_get_task_allow = [defaults[K_ENABLE_GET_TEASK_ALLOW] boolValue];
+    prefs->enable_get_task_allow = [defaults[K_ENABLE_GET_TASK_ALLOW] boolValue];
     prefs->set_cs_debugged = [defaults[K_SET_CS_DEBUGGED] boolValue];
     prefs->exploit = [defaults[K_EXPLOIT] intValue];
     return true;
@@ -748,7 +748,7 @@ void jailbreak()
                 case mach_swap_exploit: {
                     machswap_offsets_t *machswap_offsets = NULL;
                     if ((machswap_offsets = get_machswap_offsets()) != NULL &&
-                        machswap_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
+                        machswap_exploit(machswap_offsets) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR(kernel_base)) {
                         exploit_success = true;
@@ -758,7 +758,7 @@ void jailbreak()
                 case mach_swap_2_exploit: {
                     machswap_offsets_t *machswap_offsets = NULL;
                     if ((machswap_offsets = get_machswap_offsets()) != NULL &&
-                        machswap2_exploit(machswap_offsets, &tfp0, &kernel_base) == ERR_SUCCESS &&
+                        machswap2_exploit(machswap_offsets) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
                         ISADDR(kernel_base)) {
                         exploit_success = true;
@@ -905,11 +905,12 @@ void jailbreak()
     UPSTAGE();
     
     {
-        // Escape Sandbox.
+        // Initialize jailbreak.
         static uint64_t ShenanigansPatch = 0xca13feba37be;
         
-        LOG("Escaping Sandbox...");
-        SETMESSAGE(NSLocalizedString(@"Failed to escape sandbox.", nil));
+        LOG("Initializing jailbreak...");
+        SETMESSAGE(NSLocalizedString(@"Failed to initialize jailbreak.", nil));
+        LOG("Escaping sandbox...");
         myProcAddr = get_proc_struct_for_pid(myPid);
         LOG("myProcAddr = " ADDR, myProcAddr);
         _assert(ISADDR(myProcAddr), message, true);
@@ -931,21 +932,19 @@ void jailbreak()
         _assert(setuid(0) == ERR_SUCCESS, message, true);
         _assert(getuid() == 0, message, true);
         myHost = mach_host_self();
-        set_platform_binary(myProcAddr, true);
-        set_cs_platform_binary(myProcAddr, true);
-        LOG("Successfully escaped Sandbox.");
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Set HSP4.
-        
+        _assert(MACH_PORT_VALID(myHost), message, true);
+        LOG("Successfully escaped sandbox.");
         LOG("Setting HSP4 as TFP0...");
-        SETMESSAGE(NSLocalizedString(@"Failed to set HSP4 as TFP0.", nil));
         remap_tfp0_set_hsp4(&tfp0);
         LOG("Successfully set HSP4 as TFP0.");
-        INSERTSTATUS(NSLocalizedString(@"Set HSP4 as TFP0.\n", nil));
+        INSERTSTATUS(NSLocalizedString(@"Set HSP4 as TFP0.", nil));
+        LOG("Initializing kexecute...");
+        _assert(init_kexecute(), message, true);
+        LOG("Successfully initialized kexecute.");
+        LOG("Platformizing...");
+        set_platform_binary(myProcAddr, true);
+        set_cs_platform_binary(myProcAddr, true);
+        LOG("Successfully initialized jailbreak.");
     }
     
     UPSTAGE();
@@ -978,17 +977,6 @@ void jailbreak()
         const char *testFile = [NSString stringWithFormat:@"/var/mobile/test-%lu.txt", time(NULL)].UTF8String;
         writeTestFile(testFile);
         LOG("Successfully wrote a test file to UserFS.");
-    }
-    
-    UPSTAGE();
-    
-    {
-        // Initialize kexecute.
-        
-        LOG("Initializing kexecute...");
-        SETMESSAGE(NSLocalizedString(@"Failed to initialize kexecute.", nil));
-        _assert(init_kexecute(), message, true);
-        LOG("Successfully initialized kexecute.");
     }
     
     UPSTAGE();
@@ -1131,7 +1119,7 @@ void jailbreak()
         const char **snapshots = snapshot_list(rootfd);
         char *systemSnapshot = copySystemSnapshot();
         _assert(systemSnapshot != NULL, message, true);
-        const char *original_snapshot = [@(systemSnapshot) stringByAppendingString:@".disabled"].UTF8String;
+        const char *original_snapshot = "orig-fs";
         bool has_original_snapshot = false;
         const char *thedisk = "/dev/disk0s1s1";
         const char *oldest_snapshot = NULL;
@@ -1150,9 +1138,6 @@ void jailbreak()
             LOG("v_specinfo = " ADDR, v_specinfo);
             _assert(ISADDR(v_specinfo), message, true);
             WriteKernel32(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS), 0);
-            uint32_t si_flags = ReadKernel32(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS));
-            LOG("si_flags = 0x%x", si_flags);
-            _assert(si_flags == 0, message, true);
             _assert(_vnode_put(devVnode) == ERR_SUCCESS, message, true);
             LOG("Successfully cleared dev vnode's si_flags.");
             
@@ -2286,6 +2271,7 @@ out:
     myHost = HOST_NULL;
     _assert(mach_port_deallocate(mach_task_self(), myOriginalHost) == KERN_SUCCESS, message, true);
     myOriginalHost = HOST_NULL;
+    INSERTSTATUS(([NSString stringWithFormat:@"\nRead %zu bytes from kernel memory\nWrote %zu bytes to kernel memory\n", kreads, kwrites]));
     INSERTSTATUS(([NSString stringWithFormat:@"\nJailbroke in %ld seconds\n", time(NULL) - start_time]));
     STATUS(NSLocalizedString(@"Jailbroken", nil), false, false);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", NSLocalizedString(@"Jailbreak Completed with Status:", nil), status, NSLocalizedString((prefs.exploit == mach_swap_exploit || prefs.exploit == mach_swap_2_exploit) && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.", nil)], true, false);

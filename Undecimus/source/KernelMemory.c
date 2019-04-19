@@ -7,6 +7,9 @@
 #include "KernelUtilities.h"
 #include <common.h>
 
+size_t kreads = 0;
+size_t kwrites = 0;
+
 // the exploit bootstraps the full kernel memory read/write with a fake
 // task which just allows reading via the bsd_info->pid trick
 // this first port is kmem_read_port
@@ -57,6 +60,7 @@ size_t kread(uint64_t where, void* p, size_t size)
         }
         offset += sz;
     }
+    kreads += offset;
     return offset;
 }
 
@@ -79,6 +83,7 @@ size_t kwrite(uint64_t where, const void* p, size_t size)
         }
         offset += chunk;
     }
+    kwrites += offset;
     return offset;
 }
 

@@ -43,6 +43,8 @@ kern_return_t mach_vm_protect(
     boolean_t set_maximum,
     vm_prot_t new_protection);
 
+extern size_t kreads;
+extern size_t kwrites;
 extern mach_port_t tfp0;
 
 size_t kread(uint64_t where, void* p, size_t size);
