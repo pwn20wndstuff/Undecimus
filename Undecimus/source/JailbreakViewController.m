@@ -1461,9 +1461,16 @@ void jailbreak()
             
             LOG("Disabling RootFS Restore...");
             SETMESSAGE(NSLocalizedString(@"Failed to disable RootFS Restore.", nil));
+            pid_t cfprefsd_pid = pidOfProcess("/usr/libexec/cfprefsd");
+            if (cfprefsd_pid != 0) {
+                kill(cfprefsd_pid, SIGSTOP);
+            }
             _assert(modifyPlist(prefsFile, ^(id plist) {
                 plist[K_RESTORE_ROOTFS] = @NO;
             }), message, true);
+            if (cfprefsd_pid != 0) {
+                kill(cfprefsd_pid, SIGKILL);
+            }
             LOG("Successfully disabled RootFS Restore.");
             
             INSERTSTATUS(NSLocalizedString(@"Restored RootFS.\n", nil));
