@@ -258,39 +258,32 @@ void set_platform_binary(uint64_t proc, bool set)
     WriteKernel32(task_struct_addr + koffset(KSTRUCT_OFFSET_TASK_TFLAGS), task_t_flags);
 }
 
-// thx Siguza
-typedef struct {
-    uint64_t prev;
-    uint64_t next;
-    uint64_t start;
-    uint64_t end;
-} kmap_hdr_t;
+// Thanks to @Siguza
 
 uint64_t zm_fix_addr(uint64_t addr) {
+    typedef struct {
+        uint64_t prev;
+        uint64_t next;
+        uint64_t start;
+        uint64_t end;
+    } kmap_hdr_t;
     static kmap_hdr_t zm_hdr = {0, 0, 0, 0};
     if (zm_hdr.start == 0) {
-        // xxx ReadKernel64(0) ?!
-        // uint64_t zone_map_ref = find_zone_map_ref();
-        LOG("zone_map_ref: %llx ", GETOFFSET(zone_map_ref));
         uint64_t zone_map = ReadKernel64(GETOFFSET(zone_map_ref));
         LOG("zone_map: %llx ", zone_map);
         // hdr is at offset 0x10, mutexes at start
         size_t r = kread(zone_map + 0x10, &zm_hdr, sizeof(zm_hdr));
         LOG("zm_range: 0x%llx - 0x%llx (read 0x%zx, exp 0x%zx)", zm_hdr.start, zm_hdr.end, r, sizeof(zm_hdr));
-        
         if (r != sizeof(zm_hdr) || zm_hdr.start == 0 || zm_hdr.end == 0) {
             LOG("kread of zone_map failed!");
-            exit(EXIT_FAILURE);
+            return 0;
         }
-        
         if (zm_hdr.end - zm_hdr.start > 0x100000000) {
             LOG("zone_map is too big, sorry.");
-            exit(EXIT_FAILURE);
+            return 0;
         }
     }
-    
     uint64_t zm_tmp = (zm_hdr.start & 0xffffffff00000000) | ((addr) & 0xffffffff);
-    
     return zm_tmp < zm_hdr.start ? zm_tmp + 0x100000000 : zm_tmp;
 }
 
