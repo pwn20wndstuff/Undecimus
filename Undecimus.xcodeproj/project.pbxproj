@@ -32,6 +32,7 @@
 		2170BD3B21B193800059BD10 /* libMobileGestalt.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 211D0D84218DEF3E008745D8 /* libMobileGestalt.tbd */; };
 		2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		2171C4012222E3BB004E45C7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2171C4002222E3BB004E45C7 /* SystemConfiguration.framework */; };
+		2199B8E9226B40C600A8255D /* kalloc_crash.c in Sources */ = {isa = PBXBuildFile; fileRef = 2199B8E8226B40C600A8255D /* kalloc_crash.c */; };
 		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
 		21A97FD12148103C00DC0023 /* KernelExecution.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC82148103B00DC0023 /* KernelExecution.m */; };
 		21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCC2148103B00DC0023 /* KernelUtilities.c */; };
@@ -115,6 +116,8 @@
 		216F3F3C2228776E007DC1BC /* kc_parameters.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kc_parameters.c; sourceTree = "<group>"; };
 		216FDA1D220C5F5C0086D802 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		2171C4002222E3BB004E45C7 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		2199B8E7226B40C600A8255D /* kalloc_crash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kalloc_crash.h; sourceTree = "<group>"; };
+		2199B8E8226B40C600A8255D /* kalloc_crash.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = kalloc_crash.c; sourceTree = "<group>"; };
 		21A97FC42148103A00DC0023 /* KernelExecution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KernelExecution.h; sourceTree = "<group>"; };
 		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
 		21A97FC62148103B00DC0023 /* remote_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_memory.c; sourceTree = "<group>"; };
@@ -358,6 +361,7 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				2199B8E6226B40BD00A8255D /* kalloc_crash */,
 				214A1771224EBE4900588EC4 /* kerneldec */,
 				21FF63C8224E5FCE008B76D9 /* offset-cache */,
 				21FFE0F3222E4B1600EC59B2 /* machswap */,
@@ -410,6 +414,15 @@
 				21C0FC902136A46500849420 /* SpringBoardServices.framework */,
 			);
 			path = frameworks;
+			sourceTree = "<group>";
+		};
+		2199B8E6226B40BD00A8255D /* kalloc_crash */ = {
+			isa = PBXGroup;
+			children = (
+				2199B8E7226B40C600A8255D /* kalloc_crash.h */,
+				2199B8E8226B40C600A8255D /* kalloc_crash.c */,
+			);
+			name = kalloc_crash;
 			sourceTree = "<group>";
 		};
 		21C0FC5E21369EB700849420 = {
@@ -605,6 +618,7 @@
 				2150A9DE22021348001C8677 /* platform.c in Sources */,
 				213E7828220865A100FDF3B7 /* voucher_swap-poc.c in Sources */,
 				22F91CDB21E02CF300B2FCAE /* inject.m in Sources */,
+				2199B8E9226B40C600A8255D /* kalloc_crash.c in Sources */,
 				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* KernelMemory.c in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
