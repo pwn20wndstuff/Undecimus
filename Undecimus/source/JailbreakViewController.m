@@ -937,7 +937,7 @@ void jailbreak()
         LOG("Setting HSP4 as TFP0...");
         remap_tfp0_set_hsp4(&tfp0);
         LOG("Successfully set HSP4 as TFP0.");
-        INSERTSTATUS(NSLocalizedString(@"Set HSP4 as TFP0.", nil));
+        INSERTSTATUS(NSLocalizedString(@"Set HSP4 as TFP0.\n", nil));
         LOG("Initializing kexecute...");
         _assert(init_kexecute(), message, true);
         LOG("Successfully initialized kexecute.");
