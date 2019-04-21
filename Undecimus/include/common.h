@@ -6,12 +6,14 @@
 #include <mach-o/loader.h>
 #ifdef __OBJC__
 #include <Foundation/Foundation.h>
-#define LOG(str, args...) do { NSLog(@"[*] " str "\n", ##args); } while(false)
+#define RAWLOG(str, args...) do { NSLog(@str, ##args); } while(false)
 #else
 #include <CoreFoundation/CoreFoundation.h>
 extern void NSLog(CFStringRef, ...);
-#define LOG(str, args...) do { NSLog(CFSTR("[*] " str "\n"), ##args); } while(false)
+#define RAWLOG(str, args...) do { NSLog(CFSTR(str), ##args); } while(false)
 #endif
+
+#define LOG(str, args...) RAWLOG("[*] " str, ##args)
 
 extern uint64_t offset_options;
 #define OPT(x) (offset_options?((rk64(offset_options) & OPT_ ##x)?true:false):false)

@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#import <common.h>
 
 void
 log_internal(char type, const char *format, ...) {
@@ -30,7 +31,7 @@ log_stderr(char type, const char *format, va_list ap) {
 		case 'W': type = '!'; break;
 		case 'E': type = '-'; break;
 	}
-	fprintf(stderr, "[%c] %s\n", type, message);
+    RAWLOG("[%c] %s\n", type, message);
 	free(message);
 }
 
