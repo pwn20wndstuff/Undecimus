@@ -116,6 +116,28 @@ typedef struct {
     int exploit;
 } prefs_t;
 
+#define FINDOFFSET(x, critical) do { \
+    SETMESSAGE(([NSString stringWithFormat:@"Failed to find %s offset.", #x])); \
+    if (!ISADDR(GETOFFSET(x))) { \
+        SETOFFSET(x, find_symbol("_" #x)); \
+    } \
+    if (!ISADDR(GETOFFSET(x))) { \
+        uint64_t (*_find_ ##x)(void) = dlsym(RTLD_DEFAULT, "find_" #x); \
+        if (_find_ ##x != NULL) { \
+            SETOFFSET(x, _find_ ##x()); \
+        } \
+    } \
+    if (ISADDR(GETOFFSET(x))) { \
+        LOG(#x " = " ADDR " + " ADDR, GETOFFSET(x), kernel_slide); \
+        SETOFFSET(x, GETOFFSET(x) + kernel_slide); \
+    } else { \
+        SETOFFSET(x, 0); \
+        if (critical) { \
+            _assert(false, message, true); \
+        } \
+    } \
+} while (false)
+
 #define ADDRSTRING(val)        [NSString stringWithFormat:@ADDR, val]
 
 static NSString *bundledResources = nil;
@@ -850,51 +872,41 @@ void jailbreak()
         LOG("Finding offsets...");
         SETOFFSET(kernel_base, kernel_base);
         SETOFFSET(kernel_slide, kernel_slide);
-        
-#define PF(x) do { \
-        SETMESSAGE(NSLocalizedString(@"Failed to find " #x " offset.", nil)); \
-        if (!ISADDR(GETOFFSET(x))) SETOFFSET(x, find_symbol("_" #x)); \
-        if (!ISADDR(GETOFFSET(x))) SETOFFSET(x, find_ ##x()); \
-        LOG(#x " = " ADDR " + " ADDR, GETOFFSET(x), kernel_slide); \
-        _assert(ISADDR(GETOFFSET(x)), message, true); \
-        SETOFFSET(x, GETOFFSET(x) + kernel_slide); \
-} while (false)
-        PF(trustcache);
-        PF(OSBoolean_True);
-        PF(osunserializexml);
-        PF(smalloc);
+        FINDOFFSET(trustcache, true);
+        FINDOFFSET(OSBoolean_True, true);
+        FINDOFFSET(osunserializexml, true);
+        FINDOFFSET(smalloc, true);
         if (!auth_ptrs) {
-            PF(add_x0_x0_0x40_ret);
+            FINDOFFSET(add_x0_x0_0x40_ret, true);
         }
-        PF(zone_map_ref);
-        PF(vfs_context_current);
-        PF(vnode_lookup);
-        PF(vnode_put);
-        PF(kernel_task);
-        PF(shenanigans);
-        PF(lck_mtx_lock);
-        PF(lck_mtx_unlock);
+        FINDOFFSET(zone_map_ref, true);
+        FINDOFFSET(vfs_context_current, true);
+        FINDOFFSET(vnode_lookup, true);
+        FINDOFFSET(vnode_put, true);
+        FINDOFFSET(kernel_task, true);
+        FINDOFFSET(shenanigans, true);
         if (kCFCoreFoundationVersionNumber >= 1535.12) {
-            PF(vnode_get_snapshot);
-            PF(fs_lookup_snapshot_metadata_by_name_and_return_name);
-            PF(apfs_jhash_getvnode);
+            FINDOFFSET(vnode_get_snapshot, true);
+            FINDOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name, true);
+            FINDOFFSET(apfs_jhash_getvnode, true);
         }
         if (auth_ptrs) {
-            PF(pmap_load_trust_cache);
-            PF(paciza_pointer__l2tp_domain_module_start);
-            PF(paciza_pointer__l2tp_domain_module_stop);
-            PF(l2tp_domain_inited);
-            PF(sysctl__net_ppp_l2tp);
-            PF(sysctl_unregister_oid);
-            PF(mov_x0_x4__br_x5);
-            PF(mov_x9_x0__br_x1);
-            PF(mov_x10_x3__br_x6);
-            PF(kernel_forge_pacia_gadget);
-            PF(kernel_forge_pacda_gadget);
-            PF(IOUserClient__vtable);
-            PF(IORegistryEntry__getRegistryEntryID);
+            FINDOFFSET(pmap_load_trust_cache, true);
+            FINDOFFSET(paciza_pointer__l2tp_domain_module_start, true);
+            FINDOFFSET(paciza_pointer__l2tp_domain_module_stop, true);
+            FINDOFFSET(l2tp_domain_inited, true);
+            FINDOFFSET(sysctl__net_ppp_l2tp, true);
+            FINDOFFSET(sysctl_unregister_oid, true);
+            FINDOFFSET(mov_x0_x4__br_x5, true);
+            FINDOFFSET(mov_x9_x0__br_x1, true);
+            FINDOFFSET(mov_x10_x3__br_x6, true);
+            FINDOFFSET(kernel_forge_pacia_gadget, true);
+            FINDOFFSET(kernel_forge_pacda_gadget, true);
+            FINDOFFSET(IOUserClient__vtable, true);
+            FINDOFFSET(IORegistryEntry__getRegistryEntryID, true);
         }
-#undef PF
+        FINDOFFSET(lck_mtx_lock, false);
+        FINDOFFSET(lck_mtx_unlock, false);
         found_offsets = true;
         LOG("Successfully found offsets.");
 
