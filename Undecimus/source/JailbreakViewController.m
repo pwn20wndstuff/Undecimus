@@ -116,10 +116,9 @@ typedef struct {
     int exploit;
 } prefs_t;
 
-#define FINDOFFSET(x, critical) do { \
-    SETMESSAGE(([NSString stringWithFormat:@"Failed to find %s offset.", #x])); \
+#define FINDOFFSET(x, symbol, critical) do { \
     if (!ISADDR(GETOFFSET(x))) { \
-        SETOFFSET(x, find_symbol("_" #x)); \
+        SETOFFSET(x, find_symbol(symbol != NULL ? symbol : "_" #x)); \
     } \
     if (!ISADDR(GETOFFSET(x))) { \
         uint64_t (*_find_ ##x)(void) = dlsym(RTLD_DEFAULT, "find_" #x); \
@@ -872,43 +871,43 @@ void jailbreak()
         LOG("Finding offsets...");
         SETOFFSET(kernel_base, kernel_base);
         SETOFFSET(kernel_slide, kernel_slide);
-        FINDOFFSET(trustcache, true);
-        FINDOFFSET(OSBoolean_True, true);
-        FINDOFFSET(osunserializexml, true);
-        FINDOFFSET(smalloc, true);
+        FINDOFFSET(trustcache, NULL, true);
+        FINDOFFSET(OSBoolean_True, NULL, true);
+        FINDOFFSET(osunserializexml, NULL, true);
+        FINDOFFSET(smalloc, NULL, true);
         if (!auth_ptrs) {
-            FINDOFFSET(add_x0_x0_0x40_ret, true);
+            FINDOFFSET(add_x0_x0_0x40_ret, NULL, true);
         }
-        FINDOFFSET(zone_map_ref, true);
-        FINDOFFSET(vfs_context_current, true);
-        FINDOFFSET(vnode_lookup, true);
-        FINDOFFSET(vnode_put, true);
-        FINDOFFSET(kernel_task, true);
-        FINDOFFSET(shenanigans, true);
+        FINDOFFSET(zone_map_ref, NULL, true);
+        FINDOFFSET(vfs_context_current, NULL, true);
+        FINDOFFSET(vnode_lookup, NULL, true);
+        FINDOFFSET(vnode_put, NULL, true);
+        FINDOFFSET(kernel_task, NULL, true);
+        FINDOFFSET(shenanigans, NULL, true);
         if (kCFCoreFoundationVersionNumber >= 1535.12) {
-            FINDOFFSET(vnode_get_snapshot, true);
-            FINDOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name, true);
-            FINDOFFSET(apfs_jhash_getvnode, true);
+            FINDOFFSET(vnode_get_snapshot, NULL, true);
+            FINDOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name, NULL, true);
+            FINDOFFSET(apfs_jhash_getvnode, NULL, true);
         }
         if (auth_ptrs) {
-            FINDOFFSET(pmap_load_trust_cache, true);
-            FINDOFFSET(paciza_pointer__l2tp_domain_module_start, true);
-            FINDOFFSET(paciza_pointer__l2tp_domain_module_stop, true);
-            FINDOFFSET(l2tp_domain_inited, true);
-            FINDOFFSET(sysctl__net_ppp_l2tp, true);
-            FINDOFFSET(sysctl_unregister_oid, true);
-            FINDOFFSET(mov_x0_x4__br_x5, true);
-            FINDOFFSET(mov_x9_x0__br_x1, true);
-            FINDOFFSET(mov_x10_x3__br_x6, true);
-            FINDOFFSET(kernel_forge_pacia_gadget, true);
-            FINDOFFSET(kernel_forge_pacda_gadget, true);
-            FINDOFFSET(IOUserClient__vtable, true);
-            FINDOFFSET(IORegistryEntry__getRegistryEntryID, true);
+            FINDOFFSET(pmap_load_trust_cache, NULL, true);
+            FINDOFFSET(paciza_pointer__l2tp_domain_module_start, NULL, true);
+            FINDOFFSET(paciza_pointer__l2tp_domain_module_stop, NULL, true);
+            FINDOFFSET(l2tp_domain_inited, NULL, true);
+            FINDOFFSET(sysctl__net_ppp_l2tp, NULL, true);
+            FINDOFFSET(sysctl_unregister_oid, NULL, true);
+            FINDOFFSET(mov_x0_x4__br_x5, NULL, true);
+            FINDOFFSET(mov_x9_x0__br_x1, NULL, true);
+            FINDOFFSET(mov_x10_x3__br_x6, NULL, true);
+            FINDOFFSET(kernel_forge_pacia_gadget, NULL, true);
+            FINDOFFSET(kernel_forge_pacda_gadget, NULL, true);
+            FINDOFFSET(IOUserClient__vtable, NULL, true);
+            FINDOFFSET(IORegistryEntry__getRegistryEntryID, NULL, true);
         }
-        FINDOFFSET(lck_mtx_lock, false);
-        FINDOFFSET(lck_mtx_unlock, false);
-        FINDOFFSET(proc_find, false);
-        FINDOFFSET(proc_rele, false);
+        FINDOFFSET(lck_mtx_lock, NULL, false);
+        FINDOFFSET(lck_mtx_unlock, NULL, false);
+        FINDOFFSET(proc_find, NULL, false);
+        FINDOFFSET(proc_rele, NULL, false);
         found_offsets = true;
         LOG("Successfully found offsets.");
 
