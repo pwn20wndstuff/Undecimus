@@ -907,6 +907,8 @@ void jailbreak()
         }
         FINDOFFSET(lck_mtx_lock, false);
         FINDOFFSET(lck_mtx_unlock, false);
+        FINDOFFSET(proc_find, false);
+        FINDOFFSET(proc_rele, false);
         found_offsets = true;
         LOG("Successfully found offsets.");
 
@@ -1384,6 +1386,8 @@ void jailbreak()
         CACHEOFFSET(kernel_forge_pacda_gadget, "KernelForgePacdaGadget");
         CACHEOFFSET(IOUserClient__vtable, "IOUserClientVtable");
         CACHEOFFSET(IORegistryEntry__getRegistryEntryID, "IORegistryEntryGetRegistryEntryID");
+        CACHEOFFSET(proc_find, "ProcFind");
+        CACHEOFFSET(proc_rele, "ProcRele");
 #undef CACHEOFFSET
 #undef CACHEADDR
         if (![[NSMutableDictionary dictionaryWithContentsOfFile:offsetsFile] isEqual:dictionary]) {
