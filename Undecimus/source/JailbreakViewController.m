@@ -908,6 +908,9 @@ void jailbreak()
         FINDOFFSET(lck_mtx_unlock, NULL, false);
         FINDOFFSET(proc_find, NULL, false);
         FINDOFFSET(proc_rele, NULL, false);
+        FINDOFFSET(extension_create_file, NULL, true);
+        FINDOFFSET(extension_add, NULL, true);
+        FINDOFFSET(extension_release, NULL, true);
         found_offsets = true;
         LOG("Successfully found offsets.");
 
@@ -1387,6 +1390,9 @@ void jailbreak()
         CACHEOFFSET(IORegistryEntry__getRegistryEntryID, "IORegistryEntryGetRegistryEntryID");
         CACHEOFFSET(proc_find, "ProcFind");
         CACHEOFFSET(proc_rele, "ProcRele");
+        CACHEOFFSET(extension_create_file, "ExtensionCreateFile");
+        CACHEOFFSET(extension_add, "ExtensionAdd");
+        CACHEOFFSET(extension_release, "ExtensionRelease");
 #undef CACHEOFFSET
 #undef CACHEADDR
         if (![[NSMutableDictionary dictionaryWithContentsOfFile:offsetsFile] isEqual:dictionary]) {
