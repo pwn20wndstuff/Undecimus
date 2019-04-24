@@ -6,7 +6,7 @@ unc0ver jailbreak for iOS 11.0 - 12.1.2<br/>
 by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
 UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](https://reddit.com/u/Samg_is_a_Ninja)<br/>
 
-### Changes over the other jailbreaks
+## Changes over the other jailbreaks
 * All exploits in same app
 * Detailed error messages
 * Faster and more patches
@@ -46,12 +46,12 @@ Refer to this [tutorial](https://youtu.be/TqHYjLHO0zs) to see the jailbreak proc
 ### Changelog
 * Changelogs and releases are available at https://github.com/pwn20wndstuff/Undecimus/releases
 
-### To Do List
+## To Do List
 * Chain [@_bazad](https://twitter.com/_bazad)'s [blanket](https://github.com/bazad/blanket) to bypass the developer certificate requirement for multi_path: Almost done
 * Enable the on-fly entitlement patching on iOS 11: Work in progress
 * WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1): Work in progress
 
-### Special Thanks
+## Special Thanks
 * [@i41nbeer](https://twitter.com/i41nbeer) for mach_portal, triple_fetch, async_wake, empty_list, multi_path and deja_xnu
 * [@Morpheus______](https://twitter.com/Morpheus______) for the QiLin Toolkit
 * [@xerub](https://twitter.com/xerub) for libjb and the original patchfinder64
