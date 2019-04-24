@@ -35,30 +35,24 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 
 <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-2.PNG?token=AlyO4wXUInR6oHEgx0Tg31ri0t1q91frks5bx5ZbwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-1.PNG?token=AlyO48vs-YYcaKUgxXh8nIEUQQz_QEoqks5bx5ZqwA%3D%3D" width="281.25" height="609" />
 
-## Getting support
-* Use the built-in diagnostics tool
-* Tweet [@pwn20wnd](https://twitter.com/Pwn20wnd)
-
-## Best practices
-* Perform a full restore with Rollectra before switching from the other jailbreaks
+### Tips
+*  Perform a full restore with [Succession](https://www.reddit.com/r/jailbreak/comments/bg2sfp/release_succession_fully_restore_your_ios_device/) before switching from the other jailbreaks
 * Turn on the AirPlane Mode before starting the jailbreak
-* Turn off Siri before starting the jailbreak
+* Use the built-in diagnostics tool and tweet [@pwn20wnd](https://twitter.com/Pwn20wnd) for further development on any issues
 
-## Source code
+
+Refer to this [tutorial](https://youtu.be/TqHYjLHO0zs) to see the jailbreak proccess in action.
+
+### Info
+* Changelogs and releases are available at https://github.com/pwn20wndstuff/Undecimus/releases
 * This project is completely open source and it will be kept like it in the future
 * Any kind of contribution is welcome
 * The source code can be found on [pwn20wndstuff](https://github.com/pwn20wndstuff)'s GitHub account
-
-## Video tutorial
-* <a href="https://youtu.be/TqHYjLHO0zs">https://youtu.be/TqHYjLHO0zs</a>
 
 ## To Do List
 * Chain [@_bazad](https://twitter.com/_bazad)'s [blanket](https://github.com/bazad/blanket) to bypass the developer certificate requirement for multi_path: Almost done
 * Enable the on-fly entitlement patching on iOS 11: Work in progress
 * WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1): Work in progress
-
-## Changelog
-* Changelogs and releases are available at https://github.com/pwn20wndstuff/Undecimus/releases
 
 ## Special Thanks
 * [@i41nbeer](https://twitter.com/i41nbeer) for mach_portal, triple_fetch, async_wake, empty_list, multi_path and deja_xnu
