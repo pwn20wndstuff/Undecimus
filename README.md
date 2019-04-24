@@ -38,7 +38,6 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 
 ### Tips
 *  Perform a full restore with [Succession](https://www.reddit.com/r/jailbreak/comments/bg2sfp/release_succession_fully_restore_your_ios_device/) before switching from the other jailbreaks
-* Turn on the AirPlane Mode before starting the jailbreak
 * Use the built-in diagnostics tool and tweet [@pwn20wnd](https://twitter.com/Pwn20wnd) for further development on any issues
 
 
@@ -52,7 +51,7 @@ Refer to this [tutorial](https://youtu.be/TqHYjLHO0zs) to see the jailbreak proc
 * Enable the on-fly entitlement patching on iOS 11: Work in progress
 * WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1): Work in progress
 
-## Special Thanks
+### Special Thanks
 * [@i41nbeer](https://twitter.com/i41nbeer) for mach_portal, triple_fetch, async_wake, empty_list, multi_path and deja_xnu
 * [@Morpheus______](https://twitter.com/Morpheus______) for the QiLin Toolkit
 * [@xerub](https://twitter.com/xerub) for libjb and the original patchfinder64
