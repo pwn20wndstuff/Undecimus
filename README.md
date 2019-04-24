@@ -33,6 +33,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Button to open Cydia in case it doesn't appear on the Home Screen
 * Label to show the days left till the application expires
 
+
 <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-2.PNG?token=AlyO4wXUInR6oHEgx0Tg31ri0t1q91frks5bx5ZbwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-1.PNG?token=AlyO48vs-YYcaKUgxXh8nIEUQQz_QEoqks5bx5ZqwA%3D%3D" width="281.25" height="609" />
 
 ### Tips
@@ -43,13 +44,10 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 
 Refer to this [tutorial](https://youtu.be/TqHYjLHO0zs) to see the jailbreak proccess in action.
 
-### Info
+### Changelog
 * Changelogs and releases are available at https://github.com/pwn20wndstuff/Undecimus/releases
-* This project is completely open source and it will be kept like it in the future
-* Any kind of contribution is welcome
-* The source code can be found on [pwn20wndstuff](https://github.com/pwn20wndstuff)'s GitHub account
 
-## To Do List
+### To Do List
 * Chain [@_bazad](https://twitter.com/_bazad)'s [blanket](https://github.com/bazad/blanket) to bypass the developer certificate requirement for multi_path: Almost done
 * Enable the on-fly entitlement patching on iOS 11: Work in progress
 * WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1): Work in progress
@@ -74,3 +72,5 @@ Refer to this [tutorial](https://youtu.be/TqHYjLHO0zs) to see the jailbreak proc
 * [@Swag_iOS](https://twitter.com/Swag_iOS) for testing
 * [@jailbreakbuster](https://twitter.com/jailbreakbuster) for testing
 * [@Jakeashacks](https://twitter.com/Jakeashacks) for testing
+
+*This project is completely open source and it will be kept like it in the future. You can find it on [pwn20wndstuff](https://github.com/pwn20wndstuff)'s GitHub account and any kind of contribution is welcome*
