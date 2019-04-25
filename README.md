@@ -6,10 +6,10 @@ unc0ver jailbreak for iOS 11.0 - 12.1.2<br/>
 by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
 UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](https://reddit.com/u/Samg_is_a_Ninja)<br/>
 
-## Changes over the other jailbreaks
+## Changes over other jailbreaks
 * All exploits in same app
 * Detailed error messages
-* Faster and more patches
+* Faster and more stable patches
 * No extra battery drain
 * No random freezes and\or slow downs
 * No malware
@@ -33,20 +33,19 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Button to open Cydia in case it doesn't appear on the Home Screen
 * Label to show the days left till the application expires
 
-
-<img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-2.PNG?token=AlyO4wXUInR6oHEgx0Tg31ri0t1q91frks5bx5ZbwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-1.PNG?token=AlyO48vs-YYcaKUgxXh8nIEUQQz_QEoqks5bx5ZqwA%3D%3D" width="281.25" height="609" />
+<img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-2.PNG?token=AlyO4wXUInR6oHEgx0Tg31ri0t1q91frks5bx5ZbwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-1.PNG?token=AlyO48vs-YYcaKUgxXh8nIEUQQz_QEoqks5bx5ZqwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-3.PNG?token=AlyO48vs-YYcaKUgxXh8nIEUQQz_QEoqks5bx5ZqwA%3D%3D" width="281.25" height="609" />
 
 ### Tips
-*  Perform a full restore with [Succession](https://www.reddit.com/r/jailbreak/comments/bg2sfp/release_succession_fully_restore_your_ios_device/) before switching from the other jailbreaks
-* Use the built-in diagnostics tool and tweet [@pwn20wnd](https://twitter.com/Pwn20wnd) for further development on any issues
-
+*  Perform a full restore with [Succession](https://www.reddit.com/r/jailbreak/comments/bg2sfp/release_succession_fully_restore_your_ios_device/) before switching from other jailbreaks
+* Use the built-in diagnostics tool to troubleshoot encountered issues during the jailbreak proccess
+* Tweet [@pwn20wnd](https://twitter.com/Pwn20wnd) for further development on any issues or questions
 
 Refer to this [tutorial](https://youtu.be/TqHYjLHO0zs) to see the jailbreak proccess in action.
 
 ### Changelog
 * Changelogs and releases are available at https://github.com/pwn20wndstuff/Undecimus/releases
 
-## To Do List
+### To Do List
 * Chain [@_bazad](https://twitter.com/_bazad)'s [blanket](https://github.com/bazad/blanket) to bypass the developer certificate requirement for multi_path: Almost done
 * Enable the on-fly entitlement patching on iOS 11: Work in progress
 * WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1): Work in progress
@@ -72,4 +71,4 @@ Refer to this [tutorial](https://youtu.be/TqHYjLHO0zs) to see the jailbreak proc
 * [@jailbreakbuster](https://twitter.com/jailbreakbuster) for testing
 * [@Jakeashacks](https://twitter.com/Jakeashacks) for testing
 
-*This project is completely open source and it will be kept like it in the future. You can find it on [pwn20wndstuff](https://github.com/pwn20wndstuff)'s GitHub account and any kind of contribution is welcome*
+*This project is completely open source and it will be kept like it in the future. You can find it on [pwn20wndstuff](https://github.com/pwn20wndstuff)'s GitHub account and any kind of contribution is welcome.*
