@@ -15,7 +15,7 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * No malware
 * Proper jailbreak state detection
 * Proper bootstrap extraction to fix issues such as Cydia not appearing after jailbreak
-* Native build of Cydia for iOS 11, with support for the iPhone X screen size and a modern look (changes made with permission from [@saurik](https://twitter.com/saurik) )
+* Native build of Cydia for iOS 11 and iOS 12, with support for the iPhone X screen size and a modern look (changes made with permission from [@saurik](https://twitter.com/saurik).)
 * Telesphoreo port for ARM64
 * Cydia Substrate for tweak injection
 * Much faster and stable ldrestart
@@ -29,23 +29,23 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * Option to disable auto updates
 * Option to block app revokes
 * Option to restore RootFS
+* Option to set CS_DEBUGGED
+* Option to use SSH Only
+* Option to get-task-allow
 * Button to restart device
 * Button to open Cydia in case it doesn't appear on the Home Screen
 * Label to show the days left till the application expires
 
-<img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-1.PNG?token=AlyO4wXUInR6oHEgx0Tg31ri0t1q91frks5bx5ZbwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-2.PNG?token=AlyO48vs-YYcaKUgxXh8nIEUQQz_QEoqks5bx5ZqwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-3.PNG?token=AlyO48vs-YYcaKUgxXh8nIEUQQz_QEoqks5bx5ZqwA%3D%3D" width="281.25" height="609" />
+<img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-2.PNG?token=AlyO4wXUInR6oHEgx0Tg31ri0t1q91frks5bx5ZbwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-1.PNG?token=AlyO48vs-YYcaKUgxXh8nIEUQQz_QEoqks5bx5ZqwA%3D%3D" width="281.25" height="609" /> <img src="https://raw.githubusercontent.com/pwn20wndstuff/Undecimus/master/Resources/Screenshot-3.PNG?token=AlyO48vs-YYcaKUgxXh8nIEUQQz_QEoqks5bx5ZqwA%3D%3D" width="281.25" height="609" />
 
-### Tips
+## Useful Info
 *  Perform a full restore with [Succession](https://www.reddit.com/r/jailbreak/comments/bg2sfp/release_succession_fully_restore_your_ios_device/) before switching from other jailbreaks
 * Use the built-in diagnostics tool to troubleshoot encountered issues during the jailbreak proccess
 * Tweet [@pwn20wnd](https://twitter.com/Pwn20wnd) for further development on any issues or questions
-
-Refer to this [tutorial](https://youtu.be/TqHYjLHO0zs) to see the jailbreak proccess in action.
-
-### Changelog
+* Refer to this [tutorial](https://youtu.be/TqHYjLHO0zs) to see the jailbreak proccess in action.
 * Changelogs and releases are available at https://github.com/pwn20wndstuff/Undecimus/releases
 
-### To Do List
+### To-Do List
 * Chain [@_bazad](https://twitter.com/_bazad)'s [blanket](https://github.com/bazad/blanket) to bypass the developer certificate requirement for multi_path: Almost done
 * Enable the on-fly entitlement patching on iOS 11: Work in progress
 * WebKit Port with [@_niklasb](https://twitter.com/_niklasb)'s [WebKit Exploit](https://github.com/phoenhex/files/tree/master/exploits/ios-11.3.1): Work in progress
