@@ -28,6 +28,7 @@ static NSString *message = nil;
             } else { \
                 return; \
             } \
+        errno = saved_errno; \
         } \
     } \
 while (false)
