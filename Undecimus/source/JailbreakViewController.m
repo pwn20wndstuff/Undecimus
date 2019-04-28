@@ -1590,15 +1590,20 @@ void jailbreak()
             _assert([dropbear_plist writeToFile:@"/jb/Library/LaunchDaemons/dropbear.plist" atomically:YES], message, true);
             _assert(init_file("/jb/Library/LaunchDaemons/dropbear.plist", 0, 0644), message, true);
         }
-        for (NSString *file in [fileManager contentsOfDirectoryAtPath:@"/jb/Library/LaunchDaemons" error:nil]) {
-            NSString *path = [@"/jb/Library/LaunchDaemons" stringByAppendingPathComponent:file];
-            runCommand("/jb/bin/launchctl", "load", path.UTF8String, NULL);
-        }
-        for (NSString *file in [fileManager contentsOfDirectoryAtPath:@"/jb/etc/rc.d" error:nil]) {
-            NSString *path = [@"/jb/etc/rc.d" stringByAppendingPathComponent:file];
-            if ([fileManager isExecutableFileAtPath:path]) {
-                runCommand("/jb/bin/bash", "-c", path.UTF8String, NULL);
+        if (prefs.load_daemons) {
+            for (NSString *file in [fileManager contentsOfDirectoryAtPath:@"/jb/Library/LaunchDaemons" error:nil]) {
+                NSString *path = [@"/jb/Library/LaunchDaemons" stringByAppendingPathComponent:file];
+                runCommand("/jb/bin/launchctl", "load", path.UTF8String, NULL);
             }
+            for (NSString *file in [fileManager contentsOfDirectoryAtPath:@"/jb/etc/rc.d" error:nil]) {
+                NSString *path = [@"/jb/etc/rc.d" stringByAppendingPathComponent:file];
+                if ([fileManager isExecutableFileAtPath:path]) {
+                    runCommand("/jb/bin/bash", "-c", path.UTF8String, NULL);
+                }
+            }
+        }
+        if (prefs.run_uicache) {
+            _assert(runCommand("/jb/usr/bin/uicache", NULL) == ERR_SUCCESS, message, true);
         }
         _assert(runCommand("/jb/bin/launchctl", "stop", "com.apple.cfprefsd.xpc.daemon", NULL) == ERR_SUCCESS, message, true);
         LOG("Successfully enabled SSH.");
