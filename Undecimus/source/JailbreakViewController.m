@@ -117,16 +117,16 @@ typedef struct {
 } prefs_t;
 
 #define FINDOFFSET(x, symbol, critical) do { \
-    if (!ISADDR(GETOFFSET(x))) { \
+    if (!KERN_POINTER_VALID(GETOFFSET(x))) { \
         SETOFFSET(x, find_symbol(symbol != NULL ? symbol : "_" #x)); \
     } \
-    if (!ISADDR(GETOFFSET(x))) { \
+    if (!KERN_POINTER_VALID(GETOFFSET(x))) { \
         uint64_t (*_find_ ##x)(void) = dlsym(RTLD_DEFAULT, "find_" #x); \
         if (_find_ ##x != NULL) { \
             SETOFFSET(x, _find_ ##x()); \
         } \
     } \
-    if (ISADDR(GETOFFSET(x))) { \
+    if (KERN_POINTER_VALID(GETOFFSET(x))) { \
         LOG(#x " = " ADDR " + " ADDR, GETOFFSET(x), kernel_slide); \
         SETOFFSET(x, GETOFFSET(x) + kernel_slide); \
     } else { \
@@ -405,40 +405,12 @@ void unblockDomainWithName(const char *name) {
     }
 }
 
-uint64_t _vfs_context() {
-    static uint64_t vfs_context = 0;
-    if (vfs_context == 0) {
-        vfs_context = kexecute(GETOFFSET(vfs_context_current), 1, 0, 0, 0, 0, 0, 0);
-        vfs_context = zm_fix_addr(vfs_context);
-    }
-    return vfs_context;
-}
-
-int _vnode_lookup(const char *path, int flags, uint64_t *vpp, uint64_t vfs_context){
-    size_t len = strlen(path) + 1;
-    uint64_t vnode = kmem_alloc(sizeof(uint64_t));
-    uint64_t ks = kmem_alloc(len);
-    kwrite(ks, path, len);
-    int ret = (int)kexecute(GETOFFSET(vnode_lookup), ks, 0, vnode, vfs_context, 0, 0, 0);
-    if (ret != ERR_SUCCESS) {
-        return -1;
-    }
-    *vpp = ReadKernel64(vnode);
-    kmem_free(ks, len);
-    kmem_free(vnode, sizeof(uint64_t));
-    return 0;
-}
-
-int _vnode_put(uint64_t vnode){
-    return (int)kexecute(GETOFFSET(vnode_put), vnode, 0, 0, 0, 0, 0, 0);
-}
-
 uint64_t vnodeForPath(const char *path) {
-    uint64_t vfs_context = 0;
+    static uint64_t vfs_context = 0;
     uint64_t *vpp = NULL;
     uint64_t vnode = 0;
-    vfs_context = _vfs_context();
-    if (!ISADDR(vfs_context)) {
+    vfs_context = vfs_context_current();
+    if (!KERN_POINTER_VALID(vfs_context)) {
         LOG("Failed to get vfs_context.");
         goto out;
     }
@@ -447,7 +419,7 @@ uint64_t vnodeForPath(const char *path) {
         LOG("Failed to allocate memory.");
         goto out;
     }
-    if (_vnode_lookup(path, O_RDONLY, vpp, vfs_context) != ERR_SUCCESS) {
+    if (vnode_lookup(path, O_RDONLY, vpp, vfs_context) != ERR_SUCCESS) {
         LOG("Failed to get vnode at path \"%s\".", path);
         goto out;
     }
@@ -476,22 +448,22 @@ uint64_t vnodeForSnapshot(int fd, char *name) {
     uint64_t snap_vnode = 0;
     rvpp_ptr = kmem_alloc(sizeof(uint64_t));
     LOG("rvpp_ptr = " ADDR, rvpp_ptr);
-    if (!ISADDR(rvpp_ptr)) {
+    if (!KERN_POINTER_VALID(rvpp_ptr)) {
         goto out;
     }
     sdvpp_ptr = kmem_alloc(sizeof(uint64_t));
     LOG("sdvpp_ptr = " ADDR, sdvpp_ptr);
-    if (!ISADDR(sdvpp_ptr)) {
+    if (!KERN_POINTER_VALID(sdvpp_ptr)) {
         goto out;
     }
     ndp_buf = kmem_alloc(816);
     LOG("ndp_buf = " ADDR, ndp_buf);
-    if (!ISADDR(ndp_buf)) {
+    if (!KERN_POINTER_VALID(ndp_buf)) {
         goto out;
     }
-    vfs_context = _vfs_context();
+    vfs_context = vfs_context_current();
     LOG("vfs_context = " ADDR, vfs_context);
-    if (!ISADDR(vfs_context)) {
+    if (!KERN_POINTER_VALID(vfs_context)) {
         goto out;
     }
     if (kexecute(GETOFFSET(vnode_get_snapshot), fd, rvpp_ptr, sdvpp_ptr, (uint64_t)name, ndp_buf, 2, vfs_context) != ERR_SUCCESS) {
@@ -499,34 +471,34 @@ uint64_t vnodeForSnapshot(int fd, char *name) {
     }
     sdvpp = ReadKernel64(sdvpp_ptr);
     LOG("sdvpp = " ADDR, sdvpp);
-    if (!ISADDR(sdvpp)) {
+    if (!KERN_POINTER_VALID(sdvpp)) {
         goto out;
     }
     sdvpp_v_mount = ReadKernel64(sdvpp + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
     LOG("sdvpp_v_mount = " ADDR, sdvpp_v_mount);
-    if (!ISADDR(sdvpp_v_mount)) {
+    if (!KERN_POINTER_VALID(sdvpp_v_mount)) {
         goto out;
     }
     sdvpp_v_mount_mnt_data = ReadKernel64(sdvpp_v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_DATA));
     LOG("sdvpp_v_mount_mnt_data = " ADDR, sdvpp_v_mount_mnt_data);
-    if (!ISADDR(sdvpp_v_mount_mnt_data)) {
+    if (!KERN_POINTER_VALID(sdvpp_v_mount_mnt_data)) {
         goto out;
     }
     snap_meta_ptr = kmem_alloc(sizeof(uint64_t));
     LOG("snap_meta_ptr = " ADDR, snap_meta_ptr);
-    if (!ISADDR(snap_meta_ptr)) {
+    if (!KERN_POINTER_VALID(snap_meta_ptr)) {
         goto out;
     }
     old_name_ptr = kmem_alloc(sizeof(uint64_t));
     LOG("old_name_ptr = " ADDR, old_name_ptr);
-    if (!ISADDR(old_name_ptr)) {
+    if (!KERN_POINTER_VALID(old_name_ptr)) {
         goto out;
     }
     ndp_old_name_len = ReadKernel32(ndp_buf + 336 + 48);
     LOG("ndp_old_name_len = 0x%x", ndp_old_name_len);
     ndp_old_name = ReadKernel64(ndp_buf + 336 + 40);
     LOG("ndp_old_name = " ADDR, ndp_old_name);
-    if (!ISADDR(ndp_old_name)) {
+    if (!KERN_POINTER_VALID(ndp_old_name)) {
         goto out;
     }
     if (kexecute(GETOFFSET(fs_lookup_snapshot_metadata_by_name_and_return_name), sdvpp_v_mount_mnt_data, ndp_old_name, ndp_old_name_len, snap_meta_ptr, old_name_ptr, 0, 0) != ERR_SUCCESS) {
@@ -534,29 +506,29 @@ uint64_t vnodeForSnapshot(int fd, char *name) {
     }
     snap_meta = ReadKernel64(snap_meta_ptr);
     LOG("snap_meta = " ADDR, snap_meta);
-    if (!ISADDR(snap_meta)) {
+    if (!KERN_POINTER_VALID(snap_meta)) {
         goto out;
     }
     snap_vnode = kexecute(GETOFFSET(apfs_jhash_getvnode), sdvpp_v_mount_mnt_data, ReadKernel32(sdvpp_v_mount_mnt_data + 440), ReadKernel64(snap_meta + 8), 1, 0, 0, 0);
     snap_vnode = zm_fix_addr(snap_vnode);
     LOG("snap_vnode = " ADDR, snap_vnode);
-    if (!ISADDR(snap_vnode)) {
+    if (!KERN_POINTER_VALID(snap_vnode)) {
         goto out;
     }
 out:
-    if (ISADDR(sdvpp)) {
-        _vnode_put(sdvpp);
+    if (KERN_POINTER_VALID(sdvpp)) {
+        vnode_put(sdvpp);
     }
-    if (ISADDR(sdvpp_ptr)) {
+    if (KERN_POINTER_VALID(sdvpp_ptr)) {
         kmem_free(sdvpp_ptr, sizeof(uint64_t));
     }
-    if (ISADDR(ndp_buf)) {
+    if (KERN_POINTER_VALID(ndp_buf)) {
         kmem_free(ndp_buf, 816);
     }
-    if (ISADDR(snap_meta_ptr)) {
+    if (KERN_POINTER_VALID(snap_meta_ptr)) {
         kmem_free(snap_meta_ptr, sizeof(uint64_t));
     }
-    if (ISADDR(old_name_ptr)) {
+    if (KERN_POINTER_VALID(old_name_ptr)) {
         kmem_free(old_name_ptr, sizeof(uint64_t));
     }
     return snap_vnode;
@@ -710,7 +682,7 @@ void jailbreak()
             MACH_PORT_VALID(persisted_kernel_task_port) &&
             pid_for_task(persisted_kernel_task_port, &pid) == KERN_SUCCESS && pid == 0 &&
             task_info(persisted_kernel_task_port, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS &&
-            ISADDR((persisted_cache_blob = dyld_info.all_image_info_addr)) &&
+            KERN_POINTER_VALID((persisted_cache_blob = dyld_info.all_image_info_addr)) &&
             (persisted_kernel_slide = dyld_info.all_image_info_size) != -1) {
             prepare_for_rw_with_fake_tfp0(persisted_kernel_task_port);
             kernel_base = KERNEL_SEARCH_ADDRESS + persisted_kernel_slide;
@@ -734,7 +706,7 @@ void jailbreak()
                 case empty_list_exploit: {
                     if (vfs_sploit() &&
                         MACH_PORT_VALID(tfp0) &&
-                        ISADDR(kernel_base = find_kernel_base())) {
+                        KERN_POINTER_VALID(kernel_base = find_kernel_base())) {
                         exploit_success = true;
                     }
                     break;
@@ -742,7 +714,7 @@ void jailbreak()
                 case multi_path_exploit: {
                     if (mptcp_go() &&
                         MACH_PORT_VALID(tfp0) &&
-                        ISADDR(kernel_base = find_kernel_base())) {
+                        KERN_POINTER_VALID(kernel_base = find_kernel_base())) {
                         exploit_success = true;
                     }
                     break;
@@ -750,7 +722,7 @@ void jailbreak()
                 case async_wake_exploit: {
                     if (async_wake_go() &&
                         MACH_PORT_VALID(tfp0) &&
-                        ISADDR(kernel_base = find_kernel_base())) {
+                        KERN_POINTER_VALID(kernel_base = find_kernel_base())) {
                         exploit_success = true;
                     }
                     break;
@@ -761,7 +733,7 @@ void jailbreak()
                     if (MACH_PORT_VALID(tfp0) &&
                         kernel_slide_init() &&
                         kernel_slide != -1 &&
-                        ISADDR(kernel_base = (kernel_slide + KERNEL_SEARCH_ADDRESS))) {
+                        KERN_POINTER_VALID(kernel_base = (kernel_slide + KERNEL_SEARCH_ADDRESS))) {
                         exploit_success = true;
                     }
                     break;
@@ -771,7 +743,7 @@ void jailbreak()
                     if ((machswap_offsets = get_machswap_offsets()) != NULL &&
                         machswap_exploit(machswap_offsets) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
-                        ISADDR(kernel_base)) {
+                        KERN_POINTER_VALID(kernel_base)) {
                         exploit_success = true;
                     }
                     break;
@@ -781,7 +753,7 @@ void jailbreak()
                     if ((machswap_offsets = get_machswap_offsets()) != NULL &&
                         machswap2_exploit(machswap_offsets) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
-                        ISADDR(kernel_base)) {
+                        KERN_POINTER_VALID(kernel_base)) {
                         exploit_success = true;
                     }
                     break;
@@ -861,6 +833,16 @@ void jailbreak()
             wk64(offset_options, 0);
             SETOFFSET(unrestrict-options, offset_options);
         }
+        if (prefs.enable_get_task_allow) {
+            SETOPT(GET_TASK_ALLOW);
+        } else {
+            UNSETOPT(GET_TASK_ALLOW);
+        }
+        if (prefs.set_cs_debugged) {
+            SETOPT(CS_DEBUGGED);
+        } else {
+            UNSETOPT(CS_DEBUGGED);
+        }
     }
 
     UPSTAGE();
@@ -904,10 +886,16 @@ void jailbreak()
             FINDOFFSET(IOUserClient__vtable, NULL, true);
             FINDOFFSET(IORegistryEntry__getRegistryEntryID, NULL, true);
         }
-        FINDOFFSET(lck_mtx_lock, NULL, false);
-        FINDOFFSET(lck_mtx_unlock, NULL, false);
-        FINDOFFSET(proc_find, NULL, false);
-        FINDOFFSET(proc_rele, NULL, false);
+        FINDOFFSET(lck_mtx_lock, NULL, true);
+        FINDOFFSET(lck_mtx_unlock, NULL, true);
+        FINDOFFSET(proc_find, NULL, true);
+        FINDOFFSET(proc_rele, NULL, true);
+        FINDOFFSET(extension_create_file, NULL, true);
+        FINDOFFSET(extension_add, NULL, true);
+        FINDOFFSET(extension_release, NULL, true);
+        FINDOFFSET(sfree, NULL, true);
+        FINDOFFSET(sstrdup, NULL, true);
+        FINDOFFSET(strlen, NULL, true);
         found_offsets = true;
         LOG("Successfully found offsets.");
 
@@ -926,13 +914,13 @@ void jailbreak()
         LOG("Escaping sandbox...");
         myProcAddr = get_proc_struct_for_pid(myPid);
         LOG("myProcAddr = " ADDR, myProcAddr);
-        _assert(ISADDR(myProcAddr), message, true);
+        _assert(KERN_POINTER_VALID(myProcAddr), message, true);
         kernelCredAddr = get_kernel_cred_addr();
         LOG("kernelCredAddr = " ADDR, kernelCredAddr);
-        _assert(ISADDR(kernelCredAddr), message, true);
+        _assert(KERN_POINTER_VALID(kernelCredAddr), message, true);
         Shenanigans = ReadKernel64(GETOFFSET(shenanigans));
         LOG("Shenanigans = " ADDR, Shenanigans);
-        _assert(ISADDR(Shenanigans) || Shenanigans == ShenanigansPatch, message, true);
+        _assert(KERN_POINTER_VALID(Shenanigans) || Shenanigans == ShenanigansPatch, message, true);
         if (Shenanigans != kernelCredAddr) {
             LOG("Detected corrupted shenanigans pointer.");
             Shenanigans = kernelCredAddr;
@@ -941,7 +929,7 @@ void jailbreak()
         myCredAddr = kernelCredAddr;
         myOriginalCredAddr = give_creds_to_process_at_addr(myProcAddr, myCredAddr);
         LOG("myOriginalCredAddr = " ADDR, myOriginalCredAddr);
-        _assert(ISADDR(myOriginalCredAddr), message, true);
+        _assert(KERN_POINTER_VALID(myOriginalCredAddr), message, true);
         _assert(setuid(0) == ERR_SUCCESS, message, true);
         _assert(getuid() == 0, message, true);
         myHost = mach_host_self();
@@ -1146,12 +1134,12 @@ void jailbreak()
             SETMESSAGE(NSLocalizedString(@"Failed to clear dev vnode's si_flags.", nil));
             uint64_t devVnode = vnodeForPath(thedisk);
             LOG("devVnode = " ADDR, devVnode);
-            _assert(ISADDR(devVnode), message, true);
+            _assert(KERN_POINTER_VALID(devVnode), message, true);
             uint64_t v_specinfo = ReadKernel64(devVnode + koffset(KSTRUCT_OFFSET_VNODE_VU_SPECINFO));
             LOG("v_specinfo = " ADDR, v_specinfo);
-            _assert(ISADDR(v_specinfo), message, true);
+            _assert(KERN_POINTER_VALID(v_specinfo), message, true);
             WriteKernel32(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS), 0);
-            _assert(_vnode_put(devVnode) == ERR_SUCCESS, message, true);
+            _assert(vnode_put(devVnode) == ERR_SUCCESS, message, true);
             LOG("Successfully cleared dev vnode's si_flags.");
             
             // Mount RootFS.
@@ -1170,7 +1158,7 @@ void jailbreak()
             _assert(runCommandv(argv[0], 3, argv, ^(pid_t pid) {
                 uint64_t procStructAddr = get_proc_struct_for_pid(pid);
                 LOG("procStructAddr = " ADDR, procStructAddr);
-                _assert(ISADDR(procStructAddr), message, true);
+                _assert(KERN_POINTER_VALID(procStructAddr), message, true);
                 give_creds_to_process_at_addr(procStructAddr, kernelCredAddr);
             }) == ERR_SUCCESS, message, true);
             _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
@@ -1213,10 +1201,10 @@ void jailbreak()
             if (kCFCoreFoundationVersionNumber >= 1535.12) {
                 system_snapshot_vnode = vnodeForSnapshot(rootfd, systemSnapshot);
                 LOG("system_snapshot_vnode = " ADDR, system_snapshot_vnode);
-                _assert(ISADDR(system_snapshot_vnode), message, true);
+                _assert(KERN_POINTER_VALID(system_snapshot_vnode), message, true);
                 system_snapshot_vnode_v_data = ReadKernel64(system_snapshot_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_DATA));
                 LOG("system_snapshot_vnode_v_data = " ADDR, system_snapshot_vnode_v_data);
-                _assert(ISADDR(system_snapshot_vnode_v_data), message, true);
+                _assert(KERN_POINTER_VALID(system_snapshot_vnode_v_data), message, true);
                 system_snapshot_vnode_v_data_flag = ReadKernel32(system_snapshot_vnode_v_data + 49);
                 LOG("system_snapshot_vnode_v_data_flag = 0x%x", system_snapshot_vnode_v_data_flag);
                 WriteKernel32(system_snapshot_vnode_v_data + 49, system_snapshot_vnode_v_data_flag & ~0x40);
@@ -1224,7 +1212,7 @@ void jailbreak()
             _assert(fs_snapshot_rename(rootfd, systemSnapshot, original_snapshot, 0) == ERR_SUCCESS, message, true);
             if (kCFCoreFoundationVersionNumber >= 1535.12) {
                 WriteKernel32(system_snapshot_vnode_v_data + 49, system_snapshot_vnode_v_data_flag);
-                _assert(_vnode_put(system_snapshot_vnode) == ERR_SUCCESS, message, true);
+                _assert(vnode_put(system_snapshot_vnode) == ERR_SUCCESS, message, true);
             }
             LOG("Successfully renamed system snapshot.");
             
@@ -1252,10 +1240,10 @@ void jailbreak()
         _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
         uint64_t rootfs_vnode = vnodeForPath("/");
         LOG("rootfs_vnode = " ADDR, rootfs_vnode);
-        _assert(ISADDR(rootfs_vnode), message, true);
+        _assert(KERN_POINTER_VALID(rootfs_vnode), message, true);
         uint64_t v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
         LOG("v_mount = " ADDR, v_mount);
-        _assert(ISADDR(v_mount), message, true);
+        _assert(KERN_POINTER_VALID(v_mount), message, true);
         uint32_t v_flag = ReadKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG));
         if ((v_flag & MNT_RDONLY) || (v_flag & MNT_NOSUID)) {
             v_flag &= ~(MNT_RDONLY | MNT_NOSUID);
@@ -1263,7 +1251,7 @@ void jailbreak()
             _assert(runCommand("/sbin/mount", "-u", thedisk, NULL) == ERR_SUCCESS, message, true);
             WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag);
         }
-        _assert(_vnode_put(rootfs_vnode) == ERR_SUCCESS, message, true);
+        _assert(vnode_put(rootfs_vnode) == ERR_SUCCESS, message, true);
         _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, message, true);
         NSString *file = [NSString stringWithContentsOfFile:@"/.installed_unc0ver" encoding:NSUTF8StringEncoding error:nil];
         needStrap = (file == nil ||
@@ -1387,6 +1375,12 @@ void jailbreak()
         CACHEOFFSET(IORegistryEntry__getRegistryEntryID, "IORegistryEntryGetRegistryEntryID");
         CACHEOFFSET(proc_find, "ProcFind");
         CACHEOFFSET(proc_rele, "ProcRele");
+        CACHEOFFSET(extension_create_file, "ExtensionCreateFile");
+        CACHEOFFSET(extension_add, "ExtensionAdd");
+        CACHEOFFSET(extension_release, "ExtensionRelease");
+        CACHEOFFSET(sfree, "Sfree");
+        CACHEOFFSET(sstrdup, "Sstrdup");
+        CACHEOFFSET(strlen, "Strlen");
 #undef CACHEOFFSET
 #undef CACHEADDR
         if (![[NSMutableDictionary dictionaryWithContentsOfFile:offsetsFile] isEqual:dictionary]) {
@@ -1804,16 +1798,6 @@ void jailbreak()
         if (!is_symlink("/usr/lib/substrate") && !is_directory("/Library/substrate")) {
             _assert([[NSFileManager defaultManager] moveItemAtPath:@"/usr/lib/substrate" toPath:@"/Library/substrate" error:nil], message, true);
             _assert(ensure_symlink("/Library/substrate", "/usr/lib/substrate"), message, true);
-        }
-        if (prefs.enable_get_task_allow) {
-            SETOPT(GET_TASK_ALLOW);
-        } else {
-            UNSETOPT(GET_TASK_ALLOW);
-        }
-        if (prefs.set_cs_debugged) {
-            SETOPT(CS_DEBUGGED);
-        } else {
-            UNSETOPT(CS_DEBUGGED);
         }
         _assert(runCommand("/usr/libexec/substrate", NULL) == ERR_SUCCESS, message, skipSubstrate?false:true);
         LOG("Successfully started Substrate.");
