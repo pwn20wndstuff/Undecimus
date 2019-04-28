@@ -1590,12 +1590,9 @@ out:;
     {
         mach_port_destroy(mach_task_self(), postport[i]);
     }
-
-    if (fakeport)
-    {
-        free((void *)fakeport);
-    }
-
+    
+    SafeFree((void *)fakeport);
+    
     if (the_one)
     {
         mach_port_destroy(mach_task_self(), the_one);
@@ -1611,9 +1608,7 @@ out:;
         mach_vm_deallocate(mach_task_self(), (mach_vm_address_t)pipebuf, pagesize);
     }
     
-    if (pipefds) {
-        free((void *)pipefds);
-    }
+    SafeFreeNULL(pipefds);
     
     if (MACH_PORT_VALID(host)) {
         mach_port_deallocate(mach_task_self(), host);

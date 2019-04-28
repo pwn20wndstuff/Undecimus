@@ -228,7 +228,7 @@ uint64_t make_fake_task(uint64_t vm_map) {
     *(uint64_t*)(fake_task + koffset(KSTRUCT_OFFSET_TASK_VM_MAP)) = vm_map;
     *(uint8_t*)(fake_task + koffset(KSTRUCT_OFFSET_TASK_LCK_MTX_TYPE)) = 0x22;
     kmemcpy(fake_task_kaddr, (uint64_t) fake_task, 0x1000);
-    free(fake_task);
+    SafeFreeNULL(fake_task);
     
     return fake_task_kaddr;
 }
@@ -245,7 +245,7 @@ void set_all_image_info_addr(uint64_t kernel_task_kaddr) {
         _assert(rkbuffer(dyld_info.all_image_info_addr, blob, blob_size), message, true);
         // Adds any entries that are in kernel but we don't have
         merge_cache_blob(blob);
-        free(blob);
+        SafeFreeNULL(blob);
 
         // Free old offset cache - didn't bother comparing because it's faster to just replace it if it's the same
         kmem_free(dyld_info.all_image_info_addr, blob_size);
@@ -257,7 +257,7 @@ void set_all_image_info_addr(uint64_t kernel_task_kaddr) {
     uint64_t kernel_cache_blob = kmem_alloc_wired(cache_size);
     blob_rebase(cache, (uint64_t)cache, kernel_cache_blob);
     wkbuffer(kernel_cache_blob, cache, cache_size);
-    free(cache);
+    SafeFreeNULL(cache);
     WriteKernel64(kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_ALL_IMAGE_INFO_ADDR), kernel_cache_blob);
     _assert(task_info(tfp0, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS, message, true);
     _assert(dyld_info.all_image_info_addr == kernel_cache_blob, message, true);
@@ -425,10 +425,7 @@ uint64_t vnodeForPath(const char *path) {
     }
     vnode = *vpp;
 out:
-    if (vpp != NULL) {
-        free(vpp);
-        vpp = NULL;
-    }
+    SafeFreeNULL(vpp);
     return vnode;
 }
 
@@ -694,7 +691,7 @@ void jailbreak()
                 struct cache_blob *blob = create_cache_blob(blob_size);
                 _assert(rkbuffer(persisted_cache_blob, blob, blob_size), message, true);
                 import_cache_blob(blob);
-                free(blob);
+                SafeFreeNULL(blob);
                 _assert(GETOFFSET(kernel_slide) == persisted_kernel_slide, message, true);
                 found_offsets = true;
             }
@@ -1178,8 +1175,7 @@ void jailbreak()
             for (const char **snapshot = snapshots; *snapshot; snapshot++) {
                 LOG("\t%s", *snapshot);
             }
-            free(snapshots);
-            snapshots = NULL;
+            SafeFreeNULL(snapshots);
             NSString *systemVersionPlist = @"/System/Library/CoreServices/SystemVersion.plist";
             NSString *rootSystemVersionPlist = [@(rootFsMountPoint) stringByAppendingPathComponent:systemVersionPlist];
             _assert(rootSystemVersionPlist != nil, message, true);
@@ -1267,10 +1263,8 @@ void jailbreak()
                 _assert(fs_snapshot_create(rootfd, original_snapshot, 0) == ERR_SUCCESS, message, true);
             }
         }
-        free(systemSnapshot);
-        systemSnapshot = NULL;
-        free(snapshots);
-        snapshots = NULL;
+        SafeFreeNULL(systemSnapshot);
+        SafeFreeNULL(snapshots);
         close(rootfd);
         LOG("Successfully remounted RootFS.");
         INSERTSTATUS(NSLocalizedString(@"Remounted RootFS.\n", nil));
@@ -1431,12 +1425,10 @@ void jailbreak()
                 char *systemSnapshot = copySystemSnapshot();
                 _assert(systemSnapshot != NULL, message, true);
                 _assert(fs_snapshot_rename(rootfd, snapshot, systemSnapshot, 0) == ERR_SUCCESS, message, true);
-                free(systemSnapshot);
-                systemSnapshot = NULL;
+                SafeFreeNULL(systemSnapshot);
             }
             close(rootfd);
-            free(snapshots);
-            snapshots = NULL;
+            SafeFreeNULL(snapshots);
             LOG("Successfully renamed system snapshot back.");
             
             // Clean up.
@@ -1657,8 +1649,7 @@ void jailbreak()
             betaFirmware = true;
             LOG("Detected beta firmware.");
         }
-        free(osversion);
-        osversion = NULL;
+        SafeFreeNULL(osversion);
         
         NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
         _assert(resourcesPkgs != nil, message, true);
@@ -2005,8 +1996,8 @@ void jailbreak()
         _assert(targettype != NULL, message, true);
         _assert(sysctlbyname("hw.targettype", targettype, &size, NULL, 0) == ERR_SUCCESS, message, true);
         NSString *jetsamFile = [NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", targettype];
-        free(targettype);
-        targettype = NULL;
+        SafeFreeNULL(targettype);
+        
         if (prefs.increase_memory_limit) {
             // Increase memory limit.
             

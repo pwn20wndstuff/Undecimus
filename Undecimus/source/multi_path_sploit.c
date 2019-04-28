@@ -503,7 +503,7 @@ static uint32_t early_rk32(uint64_t kaddr)
         LOG("pid_for_task returned %x", err);
     }
     LOG("read val via pid_for_task: %08x", val);
-    free(pipe_contents);
+    SafeFreeNULL(pipe_contents);
     return val;
 }
 
@@ -533,7 +533,7 @@ static mach_port_t prepare_tfp0(uint64_t vm_map, uint64_t receiver)
     // replace the ipc_kmsg:
     write(early_read_pipe_write_end, pipe_contents, PIPE_SIZE);
 
-    free(pipe_contents);
+    SafeFreeNULL(pipe_contents);
 
     // early_read_port is no longer only capable of reads!
     return early_read_port;

@@ -228,7 +228,7 @@ uint64_t find_port_via_proc_pidlistuptrs_bug(mach_port_t port, int disposition)
 
     //LOG("best guess is: 0x%016llx with %d%% of the valid guesses for it", best_guess, (best_guess_count*100)/valid_guesses);
 
-    free(guesses);
+    SafeFreeNULL(guesses);
 
     return best_guess;
 }

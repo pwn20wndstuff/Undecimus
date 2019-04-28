@@ -403,10 +403,7 @@ NSDictionary *getPkgs(void) {
                 }
             }
         }
-        if (line) {
-            free(line);
-            line = NULL;
-        }
+        SafeFreeNULL(line);
         fclose(pkgs_file);
         
         mpkgs[@"firmware"] = @{

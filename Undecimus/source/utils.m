@@ -410,7 +410,7 @@ bool is_mountpoint(const char *filename) {
     assert(rv == ERR_SUCCESS);
     if (cwd) {
         chdir(cwd);
-        free(cwd);
+        SafeFreeNULL(cwd);
     }
     return buf.st_dev != p_buf.st_dev || buf.st_ino == p_buf.st_ino;
 }
@@ -687,8 +687,8 @@ bool multi_path_tcp_enabled() {
         eps.sae_dstaddrlen = sizeof(struct sockaddr);
         connectx(sock, &eps, SAE_ASSOCID_ANY, 0, NULL, 0, NULL, NULL);
         enabled = (errno != EPERM);
-        free(sockaddr_src);
-        free(sockaddr_dst);
+        SafeFreeNULL(sockaddr_src);
+        SafeFreeNULL(sockaddr_dst);
         close(sock);
     });
     return enabled;

@@ -165,7 +165,7 @@ size_t ool_ports_spray_size_with_gc(mach_port_t *holding_ports, size_t *holding_
  *
  * Description:
  * 	Create an array of Mach ports. The Mach ports are receive rights only. Once the array is no
- * 	longer needed, deallocate it with free().
+ * 	longer needed, deallocate it with SafeFreeNULL().
  */
 mach_port_t *create_ports(size_t count);
 

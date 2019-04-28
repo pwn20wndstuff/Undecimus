@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include <mach/mach.h>
+#include <common.h>
 #include "kalloc_crash.h"
 
 struct simple_msg
@@ -84,6 +85,6 @@ void do_kalloc_crash() {
         uint8_t *body = malloc(body_size);
         memset(body, 0x41, body_size);
         send_kalloc_message(body, body_size);
-        free(body);
+        SafeFreeNULL(body);
     }
 }

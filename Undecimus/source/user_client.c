@@ -15,6 +15,7 @@
 #include "log.h"
 #include "mach_vm.h"
 #include "parameters.h"
+#include "common.h"
 
 // ---- Global variables --------------------------------------------------------------------------
 
@@ -321,7 +322,7 @@ stage3_kernel_call_init() {
 	uint64_t *vtable = stage2_copyout_user_client_vtable();
 	size_t count = stage2_patch_user_client_vtable(vtable);
 	stage2_patch_user_client(vtable, count);
-	free(vtable);
+	SafeFreeNULL(vtable);
 	return true;
 }
 

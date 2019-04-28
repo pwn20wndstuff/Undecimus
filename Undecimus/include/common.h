@@ -15,6 +15,9 @@ extern void NSLog(CFStringRef, ...);
 
 #define LOG(str, args...) RAWLOG("[*] " str, ##args)
 
+#define SafeFree(x) do { if (x) free(x); } while(false)
+#define SafeFreeNULL(x) do { SafeFree(x); (x) = NULL; } while(false)
+
 extern uint64_t offset_options;
 #define OPT(x) (offset_options?((rk64(offset_options) & OPT_ ##x)?true:false):false)
 #define SETOPT(x) (offset_options?wk64(offset_options, rk64(offset_options) | OPT_ ##x):0)

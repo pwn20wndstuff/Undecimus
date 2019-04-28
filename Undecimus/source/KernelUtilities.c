@@ -852,7 +852,7 @@ char *OSString_CopyString(uint64_t OSString) {
                     OSString_CopyString = strdup(str);
                 }
             }
-            free(str);
+            SafeFreeNULL(str);
         }
     }
     return OSString_CopyString;
@@ -878,7 +878,7 @@ uint64_t get_exception_osarray(const char **exceptions) {
     size_t len=0;
     ssize_t written=0;
     char *ents = malloc(xmlsize);
-    if (ents == NULL) {
+    if (!ents) {
         return 0;
     }
     size_t xmlused = sprintf(ents, "<array>");
@@ -894,7 +894,7 @@ uint64_t get_exception_osarray(const char **exceptions) {
         }
         written = sprintf(ents + xmlused, "<string>%s/</string>", *exception);
         if (written < 0) {
-            free(ents);
+            SafeFreeNULL(ents);
             return 0;
         }
         xmlused += written;
@@ -910,7 +910,7 @@ uint64_t get_exception_osarray(const char **exceptions) {
     written = sprintf(ents + xmlused, "</array>");
     
     exception_osarray = OSUnserializeXML(ents);
-    free(ents);
+    SafeFreeNULL(ents);
     return exception_osarray;
 }
 
@@ -930,7 +930,7 @@ char **copy_amfi_entitlements(uint64_t present) {
         uint64_t item = ReadKernel64(itemBuffer + (i * sizeof(void *)));
         char *entitlementString = OSString_CopyString(item);
         if (!entitlementString) {
-            free(entitlements);
+            SafeFreeNULL(entitlements);
             return NULL;
         }
         size_t len = strlen(entitlementString) + 1;
@@ -938,14 +938,14 @@ char **copy_amfi_entitlements(uint64_t present) {
             bufferSize += 0x1000;
             entitlements = realloc(entitlements, arraySize + bufferSize);
             if (!entitlements) {
-                free(entitlementString);
+                SafeFreeNULL(entitlementString);
                 return NULL;
             }
         }
         entitlements[i] = (char*)entitlements + arraySize + bufferUsed;
         strcpy(entitlements[i], entitlementString);
         bufferUsed += len;
-        free(entitlementString);
+        SafeFreeNULL(entitlementString);
     }
     return entitlements;
 }
@@ -993,7 +993,7 @@ bool exceptionalizeProcess(uint64_t sandbox, uint64_t amfi_entitlements, const c
                                 if (strcasecmp(ent, *exception) == 0) {
                                     foundException = true;
                                 }
-                                free(ent);
+                                SafeFreeNULL(ent);
                             }
                         }
                         if (!foundException) {
@@ -1008,11 +1008,11 @@ bool exceptionalizeProcess(uint64_t sandbox, uint64_t amfi_entitlements, const c
                                     }
                                     OSObject_Release(exceptionOSArray);
                                 }
-                                free(exception_array);
+                                SafeFreeNULL(exception_array);
                             }
                         }
                     }
-                    free(currentExceptions);
+                    SafeFreeNULL(currentExceptions);
                 }
             } else {
                 uint64_t exceptionOSArray = get_exception_osarray(exceptions);
