@@ -1077,7 +1077,7 @@ bool unrestrictProcess(pid_t pid) {
                 }
                 LOG("%s(%d): Exceptionalizing process with: %s", __FUNCTION__, pid, "abs_path_exceptions");
                 if (!exceptionalizeProcess(sandbox, amfi_entitlements, abs_path_exceptions)) {
-                    LOG("%s(%d): Unable to exceptionalize process");
+                    LOG("%s(%d): Unable to exceptionalize process", __FUNCTION__, pid);
                     unrestrictProcess = false;
                 }
                 if (amfi_entitlements != 0) {
