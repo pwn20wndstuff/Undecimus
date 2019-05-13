@@ -14,6 +14,9 @@
 #include <CoreFoundation/CoreFoundation.h>
 extern void NSLog(CFStringRef, ...);
 #define RAWLOG(str, args...) do { NSLog(CFSTR(str), ##args); } while(false)
+#define BOOL bool
+#define YES ((BOOL) true)
+#define NO ((BOOL) false)
 #endif
 
 #define LOG(str, args...) RAWLOG("[*] " str, ##args)
