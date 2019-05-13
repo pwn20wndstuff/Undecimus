@@ -1292,8 +1292,6 @@ bool restore_kernel_offset_cache() {
     if (offset_cache_blob == NULL) goto out;
     if (!rkbuffer(offset_cache_addr, offset_cache_blob, *offset_cache_size)) goto out;
     import_cache_blob(offset_cache_blob);
-    if (KERN_POINTER_VALID(get_offset("OSBooleanTrue"))) set_offset("OSBooleanTrue", ReadKernel64(get_offset("OSBooleanTrue")));
-    if (KERN_POINTER_VALID(get_offset("OSBooleanTrue"))) set_offset("OSBooleanFalse", get_offset("OSBooleanTrue") + sizeof(kptr_t));
     found_offsets = true;
     restored_kernel_offset_cache = true;
 out:;
