@@ -330,7 +330,7 @@ int _pmap_load_trust_cache(kptr_t kernel_trust, size_t length) {
     if (!KERN_POINTER_VALID(kernel_trust)) goto out;
     auto const function = getoffset(pmap_load_trust_cache);
     if (!KERN_POINTER_VALID(function)) goto out;
-    ret = (int)kexecute(function, kernel_trust, (kptr_t)length, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = (int)kexec(function, kernel_trust, (kptr_t)length, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
     return ret;
 }
@@ -449,7 +449,7 @@ size_t kstrlen(kptr_t ptr) {
     if (!KERN_POINTER_VALID(ptr)) goto out;
     auto const function = getoffset(strlen);
     if (!KERN_POINTER_VALID(function)) goto out;
-    size = (size_t)kexecute(function, ptr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    size = (size_t)kexec(function, ptr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
     return size;
 }
@@ -492,7 +492,7 @@ kptr_t sstrdup(const char *str) {
     if (!KERN_POINTER_VALID(function)) goto out;
     kstr = kstralloc(str);
     if (!KERN_POINTER_VALID(kstr)) goto out;
-    ret = kexecute(function, kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = kexec(function, kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL) ret = zm_fix_addr(ret);
 out:;
     if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
@@ -503,7 +503,7 @@ kptr_t smalloc(size_t size) {
     auto ret = KPTR_NULL;
     auto const function = getoffset(smalloc);
     if (!KERN_POINTER_VALID(function)) goto out;
-    ret = kexecute(function, (kptr_t)size, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = kexec(function, (kptr_t)size, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL) ret = zm_fix_addr(ret);
 out:;
     return ret;
@@ -513,7 +513,7 @@ void sfree(kptr_t ptr) {
     if (!KERN_POINTER_VALID(ptr)) goto out;
     auto const function = getoffset(sfree);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, ptr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, ptr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -525,7 +525,7 @@ int extension_create_file(kptr_t saveto, kptr_t sb, const char *path, size_t pat
     if (!KERN_POINTER_VALID(function)) goto out;
     kstr = kstralloc(path);
     if (!KERN_POINTER_VALID(kstr)) goto out;
-    ret = (int)kexecute(function, saveto, sb, kstr, (kptr_t)path_len, (kptr_t)subtype, KPTR_NULL, KPTR_NULL);
+    ret = (int)kexec(function, saveto, sb, kstr, (kptr_t)path_len, (kptr_t)subtype, KPTR_NULL, KPTR_NULL);
 out:;
     if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
     return ret;
@@ -540,7 +540,7 @@ int extension_create_mach(kptr_t saveto, kptr_t sb, const char *name, uint32_t s
     if (!KERN_POINTER_VALID(saveto) || !KERN_POINTER_VALID(sb) || name == NULL) goto out;
     kstr = kstralloc(name);
     if (!KERN_POINTER_VALID(kstr)) goto out;
-    ret = (int)kexecute(function, saveto, sb, kstr, (kptr_t)subtype, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = (int)kexec(function, saveto, sb, kstr, (kptr_t)subtype, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
     if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
     return ret;
@@ -554,7 +554,7 @@ int extension_add(kptr_t ext, kptr_t sb, const char *desc) {
     if (!KERN_POINTER_VALID(function)) goto out;
     kstr = kstralloc(desc);
     if (!KERN_POINTER_VALID(kstr)) goto out;
-    ret = (int)kexecute(function, ext, sb, kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = (int)kexec(function, ext, sb, kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
     if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
     return ret;
@@ -564,7 +564,7 @@ void extension_release(kptr_t ext) {
     if (!KERN_POINTER_VALID(ext)) goto out;
     auto const function = getoffset(extension_release);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, ext, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, ext, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -572,7 +572,7 @@ void extension_destroy(kptr_t ext) {
     if (!KERN_POINTER_VALID(ext)) goto out;
     auto const function = getoffset(extension_destroy);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, ext, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, ext, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -620,7 +620,7 @@ kptr_t proc_find(pid_t pid) {
     auto ret = KPTR_NULL;
     auto const function = getoffset(proc_find);
     if (!KERN_POINTER_VALID(function)) goto out;
-    ret = kexecute(function, (kptr_t)pid, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = kexec(function, (kptr_t)pid, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL) ret = zm_fix_addr(ret);
 out:;
     return ret;
@@ -630,7 +630,7 @@ void proc_rele(kptr_t proc) {
     if (!KERN_POINTER_VALID(proc)) goto out;
     auto const function = getoffset(proc_rele);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, proc, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, proc, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -638,7 +638,7 @@ void proc_lock(kptr_t proc) {
     if (!KERN_POINTER_VALID(proc)) goto out;
     auto const function = getoffset(proc_lock);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, proc, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, proc, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -646,7 +646,7 @@ void proc_unlock(kptr_t proc) {
     if (!KERN_POINTER_VALID(proc)) goto out;
     auto const function = getoffset(proc_unlock);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, proc, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, proc, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -654,7 +654,7 @@ void proc_ucred_lock(kptr_t proc) {
     if (!KERN_POINTER_VALID(proc)) goto out;
     auto const function = getoffset(proc_ucred_lock);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, proc, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, proc, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -662,7 +662,7 @@ void proc_ucred_unlock(kptr_t proc) {
     if (!KERN_POINTER_VALID(proc)) goto out;
     auto const function = getoffset(proc_ucred_unlock);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, proc, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, proc, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -670,7 +670,7 @@ void vnode_lock(kptr_t vp) {
     if (!KERN_POINTER_VALID(vp)) goto out;
     auto const function = getoffset(vnode_lock);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, vp, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, vp, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -678,7 +678,7 @@ void vnode_unlock(kptr_t vp) {
     if (!KERN_POINTER_VALID(vp)) goto out;
     auto const function = getoffset(vnode_unlock);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, vp, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, vp, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -686,7 +686,7 @@ void mount_lock(kptr_t mp) {
     if (!KERN_POINTER_VALID(mp)) goto out;
     auto const function = getoffset(mount_lock);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, mp, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, mp, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -694,7 +694,7 @@ void mount_unlock(kptr_t mp) {
     if (!KERN_POINTER_VALID(mp)) goto out;
     auto const function = getoffset(mount_unlock);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, mp, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, mp, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -702,7 +702,7 @@ void task_set_platform_binary(kptr_t task, boolean_t is_platform) {
     if (!KERN_POINTER_VALID(task)) goto out;
     auto const function = getoffset(task_set_platform_binary);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, task, (kptr_t)is_platform, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, task, (kptr_t)is_platform, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -710,7 +710,7 @@ int chgproccnt(uid_t uid, int diff) {
     auto ret = -1;
     auto const function = getoffset(chgproccnt);
     if (!KERN_POINTER_VALID(function)) goto out;
-    ret = (int)kexecute(function, (kptr_t)uid, (kptr_t)diff, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = (int)kexec(function, (kptr_t)uid, (kptr_t)diff, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
     return ret;
 }
@@ -719,7 +719,7 @@ void kauth_cred_ref(kptr_t cred) {
     if (!KERN_POINTER_VALID(cred)) goto out;
     auto const function = getoffset(kauth_cred_ref);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, cred, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, cred, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -727,7 +727,7 @@ void kauth_cred_unref(kptr_t cred) {
     if (!KERN_POINTER_VALID(cred)) goto out;
     auto const function = getoffset(kauth_cred_unref);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, cred, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, cred, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -735,7 +735,7 @@ kptr_t vfs_context_current() {
     auto ret = KPTR_NULL;
     auto const function = getoffset(vfs_context_current);
     if (!KERN_POINTER_VALID(function)) goto out;
-    ret = kexecute(function, (kptr_t)1, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = kexec(function, (kptr_t)1, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL) ret = zm_fix_addr(ret);
 out:;
     return ret;
@@ -754,7 +754,7 @@ int vnode_lookup(const char *path, int flags, kptr_t *vpp, kptr_t ctx) {
     vpp_kptr_size = sizeof(kptr_t);
     vpp_kptr = kmem_alloc(vpp_kptr_size);
     if (!KERN_POINTER_VALID(vpp_kptr)) goto out;
-    ret = (int)kexecute(function, kstr, (kptr_t)flags, vpp_kptr, ctx, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = (int)kexec(function, kstr, (kptr_t)flags, vpp_kptr, ctx, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (!rkbuffer(vpp_kptr, vpp, vpp_kptr_size)) goto out;
 out:;
     if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
@@ -767,7 +767,7 @@ int vnode_put(kptr_t vp) {
     if (!KERN_POINTER_VALID(vp)) goto out;
     auto const function = getoffset(vnode_put);
     if (!KERN_POINTER_VALID(function)) goto out;
-    ret = (int)kexecute(function, vp, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = (int)kexec(function, vp, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
     return ret;
 }
@@ -780,7 +780,7 @@ bool OSDictionary_SetItem(kptr_t OSDictionary, const char *key, kptr_t val) {
     if (!KERN_POINTER_VALID(function)) goto out;
     kstr = kstralloc(key);
     if (!KERN_POINTER_VALID(kstr)) goto out;
-    ret = (bool)kexecute(function, OSDictionary, kstr, val, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = (bool)kexec(function, OSDictionary, kstr, val, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
     if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
     return ret;
@@ -794,7 +794,7 @@ kptr_t OSDictionary_GetItem(kptr_t OSDictionary, const char *key) {
     if (!KERN_POINTER_VALID(function)) goto out;
     kstr = kstralloc(key);
     if (!KERN_POINTER_VALID(kstr)) goto out;
-    ret = kexecute(function, OSDictionary, kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = kexec(function, OSDictionary, kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL && (ret>>32) == KPTR_NULL) ret = zm_fix_addr(ret);
     if (!KERN_POINTER_VALID(ret)) goto out;
 out:;
@@ -807,7 +807,7 @@ bool OSDictionary_Merge(kptr_t OSDictionary, kptr_t OSDictionary2) {
     if (!KERN_POINTER_VALID(OSDictionary) || !KERN_POINTER_VALID(OSDictionary2)) goto out;
     auto const function = OSObjectFunc(OSDictionary, off_OSDictionary_Merge);
     if (!KERN_POINTER_VALID(function)) goto out;
-    ret = (bool)kexecute(function, OSDictionary, OSDictionary2, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = (bool)kexec(function, OSDictionary, OSDictionary2, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
     return ret;
 }
@@ -849,7 +849,7 @@ bool OSArray_Merge(kptr_t OSArray, kptr_t OSArray2) {
     if (!KERN_POINTER_VALID(OSArray) || !KERN_POINTER_VALID(OSArray2)) goto out;
     auto const function = OSObjectFunc(OSArray, off_OSArray_Merge);
     if (!KERN_POINTER_VALID(function)) goto out;
-    ret = (bool)kexecute(function, OSArray, OSArray2, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = (bool)kexec(function, OSArray, OSArray2, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
     return ret;
 }
@@ -859,7 +859,7 @@ kptr_t OSArray_GetObject(kptr_t OSArray, uint32_t idx) {
     if (!KERN_POINTER_VALID(OSArray)) goto out;
     auto const function = OSObjectFunc(OSArray, off_OSArray_GetObject);
     if (!KERN_POINTER_VALID(function)) goto out;
-    ret = kexecute(OSArray, idx, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = kexec(OSArray, idx, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL) ret = zm_fix_addr(ret);
     if (!KERN_POINTER_VALID(ret)) goto out;
 out:;
@@ -870,7 +870,7 @@ void OSArray_RemoveObject(kptr_t OSArray, uint32_t idx) {
     if (!KERN_POINTER_VALID(OSArray)) goto out;
     auto const function = OSObjectFunc(OSArray, off_OSArray_RemoveObject);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, OSArray, idx, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, OSArray, idx, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -907,7 +907,7 @@ void OSObject_Release(kptr_t OSObject) {
     if (!KERN_POINTER_VALID(OSObject)) goto out;
     auto const function = OSObjectFunc(OSObject, off_OSObject_Release);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, OSObject, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, OSObject, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -915,7 +915,7 @@ void OSObject_Retain(kptr_t OSObject) {
     if (!KERN_POINTER_VALID(OSObject)) goto out;
     auto const function = OSObjectFunc(OSObject, off_OSObject_Retain);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kexecute(function, OSObject, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    kexec(function, OSObject, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -924,7 +924,7 @@ uint32_t OSObject_GetRetainCount(kptr_t OSObject) {
     if (!KERN_POINTER_VALID(OSObject)) goto out;
     auto const function = OSObjectFunc(OSObject, off_OSObject_GetRetainCount);
     if (!KERN_POINTER_VALID(function)) goto out;
-    ret = (uint32_t)kexecute(function, OSObject, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = (uint32_t)kexec(function, OSObject, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
     return ret;
 }
@@ -934,7 +934,7 @@ uint32_t OSString_GetLength(kptr_t OSString) {
     if (!KERN_POINTER_VALID(OSString)) goto out;
     auto const function = OSObjectFunc(OSString, off_OSString_GetLength);
     if (!KERN_POINTER_VALID(function)) goto out;
-    ret = (uint32_t)kexecute(function, OSString, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = (uint32_t)kexec(function, OSString, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
     return ret;
 }
@@ -975,7 +975,7 @@ kptr_t OSUnserializeXML(const char *buffer) {
     kstr = kstralloc(buffer);
     if (!KERN_POINTER_VALID(kstr)) goto out;
     auto const error_kptr = KPTR_NULL;
-    ret = kexecute(function, kstr, error_kptr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    ret = kexec(function, kstr, error_kptr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL) ret = zm_fix_addr(ret);
     if (!KERN_POINTER_VALID(ret)) goto out;
 out:;
@@ -1542,7 +1542,7 @@ kptr_t get_vnode_for_snapshot(int fd, char *name) {
     if (!KERN_POINTER_VALID(ndp_buf)) goto out;
     auto const vfs_context = vfs_context_current();
     if (!KERN_POINTER_VALID(vfs_context)) goto out;
-    if (kexecute(getoffset(vnode_get_snapshot), fd, rvpp_ptr, sdvpp_ptr, (kptr_t)name, ndp_buf, 2, vfs_context) != 0) goto out;
+    if (kexec(getoffset(vnode_get_snapshot), fd, rvpp_ptr, sdvpp_ptr, (kptr_t)name, ndp_buf, 2, vfs_context) != 0) goto out;
     sdvpp = ReadKernel64(sdvpp_ptr);
     if (!KERN_POINTER_VALID(sdvpp_ptr)) goto out;
     auto const sdvpp_v_mount = ReadKernel64(sdvpp + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
@@ -1556,10 +1556,10 @@ kptr_t get_vnode_for_snapshot(int fd, char *name) {
     ndp_old_name = ReadKernel64(ndp_buf + 336 + 40);
     if (!KERN_POINTER_VALID(ndp_old_name)) goto out;
     auto const ndp_old_name_len = ReadKernel32(ndp_buf + 336 + 48);
-    if (kexecute(getoffset(fs_lookup_snapshot_metadata_by_name_and_return_name), sdvpp_v_mount_mnt_data, ndp_old_name, ndp_old_name_len, snap_meta_ptr, old_name_ptr, 0, 0) != 0) goto out;
+    if (kexec(getoffset(fs_lookup_snapshot_metadata_by_name_and_return_name), sdvpp_v_mount_mnt_data, ndp_old_name, ndp_old_name_len, snap_meta_ptr, old_name_ptr, 0, 0) != 0) goto out;
     auto const snap_meta = ReadKernel64(snap_meta_ptr);
     if (!KERN_POINTER_VALID(snap_meta)) goto out;
-    snap_vnode = kexecute(getoffset(apfs_jhash_getvnode), sdvpp_v_mount_mnt_data, ReadKernel32(sdvpp_v_mount_mnt_data + 440), ReadKernel64(snap_meta + 8), 1, 0, 0, 0);
+    snap_vnode = kexec(getoffset(apfs_jhash_getvnode), sdvpp_v_mount_mnt_data, ReadKernel32(sdvpp_v_mount_mnt_data + 440), ReadKernel64(snap_meta + 8), 1, 0, 0, 0);
     if (snap_vnode != KPTR_NULL) snap_vnode = zm_fix_addr(snap_vnode);
     if (!KERN_POINTER_VALID(snap_vnode)) goto out;
     ret = snap_vnode;

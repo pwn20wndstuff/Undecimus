@@ -40,9 +40,9 @@ static kptr_t fake_vtable;
 static kptr_t fake_client;
 static const int fake_kalloc_size = 0x1000;
 #endif
-static pthread_mutex_t kexecute_lock;
+static pthread_mutex_t kexec_lock;
 
-bool init_kexecute()
+bool init_kexec()
 {
 #if __arm64e__
     if (!parameters_init()) return false;
@@ -98,11 +98,11 @@ bool init_kexecute()
     WriteKernel64(fake_vtable + 8 * 0xB7, getoffset(add_x0_x0_0x40_ret));
 
 #endif
-    pthread_mutex_init(&kexecute_lock, NULL);
+    pthread_mutex_init(&kexec_lock, NULL);
     return true;
 }
 
-void term_kexecute()
+void term_kexec()
 {
 #if __arm64e__
     kernel_call_deinit();
@@ -112,13 +112,13 @@ void term_kexecute()
     kmem_free(fake_client, fake_kalloc_size);
     IOServiceClose(user_client);
 #endif
-    pthread_mutex_destroy(&kexecute_lock);
+    pthread_mutex_destroy(&kexec_lock);
 }
 
-kptr_t kexecute(kptr_t ptr, kptr_t x0, kptr_t x1, kptr_t x2, kptr_t x3, kptr_t x4, kptr_t x5, kptr_t x6)
+kptr_t kexec(kptr_t ptr, kptr_t x0, kptr_t x1, kptr_t x2, kptr_t x3, kptr_t x4, kptr_t x5, kptr_t x6)
 {
     kptr_t returnval = 0;
-    pthread_mutex_lock(&kexecute_lock);
+    pthread_mutex_lock(&kexec_lock);
 #if __arm64e__
     returnval = kernel_call_7(ptr, 7, x0, x1, x2, x3, x4, x5, x6);
 #else
@@ -140,6 +140,6 @@ kptr_t kexecute(kptr_t ptr, kptr_t x0, kptr_t x1, kptr_t x2, kptr_t x3, kptr_t x
     WriteKernel64(fake_client + 0x40, offx20);
     WriteKernel64(fake_client + 0x48, offx28);
 #endif
-    pthread_mutex_unlock(&kexecute_lock);
+    pthread_mutex_unlock(&kexec_lock);
     return returnval;
 }

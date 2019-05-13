@@ -378,9 +378,9 @@ void jailbreak()
         _assert(set_kernel_task_info(), localize(@"Unable to set kernel task info."), true);
         LOG("Successfully set HSP4 as TFP0.");
         insertstatus(localize(@"Set HSP4 as TFP0.\n"));
-        LOG("Initializing kexecute...");
-        _assert(init_kexecute(), localize(@"Unable to initialize kernel code execution."), true);
-        LOG("Successfully initialized kexecute.");
+        LOG("Initializing kernel code execution...");
+        _assert(init_kexec(), localize(@"Unable to initialize kernel code execution."), true);
+        LOG("Successfully initialized kernel code execution.");
         LOG("Platformizing...");
         _assert(set_platform_binary(myProcAddr, true), localize(@"Unable to make my task a platform task."), true);
         _assert(set_cs_platform_binary(myProcAddr, true), localize(@"Unable to make my codesign blob a platform blob."), true);
@@ -1582,8 +1582,8 @@ out:;
 #undef sync_prefs
 #undef write_test_file
     progress(localize(@"Deinitializing jailbreak..."));
-    LOG("Deinitializing kexecute...");
-    term_kexecute();
+    LOG("Deinitializing kernel code execution...");
+    term_kexec();
     LOG("Unplatformizing...");
     _assert(set_platform_binary(myProcAddr, false), localize(@"Unable to make my task a non-platform task."), true);
     _assert(set_cs_platform_binary(myProcAddr, false), localize(@"Unable to make my codesign blob a non-platform blob."), true);
