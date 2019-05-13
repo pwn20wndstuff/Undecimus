@@ -271,8 +271,8 @@ static mach_port_t hold_kallocs(uint32_t kalloc_size, int allocs_per_message, in
             //return false;
         }
     }
-    free(ports_to_send);
-    free(msg);
+    SafeFreeNULL(ports_to_send);
+    SafeFreeNULL(msg);
 
     return port;
 }
@@ -394,7 +394,7 @@ static uint32_t early_rk32(uint64_t kaddr)
         LOG("pid_for_task returned %x (%s)", err, mach_error_string(err));
     }
     LOG("read val via pid_for_task: %08x", val);
-    free(buf);
+    SafeFreeNULL(buf);
     return val;
 }
 
@@ -810,8 +810,8 @@ bool vfs_sploit()
             break;
         }
     }
-    free(old_contents);
-    free(new_contents);
+    SafeFreeNULL(old_contents);
+    SafeFreeNULL(new_contents);
     if (pipe_target_kaddr_replacer_index == -1) {
         LOG("failed to find the pipe_target_kaddr_replacer pipe");
     }

@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2101395521A09BB700F9C5F2 /* hideventsystem.c in Sources */ = {isa = PBXBuildFile; fileRef = 2101395321A09BB700F9C5F2 /* hideventsystem.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
-		2116449A21737F9500250744 /* JailbreakViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* JailbreakViewController.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function -Wno-deprecated-declarations"; }; };
+		2116449A21737F9500250744 /* JailbreakViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC6E21369EB700849420 /* JailbreakViewController.m */; };
 		212D8844216E4C4800A36DA5 /* find_port.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8842216E4C4700A36DA5 /* find_port.c */; };
 		212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8846216E4DF600A36DA5 /* early_kalloc.c */; };
 		212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */ = {isa = PBXBuildFile; fileRef = 212D8849216E4EBE00A36DA5 /* async_wake.c */; };
@@ -33,9 +33,10 @@
 		2170BDCD21B332FC0059BD10 /* SpringBoardServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C0FC902136A46500849420 /* SpringBoardServices.framework */; };
 		2171C4012222E3BB004E45C7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2171C4002222E3BB004E45C7 /* SystemConfiguration.framework */; };
 		2199B8E9226B40C600A8255D /* kalloc_crash.c in Sources */ = {isa = PBXBuildFile; fileRef = 2199B8E8226B40C600A8255D /* kalloc_crash.c */; };
+		219C90A0228703DA00AFA38A /* jailbreak.m in Sources */ = {isa = PBXBuildFile; fileRef = 219C909F228703DA00AFA38A /* jailbreak.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function -Wno-deprecated-declarations"; }; };
 		21A97FD02148103C00DC0023 /* remote_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC62148103B00DC0023 /* remote_memory.c */; };
 		21A97FD12148103C00DC0023 /* KernelExecution.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FC82148103B00DC0023 /* KernelExecution.m */; };
-		21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCC2148103B00DC0023 /* KernelUtilities.c */; };
+		21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCC2148103B00DC0023 /* KernelUtilities.c */; settings = {COMPILER_FLAGS = "-Wno-deprecated-declarations"; }; };
 		21A97FD42148103C00DC0023 /* remote_call.c in Sources */ = {isa = PBXBuildFile; fileRef = 21A97FCD2148103B00DC0023 /* remote_call.c */; };
 		21B421902261302F004C17CD /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21B4218F2261302F004C17CD /* MobileCoreServices.framework */; };
 		21BB9804222F05C40012AF40 /* machswap2_pwn.m in Sources */ = {isa = PBXBuildFile; fileRef = 21BB9802222F05C40012AF40 /* machswap2_pwn.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
@@ -49,8 +50,10 @@
 		21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130EA214C03690021AA9D /* CreditsTableViewController.m */; };
 		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8521369EE900849420 /* empty_list_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		21CC3905227CDFDE0072D572 /* prefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 21CC3902227CDFDE0072D572 /* prefs.m */; };
+		21CC3906227CDFDE0072D572 /* diagnostics.m in Sources */ = {isa = PBXBuildFile; fileRef = 21CC3903227CDFDE0072D572 /* diagnostics.m */; };
 		21F4D70E21FC7A590070D5E0 /* patchfinder64.c in Sources */ = {isa = PBXBuildFile; fileRef = 21F4D70C21FC7A590070D5E0 /* patchfinder64.c */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
-		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
+		21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130E5214BDDE20021AA9D /* SettingsTableViewController.m */; };
 		21FF63CB224E5FDC008B76D9 /* offsetcache.c in Sources */ = {isa = PBXBuildFile; fileRef = 21FF63C9224E5FDC008B76D9 /* offsetcache.c */; };
 		21FFE0F8222E4C0600EC59B2 /* machswap_offsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FFE0F6222E4C0600EC59B2 /* machswap_offsets.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
 		21FFE0F9222E4C0600EC59B2 /* machswap_pwn.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FFE0F7222E4C0600EC59B2 /* machswap_pwn.m */; settings = {COMPILER_FLAGS = "-Wno-unused-variable -Wno-unused-function"; }; };
@@ -118,6 +121,9 @@
 		2171C4002222E3BB004E45C7 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		2199B8E7226B40C600A8255D /* kalloc_crash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kalloc_crash.h; sourceTree = "<group>"; };
 		2199B8E8226B40C600A8255D /* kalloc_crash.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = kalloc_crash.c; sourceTree = "<group>"; };
+		219BF90422832DBC00A4B827 /* UIProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIProgressHUD.h; sourceTree = "<group>"; };
+		219C909E228703DA00AFA38A /* jailbreak.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jailbreak.h; sourceTree = "<group>"; };
+		219C909F228703DA00AFA38A /* jailbreak.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = jailbreak.m; sourceTree = "<group>"; };
 		21A97FC42148103A00DC0023 /* KernelExecution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KernelExecution.h; sourceTree = "<group>"; };
 		21A97FC52148103B00DC0023 /* remote_call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_call.h; sourceTree = "<group>"; };
 		21A97FC62148103B00DC0023 /* remote_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remote_memory.c; sourceTree = "<group>"; };
@@ -156,6 +162,10 @@
 		21C13117214D268F0021AA9D /* multi_path_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = multi_path_sploit.c; sourceTree = "<group>"; };
 		21C13118214D268F0021AA9D /* multi_path_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multi_path_sploit.h; sourceTree = "<group>"; };
 		21C1312E214D5A710021AA9D /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
+		21CC3901227CDFDE0072D572 /* prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prefs.h; sourceTree = "<group>"; };
+		21CC3902227CDFDE0072D572 /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = prefs.m; sourceTree = "<group>"; };
+		21CC3903227CDFDE0072D572 /* diagnostics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = diagnostics.m; sourceTree = "<group>"; };
+		21CC3904227CDFDE0072D572 /* diagnostics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = diagnostics.h; sourceTree = "<group>"; };
 		21E9642421A1DD6F000625F7 /* NSTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSTask.h; sourceTree = "<group>"; };
 		21F4D70C21FC7A590070D5E0 /* patchfinder64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = patchfinder64.c; path = patchfinder64/patchfinder64.c; sourceTree = SOURCE_ROOT; };
 		21F4D70D21FC7A590070D5E0 /* patchfinder64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = patchfinder64.h; path = patchfinder64/patchfinder64.h; sourceTree = SOURCE_ROOT; };
@@ -334,6 +344,7 @@
 		2170BD3421B192750059BD10 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				219BF90422832DBC00A4B827 /* UIProgressHUD.h */,
 				2150A9E322021381001C8677 /* mach_vm.h */,
 				2150A9E422021381001C8677 /* ipc_port.h */,
 				2150A9E52202138A001C8677 /* IOKitLib.h */,
@@ -404,6 +415,12 @@
 				22C546AA21A8A8FD00EFC09C /* utils.m */,
 				222AD59421FA732A00DCBA2A /* FakeApt.h */,
 				222AD59221FA731800DCBA2A /* FakeApt.m */,
+				21CC3901227CDFDE0072D572 /* prefs.h */,
+				21CC3902227CDFDE0072D572 /* prefs.m */,
+				21CC3904227CDFDE0072D572 /* diagnostics.h */,
+				21CC3903227CDFDE0072D572 /* diagnostics.m */,
+				219C909E228703DA00AFA38A /* jailbreak.h */,
+				219C909F228703DA00AFA38A /* jailbreak.m */,
 			);
 			path = source;
 			sourceTree = "<group>";
@@ -621,13 +638,16 @@
 				2199B8E9226B40C600A8255D /* kalloc_crash.c in Sources */,
 				21C1312F214E69F80021AA9D /* empty_list_sploit.c in Sources */,
 				21C0FC8721369EE900849420 /* KernelMemory.c in Sources */,
+				21CC3906227CDFDE0072D572 /* diagnostics.m in Sources */,
 				21C0FC7A21369EB800849420 /* main.m in Sources */,
 				212D8847216E4DF600A36DA5 /* early_kalloc.c in Sources */,
+				21CC3905227CDFDE0072D572 /* prefs.m in Sources */,
 				21A97FD02148103C00DC0023 /* remote_memory.c in Sources */,
 				222AD59321FA731800DCBA2A /* FakeApt.m in Sources */,
 				21FF63CB224E5FDC008B76D9 /* offsetcache.c in Sources */,
 				216F3F3F2228776E007DC1BC /* pac.c in Sources */,
 				21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */,
+				219C90A0228703DA00AFA38A /* jailbreak.m in Sources */,
 				21C0FC8A21369EE900849420 /* KernelStructureOffsets.m in Sources */,
 				21FFE0F9222E4C0600EC59B2 /* machswap_pwn.m in Sources */,
 				21FFE0F8222E4C0600EC59B2 /* machswap_offsets.m in Sources */,

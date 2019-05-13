@@ -32,7 +32,7 @@ log_stderr(char type, const char *format, va_list ap) {
 		case 'E': type = '-'; break;
 	}
     RAWLOG("[%c] %s\n", type, message);
-	free(message);
+	SafeFreeNULL(message);
 }
 
 void (*log_implementation)(char type, const char *format, va_list ap) = log_stderr;

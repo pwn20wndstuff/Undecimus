@@ -114,10 +114,14 @@ int runCommandv(const char *cmd, int argc, const char * const* argv, void (^unre
 int runCommand(const char *cmd, ...);
 NSString *pathForResource(NSString *resource);
 pid_t pidOfProcess(const char *name);
+char *getKernelVersion(void);
+char *getMachineName(void);
+char *getModelName(void);
 bool kernelVersionContains(const char *string);
 bool machineNameContains(const char *string);
 bool multi_path_tcp_enabled(void);
 bool jailbreakEnabled(void);
+NSString *getKernelBuildVersion(void);
 bool supportsExploit(exploit_t exploit);
 bool jailbreakSupported(void);
 bool respringSupported(void);
@@ -143,6 +147,21 @@ bool canOpen(const char *URL);
 bool airplaneModeEnabled(void);
 bool installApp(const char *bundle);
 bool rebuildApplicationDatabases(void);
+char *get_path_for_pid(pid_t pid);
+NSString *getECID(void);
+NSString *getUDID(void);
+char *sysctlWithName(const char *name);
+char *getOSVersion(void);
+char *getOSProductVersion(void);
+void printOSDetails(void);
+bool isBetaFirmware(void);
+double getUptime(void);
+vm_size_t get_kernel_page_size(void);
+int waitForFile(const char *filename);
+NSString *hexFromInt(NSInteger val);
+void waitFor(int seconds);
+void blockDomainWithName(const char *name);
+void unblockDomainWithName(const char *name);
 
 extern NSData *lastSystemOutput;
 

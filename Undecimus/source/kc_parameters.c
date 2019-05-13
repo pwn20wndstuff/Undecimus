@@ -66,22 +66,22 @@ static struct initialization offsets[] = {
 
 static void
 addresses__iphone11_2__16A366() {
-    ADDRESS(paciza_pointer__l2tp_domain_module_start)       = GETOFFSET(paciza_pointer__l2tp_domain_module_start);
-    ADDRESS(paciza_pointer__l2tp_domain_module_stop)        = GETOFFSET(paciza_pointer__l2tp_domain_module_stop);
-    ADDRESS(l2tp_domain_inited)                             = GETOFFSET(l2tp_domain_inited);
-    ADDRESS(sysctl__net_ppp_l2tp)                           = GETOFFSET(sysctl__net_ppp_l2tp);
-    ADDRESS(sysctl_unregister_oid)                          = GETOFFSET(sysctl_unregister_oid);
-    ADDRESS(mov_x0_x4__br_x5)                               = GETOFFSET(mov_x0_x4__br_x5);
-    ADDRESS(mov_x9_x0__br_x1)                               = GETOFFSET(mov_x9_x0__br_x1);
-    ADDRESS(mov_x10_x3__br_x6)                              = GETOFFSET(mov_x10_x3__br_x6);
-    ADDRESS(kernel_forge_pacia_gadget)                      = GETOFFSET(kernel_forge_pacia_gadget);
-    ADDRESS(kernel_forge_pacda_gadget)                      = GETOFFSET(kernel_forge_pacda_gadget);
+    ADDRESS(paciza_pointer__l2tp_domain_module_start)       = getoffset(paciza_pointer__l2tp_domain_module_start);
+    ADDRESS(paciza_pointer__l2tp_domain_module_stop)        = getoffset(paciza_pointer__l2tp_domain_module_stop);
+    ADDRESS(l2tp_domain_inited)                             = getoffset(l2tp_domain_inited);
+    ADDRESS(sysctl__net_ppp_l2tp)                           = getoffset(sysctl__net_ppp_l2tp);
+    ADDRESS(sysctl_unregister_oid)                          = getoffset(sysctl_unregister_oid);
+    ADDRESS(mov_x0_x4__br_x5)                               = getoffset(mov_x0_x4__br_x5);
+    ADDRESS(mov_x9_x0__br_x1)                               = getoffset(mov_x9_x0__br_x1);
+    ADDRESS(mov_x10_x3__br_x6)                              = getoffset(mov_x10_x3__br_x6);
+    ADDRESS(kernel_forge_pacia_gadget)                      = getoffset(kernel_forge_pacia_gadget);
+    ADDRESS(kernel_forge_pacda_gadget)                      = getoffset(kernel_forge_pacda_gadget);
     SIZE(kernel_forge_pacxa_gadget_buffer)                  = 0x110;
     OFFSET(kernel_forge_pacxa_gadget_buffer, first_access)  = 0xe8;
     OFFSET(kernel_forge_pacxa_gadget_buffer, pacia_result)  = 0xf0;
     OFFSET(kernel_forge_pacxa_gadget_buffer, pacda_result)  = 0xe8;
-    ADDRESS(IOUserClient__vtable)                           = GETOFFSET(IOUserClient__vtable);
-    ADDRESS(IORegistryEntry__getRegistryEntryID)            = GETOFFSET(IORegistryEntry__getRegistryEntryID);
+    ADDRESS(IOUserClient__vtable)                           = getoffset(IOUserClient__vtable);
+    ADDRESS(IORegistryEntry__getRegistryEntryID)            = getoffset(IORegistryEntry__getRegistryEntryID);
 }
 
 // A list of address initializations by platform.

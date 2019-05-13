@@ -11,6 +11,7 @@
 #include "JailbreakViewController.h"
 #include "SettingsTableViewController.h"
 #include "utils.h"
+#include "prefs.h"
 
 @interface AppDelegate ()
 
@@ -83,95 +84,8 @@
 
 
 - (void)initPrefs {
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_TWEAK_INJECTION] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_TWEAK_INJECTION];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_LOAD_DAEMONS] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_LOAD_DAEMONS];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_DUMP_APTICKET] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_DUMP_APTICKET];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_REFRESH_ICON_CACHE] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_REFRESH_ICON_CACHE];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_BOOT_NONCE] == nil) {
-        [[NSUserDefaults standardUserDefaults] setObject:@"0x1111111111111111" forKey:K_BOOT_NONCE];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_EXPLOIT] != nil &&
-        !supportsExploit((exploit_t)[[NSUserDefaults standardUserDefaults] integerForKey:K_EXPLOIT])) {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:K_EXPLOIT];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_EXPLOIT] == nil) {
-        [[NSUserDefaults standardUserDefaults] setInteger:recommendedJailbreakSupport() forKey:K_EXPLOIT];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_DISABLE_AUTO_UPDATES] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_DISABLE_AUTO_UPDATES];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_DISABLE_APP_REVOKES] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_DISABLE_APP_REVOKES];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_OVERWRITE_BOOT_NONCE] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_OVERWRITE_BOOT_NONCE];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_EXPORT_KERNEL_TASK_PORT] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_EXPORT_KERNEL_TASK_PORT];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_RESTORE_ROOTFS] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_RESTORE_ROOTFS];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_INCREASE_MEMORY_LIMIT] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_INCREASE_MEMORY_LIMIT];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_ECID] == nil) {
-        [[NSUserDefaults standardUserDefaults] setObject:@"0x0" forKey:K_ECID];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_INSTALL_CYDIA] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_INSTALL_CYDIA];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_INSTALL_OPENSSH] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_INSTALL_OPENSSH];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_RELOAD_SYSTEM_DAEMONS] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:K_RELOAD_SYSTEM_DAEMONS];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_HIDE_LOG_WINDOW] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_HIDE_LOG_WINDOW];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_RESET_CYDIA_CACHE] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_RESET_CYDIA_CACHE];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_SSH_ONLY] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_SSH_ONLY];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_ENABLE_GET_TASK_ALLOW] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_ENABLE_GET_TASK_ALLOW];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:K_SET_CS_DEBUGGED] == nil) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:K_SET_CS_DEBUGGED];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
+    register_default_prefs();
+    repair_prefs();
 }
 
 - (void)initShortcuts {

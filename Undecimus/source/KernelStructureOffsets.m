@@ -45,6 +45,8 @@ uint32_t kstruct_offsets_11_0[] = {
     0x410, // KSTRUCT_OFFSET_PROC_P_MEMSTAT_STATE
     0x58, // KSTRUCT_OFFSET_PROC_MLOCK
     0xf0, // KSTRUCT_OFFSET_PROC_UCRED_MLOCK
+    0x40, // KSTRUCT_OFFSET_PROC_SVUID
+    0x44, // KSTRUCT_OFFSET_PROC_SVGID
 
     0x0, // KSTRUCT_OFFSET_FILEDESC_FD_OFILES
 
@@ -87,6 +89,7 @@ uint32_t kstruct_offsets_11_0[] = {
     0x8, // KSTRUCT_OFFSET_LABEL_L_PERPOLICY
     
     0x18, // KSTRUCT_SIZE_IPC_ENTRY
+    0x8, // KSTRUCT_OFFSET_IPC_ENTRY_IE_BITS
     
     0x6c, // KFREE_ADDR_OFFSET
 };
@@ -124,6 +127,8 @@ uint32_t kstruct_offsets_11_3[] = {
     0x410, // KSTRUCT_OFFSET_PROC_P_MEMSTAT_STATE
     0x58, // KSTRUCT_OFFSET_PROC_MLOCK
     0xf0, // KSTRUCT_OFFSET_PROC_UCRED_MLOCK
+    0x40, // KSTRUCT_OFFSET_PROC_SVUID
+    0x44, // KSTRUCT_OFFSET_PROC_SVGID
 
     0x0, // KSTRUCT_OFFSET_FILEDESC_FD_OFILES
 
@@ -166,6 +171,7 @@ uint32_t kstruct_offsets_11_3[] = {
     0x8, // KSTRUCT_OFFSET_LABEL_L_PERPOLICY
     
     0x18, // KSTRUCT_SIZE_IPC_ENTRY
+    0x8, // KSTRUCT_OFFSET_IPC_ENTRY_IE_BITS
     
     0x6c, // KFREE_ADDR_OFFSET
 };
@@ -219,6 +225,8 @@ uint32_t kstruct_offsets_12_0[] = {
     0x3f8, // KSTRUCT_OFFSET_PROC_P_MEMSTAT_STATE
     0x50, // KSTRUCT_OFFSET_PROC_MLOCK
     0xe8, // KSTRUCT_OFFSET_PROC_UCRED_MLOCK
+    0x32, // KSTRUCT_OFFSET_PROC_SVUID
+    0x36, // KSTRUCT_OFFSET_PROC_SVGID
     
     0x0, // KSTRUCT_OFFSET_FILEDESC_FD_OFILES
     
@@ -261,6 +269,7 @@ uint32_t kstruct_offsets_12_0[] = {
     0x8, // KSTRUCT_OFFSET_LABEL_L_PERPOLICY
     
     0x18, // KSTRUCT_SIZE_IPC_ENTRY
+    0x8, // KSTRUCT_OFFSET_IPC_ENTRY_IE_BITS
     
     0x6c, // KFREE_ADDR_OFFSET
 };
@@ -270,13 +279,13 @@ uint32_t koffset(enum kstruct_offset offset)
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         LOG("kCFCoreFoundationVersionNumber: %f", kCFCoreFoundationVersionNumber);
-        if (kCFCoreFoundationVersionNumber >= 1535.12) {
+        if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0) {
             LOG("offsets selected for iOS 12.0 or above");
             offsets = kstruct_offsets_12_0;
-        } else if (kCFCoreFoundationVersionNumber >= 1452.23) {
+        } else if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_11_3) {
             LOG("offsets selected for iOS 11.3 or above");
             offsets = kstruct_offsets_11_3;
-        } else if (kCFCoreFoundationVersionNumber >= 1443.00) {
+        } else if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_11_0) {
             LOG("offsets selected for iOS 11.0 to 11.2.6");
             offsets = kstruct_offsets_11_0;
         } else {

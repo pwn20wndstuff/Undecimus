@@ -101,7 +101,7 @@ int unlocknvram(void) {
     // replace vtable on IODTNVRAM object
     WriteKernel64(obj, fake_vtable);
 
-    free(buf);
+    SafeFreeNULL(buf);
     LOG("Unlocked nvram");
     return 0;
 }

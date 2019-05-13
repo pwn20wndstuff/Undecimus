@@ -10,13 +10,39 @@
 #include <mach/mach_traps.h>
 #include <mach/task.h>
 
-extern uint64_t
-find_blr_x19_gadget(void);
-
 #include "remote_call.h"
 #include "remote_memory.h"
 
 #include <common.h>
+
+#if !__arm64e__
+static uint64_t find_gadget_candidate(char **alternatives, size_t gadget_length) {
+    auto const haystack_start = (void *)atoi; // will do...
+    auto haystack_size = 100*1024*1024; // likewise...
+    
+    for (char *candidate = *alternatives; candidate != NULL; alternatives++) {
+        void *found_at = memmem(haystack_start, haystack_size, candidate, gadget_length);
+        if (found_at != NULL){
+            LOG("found at: %llx", (uint64_t)found_at);
+            return (uint64_t)found_at;
+        }
+    }
+    return 0;
+}
+
+static uint64_t blr_x19_addr = 0;
+static uint64_t find_blr_x19_gadget()
+{
+    if (blr_x19_addr != 0){
+        return blr_x19_addr;
+    }
+    auto const blr_x19 = "\x60\x02\x3f\xd6";
+    char* candidates[] = {blr_x19, NULL};
+    blr_x19_addr = find_gadget_candidate(candidates, 4);
+    return blr_x19_addr;
+}
+
+#endif
 
 // no support for non-register args
 #define MAX_REMOTE_ARGS 8

