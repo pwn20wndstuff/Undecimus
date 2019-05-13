@@ -71,13 +71,15 @@ extern char *get_path_for_pid(pid_t pid);
 kptr_t kernel_base = KPTR_NULL;
 kptr_t offset_options = KPTR_NULL;
 bool found_offsets = false;
-
 kptr_t cached_task_self_addr = KPTR_NULL;
+
+#define find_port(port, disposition) (have_kmem_read() && found_offsets ? get_address_of_port(getpid(), port) : find_port_address(port, disposition))
+
 kptr_t task_self_addr()
 {
     auto ret = KPTR_NULL;
     if (KERN_POINTER_VALID((ret = cached_task_self_addr))) goto out;
-    cached_task_self_addr = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), mach_task_self()) : find_port_address(mach_task_self(), MACH_MSG_TYPE_COPY_SEND);
+    cached_task_self_addr = find_port(mach_task_self(), MACH_MSG_TYPE_COPY_SEND);
 out:;
     return cached_task_self_addr;
 }
@@ -100,7 +102,7 @@ kptr_t current_thread()
     auto thread = THREAD_NULL;
     thread = mach_thread_self();
     if (!MACH_PORT_VALID(thread)) goto out;
-    auto const thread_port = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), thread) : find_port_address(thread, MACH_MSG_TYPE_COPY_SEND);
+    auto const thread_port = find_port(thread, MACH_MSG_TYPE_COPY_SEND);
     if (!KERN_POINTER_VALID(thread_port)) goto out;
     auto const thread_addr = ReadKernel64(thread_port + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
     if (!KERN_POINTER_VALID(thread_addr)) goto out;
@@ -116,7 +118,7 @@ kptr_t find_kernel_base()
     auto host = HOST_NULL;
     host = mach_host_self();
     if (!MACH_PORT_VALID(host)) goto out;
-    auto const hostport_addr = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), host) : find_port_address(host, MACH_MSG_TYPE_COPY_SEND);
+    auto const hostport_addr = find_port(host, MACH_MSG_TYPE_COPY_SEND);
     if (!KERN_POINTER_VALID(hostport_addr)) goto out;
     auto const realhost = ReadKernel64(hostport_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
     if (!KERN_POINTER_VALID(realhost)) goto out;
@@ -144,7 +146,7 @@ mach_port_t fake_host_priv()
     }
     // get the address of realhost:
     auto host = mach_host_self();
-    auto hostport_addr = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), host) : find_port_address(host, MACH_MSG_TYPE_COPY_SEND);
+    auto hostport_addr = find_port(host, MACH_MSG_TYPE_COPY_SEND);
     mach_port_deallocate(mach_task_self(), host);
     auto realhost = ReadKernel64(hostport_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
 
@@ -161,7 +163,7 @@ mach_port_t fake_host_priv()
     mach_port_insert_right(mach_task_self(), port, port, MACH_MSG_TYPE_MAKE_SEND);
 
     // locate the port
-    auto port_addr = have_kmem_read() && found_offsets ? get_address_of_port(getpid(), port) : find_port_address(port, MACH_MSG_TYPE_COPY_SEND);
+    auto port_addr = find_port(port, MACH_MSG_TYPE_COPY_SEND);
 
     // change the type of the port
     WriteKernel32(port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_HOST_PRIV);
@@ -176,6 +178,8 @@ mach_port_t fake_host_priv()
 
     return port;
 }
+
+#undef find_port
 
 kptr_t get_kernel_proc_struct_addr() {
     auto ret = KPTR_NULL;
