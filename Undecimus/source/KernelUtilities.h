@@ -158,6 +158,7 @@ BOOL set_hsp4(task_t port);
 kptr_t get_vnode_for_path(const char *path);
 kptr_t get_vnode_for_snapshot(int fd, char *name);
 BOOL set_kernel_task_info(void);
+int issue_extension_for_mach_service(kptr_t sb, kptr_t ctx, const char *entry_name, void *desc);
 BOOL unrestrict_process(pid_t pid);
 BOOL unrestrict_process_with_task_port(task_t task_port);
 BOOL revalidate_process(pid_t pid);

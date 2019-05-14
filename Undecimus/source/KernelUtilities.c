@@ -1614,6 +1614,24 @@ out:;
     return ret;
 }
 
+int issue_extension_for_mach_service(kptr_t sb, kptr_t ctx, const char *entry_name, void *desc) {
+    auto ret = -1;
+    auto entry_name_kstr = KPTR_NULL;
+    auto desc_kstr = KPTR_NULL;
+    if (!KERN_POINTER_VALID(sb) || entry_name == NULL || desc == NULL) goto out;
+    auto const function = getoffset(issue_extension_for_mach_service);
+    if (!KERN_POINTER_VALID(function)) goto out;
+    entry_name_kstr = kstralloc(entry_name);
+    if (!KERN_POINTER_VALID(entry_name_kstr)) goto out;
+    desc_kstr = kstralloc(desc);
+    if (!KERN_POINTER_VALID(desc_kstr)) goto out;
+    ret = (int)kexec(function, sb, ctx, entry_name_kstr, desc_kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+out:;
+    if (KERN_POINTER_VALID(entry_name_kstr)) kstrfree(entry_name_kstr); entry_name_kstr = KPTR_NULL;
+    if (KERN_POINTER_VALID(desc_kstr)) kstrfree(desc_kstr); desc_kstr = KPTR_NULL;
+    return ret;
+}
+
 BOOL analyze_pid(pid_t pid,
                  kptr_t *out_proc,
                  kptr_t *out_proc_ucred,
