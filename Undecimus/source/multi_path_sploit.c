@@ -14,7 +14,7 @@
 #include <pthread.h>
 
 #include "KernelMemory.h"
-#include "KernelStructureOffsets.h"
+#include "KernelOffsets.h"
 #include "KernelUtilities.h"
 #include <common.h>
 

@@ -45,7 +45,7 @@
 		21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21C0FC7521369EB800849420 /* LaunchScreen.storyboard */; };
 		21C0FC7A21369EB800849420 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC7921369EB800849420 /* main.m */; };
 		21C0FC8721369EE900849420 /* KernelMemory.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8021369EE900849420 /* KernelMemory.c */; };
-		21C0FC8A21369EE900849420 /* KernelStructureOffsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8621369EE900849420 /* KernelStructureOffsets.m */; };
+		21C0FC8A21369EE900849420 /* KernelOffsets.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C0FC8621369EE900849420 /* KernelOffsets.m */; };
 		21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C130DE214BC2880021AA9D /* unlocknvram.c */; };
 		21C130EB214C03690021AA9D /* CreditsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21C130EA214C03690021AA9D /* CreditsTableViewController.m */; };
 		21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */ = {isa = PBXBuildFile; fileRef = 21C13117214D268F0021AA9D /* multi_path_sploit.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
@@ -146,10 +146,10 @@
 		21C0FC7921369EB800849420 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		21C0FC8021369EE900849420 /* KernelMemory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = KernelMemory.c; sourceTree = "<group>"; };
 		21C0FC8121369EE900849420 /* empty_list_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = empty_list_sploit.h; sourceTree = "<group>"; };
-		21C0FC8221369EE900849420 /* KernelStructureOffsets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KernelStructureOffsets.h; sourceTree = "<group>"; };
+		21C0FC8221369EE900849420 /* KernelOffsets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KernelOffsets.h; sourceTree = "<group>"; };
 		21C0FC8321369EE900849420 /* KernelMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KernelMemory.h; sourceTree = "<group>"; };
 		21C0FC8521369EE900849420 /* empty_list_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = empty_list_sploit.c; sourceTree = "<group>"; };
-		21C0FC8621369EE900849420 /* KernelStructureOffsets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KernelStructureOffsets.m; sourceTree = "<group>"; };
+		21C0FC8621369EE900849420 /* KernelOffsets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KernelOffsets.m; sourceTree = "<group>"; };
 		21C0FC8B21369FC500849420 /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		21C0FC8F2136A2C500849420 /* iokit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iokit.h; sourceTree = "<group>"; };
 		21C0FC902136A46500849420 /* SpringBoardServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpringBoardServices.framework; sourceTree = "<group>"; };
@@ -394,8 +394,8 @@
 				21A97FC82148103B00DC0023 /* KernelExecution.m */,
 				21C0FC8021369EE900849420 /* KernelMemory.c */,
 				21C0FC8321369EE900849420 /* KernelMemory.h */,
-				21C0FC8221369EE900849420 /* KernelStructureOffsets.h */,
-				21C0FC8621369EE900849420 /* KernelStructureOffsets.m */,
+				21C0FC8221369EE900849420 /* KernelOffsets.h */,
+				21C0FC8621369EE900849420 /* KernelOffsets.m */,
 				21A97FC92148103B00DC0023 /* KernelUtilities.h */,
 				21A97FCC2148103B00DC0023 /* KernelUtilities.c */,
 				21C0FC7921369EB800849420 /* main.m */,
@@ -648,7 +648,7 @@
 				216F3F3F2228776E007DC1BC /* pac.c in Sources */,
 				21A97FD32148103C00DC0023 /* KernelUtilities.c in Sources */,
 				219C90A0228703DA00AFA38A /* jailbreak.m in Sources */,
-				21C0FC8A21369EE900849420 /* KernelStructureOffsets.m in Sources */,
+				21C0FC8A21369EE900849420 /* KernelOffsets.m in Sources */,
 				21FFE0F9222E4C0600EC59B2 /* machswap_pwn.m in Sources */,
 				21FFE0F8222E4C0600EC59B2 /* machswap_offsets.m in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,

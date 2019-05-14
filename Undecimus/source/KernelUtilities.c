@@ -11,23 +11,12 @@
 #include <libproc.h>
 
 #include "KernelMemory.h"
-#include "KernelStructureOffsets.h"
+#include "KernelOffsets.h"
 #include "KernelUtilities.h"
 #include "find_port.h"
 #include "KernelExecution.h"
 #include "pac.h"
 #include "kernel_call.h"
-
-#define off_OSDictionary_SetObjectWithCharP (sizeof(void*) * 0x1F)
-#define off_OSDictionary_GetObjectWithCharP (sizeof(void*) * 0x26)
-#define off_OSDictionary_Merge (sizeof(void*) * 0x23)
-#define off_OSArray_Merge (sizeof(void*) * 0x1E)
-#define off_OSArray_RemoveObject (sizeof(void*) * 0x20)
-#define off_OSArray_GetObject (sizeof(void*) * 0x22)
-#define off_OSObject_Release (sizeof(void*) * 0x05)
-#define off_OSObject_GetRetainCount (sizeof(void*) * 0x03)
-#define off_OSObject_Retain (sizeof(void*) * 0x04)
-#define off_OSString_GetLength (sizeof(void*) * 0x11)
 
 #define P_MEMSTAT_INTERNAL 0x00001000 /* Process is a system-critical-not-be-jetsammed process i.e. launchd */
 
@@ -780,7 +769,7 @@ BOOL OSDictionary_SetItem(kptr_t OSDictionary, const char *key, kptr_t val) {
     auto ret = NO;
     auto kstr = KPTR_NULL;
     if (!KERN_POINTER_VALID(OSDictionary) || key == NULL || !KERN_POINTER_VALID(val)) goto out;
-    auto const function = OSObjectFunc(OSDictionary, off_OSDictionary_SetObjectWithCharP);
+    auto const function = OSObjectFunc(OSDictionary, koffset(KVTABLE_OFFSET_OSDICTIONARY_SETOBJECTWITHCHARP));
     if (!KERN_POINTER_VALID(function)) goto out;
     kstr = kstralloc(key);
     if (!KERN_POINTER_VALID(kstr)) goto out;
@@ -794,7 +783,7 @@ kptr_t OSDictionary_GetItem(kptr_t OSDictionary, const char *key) {
     auto ret = KPTR_NULL;
     auto kstr = KPTR_NULL;
     if (!KERN_POINTER_VALID(OSDictionary) || key == NULL) goto out;
-    auto const function = OSObjectFunc(OSDictionary, off_OSDictionary_GetObjectWithCharP);
+    auto const function = OSObjectFunc(OSDictionary, koffset(KVTABLE_OFFSET_OSDICTIONARY_GETOBJECTWITHCHARP));
     if (!KERN_POINTER_VALID(function)) goto out;
     kstr = kstralloc(key);
     if (!KERN_POINTER_VALID(kstr)) goto out;
@@ -809,7 +798,7 @@ out:;
 BOOL OSDictionary_Merge(kptr_t OSDictionary, kptr_t OSDictionary2) {
     auto ret = NO;
     if (!KERN_POINTER_VALID(OSDictionary) || !KERN_POINTER_VALID(OSDictionary2)) goto out;
-    auto const function = OSObjectFunc(OSDictionary, off_OSDictionary_Merge);
+    auto const function = OSObjectFunc(OSDictionary, koffset(KVTABLE_OFFSET_OSDICTIONARY_MERGE));
     if (!KERN_POINTER_VALID(function)) goto out;
     ret = (bool)kexec(function, OSDictionary, OSDictionary2, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
@@ -851,7 +840,7 @@ out:;
 BOOL OSArray_Merge(kptr_t OSArray, kptr_t OSArray2) {
     auto ret = NO;
     if (!KERN_POINTER_VALID(OSArray) || !KERN_POINTER_VALID(OSArray2)) goto out;
-    auto const function = OSObjectFunc(OSArray, off_OSArray_Merge);
+    auto const function = OSObjectFunc(OSArray, koffset(KVTABLE_OFFSET_OSARRAY_MERGE));
     if (!KERN_POINTER_VALID(function)) goto out;
     ret = (bool)kexec(function, OSArray, OSArray2, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
@@ -861,7 +850,7 @@ out:;
 kptr_t OSArray_GetObject(kptr_t OSArray, uint32_t idx) {
     auto ret = KPTR_NULL;
     if (!KERN_POINTER_VALID(OSArray)) goto out;
-    auto const function = OSObjectFunc(OSArray, off_OSArray_GetObject);
+    auto const function = OSObjectFunc(OSArray, koffset(KVTABLE_OFFSET_OSARRAY_GETOBJECT));
     if (!KERN_POINTER_VALID(function)) goto out;
     ret = kexec(OSArray, idx, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL) ret = zm_fix_addr(ret);
@@ -872,7 +861,7 @@ out:;
 
 void OSArray_RemoveObject(kptr_t OSArray, uint32_t idx) {
     if (!KERN_POINTER_VALID(OSArray)) goto out;
-    auto const function = OSObjectFunc(OSArray, off_OSArray_RemoveObject);
+    auto const function = OSObjectFunc(OSArray, koffset(KVTABLE_OFFSET_OSARRAY_REMOVEOBJECT));
     if (!KERN_POINTER_VALID(function)) goto out;
     kexec(function, OSArray, idx, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
@@ -900,7 +889,7 @@ kptr_t OSObjectFunc(kptr_t OSObject, uint32_t off) {
     auto vtable = ReadKernel64(OSObject);
     if (vtable != KPTR_NULL) vtable = kernel_xpacd(vtable);
     if (!KERN_POINTER_VALID(vtable)) goto out;
-    ret = ReadKernel64(vtable + off);
+    ret = ReadKernel64(vtable + (sizeof(kptr_t) * off));
     if (ret != KPTR_NULL) ret = kernel_xpaci(ret);
     if (!KERN_POINTER_VALID(ret)) goto out;
 out:;
@@ -909,7 +898,7 @@ out:;
 
 void OSObject_Release(kptr_t OSObject) {
     if (!KERN_POINTER_VALID(OSObject)) goto out;
-    auto const function = OSObjectFunc(OSObject, off_OSObject_Release);
+    auto const function = OSObjectFunc(OSObject, koffset(KVTABLE_OFFSET_OSOBJECT_RELEASE));
     if (!KERN_POINTER_VALID(function)) goto out;
     kexec(function, OSObject, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
@@ -917,7 +906,7 @@ out:;
 
 void OSObject_Retain(kptr_t OSObject) {
     if (!KERN_POINTER_VALID(OSObject)) goto out;
-    auto const function = OSObjectFunc(OSObject, off_OSObject_Retain);
+    auto const function = OSObjectFunc(OSObject, koffset(KVTABLE_OFFSET_OSOBJECT_RETAIN));
     if (!KERN_POINTER_VALID(function)) goto out;
     kexec(function, OSObject, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
@@ -926,7 +915,7 @@ out:;
 uint32_t OSObject_GetRetainCount(kptr_t OSObject) {
     auto ret = (uint32_t)0;
     if (!KERN_POINTER_VALID(OSObject)) goto out;
-    auto const function = OSObjectFunc(OSObject, off_OSObject_GetRetainCount);
+    auto const function = OSObjectFunc(OSObject, koffset(KVTABLE_OFFSET_OSOBJECT_GETRETAINCOUNT));
     if (!KERN_POINTER_VALID(function)) goto out;
     ret = (uint32_t)kexec(function, OSObject, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
@@ -936,7 +925,7 @@ out:;
 uint32_t OSString_GetLength(kptr_t OSString) {
     auto ret = (uint32_t)0;
     if (!KERN_POINTER_VALID(OSString)) goto out;
-    auto const function = OSObjectFunc(OSString, off_OSString_GetLength);
+    auto const function = OSObjectFunc(OSString, koffset(KVTABLE_OFFSET_OSSTRING_GETLENGTH));
     if (!KERN_POINTER_VALID(function)) goto out;
     ret = (uint32_t)kexec(function, OSString, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;

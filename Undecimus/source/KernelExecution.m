@@ -1,6 +1,6 @@
 #include "KernelExecution.h"
 #include "KernelMemory.h"
-#include "KernelStructureOffsets.h"
+#include "KernelOffsets.h"
 #include "KernelUtilities.h"
 #include "find_port.h"
 #include "kernel_call.h"

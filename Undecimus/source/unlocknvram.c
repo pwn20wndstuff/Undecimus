@@ -11,7 +11,7 @@
 #include <iokit.h>
 #include <common.h>
 #include "KernelUtilities.h"
-#include "KernelStructureOffsets.h"
+#include "KernelOffsets.h"
 #include "KernelMemory.h"
 #include "find_port.h"
 #include "pac.h"

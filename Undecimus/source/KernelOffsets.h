@@ -3,7 +3,7 @@
 
 extern uint32_t* offsets;
 
-enum kstruct_offset {
+enum kernel_offset {
     /* struct task */
     KSTRUCT_OFFSET_TASK_LCK_MTX_TYPE,
     KSTRUCT_OFFSET_TASK_REF_COUNT,
@@ -98,9 +98,27 @@ enum kstruct_offset {
     KSTRUCT_SIZE_IPC_ENTRY,
     KSTRUCT_OFFSET_IPC_ENTRY_IE_BITS,
     
+    /* vtable OSDictionary */
+    KVTABLE_OFFSET_OSDICTIONARY_SETOBJECTWITHCHARP,
+    KVTABLE_OFFSET_OSDICTIONARY_GETOBJECTWITHCHARP,
+    KVTABLE_OFFSET_OSDICTIONARY_MERGE,
+    
+    /* vtable OSArray */
+    KVTABLE_OFFSET_OSARRAY_MERGE,
+    KVTABLE_OFFSET_OSARRAY_REMOVEOBJECT,
+    KVTABLE_OFFSET_OSARRAY_GETOBJECT,
+    
+    /* vtable OSObject */
+    KVTABLE_OFFSET_OSOBJECT_RELEASE,
+    KVTABLE_OFFSET_OSOBJECT_GETRETAINCOUNT,
+    KVTABLE_OFFSET_OSOBJECT_RETAIN,
+    
+    /* vtable OSString */
+    KVTABLE_OFFSET_OSSTRING_GETLENGTH,
+    
     KFREE_ADDR_OFFSET,
 };
 
-uint32_t koffset(enum kstruct_offset offset);
+uint32_t koffset(enum kernel_offset offset);
 
 #endif

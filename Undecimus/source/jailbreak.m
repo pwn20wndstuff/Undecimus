@@ -37,7 +37,7 @@
 #import <offsetcache.h>
 #import <kerneldec.h>
 #import "JailbreakViewController.h"
-#include "KernelStructureOffsets.h"
+#include "KernelOffsets.h"
 #include "empty_list_sploit.h"
 #include "KernelMemory.h"
 #include "KernelExecution.h"

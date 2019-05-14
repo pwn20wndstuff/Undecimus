@@ -10,7 +10,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 
 #include "KernelMemory.h"
-#include "KernelStructureOffsets.h"
+#include "KernelOffsets.h"
 #include "KernelUtilities.h"
 #include "async_wake.h"
 #include "early_kalloc.h"

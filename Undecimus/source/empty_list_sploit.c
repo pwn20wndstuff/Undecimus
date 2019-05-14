@@ -12,7 +12,7 @@
 #include <mach/mach.h>
 
 #include "KernelMemory.h"
-#include "KernelStructureOffsets.h"
+#include "KernelOffsets.h"
 #include "KernelUtilities.h"
 #include "empty_list_sploit.h"
 #include <common.h>

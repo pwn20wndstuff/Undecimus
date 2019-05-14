@@ -6,13 +6,13 @@
 #include <sys/sysctl.h>
 #include <sys/utsname.h>
 
-#include "KernelStructureOffsets.h"
+#include "KernelOffsets.h"
 #include <common.h>
 #include "utils.h"
 
 uint32_t* offsets = NULL;
 
-uint32_t kstruct_offsets_11_0[] = {
+uint32_t kernel_offsets_11_0[] = {
     0xb, // KSTRUCT_OFFSET_TASK_LCK_MTX_TYPE
     0x10, // KSTRUCT_OFFSET_TASK_REF_COUNT
     0x14, // KSTRUCT_OFFSET_TASK_ACTIVE
@@ -91,10 +91,24 @@ uint32_t kstruct_offsets_11_0[] = {
     0x18, // KSTRUCT_SIZE_IPC_ENTRY
     0x8, // KSTRUCT_OFFSET_IPC_ENTRY_IE_BITS
     
+    0x1F, // KVTABLE_OFFSET_OSDICTIONARY_SETOBJECTWITHCHARP
+    0x26, // KVTABLE_OFFSET_OSDICTIONARY_GETOBJECTWITHCHARP
+    0x23, // KVTABLE_OFFSET_OSDICTIONARY_MERGE
+    
+    0x1E, // KVTABLE_OFFSET_OSARRAY_MERGE
+    0x20, // KVTABLE_OFFSET_OSARRAY_REMOVEOBJECT
+    0x22, // KVTABLE_OFFSET_OSARRAY_GETOBJECT
+    
+    0x05, // KVTABLE_OFFSET_OSOBJECT_RELEASE
+    0x03, // KVTABLE_OFFSET_OSOBJECT_GETRETAINCOUNT
+    0x04, // KVTABLE_OFFSET_OSOBJECT_RETAIN
+    
+    0x11, // KVTABLE_OFFSET_OSSTRING_GETLENGTH
+    
     0x6c, // KFREE_ADDR_OFFSET
 };
 
-uint32_t kstruct_offsets_11_3[] = {
+uint32_t kernel_offsets_11_3[] = {
     0xb, // KSTRUCT_OFFSET_TASK_LCK_MTX_TYPE
     0x10, // KSTRUCT_OFFSET_TASK_REF_COUNT
     0x14, // KSTRUCT_OFFSET_TASK_ACTIVE
@@ -173,10 +187,24 @@ uint32_t kstruct_offsets_11_3[] = {
     0x18, // KSTRUCT_SIZE_IPC_ENTRY
     0x8, // KSTRUCT_OFFSET_IPC_ENTRY_IE_BITS
     
+    0x1F, // KVTABLE_OFFSET_OSDICTIONARY_SETOBJECTWITHCHARP
+    0x26, // KVTABLE_OFFSET_OSDICTIONARY_GETOBJECTWITHCHARP
+    0x23, // KVTABLE_OFFSET_OSDICTIONARY_MERGE
+    
+    0x1E, // KVTABLE_OFFSET_OSARRAY_MERGE
+    0x20, // KVTABLE_OFFSET_OSARRAY_REMOVEOBJECT
+    0x22, // KVTABLE_OFFSET_OSARRAY_GETOBJECT
+    
+    0x05, // KVTABLE_OFFSET_OSOBJECT_RELEASE
+    0x03, // KVTABLE_OFFSET_OSOBJECT_GETRETAINCOUNT
+    0x04, // KVTABLE_OFFSET_OSOBJECT_RETAIN
+    
+    0x11, // KVTABLE_OFFSET_OSSTRING_GETLENGTH
+    
     0x6c, // KFREE_ADDR_OFFSET
 };
 
-uint32_t kstruct_offsets_12_0[] = {
+uint32_t kernel_offsets_12_0[] = {
     0xb, // KSTRUCT_OFFSET_TASK_LCK_MTX_TYPE
     0x10, // KSTRUCT_OFFSET_TASK_REF_COUNT
     0x14, // KSTRUCT_OFFSET_TASK_ACTIVE
@@ -271,23 +299,37 @@ uint32_t kstruct_offsets_12_0[] = {
     0x18, // KSTRUCT_SIZE_IPC_ENTRY
     0x8, // KSTRUCT_OFFSET_IPC_ENTRY_IE_BITS
     
+    0x1F, // KVTABLE_OFFSET_OSDICTIONARY_SETOBJECTWITHCHARP
+    0x26, // KVTABLE_OFFSET_OSDICTIONARY_GETOBJECTWITHCHARP
+    0x23, // KVTABLE_OFFSET_OSDICTIONARY_MERGE
+    
+    0x1E, // KVTABLE_OFFSET_OSARRAY_MERGE
+    0x20, // KVTABLE_OFFSET_OSARRAY_REMOVEOBJECT
+    0x22, // KVTABLE_OFFSET_OSARRAY_GETOBJECT
+    
+    0x05, // KVTABLE_OFFSET_OSOBJECT_RELEASE
+    0x03, // KVTABLE_OFFSET_OSOBJECT_GETRETAINCOUNT
+    0x04, // KVTABLE_OFFSET_OSOBJECT_RETAIN
+    
+    0x11, // KVTABLE_OFFSET_OSSTRING_GETLENGTH
+    
     0x6c, // KFREE_ADDR_OFFSET
 };
 
-uint32_t koffset(enum kstruct_offset offset)
+uint32_t koffset(enum kernel_offset offset)
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         LOG("kCFCoreFoundationVersionNumber: %f", kCFCoreFoundationVersionNumber);
         if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0) {
             LOG("offsets selected for iOS 12.0 or above");
-            offsets = kstruct_offsets_12_0;
+            offsets = kernel_offsets_12_0;
         } else if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_11_3) {
             LOG("offsets selected for iOS 11.3 or above");
-            offsets = kstruct_offsets_11_3;
+            offsets = kernel_offsets_11_3;
         } else if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_11_0) {
             LOG("offsets selected for iOS 11.0 to 11.2.6");
-            offsets = kstruct_offsets_11_0;
+            offsets = kernel_offsets_11_0;
         } else {
             LOG("iOS version too low, 11.0 required");
             offsets = NULL;
