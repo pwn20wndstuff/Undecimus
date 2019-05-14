@@ -1080,8 +1080,9 @@ BOOL set_sandbox_exceptions(kptr_t sandbox, const char **exceptions) {
     if (!KERN_POINTER_VALID(sandbox) || exceptions == NULL) goto out;
     for (auto exception = exceptions; *exception; exception++) {
         if (!set_file_extension(sandbox, FILE_EXC_KEY, *exception))
-            ret = NO;
+            goto out;
     }
+    ret = YES;
 out:;
     return ret;
 }
@@ -1679,7 +1680,7 @@ BOOL analyze_pid(pid_t pid,
                     }
                 }
                 if (out_sandbox != NULL) {
-                    sandbox = get_sandbox(sandbox);
+                    sandbox = get_sandbox(cr_label);
                 }
             }
         }
@@ -1817,7 +1818,7 @@ BOOL unrestrict_process(pid_t pid) {
         ret = NO;
     }
     if (OPT(GET_TASK_ALLOW)) {
-        LOG("Enabling get-task-allow for pid %x", pid);
+        LOG("Enabling get-task-allow for pid %d", pid);
         if (!entitle_process(amfi_entitlements, "get-task-allow", OSBoolTrue)) {
             LOG("Unable to enable get-task-allow entitlement for pid %d", pid);
             ret = NO;
@@ -1838,7 +1839,7 @@ BOOL unrestrict_process(pid_t pid) {
             ret = NO;
         }
     }
-    LOG("Setting exceptions for pid %x", pid);
+    LOG("Setting exceptions for pid %d", pid);
     if (!set_exceptions(sandbox, amfi_entitlements)) {
         LOG("Unable to set exceptions for pid %d", pid);
         ret = NO;
