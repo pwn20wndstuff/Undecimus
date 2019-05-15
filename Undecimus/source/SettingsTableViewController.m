@@ -97,7 +97,7 @@
     [self.IncreaseMemoryLimitSwitch setOn:(BOOL)prefs->increase_memory_limit];
     [self.installSSHSwitch setOn:(BOOL)prefs->install_openssh];
     [self.installCydiaSwitch setOn:(BOOL)prefs->install_cydia];
-    [self.ECIDLabel setPlaceholder:hexFromInt([@(prefs->ecid) integerValue])];
+    if (prefs->ecid) [self.ECIDLabel setPlaceholder:hexFromInt([@(prefs->ecid) integerValue])];
     [self.ReloadSystemDaemonsSwitch setOn:(BOOL)prefs->reload_system_daemons];
     [self.HideLogWindowSwitch setOn:(BOOL)prefs->hide_log_window];
     [self.ResetCydiaCacheSwitch setOn:(BOOL)prefs->reset_cydia_cache];
