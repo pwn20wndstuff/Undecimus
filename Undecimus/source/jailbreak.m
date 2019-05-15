@@ -1205,7 +1205,7 @@ void jailbreak()
         // Extract bootstrap.
         progress(localize(@"Extracting bootstrap..."));
         
-        if (pkgIsBy("CoolStar", "lzma")) {
+        if (!pkgIsConfigured("xz")) {
             removePkg("lzma", true);
             extractDebsForPkg(@"lzma", debsToInstall, false);
             _assert(injectTrustCache(toInjectToTrustCache, getoffset(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, localize(@"Unable to inject newly extracted lzma to trust cache."), true);
@@ -1216,8 +1216,9 @@ void jailbreak()
         if (pkgIsInstalled("openssl") && compareInstalledVersion("openssl", "lt", "1.0.2q")) {
             removePkg("openssl", true);
         }
+        
         // Test dpkg
-        if (!pkgIsConfigured("dpkg") || pkgIsBy("CoolStar", "dpkg")) {
+        if (!pkgIsConfigured("dpkg")) {
             LOG("Extracting dpkg...");
             _assert(extractDebsForPkg(@"dpkg", debsToInstall, false), localize(@"Unable to extract dpkg."), true);
             _assert(injectTrustCache(toInjectToTrustCache, getoffset(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, localize(@"Unable to inject newly extracted dpkg to trust cache."), true);
@@ -1280,6 +1281,14 @@ void jailbreak()
             [listContents writeToFile:@(listPath) atomically:NO encoding:NSUTF8StringEncoding error:nil];
         }
         init_file(listPath, 0, 0644);
+        const char *prefsPath = "/etc/apt/undecimus/preferences";
+        NSString *prefsContents = @"Package: *\nPin: release o=Undecimus\nPin-Priority: 1001\n";
+        NSString *existingPrefs = [NSString stringWithContentsOfFile:@(prefsPath) encoding:NSUTF8StringEncoding error:nil];
+        if (![prefsContents isEqualToString:existingPrefs]) {
+            clean_file(prefsPath);
+            [prefsContents writeToFile:@(prefsPath) atomically:NO encoding:NSUTF8StringEncoding error:nil];
+        }
+        init_file(prefsPath, 0, 0644);
         auto const repoPath = pathForResource(@"apt");
         _assert(repoPath != nil, localize(@"Unable to get repo path."), true);
         ensure_directory("/var/lib/undecimus", 0, 0755);
@@ -1297,7 +1306,9 @@ void jailbreak()
         
         if (debsToInstall.count > 0) {
             // Install any depends we may have ignored earlier
-            _assert(aptInstall(@[@"-f"]), localize(@"Unable to install dependencies."), true);
+            if (!aptInstall(@[@"-f"])) {
+                _assert(aptRepair(), localize(@"Unable to repair system."), true);
+            }
             debsToInstall = nil;
         }
         
@@ -1425,28 +1436,16 @@ void jailbreak()
     {
         if (pkgIsInstalled("cydia-gui")) {
             // Remove Electra's Cydia.
-            progress(localize(@"Removing Electra's Cydia..."));
-            _assert(removePkg("cydia-gui", true), localize(@"Unable to remove Electra's Cydia."), true);
+            progress(localize(@"Removing Cydia Dummy Package..."));
+            _assert(removePkg("cydia-gui", true), localize(@"Unable to remove Cydia Dummy Package."), true);
             prefs->install_cydia = true;
             prefs->run_uicache = true;
             sync_prefs();
-            LOG("Successfully removed Electra's Cydia.");
+            LOG("Successfully removed Cydia Dummy Package.");
             
-            insertstatus(localize(@"Removed Electra's Cydia.\n"));
+            insertstatus(localize(@"Removed Cydia Dummy Package.\n"));
         }
-        if (access("/etc/apt/sources.list.d/sileo.sources", F_OK) == ERR_SUCCESS) {
-            // Remove Electra's Sileo - it has trigger loops and incompatible depends
-            progress(localize(@"Removing Incompatible Sileo..."));
-            
-            if (pkgIsInstalled("org.coolstar.sileo")) {
-                _assert(removePkg("org.coolstar.sileo", true), localize(@"Unable to remove incompatible Sileo."), true);
-                prefs->run_uicache = true;
-                sync_prefs();
-            }
-            clean_file("/etc/apt/sources.list.d/sileo.sources");
-            
-            insertstatus(localize(@"Removing Incompatible Sileo.\n"));
-        }
+        deduplicateSillySources();
         if (pkgIsInstalled("cydia-upgrade-helper")) {
             // Remove Electra's Cydia Upgrade Helper.
             progress(localize(@"Removing Electra's Cydia Upgrade Helper..."));

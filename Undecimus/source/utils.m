@@ -356,6 +356,10 @@ bool aptUpgrade() {
     return runApt(@[@"-y", @"--allow-unauthenticated", @"--allow-downgrades", @"-f", @"dist-upgrade"]);
 }
 
+bool aptRepair() {
+    return runApt(@[@"-o", @"Dir::Etc::preferences=undecimus/preferences", @"-o", @"Dir::Etc::preferencesparts=''", @"-y", @"--allow-unauthenticated", @"--allow-downgrades", @"-f", @"dist-upgrade"]);
+}
+
 bool extractAptPkgList(NSString *path, ArchiveFile* listcache, id_t owner)
 {
     struct stat buf;
@@ -373,6 +377,57 @@ bool ensureAptPkgLists() {
     if (!listsArchive) return false;
     bool success = extractAptPkgList(@"/var/lib/apt/lists", listsArchive, 0);
     return success && extractAptPkgList(@"/var/mobile/Library/Caches/com.saurik.Cydia/lists", listsArchive, 501);
+}
+
+bool removeURLFromSources(NSMutableString *sources, NSString *url)
+{
+    bool removed=false;
+    NSString *pattern = [NSString stringWithFormat:@"[^\\n](?:(?!\\n\\n).)*%@(?:(?!\\n\\n).)*\\n\\n",
+                         [url stringByReplacingOccurrencesOfString:@"." withString:@"\\."]
+                         ];
+    NSRegularExpression *sourceexp = [NSRegularExpression
+                                      regularExpressionWithPattern:pattern
+                                      options:NSRegularExpressionDotMatchesLineSeparators
+                                      error:nil];
+    
+    for (NSTextCheckingResult *source in [sourceexp matchesInString:sources options:0 range:NSMakeRange(0, sources.length)])
+    {
+        removed = true;
+        [sources deleteCharactersInRange:[source rangeAtIndex:0]];
+    }
+    return removed;
+}
+
+void deduplicateSillySources(void)
+{
+    NSString *cydia_list = [NSString stringWithContentsOfFile:@"/etc/apt/sources.list.d/cydia.list" encoding:NSUTF8StringEncoding error:nil];
+    NSMutableString *sileo_sources = [NSMutableString stringWithContentsOfFile:@"/etc/apt/sources.list.d/sileo.sources" encoding:NSUTF8StringEncoding error:nil];
+    if (cydia_list && sileo_sources) {
+        NSFileManager *fm = [NSFileManager defaultManager];
+        if (!pkgIsInstalled("org.coolstar.sileo")) {
+            NSString *orig_sileo_sources = [sileo_sources copy];
+            NSRegularExpression *urlexp = [NSRegularExpression regularExpressionWithPattern:@"https?://(\\S+[^/\\s]|\\S+)/?\\s" options:0 error:nil];
+            
+            for (NSTextCheckingResult *match in [urlexp matchesInString:cydia_list options:0 range:NSMakeRange(0, cydia_list.length)])
+            {
+                NSString *url = [cydia_list substringWithRange:[match rangeAtIndex:1]];
+                if ([url isEqualToString:@"apt.thebigboss.org"] && removeURLFromSources(sileo_sources, @"repounclutter.coolstar.org")) {
+                    LOG("Removing duplicated souce repounclutter from sileo.sources");
+                }
+                if (removeURLFromSources(sileo_sources, url)) {
+                    LOG("Removing duplicated source %@ from sileo.sources", url);
+                }
+            }
+            if (![sileo_sources isEqual:orig_sileo_sources]) {
+                [fm createFileAtPath:@"/etc/apt/sources.list.d/sileo.sources"
+                            contents:[sileo_sources dataUsingEncoding:NSUTF8StringEncoding]
+                          attributes:@{ NSFileOwnerAccountID:@(0), NSFileGroupOwnerAccountID:@(0), NSFilePosixPermissions:@(0644) }
+                 ];
+            }
+        } else {
+            [fm removeItemAtPath:@"/etc/apt/sources.list.d/sileo.sources" error:nil];
+        }
+    }
 }
 
 bool is_symlink(const char *filename) {
