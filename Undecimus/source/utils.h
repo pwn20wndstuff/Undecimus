@@ -92,7 +92,7 @@ bool compareInstalledVersion(const char *packageID, const char *op, const char *
 bool extractDeb(NSString *debPath);
 bool extractDebs(NSArray <NSString *> *debPaths);
 bool installDeb(const char *debName, bool forceDeps);
-bool installDebs(NSArray <NSString*> *debs, bool forceDeps);
+bool installDebs(NSArray <NSString*> *debs, bool forceDeps, bool forceAll);
 bool removePkg(char *packageID, bool forceDeps);
 bool removePkgs(NSArray <NSString*> *packageIDs, bool forceDeps);
 BOOL compareDpkgVersion(NSString *version1, NSString *op, NSString *version2, BOOL *result);

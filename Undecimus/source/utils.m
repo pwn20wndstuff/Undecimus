@@ -204,7 +204,7 @@ bool compareInstalledVersion(const char *packageID, const char *op, const char *
     return rv;
 }
 
-bool runDpkg(NSArray <NSString*> *args, bool forceDeps) {
+bool runDpkg(NSArray <NSString*> *args, bool forceDeps, bool forceAll) {
     if ([args count] < 2) {
         LOG("%s: Nothing to do", __FUNCTION__);
         return false;
@@ -217,7 +217,9 @@ bool runDpkg(NSArray <NSString*> *args, bool forceDeps) {
                         @"--no-triggers"
                      ]];
     
-    if (forceDeps) {
+    if (forceAll) {
+        [command addObject:@"--force-all"];
+    } else if (forceDeps) {
         [command addObjectsFromArray:@[@"--force-depends", @"--force-remove-essential"]];
     }
     for (NSString *arg in args) {
@@ -298,19 +300,19 @@ bool extractDebs(NSArray <NSString *> *debPaths) {
 }
 
 bool installDeb(const char *debName, bool forceDeps) {
-    return runDpkg(@[@"-i", @(debName)], forceDeps);
+    return runDpkg(@[@"-i", @(debName)], forceDeps, false);
 }
 
-bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
+bool installDebs(NSArray <NSString*> *debs, bool forceDeps, bool forceAll) {
     if ([debs count] < 1) {
         LOG("%s: Nothing to install", __FUNCTION__);
         return false;
     }
-    return runDpkg([@[@"-i"] arrayByAddingObjectsFromArray:debs], forceDeps);
+    return runDpkg([@[@"-i"] arrayByAddingObjectsFromArray:debs], forceDeps, forceAll);
 }
 
 bool removePkg(char *packageID, bool forceDeps) {
-    return runDpkg(@[@"-r", @(packageID)], forceDeps);
+    return runDpkg(@[@"-r", @(packageID)], forceDeps, false);
 }
 
 bool removePkgs(NSArray <NSString*> *pkgs, bool forceDeps) {
@@ -318,7 +320,7 @@ bool removePkgs(NSArray <NSString*> *pkgs, bool forceDeps) {
         LOG("%s: Nothing to remove", __FUNCTION__);
         return false;
     }
-    return runDpkg([@[@"-r"] arrayByAddingObjectsFromArray:pkgs], forceDeps);
+    return runDpkg([@[@"-r"] arrayByAddingObjectsFromArray:pkgs], forceDeps, false);
 }
 
 bool runApt(NSArray <NSString*> *args) {
@@ -357,7 +359,7 @@ bool aptUpgrade() {
 }
 
 bool aptRepair() {
-    return runApt(@[@"-o", @"Dir::Etc::preferences=undecimus/preferences", @"-o", @"Dir::Etc::preferencesparts=''", @"-y", @"--allow-unauthenticated", @"--allow-downgrades", @"-f", @"dist-upgrade"]);
+    return runApt(@[@"-o", @"Dir::Etc::preferences=undecimus/preferences", @"-o", @"Dir::Etc::preferencesparts=''", @"-y", @"--allow-unauthenticated", @"--allow-remove-essential", @"--allow-downgrades", @"-f", @"dist-upgrade"]);
 }
 
 bool extractAptPkgList(NSString *path, ArchiveFile* listcache, id_t owner)
@@ -404,15 +406,15 @@ void deduplicateSillySources(void)
     NSMutableString *sileo_sources = [NSMutableString stringWithContentsOfFile:@"/etc/apt/sources.list.d/sileo.sources" encoding:NSUTF8StringEncoding error:nil];
     if (cydia_list && sileo_sources) {
         NSFileManager *fm = [NSFileManager defaultManager];
-        if (!pkgIsInstalled("org.coolstar.sileo")) {
+        if (pkgIsInstalled("org.coolstar.sileo")) {
             NSString *orig_sileo_sources = [sileo_sources copy];
             NSRegularExpression *urlexp = [NSRegularExpression regularExpressionWithPattern:@"https?://(\\S+[^/\\s]|\\S+)/?\\s" options:0 error:nil];
             
             for (NSTextCheckingResult *match in [urlexp matchesInString:cydia_list options:0 range:NSMakeRange(0, cydia_list.length)])
             {
                 NSString *url = [cydia_list substringWithRange:[match rangeAtIndex:1]];
-                if ([url isEqualToString:@"apt.thebigboss.org"] && removeURLFromSources(sileo_sources, @"repounclutter.coolstar.org")) {
-                    LOG("Removing duplicated souce repounclutter from sileo.sources");
+                if ([url hasPrefix:@"apt.thebigboss.org"] && removeURLFromSources(sileo_sources, @"repounclutter.coolstar.org")) {
+                    LOG("Removing duplicated source repounclutter from sileo.sources");
                 }
                 if (removeURLFromSources(sileo_sources, url)) {
                     LOG("Removing duplicated source %@ from sileo.sources", url);

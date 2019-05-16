@@ -1234,7 +1234,7 @@ void jailbreak()
             if (access("/usr/libexec/cydia/firmware.sh", F_OK) != ERR_SUCCESS || !pkgIsConfigured("cydia")) {
                 auto const fwDebs = debsForPkgs(@[@"cydia", @"cydia-lproj", @"darwintools", @"uikittools", @"system-cmds"]);
                 _assert(fwDebs != nil, localize(@"Unable to get firmware debs."), true);
-                _assert(installDebs(fwDebs, true), localize(@"Unable to install firmware debs."), true);
+                _assert(installDebs(fwDebs, true, false), localize(@"Unable to install firmware debs."), true);
                 rv = _system("/usr/libexec/cydia/firmware.sh");
                 _assert(WEXITSTATUS(rv) == 0, localize(@"Unable to create virtual dependencies."), true);
             }
@@ -1268,7 +1268,7 @@ void jailbreak()
         
         if (debsToInstall.count > 0) {
             LOG("Installing manually exctracted debs...");
-            _assert(installDebs(debsToInstall, true), localize(@"Unable to install manually extracted debs."), true);
+            _assert(installDebs(debsToInstall, true, true), localize(@"Unable to install manually extracted debs."), true);
         }
         
         _assert(ensure_directory("/etc/apt/undecimus", 0, 0755), localize(@"Unable to create local repo."), true);
@@ -1297,19 +1297,16 @@ void jailbreak()
             auto const aptNeeded = resolveDepsForPkg(@"apt1.4", false);
             _assert(aptNeeded != nil && aptNeeded.count > 0, localize(@"Unable to resolve dependencies for apt."), true);
             auto const aptDebs = debsForPkgs(aptNeeded);
-            _assert(installDebs(aptDebs, true), localize(@"Unable to install debs for apt."), true);
+            _assert(installDebs(aptDebs, true, true), localize(@"Unable to install debs for apt."), true);
             _assert(aptUpdate(), localize(@"Unable to update apt package index."), true);
+            _assert(aptRepair(), localize(@"Unable to repair system."), true);
         }
         
         // Workaround for what appears to be an apt bug
         ensure_symlink("/var/lib/undecimus/apt/./Packages", "/var/lib/apt/lists/_var_lib_undecimus_apt_._Packages");
         
-        if (debsToInstall.count > 0) {
-            // Install any depends we may have ignored earlier
-            if (!aptInstall(@[@"-f"])) {
-                _assert(aptRepair(), localize(@"Unable to repair system."), true);
-            }
-            debsToInstall = nil;
+        if (!aptInstall(@[@"-f"])) {
+            _assert(aptRepair(), localize(@"Unable to repair system."), true);
         }
         
         // Dpkg and apt both work now
