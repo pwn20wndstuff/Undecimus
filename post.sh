@@ -1,9 +1,15 @@
 #!/bin/sh
 # Get path for dpkg
-set -e
 if [ -f ~/.profile ]; then
     . ~/.profile
 fi
+
+# 'set -e' has to be included after (and not before!) .profile's logic or else this happens:
+# /Users/travis/.travis/functions: line 221: syntax error near unexpected token `<'
+# /Users/travis/.travis/functions: line 221: `  done < <('
+set -e
+
+echo Using Source Root: ${SOURCE_ROOT}
 
 if [[ "${CODE_SIGNING_REQUIRED}" == "NO" ]]; then
   if which -s gtar; then
@@ -13,7 +19,7 @@ if [[ "${CODE_SIGNING_REQUIRED}" == "NO" ]]; then
   else
     TAR=tar
   fi
-
+  echo Using tar: ${TAR}
   LISTSRC="${SOURCE_ROOT}/Undecimus/resources/lists.tar.lzma"
   pushd "${TEMP_DIR}"
   rm -rf lists
