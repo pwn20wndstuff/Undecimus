@@ -340,7 +340,7 @@ bool runApt(NSArray <NSString*> *args) {
     }
     argv[command.count] = NULL;
     int rv = runCommandv(argv[0], (int)[command count], argv, NULL);
-    return !WEXITSTATUS(rv);
+    return WIFEXITED(rv) && !WEXITSTATUS(rv);
 }
 
 bool aptUpdate() {
