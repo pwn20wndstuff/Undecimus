@@ -1230,14 +1230,14 @@ void jailbreak()
         }
         
         if (needStrap || !pkgIsConfigured("firmware")) {
-            LOG("Extracting Cydia...");
             if (access("/usr/libexec/cydia/firmware.sh", F_OK) != ERR_SUCCESS || !pkgIsConfigured("cydia")) {
+                LOG("Extracting Cydia...");
                 auto const fwDebs = debsForPkgs(@[@"cydia", @"cydia-lproj", @"darwintools", @"uikittools", @"system-cmds"]);
                 _assert(fwDebs != nil, localize(@"Unable to get firmware debs."), true);
                 _assert(installDebs(fwDebs, true, false), localize(@"Unable to install firmware debs."), true);
-                rv = _system("/usr/libexec/cydia/firmware.sh");
-                _assert(WEXITSTATUS(rv) == 0, localize(@"Unable to create virtual dependencies."), true);
             }
+            rv = _system("/usr/libexec/cydia/firmware.sh");
+            _assert(WEXITSTATUS(rv) == 0, localize(@"Unable to create virtual dependencies."), true);
         }
         
         // Dpkg better work now
