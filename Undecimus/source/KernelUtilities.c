@@ -1311,7 +1311,7 @@ BOOL restore_kernel_offset_cache() {
     if (kr != KERN_SUCCESS) goto out;
     if (!KERN_POINTER_VALID(task_dyld_info->all_image_info_addr)) goto out;
     offset_cache_addr = task_dyld_info->all_image_info_addr;
-    if (offset_cache_addr <= kernel_base) goto out;
+    if (offset_cache_addr == kernel_base) goto out;
     offset_cache_size_addr = offset_cache_addr + offsetof(struct cache_blob, size);
     if (!rkbuffer(offset_cache_size_addr, offset_cache_size, sizeof(*offset_cache_size))) goto out;
     offset_cache_blob = create_cache_blob(*offset_cache_size);
