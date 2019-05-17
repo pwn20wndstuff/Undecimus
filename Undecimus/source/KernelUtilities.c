@@ -594,18 +594,15 @@ BOOL set_file_extension(kptr_t sandbox, const char *exc_key, const char *path) {
     if (!KERN_POINTER_VALID(ext_kptr)) goto out;
     auto const ret_extension_create_file = extension_create_file(ext_kptr, sandbox, path, strlen(path), 0);
     if (ret_extension_create_file != 0) goto out;
-    if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0) {
-        ext = ReadKernel64(ext_kptr);
-    } else {
-        ext = ext_kptr;
-    }
+    ext = ReadKernel64(ext_kptr);
     if (!KERN_POINTER_VALID(ext)) goto out;
     auto const ret_extension_add = extension_add(ext, sandbox, exc_key);
     if (ret_extension_add != 0) goto out;
     ret = YES;
 out:;
-    if (KERN_POINTER_VALID(ext)) extension_release(ext_kptr); ext = KPTR_NULL;
-    if (KERN_POINTER_VALID(ext_kptr)) sfree(ext_kptr); ext_kptr = KPTR_NULL;
+    if (KERN_POINTER_VALID(ext_kptr)) extension_release(ext_kptr);
+    ext_kptr = KPTR_NULL;
+    ext = KPTR_NULL;
     return ret;
 }
 
