@@ -6,9 +6,8 @@
 
 #include <common.h>
 #include <iokit.h>
-#include <patchfinder64.h>
 #include <sys/mount.h>
-#include <libproc.h>
+#include <sys/stat.h>
 
 #include "KernelMemory.h"
 #include "KernelOffsets.h"
@@ -40,13 +39,29 @@
 
 #define CS_OPS_STATUS 0
 #define CS_OPS_ENTITLEMENTS_BLOB 7
-#define FILE_EXC_KEY "com.apple.security.exception.files.absolute-path.read-only"
 
-const char *abs_path_exceptions[] = {
+#define FILE_READ_EXC_KEY "com.apple.security.exception.files.absolute-path.read-only"
+#define MACH_LOOKUP_EXC_KEY "com.apple.security.exception.mach-lookup.global-name"
+#define MACH_REGISTER_EXC_KEY "com.apple.security.exception.mach-register.global-name"
+
+static const char *file_read_exceptions[] = {
     "/Library",
     "/private/var/mobile/Library",
     "/System/Library/Caches",
     "/private/var/mnt",
+    NULL
+};
+
+static const char *mach_lookup_exceptions[] = {
+    "cy:com.saurik.substrated",
+    "ch.ringwald.hidsupport.backboard",
+    "com.rpetrich.rocketbootstrapd",
+    "com.apple.BTLEAudioController.xpc",
+    NULL
+};
+
+static const char *mach_register_exceptions[] = {
+    "ch.ringwald.hidsupport.backboard",
     NULL
 };
 
@@ -61,6 +76,7 @@ kptr_t kernel_base = KPTR_NULL;
 kptr_t offset_options = KPTR_NULL;
 BOOL found_offsets = NO;
 kptr_t cached_task_self_addr = KPTR_NULL;
+static BOOL weird_offsets = NO;
 
 #define find_port(port, disposition) (have_kmem_read() && found_offsets ? get_address_of_port(getpid(), port) : find_port_address(port, disposition))
 
@@ -578,7 +594,11 @@ BOOL set_file_extension(kptr_t sandbox, const char *exc_key, const char *path) {
     if (!KERN_POINTER_VALID(ext_kptr)) goto out;
     auto const ret_extension_create_file = extension_create_file(ext_kptr, sandbox, path, strlen(path), 0);
     if (ret_extension_create_file != 0) goto out;
-    ext = ReadKernel64(ext_kptr);
+    if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0) {
+        ext = ReadKernel64(ext_kptr);
+    } else {
+        ext = ext_kptr;
+    }
     if (!KERN_POINTER_VALID(ext)) goto out;
     auto const ret_extension_add = extension_add(ext, sandbox, exc_key);
     if (ret_extension_add != 0) goto out;
@@ -591,21 +611,10 @@ out:;
 
 BOOL set_mach_extension(kptr_t sandbox, const char *exc_key, const char *name) {
     auto ret = NO;
-    auto ext_kptr = KPTR_NULL;
-    auto ext = KPTR_NULL;
     if (!KERN_POINTER_VALID(sandbox) || exc_key == NULL || name == NULL) goto out;
-    ext_kptr = smalloc(sizeof(kptr_t));
-    if (!KERN_POINTER_VALID(ext_kptr)) goto out;
-    auto const ret_extension_create_mach = extension_create_mach(ext_kptr, sandbox, name, 0);
-    if (ret_extension_create_mach != 0) goto out;
-    ext = ReadKernel64(ext_kptr);
-    if (!KERN_POINTER_VALID(ext)) goto out;
-    auto const ret_extension_add = extension_add(ext, sandbox, exc_key);
-    if (ret_extension_add != 0) goto out;
+    if (issue_extension_for_mach_service(sandbox, KPTR_NULL, name, (void *)exc_key) != 0) goto out;
     ret = YES;
 out:;
-    if (KERN_POINTER_VALID(ext)) extension_release(ext_kptr); ext = KPTR_NULL;
-    if (KERN_POINTER_VALID(ext_kptr)) sfree(ext_kptr); ext_kptr = KPTR_NULL;
     return ret;
 }
 
@@ -976,7 +985,7 @@ out:;
     return ret;
 }
 
-kptr_t get_exception_osarray(const char **exceptions) {
+kptr_t get_exception_osarray(const char **exceptions, bool is_file_extension) {
     auto exception_osarray = KPTR_NULL;
     auto xmlsize = (size_t)0x1000;
     auto len = SIZE_NULL;
@@ -996,7 +1005,7 @@ kptr_t get_exception_osarray(const char **exceptions) {
                 return 0;
             }
         }
-        written = sprintf(ents + xmlused, "<string>%s/</string>", *exception);
+        written = sprintf(ents + xmlused, "<string>%s%s</string>", *exception, is_file_extension ? "/" : "");
         if (written < 0) {
             SafeFreeNULL(ents);
             return 0;
@@ -1056,6 +1065,14 @@ char **copy_amfi_entitlements(kptr_t present) {
 
 kptr_t getOSBool(BOOL value) {
     auto ret = KPTR_NULL;
+    if (weird_offsets) {
+        if (value) {
+            ret = getoffset(OSBoolean_True);
+        } else {
+            ret = getoffset(OSBoolean_False);
+        }
+        goto out;
+    }
     auto const symbol = getoffset(OSBoolean_True);
     if (!KERN_POINTER_VALID(symbol)) goto out;
     auto OSBool = ReadKernel64(symbol);
@@ -1075,11 +1092,19 @@ out:;
     return ret;
 }
 
-BOOL set_sandbox_exceptions(kptr_t sandbox, const char **exceptions) {
+BOOL set_sandbox_exceptions(kptr_t sandbox) {
     auto ret = NO;
-    if (!KERN_POINTER_VALID(sandbox) || exceptions == NULL) goto out;
-    for (auto exception = exceptions; *exception; exception++) {
-        if (!set_file_extension(sandbox, FILE_EXC_KEY, *exception))
+    if (!KERN_POINTER_VALID(sandbox)) goto out;
+    for (auto exception = file_read_exceptions; *exception; exception++) {
+        if (!set_file_extension(sandbox, FILE_READ_EXC_KEY, *exception))
+            goto out;
+    }
+    for (auto exception = mach_lookup_exceptions; *exception; exception++) {
+        if (!set_mach_extension(sandbox, MACH_LOOKUP_EXC_KEY, *exception))
+            goto out;
+    }
+    for (auto exception = mach_register_exceptions; *exception; exception++) {
+        if (!set_mach_extension(sandbox, MACH_REGISTER_EXC_KEY, *exception))
             goto out;
     }
     ret = YES;
@@ -1104,15 +1129,15 @@ out:;
     return ret;
 }
 
-BOOL set_amfi_exceptions(kptr_t amfi_entitlements, const char **exceptions) {
+BOOL set_amfi_exceptions(kptr_t amfi_entitlements, const char *exc_key, const char **exceptions, bool is_file_extension) {
     auto ret = NO;
     auto current_exceptions = (char **)NULL;
     if (!KERN_POINTER_VALID(amfi_entitlements) || exceptions == NULL) goto out;
-    auto const present_exception_osarray = OSDictionary_GetItem(amfi_entitlements, FILE_EXC_KEY);
+    auto const present_exception_osarray = OSDictionary_GetItem(amfi_entitlements, exc_key);
     if (present_exception_osarray == KPTR_NULL) {
-        auto osarray = get_exception_osarray(exceptions);
+        auto osarray = get_exception_osarray(exceptions, is_file_extension);
         if (!KERN_POINTER_VALID(osarray)) goto out;
-        ret = OSDictionary_SetItem(amfi_entitlements, FILE_EXC_KEY, osarray);
+        ret = OSDictionary_SetItem(amfi_entitlements, exc_key, osarray);
         OSObject_Release(osarray);
         goto out;
     }
@@ -1124,7 +1149,7 @@ BOOL set_amfi_exceptions(kptr_t amfi_entitlements, const char **exceptions) {
             continue;
         }
         const char *array[] = {*exception, NULL};
-        auto osarray = get_exception_osarray(array);
+        auto osarray = get_exception_osarray(array, is_file_extension);
         if (!KERN_POINTER_VALID(osarray)) continue;
         ret = OSArray_Merge(present_exception_osarray, osarray);
         OSObject_Release(osarray);
@@ -1137,10 +1162,12 @@ out:;
 BOOL set_exceptions(kptr_t sandbox, kptr_t amfi_entitlements) {
     auto ret = NO;
     if (KERN_POINTER_VALID(sandbox))
-        if (!set_sandbox_exceptions(sandbox, abs_path_exceptions))
+        if (!set_sandbox_exceptions(sandbox))
             goto out;
     if (KERN_POINTER_VALID(amfi_entitlements))
-        if (!set_amfi_exceptions(amfi_entitlements, abs_path_exceptions))
+        if (!set_amfi_exceptions(amfi_entitlements, FILE_READ_EXC_KEY, file_read_exceptions, true) ||
+            !set_amfi_exceptions(amfi_entitlements, MACH_LOOKUP_EXC_KEY, mach_lookup_exceptions, false) ||
+            !set_amfi_exceptions(amfi_entitlements, MACH_REGISTER_EXC_KEY, mach_register_exceptions, false))
             goto out;
     ret = YES;
 out:;
@@ -1168,8 +1195,13 @@ out:;
 BOOL entitle_process_with_pid(pid_t pid, const char *key, kptr_t val) {
     auto ret = NO;
     auto proc = KPTR_NULL;
+    auto do_proc_rele = YES;
     if (pid <= 0 || key == NULL || !KERN_POINTER_VALID(val)) goto out;
     proc = proc_find(pid);
+    if (!KERN_POINTER_VALID(proc)) {
+        proc = get_proc_struct_for_pid(pid);
+        do_proc_rele = NO;
+    }
     if (!KERN_POINTER_VALID(proc)) goto out;
     auto const proc_ucred = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_UCRED));
     if (!KERN_POINTER_VALID(proc_ucred)) goto out;
@@ -1180,7 +1212,7 @@ BOOL entitle_process_with_pid(pid_t pid, const char *key, kptr_t val) {
     if (!entitle_process(amfi_entitlements, key, val)) goto out;
     ret = YES;
 out:;
-    if (KERN_POINTER_VALID(proc)) proc_rele(proc);
+    if (do_proc_rele && KERN_POINTER_VALID(proc)) proc_rele(proc);
     return ret;
 }
 
@@ -1243,7 +1275,6 @@ BOOL restore_kernel_base(uint64_t *out_kernel_base, uint64_t *out_kernel_slide) 
     *task_dyld_info_count = TASK_DYLD_INFO_COUNT;
     kr = task_info(tfp0, TASK_DYLD_INFO, (task_info_t)task_dyld_info, task_dyld_info_count);
     if (kr != KERN_SUCCESS) goto out;
-    if (task_dyld_info->all_image_info_size > MAX_KASLR_SLIDE) goto out;
     *kernel_task_slide = task_dyld_info->all_image_info_size;
     *kernel_task_base = *kernel_task_slide + STATIC_KERNEL_BASE_ADDRESS;
     *out_kernel_base = *kernel_task_base;
@@ -1280,6 +1311,7 @@ BOOL restore_kernel_offset_cache() {
     if (kr != KERN_SUCCESS) goto out;
     if (!KERN_POINTER_VALID(task_dyld_info->all_image_info_addr)) goto out;
     offset_cache_addr = task_dyld_info->all_image_info_addr;
+    if (offset_cache_addr <= kernel_base) goto out;
     offset_cache_size_addr = offset_cache_addr + offsetof(struct cache_blob, size);
     if (!rkbuffer(offset_cache_size_addr, offset_cache_size, sizeof(*offset_cache_size))) goto out;
     offset_cache_blob = create_cache_blob(*offset_cache_size);
@@ -1332,8 +1364,8 @@ BOOL restore_file_offset_cache(const char *offset_cache_file_path, kptr_t *out_k
     restore_offset("KernelBase", offset_kernel_base);
     restore_offset("KernelSlide", offset_kernel_slide);
     restore_and_set_offset("TrustChain", "trustcache");
-    restore_and_set_offset("OSBooleanTrue", "OSBooleanTrue");
-    restore_and_set_offset("OSBooleanFalse", "OSBooleanFalse");
+    restore_and_set_offset("OSBooleanTrue", "OSBoolean_True");
+    restore_and_set_offset("OSBooleanFalse", "OSBoolean_False");
     restore_and_set_offset("OSUnserializeXML", "osunserializexml");
     restore_and_set_offset("Smalloc", "smalloc");
     restore_and_set_offset("AddRetGadget", "add_x0_x0_0x40_ret");
@@ -1342,6 +1374,7 @@ BOOL restore_file_offset_cache(const char *offset_cache_file_path, kptr_t *out_k
     restore_and_set_offset("VnodeLookup", "vnode_lookup");
     restore_and_set_offset("VnodePut", "vnode_put");
     restore_and_set_offset("KernelTask", "kernel_task");
+    restore_and_set_offset("KernProc", "kernproc");
     restore_and_set_offset("Shenanigans", "shenanigans");
     restore_and_set_offset("LckMtxLock", "lck_mtx_lock");
     restore_and_set_offset("LckMtxUnlock", "lck_mtx_unlock");
@@ -1373,6 +1406,7 @@ BOOL restore_file_offset_cache(const char *offset_cache_file_path, kptr_t *out_k
 #undef restore_and_set_offset
     *out_kernel_base = offset_kernel_base;
     *out_kernel_slide = offset_kernel_slide;
+    weird_offsets = YES;
     found_offsets = YES;
     restored_file_offset_cache = YES;
 out:;
@@ -1585,7 +1619,7 @@ BOOL set_kernel_task_info() {
     if (!KERN_POINTER_VALID(kernel_task_addr)) goto out;
     kr = task_info(tfp0, TASK_DYLD_INFO, (task_info_t)task_dyld_info, task_dyld_info_count);
     if (kr != KERN_SUCCESS) goto out;
-    if (!KERN_POINTER_VALID(task_dyld_info->all_image_info_addr) && task_dyld_info->all_image_info_addr != kernel_base && task_dyld_info->all_image_info_addr > kernel_base) {
+    if (KERN_POINTER_VALID(task_dyld_info->all_image_info_addr) && task_dyld_info->all_image_info_addr != kernel_base && task_dyld_info->all_image_info_addr > kernel_base) {
         auto const blob_size = ReadKernel32(task_dyld_info->all_image_info_addr + offsetof(struct cache_blob, size));
         if (blob_size <= 0) goto out;
         auto blob = create_cache_blob(blob_size);
@@ -1836,16 +1870,26 @@ BOOL unrestrict_process(pid_t pid) {
         ret = NO;
     }
     if (OPT(GET_TASK_ALLOW)) {
-        LOG("Enabling get-task-allow for pid %d", pid);
+        LOG("Enabling get-task-allow entitlement for pid %d", pid);
         if (!entitle_process(amfi_entitlements, "get-task-allow", OSBoolTrue)) {
             LOG("Unable to enable get-task-allow entitlement for pid %d", pid);
             ret = NO;
         }
+        LOG("Setting get-task-allow codesign flag for pid %d", pid);
+        if (!set_csflags(proc, CS_GET_TASK_ALLOW, YES)) {
+            LOG("Unable to set get-task-allow codesign flag for pid %d", pid);
+            ret = NO;
+        }
     }
     if (is_platform_application) {
-        LOG("Setting task platform binary flag for pid %d", pid);
+        LOG("Setting platform binary task flag for pid %d", pid);
         if (!set_platform_binary(proc, YES)) {
-            LOG("Unable to set task platform binary flag for pid %d", pid);
+            LOG("Unable to set platform binary task flag for pid %d", pid);
+            ret = NO;
+        }
+        LOG("Setting platform binary codesign flag for pid %d", pid);
+        if (!set_cs_platform_binary(proc, YES)) {
+            LOG("Unable to set platform binary codesign flag for pid %d", pid);
             ret = NO;
         }
     }
@@ -1898,12 +1942,10 @@ BOOL revalidate_process(pid_t pid) {
         ret = NO;
         goto out;
     }
-    if (OPT(CS_DEBUGGED)) {
-        LOG("Setting codesign dynamic validity flag for pid %d", pid);
-        if (!set_csflags(proc, CS_VALID, YES)) {
-            LOG("Unable to set codesign dynamic validity flag for pid %d", pid);
-            ret = NO;
-        }
+    LOG("Setting dynamic validity codesign flag for pid %d", pid);
+    if (!set_csflags(proc, CS_VALID, YES)) {
+        LOG("Unable to set dynamic validity codesign flag for pid %d", pid);
+        ret = NO;
     }
 out:;
     if (KERN_POINTER_VALID(proc)) proc_rele(proc);
