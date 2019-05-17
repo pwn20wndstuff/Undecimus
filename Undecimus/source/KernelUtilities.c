@@ -463,48 +463,21 @@ out:;
     return size;
 }
 
-kptr_t kstralloc(const char *str) {
-    auto ret = NO;
-    auto str_kptr = KPTR_NULL;
-    auto str_kptr_size = SIZE_NULL;
-    if (str == NULL) goto out;
-    str_kptr_size = strlen(str) + 1;
-    str_kptr = kmem_alloc(str_kptr_size);
-    if (!KERN_POINTER_VALID(str_kptr)) goto out;
-    if (!wkbuffer(str_kptr, (void *)str, str_kptr_size)) goto out;
-    ret = YES;
-out:;
-    if (!ret && str_kptr_size != SIZE_NULL && KERN_POINTER_VALID(str_kptr)) {
-        kmem_free(str_kptr, str_kptr_size);
-        str_kptr = KPTR_NULL;
-        str_kptr_size = SIZE_NULL;
-    }
-    return str_kptr;
-}
-
-BOOL kstrfree(kptr_t ptr) {
-    BOOL ret = NO;
-    auto size = SIZE_NULL;
-    if (!KERN_POINTER_VALID(ptr)) goto out;
-    size = kstrlen(ptr) + 1;
-    if (!kmem_free(ptr, size)) goto out;
-    ret = YES;
-out:;
-    return ret;
-}
-
 kptr_t sstrdup(const char *str) {
     auto ret = KPTR_NULL;
     auto kstr = KPTR_NULL;
+    auto kstr_size = SIZE_NULL;
     if (str == NULL) goto out;
     auto const function = getoffset(sstrdup);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kstr = kstralloc(str);
+    kstr_size = strlen(str) + 1;
+    kstr = kmem_alloc(kstr_size);
     if (!KERN_POINTER_VALID(kstr)) goto out;
+    if (!wkbuffer(kstr, (void *)str, kstr_size)) goto out;
     ret = kexec(function, kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL) ret = zm_fix_addr(ret);
 out:;
-    if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
+    if (kstr_size != SIZE_NULL && KERN_POINTER_VALID(kstr)) kmem_free(kstr, kstr_size); kstr = KPTR_NULL;
     return ret;
 }
 
@@ -532,11 +505,11 @@ int extension_create_file(kptr_t saveto, kptr_t sb, const char *path, size_t pat
     if (!KERN_POINTER_VALID(saveto) || !KERN_POINTER_VALID(sb) || path == NULL || path_len <= 0) goto out;
     auto const function = getoffset(extension_create_file);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kstr = kstralloc(path);
+    kstr = sstrdup(path);
     if (!KERN_POINTER_VALID(kstr)) goto out;
     ret = (int)kexec(function, saveto, sb, kstr, (kptr_t)path_len, (kptr_t)subtype, KPTR_NULL, KPTR_NULL);
 out:;
-    if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
+    SafeSFreeNULL(kstr);
     return ret;
 }
 
@@ -547,11 +520,11 @@ int extension_create_mach(kptr_t saveto, kptr_t sb, const char *name, uint32_t s
     if (!KERN_POINTER_VALID(function)) goto out;
     kstr = KPTR_NULL;
     if (!KERN_POINTER_VALID(saveto) || !KERN_POINTER_VALID(sb) || name == NULL) goto out;
-    kstr = kstralloc(name);
+    kstr = sstrdup(name);
     if (!KERN_POINTER_VALID(kstr)) goto out;
     ret = (int)kexec(function, saveto, sb, kstr, (kptr_t)subtype, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
-    if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
+    SafeSFreeNULL(kstr);
     return ret;
 }
 
@@ -561,11 +534,11 @@ int extension_add(kptr_t ext, kptr_t sb, const char *desc) {
     if (!KERN_POINTER_VALID(ext) || !KERN_POINTER_VALID(sb) || desc == NULL) goto out;
     auto const function = getoffset(extension_add);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kstr = kstralloc(desc);
+    kstr = sstrdup(desc);
     if (!KERN_POINTER_VALID(kstr)) goto out;
     ret = (int)kexec(function, ext, sb, kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
-    if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
+    SafeSFreeNULL(kstr);
     return ret;
 }
 
@@ -748,16 +721,16 @@ int vnode_lookup(const char *path, int flags, kptr_t *vpp, kptr_t ctx) {
     if (path == NULL || vpp == NULL || !KERN_POINTER_VALID(ctx)) goto out;
     auto const function = getoffset(vnode_lookup);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kstr = kstralloc(path);
+    kstr = sstrdup(path);
     if (!KERN_POINTER_VALID(kstr)) goto out;
     vpp_kptr_size = sizeof(kptr_t);
-    vpp_kptr = kmem_alloc(vpp_kptr_size);
+    vpp_kptr = smalloc(vpp_kptr_size);
     if (!KERN_POINTER_VALID(vpp_kptr)) goto out;
     ret = (int)kexec(function, kstr, (kptr_t)flags, vpp_kptr, ctx, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (!rkbuffer(vpp_kptr, vpp, vpp_kptr_size)) goto out;
 out:;
-    if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
-    if (KERN_POINTER_VALID(vpp_kptr)) kmem_free(vpp_kptr, vpp_kptr_size); vpp_kptr = KPTR_NULL;
+    SafeSFreeNULL(kstr);
+    SafeSFreeNULL(vpp_kptr);
     return ret;
 }
 
@@ -777,11 +750,11 @@ BOOL OSDictionary_SetItem(kptr_t OSDictionary, const char *key, kptr_t val) {
     if (!KERN_POINTER_VALID(OSDictionary) || key == NULL || !KERN_POINTER_VALID(val)) goto out;
     auto const function = OSObjectFunc(OSDictionary, koffset(KVTABLE_OFFSET_OSDICTIONARY_SETOBJECTWITHCHARP));
     if (!KERN_POINTER_VALID(function)) goto out;
-    kstr = kstralloc(key);
+    kstr = sstrdup(key);
     if (!KERN_POINTER_VALID(kstr)) goto out;
     ret = (bool)kexec(function, OSDictionary, kstr, val, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
-    if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
+    SafeSFreeNULL(kstr);
     return ret;
 }
 
@@ -791,13 +764,13 @@ kptr_t OSDictionary_GetItem(kptr_t OSDictionary, const char *key) {
     if (!KERN_POINTER_VALID(OSDictionary) || key == NULL) goto out;
     auto const function = OSObjectFunc(OSDictionary, koffset(KVTABLE_OFFSET_OSDICTIONARY_GETOBJECTWITHCHARP));
     if (!KERN_POINTER_VALID(function)) goto out;
-    kstr = kstralloc(key);
+    kstr = sstrdup(key);
     if (!KERN_POINTER_VALID(kstr)) goto out;
     ret = kexec(function, OSDictionary, kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL && (ret>>32) == KPTR_NULL) ret = zm_fix_addr(ret);
     if (!KERN_POINTER_VALID(ret)) goto out;
 out:;
-    if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
+    SafeSFreeNULL(kstr);
     return ret;
 }
 
@@ -971,14 +944,14 @@ kptr_t OSUnserializeXML(const char *buffer) {
     if (buffer == NULL) goto out;
     auto const function = getoffset(osunserializexml);
     if (!KERN_POINTER_VALID(function)) goto out;
-    kstr = kstralloc(buffer);
+    kstr = sstrdup(buffer);
     if (!KERN_POINTER_VALID(kstr)) goto out;
     auto const error_kptr = KPTR_NULL;
     ret = kexec(function, kstr, error_kptr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL) ret = zm_fix_addr(ret);
     if (!KERN_POINTER_VALID(ret)) goto out;
 out:;
-    if (KERN_POINTER_VALID(kstr)) kstrfree(kstr); kstr = KPTR_NULL;
+    SafeSFreeNULL(kstr);
     return ret;
 }
 
@@ -1557,11 +1530,11 @@ kptr_t get_vnode_for_snapshot(int fd, char *name) {
     auto snap_meta_ptr = KPTR_NULL;
     auto old_name_ptr = KPTR_NULL;
     auto ndp_old_name = KPTR_NULL;
-    rvpp_ptr = kmem_alloc(sizeof(kptr_t));
+    rvpp_ptr = smalloc(sizeof(kptr_t));
     if (!KERN_POINTER_VALID(rvpp_ptr)) goto out;
-    sdvpp_ptr = kmem_alloc(sizeof(kptr_t));
+    sdvpp_ptr = smalloc(sizeof(kptr_t));
     if (!KERN_POINTER_VALID(sdvpp_ptr)) goto out;
-    ndp_buf = kmem_alloc(816);
+    ndp_buf = smalloc(816);
     if (!KERN_POINTER_VALID(ndp_buf)) goto out;
     auto const vfs_context = vfs_context_current();
     if (!KERN_POINTER_VALID(vfs_context)) goto out;
@@ -1572,9 +1545,9 @@ kptr_t get_vnode_for_snapshot(int fd, char *name) {
     if (!KERN_POINTER_VALID(sdvpp_v_mount)) goto out;
     auto const sdvpp_v_mount_mnt_data = ReadKernel64(sdvpp_v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_DATA));
     if (!KERN_POINTER_VALID(sdvpp_v_mount_mnt_data)) goto out;
-    snap_meta_ptr = kmem_alloc(sizeof(kptr_t));
+    snap_meta_ptr = smalloc(sizeof(kptr_t));
     if (!KERN_POINTER_VALID(snap_meta_ptr)) goto out;
-    old_name_ptr = kmem_alloc(sizeof(kptr_t));
+    old_name_ptr = smalloc(sizeof(kptr_t));
     if (!KERN_POINTER_VALID(old_name_ptr)) goto out;
     ndp_old_name = ReadKernel64(ndp_buf + 336 + 40);
     if (!KERN_POINTER_VALID(ndp_old_name)) goto out;
@@ -1588,10 +1561,10 @@ kptr_t get_vnode_for_snapshot(int fd, char *name) {
     ret = snap_vnode;
 out:
     if (KERN_POINTER_VALID(sdvpp)) vnode_put(sdvpp); sdvpp = KPTR_NULL;
-    if (KERN_POINTER_VALID(sdvpp_ptr)) kmem_free(sdvpp_ptr, sizeof(kptr_t)); sdvpp_ptr = KPTR_NULL;
-    if (KERN_POINTER_VALID(ndp_buf)) kmem_free(ndp_buf, 816); ndp_buf = KPTR_NULL;
-    if (KERN_POINTER_VALID(snap_meta_ptr)) kmem_free(snap_meta_ptr, sizeof(kptr_t)); snap_meta_ptr = KPTR_NULL;
-    if (KERN_POINTER_VALID(old_name_ptr)) kmem_free(old_name_ptr, sizeof(kptr_t)); old_name_ptr = KPTR_NULL;
+    SafeSFreeNULL(sdvpp_ptr);
+    SafeSFreeNULL(ndp_buf);
+    SafeSFreeNULL(snap_meta_ptr);
+    SafeSFreeNULL(old_name_ptr);
     return ret;
 }
 
@@ -1652,14 +1625,14 @@ int issue_extension_for_mach_service(kptr_t sb, kptr_t ctx, const char *entry_na
     if (!KERN_POINTER_VALID(sb) || entry_name == NULL || desc == NULL) goto out;
     auto const function = getoffset(issue_extension_for_mach_service);
     if (!KERN_POINTER_VALID(function)) goto out;
-    entry_name_kstr = kstralloc(entry_name);
+    entry_name_kstr = sstrdup(entry_name);
     if (!KERN_POINTER_VALID(entry_name_kstr)) goto out;
-    desc_kstr = kstralloc(desc);
+    desc_kstr = sstrdup(desc);
     if (!KERN_POINTER_VALID(desc_kstr)) goto out;
     ret = (int)kexec(function, sb, ctx, entry_name_kstr, desc_kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
-    if (KERN_POINTER_VALID(entry_name_kstr)) kstrfree(entry_name_kstr); entry_name_kstr = KPTR_NULL;
-    if (KERN_POINTER_VALID(desc_kstr)) kstrfree(desc_kstr); desc_kstr = KPTR_NULL;
+    SafeSFreeNULL(entry_name_kstr);
+    SafeSFreeNULL(desc_kstr);
     return ret;
 }
 
