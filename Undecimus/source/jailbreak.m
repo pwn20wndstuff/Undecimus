@@ -1188,11 +1188,13 @@ void jailbreak()
         
         // Run substrate
         progress(localize(@"Starting Substrate..."));
-        if (access("/usr/lib/substrate", F_OK) == ERR_SUCCESS && !is_symlink("/usr/lib/substrate")) {
-            _assert(clean_file("/Library/substrate"), localize(@"Unable to clean old Substrate directory."), true);
-            _assert([[NSFileManager defaultManager] moveItemAtPath:@"/usr/lib/substrate" toPath:@"/Library/substrate" error:nil], localize(@"Unable to move Substrate directory."), true);
+        if (access("/Library/substrate", F_OK) == ERR_SUCCESS &&
+            is_directory("/Library/substrate") &&
+            access("/usr/lib/substrate", F_OK) == ERR_SUCCESS &&
+            is_symlink("/usr/lib/substrate")) {
+            _assert(clean_file("/usr/lib/substrate"), localize(@"Unable to clean old substrate directory."), true);
+            _assert([[NSFileManager defaultManager] moveItemAtPath:@"/Library/substrate" toPath:@"/usr/lib/substrate" error:nil], localize(@"Unable to move substrate directory."), true);
         }
-        _assert(ensure_symlink("/Library/substrate", "/usr/lib/substrate"), localize(@"Unable to symlink Substrate directory."), true);
         _assert(runCommand("/usr/libexec/substrate", NULL) == ERR_SUCCESS, localize(skipSubstrate?@"Unable to restart Substrate.":@"Unable to start Substrate."), skipSubstrate?false:true);
         LOG("Successfully started Substrate.");
         
@@ -1553,7 +1555,7 @@ void jailbreak()
             // Load Tweaks.
             
             progress(localize(@"Loading Tweaks..."));
-            if (prefs->reload_system_daemons) {
+            if (prefs->reload_system_daemons && !needStrap) {
                 rv = system("nohup bash -c \""
                             "sleep 1 ;"
                             "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
@@ -1564,7 +1566,7 @@ void jailbreak()
                 rv = system("nohup bash -c \""
                             "sleep 1 ;"
                             "launchctl stop com.apple.mDNSResponder ;"
-                            "launchctl stop com.apple.backboardd"
+                            "sbreload"
                             "\" >/dev/null 2>&1 &");
             }
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, localize(@"Unable to load tweaks."), true);
