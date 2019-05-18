@@ -27,11 +27,11 @@
 #define K_ECID                     "Ecid"
 #define K_INSTALL_OPENSSH          "InstallOpenSSH"
 #define K_INSTALL_CYDIA            "InstallCydia"
-#define K_RELOAD_SYSTEM_DAEMONS    "ReloadSystemDaemons"
+#define K_RELOAD_SYSTEM_DAEMONS    "DoReloadSystemDaemons"
 #define K_HIDE_LOG_WINDOW          "HideLogWindow"
 #define K_RESET_CYDIA_CACHE        "ResetCydiaCache"
 #define K_SSH_ONLY                 "SSHOnly"
-#define K_ENABLE_GET_TASK_ALLOW    "EnableGetTaskAllow"
+#define K_ENABLE_GET_TASK_ALLOW    "DoEnableGetTaskAllow"
 #define K_SET_CS_DEBUGGED          "SetCSDebugged"
 
 typedef struct {

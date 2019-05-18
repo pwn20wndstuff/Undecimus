@@ -113,7 +113,7 @@ void register_default_prefs() {
     defaults[@K_INSTALL_OPENSSH] = @NO;
     defaults[@K_RELOAD_SYSTEM_DAEMONS] = @YES;
     defaults[@K_SSH_ONLY] = @NO;
-    defaults[@K_ENABLE_GET_TASK_ALLOW] = @NO;
+    defaults[@K_ENABLE_GET_TASK_ALLOW] = @YES;
     defaults[@K_SET_CS_DEBUGGED] = @NO;
     defaults[@K_HIDE_LOG_WINDOW] = @NO;
     defaults[@K_EXPLOIT] = [NSNumber numberWithInteger:recommendedJailbreakSupport()];
