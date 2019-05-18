@@ -824,6 +824,7 @@ void jailbreak()
             _assert(rootfd > 0, localize(@"Unable to open RootFS."), true);
             auto snapshots = snapshot_list(rootfd);
             _assert(snapshots != NULL, localize(@"Unable to get snapshots for RootFS."), true);
+            _assert(*snapshots != NULL, localize(@"Found no snapshot for RootFS."), true);
             auto snapshot = strdup(*snapshots);
             LOG("%s", snapshot);
             _assert(snapshot != NULL, localize(@"Unable to find original snapshot for RootFS."), true);
