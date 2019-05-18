@@ -847,9 +847,9 @@ void jailbreak()
             _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, localize(@"Unable to verify mounted snapshot."), true);
             _assert(extractDebsForPkg(@"rsync", nil, false), localize(@"Unable to extract rsync."), true);
             _assert(extractDebsForPkg(@"uikittools", nil, false), localize(@"Unable to extract uikittools."), true);
-            _assert(injectTrustCache(@[@"/usr/bin/rsync", @"/usr/bin/uicache"], getoffset(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, localize(@"Unable to inject rsync and uicache to trust cache."), true);
+            _assert(injectTrustCache(@[@"/usr/bin/rsync", @"/usr/bin/uicache", @"/usr/bin/find"], getoffset(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, localize(@"Unable to inject rsync and uicache to trust cache."), true);
             if (kCFCoreFoundationVersionNumber < kCFCoreFoundationVersionNumber_iOS_11_3) {
-                _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "--exclude=/usr/bin/uicache", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, localize(@"Unable to sync /Applications."), true);
+                _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "--exclude=/usr/bin/uicache", "--exclude=/usr/bin/find", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, localize(@"Unable to sync /Applications."), true);
             } else {
                 _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"Applications/."].UTF8String, "/Applications", NULL) == 0, localize(@"Unable to sync /."), true);
             }
@@ -859,6 +859,7 @@ void jailbreak()
             SafeFreeNULL(snapshots);
             _assert(runCommand("/usr/bin/uicache", NULL) == ERR_SUCCESS, localize(@"Unable to refresh icon cache."), true);
             _assert(clean_file("/usr/bin/uicache"), localize(@"Unable to clean uicache binary."), true);
+            _assert(clean_file("/usr/bin/find"), localize(@"Unable to clean find binary."), true);
             LOG("Successfully reverted back RootFS remount.");
             
             // Clean up.
@@ -1354,7 +1355,7 @@ void jailbreak()
         clean_file("/electra");
         clean_file("/chimera");
         clean_file("/.bootstrapped_electra");
-        clean_file([NSString stringWithFormat:@"/etc/.installed-chimera-%@", getUDID()].UTF8String);
+        clean_file([NSString stringWithFormat:@"/etc/.installed-chimera-%@", getECID()].UTF8String);
         clean_file("/usr/lib/libjailbreak.dylib");
         
         LOG("Successfully extracted bootstrap.");
