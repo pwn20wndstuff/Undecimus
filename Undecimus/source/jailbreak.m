@@ -577,6 +577,10 @@ void jailbreak()
                 _assert(unmount(rootFsMountPoint, MNT_FORCE) == ERR_SUCCESS, localize(@"Unable to unmount old RootFS mount point."), true);
             }
             _assert(clean_file(rootFsMountPoint), localize(@"Unable to clean old RootFS mount point."), true);
+            auto const hardwareMountPoint = "/private/var/hardware";
+            if (is_mountpoint(hardwareMountPoint)) {
+                _assert(unmount(hardwareMountPoint, MNT_FORCE) == ERR_SUCCESS, localize(@"Unable to unmount hardware mount point."), true);
+            }
             _assert(ensure_directory(rootFsMountPoint, 0, 0755), localize(@"Unable to create RootFS mount point."), true);
             const char *argv[] = {"/sbin/mount_apfs", thedisk, rootFsMountPoint, NULL};
             _assert(runCommandv(argv[0], 3, argv, ^(pid_t pid) {
