@@ -573,7 +573,7 @@ BOOL set_file_extension(kptr_t sandbox, const char *exc_key, const char *path) {
     if (ret_extension_add != 0) goto out;
     ret = YES;
 out:;
-    if (KERN_POINTER_VALID(ext_kptr)) extension_release(ext_kptr);
+    if (KERN_POINTER_VALID(ext_kptr) && (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 || ext == KPTR_NULL)) extension_release(ext_kptr);
     ext_kptr = KPTR_NULL;
     ext = KPTR_NULL;
     return ret;
