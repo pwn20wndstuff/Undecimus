@@ -1292,50 +1292,50 @@ void waitFor(int seconds) {
     }
 }
 
-void blockDomainWithName(const char *name) {
-    id hostsFile = nil;
-    id newLine = nil;
-    id newHostsFile = nil;
-    hostsFile = [NSString stringWithContentsOfFile:@"/etc/hosts" encoding:NSUTF8StringEncoding error:nil];
-    newHostsFile = hostsFile;
-    newLine = [NSString stringWithFormat:@"\n127.0.0.1 %s\n", name];
-    if (![hostsFile containsString:newLine]) {
-        newHostsFile = [newHostsFile stringByAppendingString:newLine];
+bool blockDomainWithName(const char *name) {
+    if (!unblockDomainWithName(name)) {
+        LOG("%s: Unable to clean hosts file", __FUNCTION__);
+        return false;
     }
-    newLine = [NSString stringWithFormat:@"\n::1 %s\n", name];
-    if (![hostsFile containsString:newLine]) {
-        newHostsFile = [newHostsFile stringByAppendingString:newLine];
+    NSString *domain = @(name);
+    NSString *hosts_file = @"/etc/hosts";
+    NSString *hosts = [NSString stringWithContentsOfFile:hosts_file encoding:NSUTF8StringEncoding error:nil];
+    if (hosts == nil) {
+        LOG("%s: Unable to read hosts file", __FUNCTION__);
+        return false;
     }
-    if (![newHostsFile isEqual:hostsFile]) {
-        [newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    NSArray *redirects = @[@"127.0.0.1", @"n::1"];
+    for (NSString *redirect in redirects) {
+        NSString *line = [NSString stringWithFormat:@"\n%@\t%@\n", redirect, domain];
+        hosts = [hosts stringByAppendingString:line];
     }
+    if (![hosts writeToFile:hosts_file atomically:YES encoding:NSUTF8StringEncoding error:nil]) {
+        LOG("%s: Unable to update hosts file", __FUNCTION__);
+        return false;
+    }
+    return true;
 }
 
-void unblockDomainWithName(const char *name) {
-    id hostsFile = nil;
-    id newLine = nil;
-    id newHostsFile = nil;
-    hostsFile = [NSString stringWithContentsOfFile:@"/etc/hosts" encoding:NSUTF8StringEncoding error:nil];
-    newHostsFile = hostsFile;
-    newLine = [NSString stringWithFormat:@"\n127.0.0.1 %s\n", name];
-    if ([hostsFile containsString:newLine]) {
-        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
+bool unblockDomainWithName(const char *name) {
+    NSString *domain = @(name);
+    NSString *hosts_file = @"/etc/hosts";
+    NSString *hosts = [NSString stringWithContentsOfFile:hosts_file encoding:NSUTF8StringEncoding error:nil];
+    if (hosts == nil) {
+        LOG("%s: Unable to read hosts file", __FUNCTION__);
+        return false;
     }
-    newLine = [NSString stringWithFormat:@"\n0.0.0.0 %s\n", name];
-    if ([hostsFile containsString:newLine]) {
-        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
+    for (NSString *line in [hosts componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
+        for (NSString *string in [line componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]) {
+            if ([string isEqualToString:domain]) {
+                hosts = [hosts stringByReplacingOccurrencesOfString:line withString:@""];
+            }
+        }
     }
-    newLine = [NSString stringWithFormat:@"\n0.0.0.0    %s\n", name];
-    if ([hostsFile containsString:newLine]) {
-        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
+    if (![hosts writeToFile:hosts_file atomically:YES encoding:NSUTF8StringEncoding error:nil]) {
+        LOG("%s: Unable to update hosts file", __FUNCTION__);
+        return false;
     }
-    newLine = [NSString stringWithFormat:@"\n::1 %s\n", name];
-    if ([hostsFile containsString:newLine]) {
-        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
-    }
-    if (![newHostsFile isEqual:hostsFile]) {
-        [newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil];
-    }
+    return true;
 }
 
 __attribute__((constructor))
