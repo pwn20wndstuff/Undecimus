@@ -1338,6 +1338,16 @@ bool unblockDomainWithName(const char *name) {
     return true;
 }
 
+bool cydiaIsInstalled() {
+    if (access("/Applications/Cydia.app", F_OK) != ERR_SUCCESS) {
+        return false;
+    }
+    if (!canOpen("cydia://")) {
+        return false;
+    }
+    return true;
+}
+
 __attribute__((constructor))
 static void ctor() {
     toInjectToTrustCache = [NSMutableArray new];

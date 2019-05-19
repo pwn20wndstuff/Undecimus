@@ -1529,7 +1529,7 @@ void jailbreak()
     upstage();
     
     {
-        if (prefs->run_uicache || !canOpen("cydia://")) {
+        if (prefs->run_uicache || !cydiaIsInstalled()) {
             // Run uicache.
             
             progress(localize(@"Refreshing icon cache..."));

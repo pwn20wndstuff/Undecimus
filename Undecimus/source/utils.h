@@ -166,6 +166,7 @@ NSString *hexFromInt(NSInteger val);
 void waitFor(int seconds);
 bool blockDomainWithName(const char *name);
 bool unblockDomainWithName(const char *name);
+bool cydiaIsInstalled(void);
 
 extern NSData *lastSystemOutput;
 
