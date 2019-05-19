@@ -92,27 +92,27 @@ extern int maxStage;
 
 void jailbreak()
 {
-    auto rv = 0;
-    auto usedPersistedKernelTaskPort = NO;
-    auto const myPid = getpid();
-    auto const myUid = getuid();
-    auto myHost = HOST_NULL;
-    auto myOriginalHost = HOST_NULL;
-    auto myProcAddr = KPTR_NULL;
-    auto myOriginalCredAddr = KPTR_NULL;
-    auto myCredAddr = KPTR_NULL;
-    auto kernelCredAddr = KPTR_NULL;
-    auto Shenanigans = KPTR_NULL;
-    auto prefs = copy_prefs();
-    auto needStrap = NO;
-    auto needSubstrate = NO;
-    auto skipSubstrate = NO;
-    auto const homeDirectory = NSHomeDirectory();
-    auto debsToInstall = [NSMutableArray new];
-    auto status = [NSMutableString new];
-    auto const betaFirmware = isBetaFirmware();
-    auto const start_time = time(NULL);
-    auto hud = addProgressHUD();
+    int rv = 0;
+    bool usedPersistedKernelTaskPort = NO;
+    pid_t const myPid = getpid();
+    uid_t const myUid = getuid();
+    host_t myHost = HOST_NULL;
+    host_t myOriginalHost = HOST_NULL;
+    kptr_t myProcAddr = KPTR_NULL;
+    kptr_t myOriginalCredAddr = KPTR_NULL;
+    kptr_t myCredAddr = KPTR_NULL;
+    kptr_t kernelCredAddr = KPTR_NULL;
+    kptr_t Shenanigans = KPTR_NULL;
+    prefs_t *prefs = copy_prefs();
+    bool needStrap = NO;
+    bool needSubstrate = NO;
+    bool skipSubstrate = NO;
+    NSString *const homeDirectory = NSHomeDirectory();
+    NSMutableArray *debsToInstall = [NSMutableArray new];
+    NSMutableString *status = [NSMutableString new];
+    bool const betaFirmware = isBetaFirmware();
+    time_t const start_time = time(NULL);
+    UIProgressHUD *hud = addProgressHUD();
     JailbreakViewController *sharedController = [JailbreakViewController sharedController];
 #define insertstatus(x) do { [status appendString:x]; } while (false)
 #define progress(x) do { LOG("Progress: %@", x); updateProgressHUD(hud, x); } while (false)
@@ -128,7 +128,7 @@ void jailbreak()
         // Exploit kernel.
         
         progress(localize(@"Exploiting kernel..."));
-        auto exploit_success = NO;
+        bool exploit_success = NO;
         myHost = mach_host_self();
         _assert(MACH_PORT_VALID(myHost), localize(NSLocalizedString(@"Unable to get host port.", nil)), true);
         myOriginalHost = myHost;
@@ -174,7 +174,7 @@ void jailbreak()
                     break;
                 }
                 case mach_swap_exploit: {
-                    auto const machswap_offsets = get_machswap_offsets();
+                    machswap_offsets_t *const machswap_offsets = get_machswap_offsets();
                     if (machswap_offsets != NULL &&
                         machswap_exploit(machswap_offsets) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
@@ -184,7 +184,7 @@ void jailbreak()
                     break;
                 }
                 case mach_swap_2_exploit: {
-                    auto const machswap_offsets = get_machswap_offsets();
+                    machswap_offsets_t *const machswap_offsets = get_machswap_offsets();
                     if (machswap_offsets != NULL &&
                         machswap2_exploit(machswap_offsets) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
@@ -229,18 +229,18 @@ void jailbreak()
             // Initialize patchfinder.
             
             progress(localize(@"Initializing patchfinder..."));
-            auto const original_kernel_cache_path = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
-            auto const decompressed_kernel_cache_path = [homeDirectory stringByAppendingPathComponent:@"Documents/kernelcache.dec"].UTF8String;
+            char *const original_kernel_cache_path = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
+            const char *decompressed_kernel_cache_path = [homeDirectory stringByAppendingPathComponent:@"Documents/kernelcache.dec"].UTF8String;
             if (!canRead(decompressed_kernel_cache_path)) {
-                auto const original_kernel_cache = fopen(original_kernel_cache_path, "rb");
+                FILE *const original_kernel_cache = fopen(original_kernel_cache_path, "rb");
                 _assert(original_kernel_cache != NULL, localize(@"Unable to open original kernelcache for reading."), true);
-                auto const decompressed_kernel_cache = fopen(decompressed_kernel_cache_path, "w+b");
+                FILE *const decompressed_kernel_cache = fopen(decompressed_kernel_cache_path, "w+b");
                 _assert(decompressed_kernel_cache != NULL, localize(@"Unable to open decompressed kernelcache for writing."), true);
                 _assert(decompress_kernel(original_kernel_cache, decompressed_kernel_cache, NULL, true) == ERR_SUCCESS, localize(@"Unable to decompress kernelcache."), true);
                 fclose(decompressed_kernel_cache);
                 fclose(original_kernel_cache);
             }
-            auto kernelVersion = getKernelVersion();
+            char *kernelVersion = getKernelVersion();
             _assert(kernelVersion != NULL, localize(@"Unable to get kernel version."), true);
             if (init_kernel(NULL, 0, decompressed_kernel_cache_path) != ERR_SUCCESS ||
                 find_strref(kernelVersion, 1, string_base_const, true, false) == KPTR_NULL) {
@@ -346,7 +346,7 @@ void jailbreak()
     
     {
         // Initialize jailbreak.
-        auto const ShenanigansPatch = (kptr_t)0xca13feba37be;
+        kptr_t const ShenanigansPatch = 0xca13feba37be;
         
         progress(localize(@"Initializing jailbreak..."));
         LOG("Escaping sandbox...");
@@ -411,7 +411,7 @@ void jailbreak()
         // Write a test file to UserFS.
         
         progress(localize(@"Writing a test file to UserFS..."));
-        auto const testFile = [NSString stringWithFormat:@"/var/mobile/test-%lu.txt", time(NULL)].UTF8String;
+        const char *testFile = [NSString stringWithFormat:@"/var/mobile/test-%lu.txt", time(NULL)].UTF8String;
         write_test_file(testFile);
         LOG("Successfully wrote a test file to UserFS.");
     }
@@ -420,13 +420,13 @@ void jailbreak()
     
     {
         if (prefs->dump_apticket) {
-            auto const originalFile = @"/System/Library/Caches/apticket.der";
-            auto const dumpFile = [homeDirectory stringByAppendingPathComponent:@"Documents/apticket.der"];
+            NSString *const originalFile = @"/System/Library/Caches/apticket.der";
+            NSString *const dumpFile = [homeDirectory stringByAppendingPathComponent:@"Documents/apticket.der"];
             if (![sha1sum(originalFile) isEqualToString:sha1sum(dumpFile)]) {
                 // Dump APTicket.
                 
                 progress(localize(@"Dumping APTicket..."));
-                auto const fileData = [NSData dataWithContentsOfFile:originalFile];
+                NSData *const fileData = [NSData dataWithContentsOfFile:originalFile];
                 _assert(([fileData writeToFile:dumpFile atomically:YES]), localize(@"Unable to dump APTicket."), true);
                 LOG("Successfully dumped APTicket.");
             }
@@ -445,7 +445,7 @@ void jailbreak()
             LOG("Successfully unlocked nvram.");
             
             _assert(runCommand("/usr/sbin/nvram", "-p", NULL) == ERR_SUCCESS, localize(@"Unable to print nvram variables."), true);
-            auto const bootNonceKey = "com.apple.System.boot-nonce";
+            char *const bootNonceKey = "com.apple.System.boot-nonce";
             if (runCommand("/usr/sbin/nvram", bootNonceKey, NULL) != ERR_SUCCESS ||
                 strstr(lastSystemOutput.bytes, prefs->boot_nonce) == NULL) {
                 // Set boot-nonce.
@@ -473,8 +473,8 @@ void jailbreak()
         // Log slide.
         
         progress(localize(@"Logging slide..."));
-        auto const file = @(SLIDE_FILE);
-        auto const fileData = [[NSString stringWithFormat:@(ADDR "\n"), kernel_slide] dataUsingEncoding:NSUTF8StringEncoding];
+        NSString *const file = @(SLIDE_FILE);
+        NSData *const fileData = [[NSString stringWithFormat:@(ADDR "\n"), kernel_slide] dataUsingEncoding:NSUTF8StringEncoding];
         if (![[NSData dataWithContentsOfFile:file] isEqual:fileData]) {
             _assert(clean_file(file.UTF8String), localize(@"Unable to clean old kernel slide log."), true);
             _assert(create_file_data(file.UTF8String, 0, 0644, fileData), localize(@"Unable to log kernel slide."), true);
@@ -489,7 +489,7 @@ void jailbreak()
         // Log ECID.
         
         progress(localize(@"Logging ECID..."));
-        auto const ECID = getECID();
+        NSString *const ECID = getECID();
         if (ECID != nil) {
             prefs->ecid = ECID.UTF8String;
             sync_prefs();
@@ -503,10 +503,10 @@ void jailbreak()
     upstage();
     
     {
-        auto const array = @[@"/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate",
-                             @"/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation",
-                             @"/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate",
-                             @"/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation"];
+        NSArray *const array = @[@"/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate",
+                                 @"/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation",
+                                 @"/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate",
+                                 @"/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation"];
         if (prefs->disable_auto_updates) {
             // Disable Auto Updates.
             
@@ -541,15 +541,15 @@ void jailbreak()
         // Remount RootFS.
         
         progress(localize(@"Remounting RootFS..."));
-        auto rootfd = open("/", O_RDONLY);
+        int rootfd = open("/", O_RDONLY);
         _assert(rootfd > 0, localize(@"Unable to open RootFS."), true);
-        auto snapshots = snapshot_list(rootfd);
-        auto systemSnapshot = copySystemSnapshot();
+        const char **snapshots = snapshot_list(rootfd);
+        char *systemSnapshot = copySystemSnapshot();
         _assert(systemSnapshot != NULL, localize(@"Unable to copy system snapshot."), true);
-        auto const original_snapshot = "orig-fs";
-        auto has_original_snapshot = NO;
-        auto const thedisk = "/dev/disk0s1s1";
-        auto oldest_snapshot = NULL;
+        char *const original_snapshot = "orig-fs";
+        bool has_original_snapshot = NO;
+        char *const thedisk = "/dev/disk0s1s1";
+        char *oldest_snapshot = NULL;
         _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, localize(@"Unable to print mount list."), false);
         if (snapshots == NULL) {
             close(rootfd);
@@ -557,10 +557,10 @@ void jailbreak()
             // Clear dev vnode's si_flags.
             
             LOG("Clearing dev vnode's si_flags...");
-            auto devVnode = get_vnode_for_path(thedisk);
+            kptr_t devVnode = get_vnode_for_path(thedisk);
             LOG("devVnode = " ADDR, devVnode);
             _assert(KERN_POINTER_VALID(devVnode), localize(@"Unable to get vnode for root device."), true);
-            auto v_specinfo = ReadKernel64(devVnode + koffset(KSTRUCT_OFFSET_VNODE_VU_SPECINFO));
+            kptr_t v_specinfo = ReadKernel64(devVnode + koffset(KSTRUCT_OFFSET_VNODE_VU_SPECINFO));
             LOG("v_specinfo = " ADDR, v_specinfo);
             _assert(KERN_POINTER_VALID(v_specinfo), localize(@"Unable to get specinfo for root device."), true);
             WriteKernel32(v_specinfo + koffset(KSTRUCT_OFFSET_SPECINFO_SI_FLAGS), 0);
@@ -570,27 +570,27 @@ void jailbreak()
             // Mount RootFS.
             
             LOG("Mounting RootFS...");
-            auto const invalidRootMessage = localize(@"RootFS already mounted, delete OTA file from Settings - Storage if present and reboot.");
+            NSString *const invalidRootMessage = localize(@"RootFS already mounted, delete OTA file from Settings - Storage if present and reboot.");
             _assert(!is_mountpoint("/var/MobileSoftwareUpdate/mnt1"), invalidRootMessage, true);
-            auto const rootFsMountPoint = "/private/var/tmp/jb/mnt1";
+            char *const rootFsMountPoint = "/private/var/tmp/jb/mnt1";
             if (is_mountpoint(rootFsMountPoint)) {
                 _assert(unmount(rootFsMountPoint, MNT_FORCE) == ERR_SUCCESS, localize(@"Unable to unmount old RootFS mount point."), true);
             }
             _assert(clean_file(rootFsMountPoint), localize(@"Unable to clean old RootFS mount point."), true);
-            auto const hardwareMountPoint = "/private/var/hardware";
+            char *const hardwareMountPoint = "/private/var/hardware";
             if (is_mountpoint(hardwareMountPoint)) {
                 _assert(unmount(hardwareMountPoint, MNT_FORCE) == ERR_SUCCESS, localize(@"Unable to unmount hardware mount point."), true);
             }
             _assert(ensure_directory(rootFsMountPoint, 0, 0755), localize(@"Unable to create RootFS mount point."), true);
             const char *argv[] = {"/sbin/mount_apfs", thedisk, rootFsMountPoint, NULL};
             _assert(runCommandv(argv[0], 3, argv, ^(pid_t pid) {
-                auto const procStructAddr = get_proc_struct_for_pid(pid);
+                kptr_t const procStructAddr = get_proc_struct_for_pid(pid);
                 LOG("procStructAddr = " ADDR, procStructAddr);
                 _assert(KERN_POINTER_VALID(procStructAddr), localize(@"Unable to find mount_apfs's process in kernel memory."), true);
                 give_creds_to_process_at_addr(procStructAddr, kernelCredAddr);
             }) == ERR_SUCCESS, localize(@"Unable to mount RootFS."), true);
             _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, localize(@"Unable to print new mount list."), true);
-            auto const systemSnapshotLaunchdPath = [@(rootFsMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
+            const char *systemSnapshotLaunchdPath = [@(rootFsMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
             _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, localize(@"Unable to verify newly mounted RootFS."), true);
             LOG("Successfully mounted RootFS.");
             
@@ -602,27 +602,27 @@ void jailbreak()
             snapshots = snapshot_list(rootfd);
             _assert(snapshots != NULL, localize(@"Unable to get snapshots for newly mounted RootFS."), true);
             LOG("Snapshots on newly mounted RootFS:");
-            for (auto snapshot = snapshots; *snapshot; snapshot++) {
+            for (const char **snapshot = snapshots; *snapshot; snapshot++) {
                 LOG("\t%s", *snapshot);
             }
             SafeFreeNULL(snapshots);
-            auto const systemVersionPlist = @"/System/Library/CoreServices/SystemVersion.plist";
-            auto const rootSystemVersionPlist = [@(rootFsMountPoint) stringByAppendingPathComponent:systemVersionPlist];
-            auto const snapshotSystemVersion = [NSDictionary dictionaryWithContentsOfFile:systemVersionPlist];
+            NSString *const systemVersionPlist = @"/System/Library/CoreServices/SystemVersion.plist";
+            NSString *const rootSystemVersionPlist = [@(rootFsMountPoint) stringByAppendingPathComponent:systemVersionPlist];
+            NSDictionary *const snapshotSystemVersion = [NSDictionary dictionaryWithContentsOfFile:systemVersionPlist];
             _assert(snapshotSystemVersion != nil, localize(@"Unable to get SystemVersion.plist for RootFS."), true);
-            auto const rootfsSystemVersion = [NSDictionary dictionaryWithContentsOfFile:rootSystemVersionPlist];
+            NSDictionary *const rootfsSystemVersion = [NSDictionary dictionaryWithContentsOfFile:rootSystemVersionPlist];
             _assert(rootfsSystemVersion != nil, localize(@"Unable to get SystemVersion.plist for newly mounted RootFS."), true);
             if (![rootfsSystemVersion[@"ProductBuildVersion"] isEqualToString:snapshotSystemVersion[@"ProductBuildVersion"]]) {
                 LOG("snapshot VersionPlist: %@", snapshotSystemVersion);
                 LOG("rootfs VersionPlist: %@", rootfsSystemVersion);
                 _assert("BuildVersions match"==NULL, invalidRootMessage, true);
             }
-            auto const test_snapshot = "test-snapshot";
+            char *const test_snapshot = "test-snapshot";
             _assert(fs_snapshot_create(rootfd, test_snapshot, 0) == ERR_SUCCESS, localize(@"Unable to create test snapshot."), true);
             _assert(fs_snapshot_delete(rootfd, test_snapshot, 0) == ERR_SUCCESS, localize(@"Unable to delete test snapshot."), true);
-            auto system_snapshot_vnode = KPTR_NULL;
-            auto system_snapshot_vnode_v_data = KPTR_NULL;
-            auto system_snapshot_vnode_v_data_flag = 0;
+            kptr_t system_snapshot_vnode = KPTR_NULL;
+            kptr_t system_snapshot_vnode_v_data = KPTR_NULL;
+            uint32_t system_snapshot_vnode_v_data_flag = 0;
             if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0) {
                 system_snapshot_vnode = get_vnode_for_snapshot(rootfd, systemSnapshot);
                 LOG("system_snapshot_vnode = " ADDR, system_snapshot_vnode);
@@ -651,7 +651,7 @@ void jailbreak()
             LOG("Successfully rebooted.");
         } else {
             LOG("APFS Snapshots:");
-            for (auto snapshot = snapshots; *snapshot; snapshot++) {
+            for (const char **snapshot = snapshots; *snapshot; snapshot++) {
                 if (oldest_snapshot == NULL) {
                     oldest_snapshot = strdup(*snapshot);
                 }
@@ -662,17 +662,17 @@ void jailbreak()
             }
         }
         
-        auto rootfs_vnode = get_vnode_for_path("/");
+        kptr_t rootfs_vnode = get_vnode_for_path("/");
         LOG("rootfs_vnode = " ADDR, rootfs_vnode);
         _assert(KERN_POINTER_VALID(rootfs_vnode), localize(@"Unable to get vnode for RootFS."), true);
-        auto v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
+        kptr_t v_mount = ReadKernel64(rootfs_vnode + koffset(KSTRUCT_OFFSET_VNODE_V_MOUNT));
         LOG("v_mount = " ADDR, v_mount);
         _assert(KERN_POINTER_VALID(v_mount), localize(@"Unable to get mount info for RootFS."), true);
-        auto v_flag = ReadKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG));
+        uint32_t v_flag = ReadKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG));
         if ((v_flag & MNT_RDONLY) || (v_flag & MNT_NOSUID)) {
             v_flag &= ~(MNT_RDONLY | MNT_NOSUID);
             WriteKernel32(v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_FLAG), v_flag & ~MNT_ROOTFS);
-            auto opts = strdup(thedisk);
+            char *opts = strdup(thedisk);
             _assert(opts != NULL, localize(@"Unable to allocate memory for ops."), true);
             _assert(mount("apfs", "/", MNT_UPDATE, (void *)&opts) == ERR_SUCCESS, localize(@"Unable to remount RootFS."), true);
             SafeFreeNULL(opts);
@@ -680,7 +680,7 @@ void jailbreak()
         }
         _assert(vnode_put(rootfs_vnode) == ERR_SUCCESS, localize(@"Unable to close RootFS vnode."), true);
         _assert(runCommand("/sbin/mount", NULL) == ERR_SUCCESS, localize(@"Unable to print new mount list."), false);
-        auto const file = [NSString stringWithContentsOfFile:@"/.installed_unc0ver" encoding:NSUTF8StringEncoding error:nil];
+        NSString *const file = [NSString stringWithContentsOfFile:@"/.installed_unc0ver" encoding:NSUTF8StringEncoding error:nil];
         needStrap = file == nil;
         needStrap |= ![file isEqualToString:@""] && ![file isEqualToString:[NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber]];
         needStrap &= access("/electra", F_OK) != ERR_SUCCESS;
@@ -708,7 +708,7 @@ void jailbreak()
         // Write a test file to RootFS.
         
         progress(localize(@"Writing a test file to RootFS..."));
-        auto const testFile = [NSString stringWithFormat:@"/test-%lu.txt", time(NULL)].UTF8String;
+        const char *testFile = [NSString stringWithFormat:@"/test-%lu.txt", time(NULL)].UTF8String;
         write_test_file(testFile);
         LOG("Successfully wrote a test file to RootFS.");
     }
@@ -716,9 +716,9 @@ void jailbreak()
     upstage();
     
     {
-        auto const array = @[@"/var/Keychains/ocspcache.sqlite3",
-                             @"/var/Keychains/ocspcache.sqlite3-shm",
-                             @"/var/Keychains/ocspcache.sqlite3-wal"];
+        NSArray *const array = @[@"/var/Keychains/ocspcache.sqlite3",
+                                 @"/var/Keychains/ocspcache.sqlite3-shm",
+                                 @"/var/Keychains/ocspcache.sqlite3-wal"];
         if (prefs->disable_app_revokes && kCFCoreFoundationVersionNumber < kCFCoreFoundationVersionNumber_iOS_12_0) {
             // Disable app revokes.
             progress(localize(@"Disabling app revokes..."));
@@ -757,8 +757,8 @@ void jailbreak()
     upstage();
     
     {
-        auto const offsetsFile = @"/jb/offsets.plist";
-        auto dictionary = [NSMutableDictionary new];
+        NSString *const offsetsFile = @"/jb/offsets.plist";
+        NSMutableDictionary *dictionary = [NSMutableDictionary new];
 #define cache_address(value, name) do { \
     dictionary[@(name)] = ADDRSTRING(value); \
 } while (false)
@@ -824,16 +824,16 @@ void jailbreak()
             notice(localize(@"Will restore RootFS. This may take a while. Don't exit the app and don't let the device lock."), 1, 1);
             
             LOG("Reverting back RootFS remount...");
-            auto const rootfd = open("/", O_RDONLY);
+            int const rootfd = open("/", O_RDONLY);
             _assert(rootfd > 0, localize(@"Unable to open RootFS."), true);
-            auto snapshots = snapshot_list(rootfd);
+            const char **snapshots = snapshot_list(rootfd);
             _assert(snapshots != NULL, localize(@"Unable to get snapshots for RootFS."), true);
             _assert(*snapshots != NULL, localize(@"Found no snapshot for RootFS."), true);
-            auto snapshot = strdup(*snapshots);
+            char *snapshot = strdup(*snapshots);
             LOG("%s", snapshot);
             _assert(snapshot != NULL, localize(@"Unable to find original snapshot for RootFS."), true);
             if (!(kCFCoreFoundationVersionNumber < kCFCoreFoundationVersionNumber_iOS_11_3)) {
-                auto systemSnapshot = copySystemSnapshot();
+                char *systemSnapshot = copySystemSnapshot();
                 _assert(systemSnapshot != NULL, localize(@"Unable to copy system snapshot."), true);
                 _assert(fs_snapshot_rename(rootfd, snapshot, systemSnapshot, 0) == ERR_SUCCESS, localize(@"Unable to rename original snapshot."), true);
                 SafeFreeNULL(snapshot);
@@ -841,14 +841,14 @@ void jailbreak()
                 _assert(snapshot != NULL, localize(@"Unable to duplicate string."), true);
                 SafeFreeNULL(systemSnapshot);
             }
-            auto const systemSnapshotMountPoint = "/private/var/tmp/jb/mnt2";
+            char *const systemSnapshotMountPoint = "/private/var/tmp/jb/mnt2";
             if (is_mountpoint(systemSnapshotMountPoint)) {
                 _assert(unmount(systemSnapshotMountPoint, MNT_FORCE) == ERR_SUCCESS, localize(@"Unable to unmount old snapshot mount point."), true);
             }
             _assert(clean_file(systemSnapshotMountPoint), localize(@"Unable to clean old snapshot mount point."), true);
             _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), localize(@"Unable to create snapshot mount point."), true);
             _assert(fs_snapshot_mount(rootfd, systemSnapshotMountPoint, snapshot, 0) == ERR_SUCCESS, localize(@"Unable to mount original snapshot."), true);
-            auto const systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
+            const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
             _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, localize(@"Unable to verify mounted snapshot."), true);
             _assert(extractDebsForPkg(@"rsync", nil, false), localize(@"Unable to extract rsync."), true);
             _assert(extractDebsForPkg(@"uikittools", nil, false), localize(@"Unable to extract uikittools."), true);
@@ -870,12 +870,12 @@ void jailbreak()
             // Clean up.
             
             LOG("Cleaning up...");
-            auto const cleanUpFileList = @[@"/var/cache",
-                                           @"/var/lib",
-                                           @"/var/stash",
-                                           @"/var/db/stash",
-                                           @"/var/mobile/Library/Cydia",
-                                           @"/var/mobile/Library/Caches/com.saurik.Cydia"];
+            NSArray *const cleanUpFileList = @[@"/var/cache",
+                                               @"/var/lib",
+                                               @"/var/stash",
+                                               @"/var/db/stash",
+                                               @"/var/mobile/Library/Cydia",
+                                               @"/var/mobile/Library/Caches/com.saurik.Cydia"];
             for (id file in cleanUpFileList) {
                 clean_file([file UTF8String]);
             }
@@ -925,13 +925,13 @@ void jailbreak()
     
     if (prefs->ssh_only && needStrap) {
         progress(localize(@"Enabling SSH..."));
-        auto toInject = [NSMutableArray new];
+        NSMutableArray *toInject = [NSMutableArray new];
         if (!verifySums(pathForResource(@"binpack64-256.md5sums"), HASHTYPE_MD5)) {
-            auto binpack64 = [ArchiveFile archiveWithFile:pathForResource(@"binpack64-256.tar.lzma")];
+            ArchiveFile *const binpack64 = [ArchiveFile archiveWithFile:pathForResource(@"binpack64-256.tar.lzma")];
             _assert(binpack64 != nil, localize(@"Unable to open binpack."), true);
             _assert([binpack64 extractToPath:@"/jb"], localize(@"Unable to extract binpack."), true);
             for (id file in binpack64.files.allKeys) {
-                auto const path = [@"/jb" stringByAppendingPathComponent:file];
+                NSString *const path = [@"/jb" stringByAppendingPathComponent:file];
                 if (cdhashFor(path) != nil) {
                     if (![toInject containsObject:path]) {
                         [toInject addObject:path];
@@ -939,11 +939,11 @@ void jailbreak()
                 }
             }
         }
-        auto const fileManager = [NSFileManager defaultManager];
-        auto directoryEnumerator = [fileManager enumeratorAtURL:[NSURL URLWithString:@"/jb"] includingPropertiesForKeys:@[NSURLIsDirectoryKey] options:0 errorHandler:nil];
+        NSFileManager *const fileManager = [NSFileManager defaultManager];
+        NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtURL:[NSURL URLWithString:@"/jb"] includingPropertiesForKeys:@[NSURLIsDirectoryKey] options:0 errorHandler:nil];
         _assert(directoryEnumerator != nil, localize(@"Unable to create directory enumerator."), true);
         for (id URL in directoryEnumerator) {
-            auto path = [URL path];
+            NSString *const path = [URL path];
             if (cdhashFor(path) != nil) {
                 if (![toInject containsObject:path]) {
                     [toInject addObject:path];
@@ -951,14 +951,14 @@ void jailbreak()
             }
         }
         for (id file in [fileManager contentsOfDirectoryAtPath:@"/Applications" error:nil]) {
-            auto path = [@"/Applications" stringByAppendingPathComponent:file];
-            auto info_plist = [NSMutableDictionary dictionaryWithContentsOfFile:[path stringByAppendingPathComponent:@"Info.plist"]];
+            NSString *const path = [@"/Applications" stringByAppendingPathComponent:file];
+            NSMutableDictionary *const info_plist = [NSMutableDictionary dictionaryWithContentsOfFile:[path stringByAppendingPathComponent:@"Info.plist"]];
             if (info_plist == nil) continue;
             if ([info_plist[@"CFBundleIdentifier"] hasPrefix:@"com.apple."]) continue;
             directoryEnumerator = [fileManager enumeratorAtURL:[NSURL URLWithString:path] includingPropertiesForKeys:@[NSURLIsDirectoryKey] options:0 errorHandler:nil];
             if (directoryEnumerator == nil) continue;
             for (id URL in directoryEnumerator) {
-                auto path = [URL path];
+                NSString *const path = [URL path];
                 if (cdhashFor(path) != nil) {
                     if (![toInject containsObject:path]) {
                         [toInject addObject:path];
@@ -969,7 +969,7 @@ void jailbreak()
         if (toInject.count > 0) {
             _assert(injectTrustCache(toInject, getoffset(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, localize(@"Unable to inject binaries to trust cache."), true);
         }
-        auto const binpackMessage = localize(@"Unable to setup binpack.");
+        NSString *const binpackMessage = localize(@"Unable to setup binpack.");
         _assert(ensure_symlink("/jb/usr/bin/scp", "/usr/bin/scp"), binpackMessage, true);
         _assert(ensure_directory("/usr/local/lib", 0, 0755), binpackMessage, true);
         _assert(ensure_directory("/usr/local/lib/zsh", 0, 0755), binpackMessage, true);
@@ -985,7 +985,7 @@ void jailbreak()
         _assert(ensure_directory("/jb/Library/LaunchDaemons", 0, 0755), binpackMessage, true);
         _assert(ensure_directory("/jb/etc/rc.d", 0, 0755), binpackMessage, true);
         if (access("/jb/Library/LaunchDaemons/dropbear.plist", F_OK) != ERR_SUCCESS) {
-            auto dropbear_plist = [NSMutableDictionary new];
+            NSMutableDictionary *dropbear_plist = [NSMutableDictionary new];
             _assert(dropbear_plist, localize(@"Unable to allocate memory for dropbear plist."), true);
             dropbear_plist[@"Program"] = @"/jb/usr/local/bin/dropbear";
             dropbear_plist[@"RunAtLoad"] = @YES;
@@ -1004,11 +1004,11 @@ void jailbreak()
         }
         if (prefs->load_daemons) {
             for (id file in [fileManager contentsOfDirectoryAtPath:@"/jb/Library/LaunchDaemons" error:nil]) {
-                auto const path = [@"/jb/Library/LaunchDaemons" stringByAppendingPathComponent:file];
+                NSString *const path = [@"/jb/Library/LaunchDaemons" stringByAppendingPathComponent:file];
                 runCommand("/jb/bin/launchctl", "load", path.UTF8String, NULL);
             }
             for (id file in [fileManager contentsOfDirectoryAtPath:@"/jb/etc/rc.d" error:nil]) {
-                auto const path = [@"/jb/etc/rc.d" stringByAppendingPathComponent:file];
+                NSString *const path = [@"/jb/etc/rc.d" stringByAppendingPathComponent:file];
                 if ([fileManager isExecutableFileAtPath:path]) {
                     runCommand("/jb/bin/bash", "-c", path.UTF8String, NULL);
                 }
@@ -1047,7 +1047,7 @@ void jailbreak()
                          );
         if (needSubstrate) {
             LOG(@"We need substrate.");
-            auto const substrateDeb = debForPkg(@"mobilesubstrate");
+            NSString *const substrateDeb = debForPkg(@"mobilesubstrate");
             _assert(substrateDeb != nil, localize(@"Unable to get deb for Substrate."), true);
             if (pidOfProcess("/usr/libexec/substrated") == 0) {
                 _assert(extractDeb(substrateDeb), localize(@"Unable to extract Substrate."), true);
@@ -1058,7 +1058,7 @@ void jailbreak()
             [debsToInstall addObject:substrateDeb];
         }
         
-        auto resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
+        NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
         _assert(resourcesPkgs != nil, localize(@"Unable to get resource packages."), true);
         resourcesPkgs = [@[@"system-memory-reset-fix"] arrayByAddingObjectsFromArray:resourcesPkgs];
         if (betaFirmware) {
@@ -1068,7 +1068,7 @@ void jailbreak()
             resourcesPkgs = [@[@"com.ps.letmeblock"] arrayByAddingObjectsFromArray:resourcesPkgs];
         }
         
-        auto pkgsToRepair = [NSMutableArray new];
+        NSMutableArray *pkgsToRepair = [NSMutableArray new];
         LOG("Resource Pkgs: \"%@\".", resourcesPkgs);
         for (id pkg in resourcesPkgs) {
             // Ignore mobilesubstrate because we just handled that separately.
@@ -1087,7 +1087,7 @@ void jailbreak()
         }
         if (pkgsToRepair.count > 0) {
             LOG(@"(Re-)Extracting \"%@\".", pkgsToRepair);
-            auto const debsToRepair = debsForPkgs(pkgsToRepair);
+            NSArray <NSString *> *const debsToRepair = debsForPkgs(pkgsToRepair);
             _assert(debsToRepair.count == pkgsToRepair.count, localize(@"Unable to get debs for packages to repair."), true);
             _assert(extractDebs(debsToRepair), localize(@"Unable to repair packages."), true);
             [debsToInstall addObjectsFromArray:debsToRepair];
@@ -1116,7 +1116,7 @@ void jailbreak()
         // Inject trust cache
         
         progress(localize(@"Injecting trust cache..."));
-        auto resources = [NSArray arrayWithContentsOfFile:@"/usr/share/jailbreak/injectme.plist"];
+        NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/jailbreak/injectme.plist"];
         // If substrate is already running but was broken, skip injecting again
         if (!skipSubstrate) {
             resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
@@ -1160,7 +1160,7 @@ void jailbreak()
         _assert(ensure_file("/var/lib/dpkg/available", 0, 0644), localize(@"Unable to repair dpkg available file."), true);
         
         // Make sure firmware-sbin package is not corrupted.
-        auto file = [NSString stringWithContentsOfFile:@"/var/lib/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil];
+        NSString *file = [NSString stringWithContentsOfFile:@"/var/lib/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil];
         if ([file containsString:@"/sbin/fstyp"] || [file containsString:@"\n\n"]) {
             // This is not a stock file for iOS11+
             file = [file stringByReplacingOccurrencesOfString:@"/sbin/fstyp\n" withString:@""];
@@ -1232,7 +1232,7 @@ void jailbreak()
             _assert(injectTrustCache(toInjectToTrustCache, getoffset(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, localize(@"Unable to inject newly extracted dpkg to trust cache."), true);
             [toInjectToTrustCache removeAllObjects];
             injectedToTrustCache = true;
-            auto const dpkg_deb = debForPkg(@"dpkg");
+            NSString *const dpkg_deb = debForPkg(@"dpkg");
             _assert(installDeb(dpkg_deb.UTF8String, true), localize(@"Unable to install deb for dpkg."), true);
             [debsToInstall removeObject:dpkg_deb];
         }
@@ -1240,7 +1240,7 @@ void jailbreak()
         if (needStrap || !pkgIsConfigured("firmware")) {
             if (access("/usr/libexec/cydia/firmware.sh", F_OK) != ERR_SUCCESS || !pkgIsConfigured("cydia")) {
                 LOG("Extracting Cydia...");
-                auto const fwDebs = debsForPkgs(@[@"cydia", @"cydia-lproj", @"darwintools", @"uikittools", @"system-cmds"]);
+                NSArray <NSString *> *const fwDebs = debsForPkgs(@[@"cydia", @"cydia-lproj", @"darwintools", @"uikittools", @"system-cmds"]);
                 _assert(fwDebs != nil, localize(@"Unable to get firmware debs."), true);
                 _assert(installDebs(fwDebs, true, false), localize(@"Unable to install firmware debs."), true);
             }
@@ -1265,7 +1265,7 @@ void jailbreak()
             (pkgIsInstalled("apt7-key") && compareInstalledVersion("apt7-key", "lt", "1:0"))
             ) {
             LOG("Installing newer version of apt7");
-            auto const apt7debs = debsForPkgs(@[@"apt7", @"apt7-key", @"apt7-lib"]);
+            NSArray <NSString *> *const apt7debs = debsForPkgs(@[@"apt7", @"apt7-key", @"apt7-lib"]);
             _assert(apt7debs != nil && apt7debs.count == 3, localize(@"Unable to get debs for apt7."), true);
             for (id deb in apt7debs) {
                 if (![debsToInstall containsObject:deb]) {
@@ -1281,9 +1281,9 @@ void jailbreak()
         
         _assert(ensure_directory("/etc/apt/undecimus", 0, 0755), localize(@"Unable to create local repo."), true);
         clean_file("/etc/apt/sources.list.d/undecimus.list");
-        auto const listPath = "/etc/apt/undecimus/undecimus.list";
-        auto const listContents = @"deb file:///var/lib/undecimus/apt ./\n";
-        auto const existingList = [NSString stringWithContentsOfFile:@(listPath) encoding:NSUTF8StringEncoding error:nil];
+        char const *listPath = "/etc/apt/undecimus/undecimus.list";
+        NSString *const listContents = @"deb file:///var/lib/undecimus/apt ./\n";
+        NSString *const existingList = [NSString stringWithContentsOfFile:@(listPath) encoding:NSUTF8StringEncoding error:nil];
         if (![listContents isEqualToString:existingList]) {
             clean_file(listPath);
             [listContents writeToFile:@(listPath) atomically:NO encoding:NSUTF8StringEncoding error:nil];
@@ -1297,14 +1297,14 @@ void jailbreak()
             [prefsContents writeToFile:@(prefsPath) atomically:NO encoding:NSUTF8StringEncoding error:nil];
         }
         init_file(prefsPath, 0, 0644);
-        auto const repoPath = pathForResource(@"apt");
+        NSString *const repoPath = pathForResource(@"apt");
         _assert(repoPath != nil, localize(@"Unable to get repo path."), true);
         ensure_directory("/var/lib/undecimus", 0, 0755);
         ensure_symlink([repoPath UTF8String], "/var/lib/undecimus/apt");
         if (!pkgIsConfigured("apt1.4") || !aptUpdate()) {
-            auto const aptNeeded = resolveDepsForPkg(@"apt1.4", false);
+            NSArray *const aptNeeded = resolveDepsForPkg(@"apt1.4", false);
             _assert(aptNeeded != nil && aptNeeded.count > 0, localize(@"Unable to resolve dependencies for apt."), true);
-            auto const aptDebs = debsForPkgs(aptNeeded);
+            NSArray <NSString *> *const aptDebs = debsForPkgs(aptNeeded);
             _assert(installDebs(aptDebs, true, true), localize(@"Unable to install debs for apt."), true);
             _assert(aptUpdate(), localize(@"Unable to update apt package index."), true);
             _assert(aptRepair(), localize(@"Unable to repair system."), true);
@@ -1341,7 +1341,7 @@ void jailbreak()
             }
         }
         
-        auto const file_data = [[NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber] dataUsingEncoding:NSUTF8StringEncoding];
+        NSData *const file_data = [[NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber] dataUsingEncoding:NSUTF8StringEncoding];
         if (![[NSData dataWithContentsOfFile:@"/.installed_unc0ver"] isEqual:file_data]) {
             _assert(clean_file("/.installed_unc0ver"), localize(@"Unable to clean old bootstrap marker file."), true);
             _assert(create_file_data("/.installed_unc0ver", 0, 0644, file_data), localize(@"Unable to create bootstrap marker file."), true);
@@ -1395,9 +1395,9 @@ void jailbreak()
     upstage();
     
     {
-        auto targettype = sysctlWithName("hw.targettype");
+        char *targettype = sysctlWithName("hw.targettype");
         _assert(targettype != NULL, localize(@"Unable to get hardware targettype."), true);
-        auto const jetsamFile = [NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", targettype];
+        NSString *const jetsamFile = [NSString stringWithFormat:@"/System/Library/LaunchDaemons/com.apple.jetsamproperties.%s.plist", targettype];
         SafeFreeNULL(targettype);
         
         if (prefs->increase_memory_limit) {
@@ -1472,7 +1472,7 @@ void jailbreak()
             // Install Cydia.
             
             progress(localize(@"Installing Cydia..."));
-            auto const cydiaVer = versionOfPkg(@"cydia");
+            NSString *const cydiaVer = versionOfPkg(@"cydia");
             _assert(cydiaVer != nil, localize(@"Unable to get Cydia version."), true);
             _assert(aptInstall(@[@"--reinstall", [@"cydia" stringByAppendingFormat:@"=%@", cydiaVer]]), localize(@"Unable to reinstall Cydia."), true);
             prefs->install_cydia = false;

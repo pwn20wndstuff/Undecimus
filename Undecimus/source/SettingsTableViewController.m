@@ -29,12 +29,12 @@
 // https://github.com/Matchstic/ReProvision/blob/7b595c699335940f68702bb204c5aa55b8b1896f/Shared/Application%20Database/RPVApplication.m#L102
 
 + (NSDictionary *)provisioningProfileAtPath:(NSString *)path {
-    auto stringContent = [NSString stringWithContentsOfFile:path encoding:NSASCIIStringEncoding error:nil];
+    NSString *stringContent = [NSString stringWithContentsOfFile:path encoding:NSASCIIStringEncoding error:nil];
     stringContent = [stringContent componentsSeparatedByString:@"<plist version=\"1.0\">"][1];
     stringContent = [NSString stringWithFormat:@"%@%@", @"<plist version=\"1.0\">", stringContent];
     stringContent = [stringContent componentsSeparatedByString:@"</plist>"][0];
     stringContent = [NSString stringWithFormat:@"%@%@", stringContent, @"</plist>"];
-    auto const stringData = [stringContent dataUsingEncoding:NSASCIIStringEncoding];
+    NSData *const stringData = [stringContent dataUsingEncoding:NSASCIIStringEncoding];
     id const plist = [NSPropertyListSerialization propertyListWithData:stringData options:NSPropertyListImmutable format:nil error:nil];
     return plist;
 }
@@ -46,10 +46,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    auto const myImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Clouds"]];
+    UIImageView *const myImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Clouds"]];
     [myImageView setContentMode:UIViewContentModeScaleAspectFill];
     [myImageView setFrame:self.tableView.frame];
-    auto const myView = [[UIView alloc] initWithFrame:myImageView.frame];
+    UIView *const myView = [[UIView alloc] initWithFrame:myImageView.frame];
     [myView setBackgroundColor:[UIColor whiteColor]];
     [myView setAlpha:0.84];
     [myView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
@@ -72,7 +72,7 @@
 }
 
 - (void)reloadData {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     [self.TweakInjectionSwitch setOn:(BOOL)prefs->load_tweaks];
     [self.LoadDaemonsSwitch setOn:(BOOL)prefs->load_daemons];
     [self.DumpAPTicketSwitch setOn:(BOOL)prefs->dump_apticket];
@@ -111,7 +111,7 @@
 }
 
 - (IBAction)TweakInjectionSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->load_tweaks = (bool)self.TweakInjectionSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -119,7 +119,7 @@
 }
 
 - (IBAction)LoadDaemonsSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->load_daemons = (bool)self.LoadDaemonsSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -127,7 +127,7 @@
 }
 
 - (IBAction)DumpAPTicketSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->dump_apticket = (bool)self.DumpAPTicketSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -135,15 +135,15 @@
 }
 
 - (IBAction)BootNonceTextFieldTriggered:(id)sender {
-    auto val = (uint64_t)0;
+    uint64_t val = 0;
     if ([[NSScanner scannerWithString:[self.BootNonceTextField text]] scanHexLongLong:&val] && val != HUGE_VAL && val != -HUGE_VAL) {
-        auto prefs = copy_prefs();
+        prefs_t *prefs = copy_prefs();
         prefs->boot_nonce = [NSString stringWithFormat:@ADDR, val].UTF8String;
         set_prefs(prefs);
         release_prefs(&prefs);
     } else {
-        auto const alertController = [UIAlertController alertControllerWithTitle:localize(@"Invalid Entry") message:localize(@"The boot nonce entered could not be parsed") preferredStyle:UIAlertControllerStyleAlert];
-        auto const OK = [UIAlertAction actionWithTitle:localize(@"OK") style:UIAlertActionStyleDefault handler:nil];
+        UIAlertController *const alertController = [UIAlertController alertControllerWithTitle:localize(@"Invalid Entry") message:localize(@"The boot nonce entered could not be parsed") preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *const OK = [UIAlertAction actionWithTitle:localize(@"OK") style:UIAlertActionStyleDefault handler:nil];
         [alertController addAction:OK];
         [self presentViewController:alertController animated:YES completion:nil];
     }
@@ -151,7 +151,7 @@
 }
 
 - (IBAction)RefreshIconCacheSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->run_uicache = (bool)self.RefreshIconCacheSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -159,7 +159,7 @@
 }
 
 - (IBAction)KernelExploitSegmentedControl:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->exploit = (int)self.KernelExploitSegmentedControl.selectedSegmentIndex;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -167,7 +167,7 @@
 }
 
 - (IBAction)DisableAppRevokesSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->disable_app_revokes = (bool)self.DisableAppRevokesSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -175,9 +175,9 @@
 }
 
 - (IBAction)tappedOnRestart:(id)sender {
-    auto const block = ^(void) {
+    void (^const block)(void) = ^(void) {
         notice(localize(@"The device will be restarted."), true, false);
-        auto const support = recommendedRestartSupport();
+        NSInteger const support = recommendedRestartSupport();
         switch (support) {
             case necp_exploit: {
                 necp_die();
@@ -200,7 +200,7 @@
 }
 
 - (IBAction)DisableAutoUpdatesSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->disable_auto_updates = (bool)self.DisableAutoUpdatesSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -208,9 +208,9 @@
 }
 
 - (IBAction)tappedOnShareDiagnosticsData:(id)sender {
-    auto const URL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Documents/diagnostics.plist", NSHomeDirectory()]];
+    NSURL *const URL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Documents/diagnostics.plist", NSHomeDirectory()]];
     [getDiagnostics() writeToURL:URL error:nil];
-    auto const activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[URL] applicationActivities:nil];
+    UIActivityViewController *const activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[URL] applicationActivities:nil];
     if ([activityViewController respondsToSelector:@selector(popoverPresentationController)]) {
         [[activityViewController popoverPresentationController] setSourceView:self.ShareDiagnosticsDataButton];
     }
@@ -226,7 +226,7 @@
 }
 
 - (IBAction)OverwriteBootNonceSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->overwrite_boot_nonce = (bool)self.OverwriteBootNonceSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -234,34 +234,34 @@
 }
 
 - (IBAction)tappedOnCopyNonce:(id)sender{
-    auto const copyBootNonceAlert = [UIAlertController alertControllerWithTitle:localize(@"Copy boot nonce?") message:localize(@"Would you like to copy nonce generator to clipboard?") preferredStyle:UIAlertControllerStyleAlert];
-    auto const copyAction = [UIAlertAction actionWithTitle:localize(@"Yes") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        auto prefs = copy_prefs();
+    UIAlertController *const copyBootNonceAlert = [UIAlertController alertControllerWithTitle:localize(@"Copy boot nonce?") message:localize(@"Would you like to copy nonce generator to clipboard?") preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *const copyAction = [UIAlertAction actionWithTitle:localize(@"Yes") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        prefs_t *prefs = copy_prefs();
         [[UIPasteboard generalPasteboard] setString:@(prefs->boot_nonce)];
         release_prefs(&prefs);
     }];
-    auto const noAction = [UIAlertAction actionWithTitle:localize(@"No") style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *const noAction = [UIAlertAction actionWithTitle:localize(@"No") style:UIAlertActionStyleCancel handler:nil];
     [copyBootNonceAlert addAction:copyAction];
     [copyBootNonceAlert addAction:noAction];
     [self presentViewController:copyBootNonceAlert animated:TRUE completion:nil];
 }
 
 - (IBAction)tappedOnCopyECID:(id)sender {
-    auto const copyBootNonceAlert = [UIAlertController alertControllerWithTitle:localize(@"Copy ECID?") message:localize(@"Would you like to ECID to clipboard?") preferredStyle:UIAlertControllerStyleAlert];
-    auto const copyAction = [UIAlertAction actionWithTitle:localize(@"Yes") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        auto prefs = copy_prefs();
+    UIAlertController *const copyBootNonceAlert = [UIAlertController alertControllerWithTitle:localize(@"Copy ECID?") message:localize(@"Would you like to ECID to clipboard?") preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *const copyAction = [UIAlertAction actionWithTitle:localize(@"Yes") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        prefs_t *prefs = copy_prefs();
         [[UIPasteboard generalPasteboard] setString:hexFromInt(@(prefs->ecid).integerValue)];
         release_prefs(&prefs);
     }];
-    auto const noAction = [UIAlertAction actionWithTitle:localize(@"No") style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *const noAction = [UIAlertAction actionWithTitle:localize(@"No") style:UIAlertActionStyleCancel handler:nil];
     [copyBootNonceAlert addAction:copyAction];
     [copyBootNonceAlert addAction:noAction];
     [self presentViewController:copyBootNonceAlert animated:TRUE completion:nil];
 }
 
 - (IBAction)tappedOnCheckForUpdate:(id)sender {
-    auto const block = ^(void) {
-        auto const update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
+    void (^const block)(void) = ^(void) {
+        NSString *const update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
         if (update == nil) {
             notice(localize(@"Failed to check for update."), true, false);
         } else if ([update compare:appVersion() options:NSNumericSearch] == NSOrderedDescending) {
@@ -274,7 +274,7 @@
 }
 
 - (IBAction)exportKernelTaskPortSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->export_kernel_task_port = (bool)self.ExportKernelTaskPortSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -282,7 +282,7 @@
 }
 
 - (IBAction)RestoreRootFSSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->restore_rootfs = (bool)self.RestoreRootFSSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -290,7 +290,7 @@
 }
 
 - (IBAction)installCydiaSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->install_cydia = (bool)self.installCydiaSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -298,7 +298,7 @@
 }
 
 - (IBAction)installSSHSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->install_openssh = (bool)self.installSSHSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -311,7 +311,7 @@
 }
 
 - (IBAction)IncreaseMemoryLimitSwitch:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->increase_memory_limit = (bool)self.IncreaseMemoryLimitSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -319,7 +319,7 @@
 }
 
 - (IBAction)tappedOnAutomaticallySelectExploit:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->exploit = (int)recommendedJailbreakSupport();
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -327,7 +327,7 @@
 }
 
 - (IBAction)reloadSystemDaemonsSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->reload_system_daemons = (bool)self.ReloadSystemDaemonsSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -335,12 +335,12 @@
 }
 
 - (IBAction)tappedRestartSpringBoard:(id)sender {
-    auto const block = ^(void) {
+    void (^const block)(void) = ^(void) {
         notice(localize(@"SpringBoard will be restarted."), true, false);
-        auto const support = recommendedRespringSupport();
+        NSInteger const support = recommendedRespringSupport();
         switch (support) {
             case deja_xnu_exploit: {
-                auto const bb_tp = hid_event_queue_exploit();
+                mach_port_t const bb_tp = hid_event_queue_exploit();
                 _assert(MACH_PORT_VALID(bb_tp), localize(@"Unable to get task port for backboardd."), true);
                 _assert(thread_call_remote(bb_tp, exit, 1, REMOTE_LITERAL(EXIT_SUCCESS)) == ERR_SUCCESS, localize(@"Unable to make backboardd exit."), true);
                 break;
@@ -359,12 +359,12 @@
 }
 
 - (IBAction)hideLogWindowSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->hide_log_window = (bool)self.HideLogWindowSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
-    auto const block = ^(void) {
+    void (^const block)(void) = ^(void) {
         notice(localize(@"Preference was changed. The app will now exit."), true, false);
         exit(EXIT_SUCCESS);
     };
@@ -372,7 +372,7 @@
 }
 
 - (IBAction)resetCydiaCacheSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->reset_cydia_cache = (bool)self.ResetCydiaCacheSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -380,7 +380,7 @@
 }
 
 - (IBAction)sshOnlySwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->ssh_only = (bool)self.SSHOnlySwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -388,7 +388,7 @@
 }
 
 - (IBAction)enableGetTaskAllowSwitchTriggered:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->enable_get_task_allow = (bool)self.EnableGetTaskAllowSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -396,7 +396,7 @@
 }
 
 - (IBAction)setCSDebugged:(id)sender {
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     prefs->set_cs_debugged = (bool)self.SetCSDebuggedSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
@@ -404,7 +404,7 @@
 }
 
 - (IBAction)tappedOnResetAppPreferences:(id)sender {
-    auto const block = ^(void) {
+    void (^const block)(void) = ^(void) {
         reset_prefs();
         notice(localize(@"Preferences were reset. The app will now exit."), true, false);
         exit(EXIT_SUCCESS);

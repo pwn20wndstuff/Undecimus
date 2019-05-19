@@ -32,7 +32,7 @@ extern void NSLog(CFStringRef, ...);
 #define kCFCoreFoundationVersionNumber_iOS_11_3 1452.23
 #define kCFCoreFoundationVersionNumber_iOS_11_0 1443.00
 
-#define auto __auto_type
+#define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define ADDR                 "0x%016llx"
 #define MACH_HEADER_MAGIC    MH_MAGIC_64
@@ -52,8 +52,6 @@ extern kptr_t offset_options;
 #define UNSETOPT(x) (offset_options?wk64(offset_options, rk64(offset_options) & ~OPT_ ##x):0)
 #define OPT_GET_TASK_ALLOW (1<<0)
 #define OPT_CS_DEBUGGED (1<<1)
-
-#define SIZE_NULL ((size_t) 0)
 
 #endif
 

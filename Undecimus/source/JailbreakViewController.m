@@ -27,7 +27,7 @@ static NSString *bundledResources = nil;
 - (IBAction)tappedOnJailbreak:(id)sender
 {
     status(localize(@"Jailbreak"), false, false);
-    auto const block = ^(void) {
+    void (^const block)(void) = ^(void) {
         _assert(bundledResources != nil, localize(@"Bundled Resources version missing."), true);
         if (!jailbreakSupported()) {
             status(localize(@"Unsupported"), false, true);
@@ -40,7 +40,7 @@ static NSString *bundledResources = nil;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     if (!jailbreakSupported()) {
         status(localize(@"Unsupported"), false, true);
     } else if (prefs->restore_rootfs) {
@@ -57,7 +57,7 @@ static NSString *bundledResources = nil;
     [super viewDidLoad];
     _canExit = YES;
     // Do any additional setup after loading the view, typically from a nib.
-    auto prefs = copy_prefs();
+    prefs_t *prefs = copy_prefs();
     if (prefs->hide_log_window) {
         _outputView.hidden = YES;
         _outputView = nil;

@@ -1273,8 +1273,8 @@ out:
 }
 
 int waitForFile(const char *filename) {
-    auto rv = access(filename, F_OK);
-    for (auto i = 0; !(i >= 100 || rv == ERR_SUCCESS); i++) {
+    int rv = access(filename, F_OK);
+    for (int i = 0; !(i >= 100 || rv == ERR_SUCCESS); i++) {
         usleep(100000);
         rv = access(filename, F_OK);
     }
@@ -1286,7 +1286,7 @@ NSString *hexFromInt(NSInteger val) {
 }
 
 void waitFor(int seconds) {
-    for (auto i = 1; i <= seconds; i++) {
+    for (int i = 1; i <= seconds; i++) {
         LOG("Waiting (%d/%d)", i, seconds);
         sleep(1);
     }

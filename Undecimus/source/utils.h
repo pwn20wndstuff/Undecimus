@@ -46,6 +46,7 @@ int proc_pidpath(pid_t pid, void *buffer, uint32_t buffersize);
 - (BOOL) registerApplicationDictionary:(id)application;
 - (BOOL) installApplication:(id)application withOptions:(id)options;
 - (BOOL) _LSPrivateRebuildApplicationDatabasesForSystemApps:(BOOL)system internal:(BOOL)internal user:(BOOL)user;
+- (BOOL) applicationIsInstalled:(id)arg1;
 @end
 
 static inline bool create_file_data(const char *file, int owner, mode_t mode, NSData *data) {
