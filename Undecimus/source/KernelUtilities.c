@@ -1193,15 +1193,10 @@ out:;
 bool entitle_process_with_pid(pid_t pid, const char *key, kptr_t val) {
     bool ret = false;
     kptr_t proc = KPTR_NULL;
-    bool do_proc_rele = true;
     _assert(pid > 0);
     _assert(key != NULL);
     _assert(KERN_POINTER_VALID(val));
     proc = proc_find(pid);
-    if (!KERN_POINTER_VALID(proc)) {
-        proc = get_proc_struct_for_pid(pid);
-        do_proc_rele = false;
-    }
     _assert(KERN_POINTER_VALID(proc));
     kptr_t const proc_ucred = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_UCRED));
     _assert(KERN_POINTER_VALID(proc_ucred));
@@ -1212,20 +1207,36 @@ bool entitle_process_with_pid(pid_t pid, const char *key, kptr_t val) {
     _assert(entitle_process(amfi_entitlements, key, val));
     ret = true;
 out:;
-    if (do_proc_rele && KERN_POINTER_VALID(proc)) proc_rele(proc);
+    if (KERN_POINTER_VALID(proc)) proc_rele(proc);
     return ret;
 }
 
 bool remove_memory_limit() {
     kptr_t ret = false;
+    size_t kstr_size = 0;
+    kptr_t kstr = KPTR_NULL;
     pid_t const pid = getpid();
     char *const entitlement_key = "com.apple.private.memorystatus";
     kptr_t const entitlement_val = OSBoolTrue;
     _assert(KERN_POINTER_VALID(entitlement_val));
-    _assert(entitle_process_with_pid(pid, entitlement_key, entitlement_val));
+    kptr_t const proc = get_proc_struct_for_pid(pid);
+    _assert(KERN_POINTER_VALID(proc));
+    kptr_t const proc_ucred = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_UCRED));
+    _assert(KERN_POINTER_VALID(proc_ucred));
+    kptr_t const cr_label = ReadKernel64(proc_ucred + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL));
+    _assert(KERN_POINTER_VALID(cr_label));
+    kptr_t const amfi_entitlements = get_amfi_entitlements(cr_label);
+    _assert(KERN_POINTER_VALID(amfi_entitlements));
+    kptr_t function = OSObjectFunc(amfi_entitlements, koffset(KVTABLE_OFFSET_OSDICTIONARY_SETOBJECTWITHCHARP));
+    _assert(KERN_POINTER_VALID(function));
+    kstr_size = strlen(entitlement_key) + 1;
+    kstr = kmem_alloc(kstr_size);
+    _assert(KERN_POINTER_VALID(kstr));
+    _assert(kexec(function, amfi_entitlements, kstr, entitlement_val, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL));
     _assert(memorystatus_control(MEMORYSTATUS_CMD_SET_JETSAM_TASK_LIMIT, pid, 0, NULL, 0) == 0);
     ret = true;
 out:;
+    if (kstr_size != 0 && KERN_POINTER_VALID(kstr)) kmem_free(kstr, kstr_size); kstr = KPTR_NULL;
     return ret;
 }
 
