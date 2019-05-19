@@ -69,7 +69,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fAs-8y-ldG">
-                                                    <rect key="frame" x="251" y="6.6666666666666679" width="51" height="31.000000000000004"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="TweakInjectionSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="Z1x-y7-bY3"/>
@@ -93,7 +93,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sUh-Nj-0hf">
-                                                    <rect key="frame" x="251" y="6.6666666666666679" width="51" height="31.000000000000004"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="LoadDaemonsSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="Dgd-BY-JMR"/>
@@ -127,7 +127,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xWn-fd-7EJ">
-                                                    <rect key="frame" x="251" y="6.6666666666666679" width="51" height="31.000000000000004"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="DumpAPTicketSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="PmY-Z0-3ZE"/>
@@ -161,7 +161,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E0P-lH-E3m">
-                                                    <rect key="frame" x="251" y="6.6666666666666679" width="51" height="31.000000000000004"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="RefreshIconCacheSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="085-nY-4Sq"/>
@@ -195,7 +195,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P95-aF-zxV">
-                                                    <rect key="frame" x="251" y="6.6666666666666679" width="51" height="31.000000000000004"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="DisableAutoUpdatesSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="lD9-Md-Bc0"/>
@@ -229,7 +229,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="p9t-Tt-64i">
-                                                    <rect key="frame" x="251" y="6.6666666666666679" width="51" height="31.000000000000004"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="DisableAppRevokesSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="JeN-mn-4Md"/>
@@ -263,7 +263,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5W0-39-WKV">
-                                                    <rect key="frame" x="251" y="6.6666666666666679" width="51" height="31.000000000000004"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="OverwriteBootNonceSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="M1g-qz-TRn"/>
@@ -297,7 +297,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HCT-C6-X9W">
-                                                    <rect key="frame" x="251" y="6.6666666666666679" width="51" height="31.000000000000004"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="exportKernelTaskPortSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="av9-IP-LAU"/>
@@ -331,14 +331,14 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vce-QD-qkd">
-                                                    <rect key="frame" x="251" y="6.3333333333333321" width="51" height="30.999999999999996"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="RestoreRootFSSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="zN4-VM-S1o"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Restore RootFS (rec0ver)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FOl-bQ-yTJ">
-                                                    <rect key="frame" x="15" y="11.333333333333336" width="193.66666666666666" height="21"/>
+                                                    <rect key="frame" x="15" y="11.666666666666664" width="193.66666666666666" height="21"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="21" id="juh-26-jFP"/>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="193.5" id="vJ1-n1-ko1"/>
@@ -365,14 +365,14 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="su4-yz-yLP">
-                                                    <rect key="frame" x="251" y="6.3333333333333321" width="51" height="30.999999999999996"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="IncreaseMemoryLimitSwitch:" destination="ScN-Hx-Um8" eventType="valueChanged" id="m86-5g-Fnn"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Increase Memory Limit (Beta)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hJV-7W-2Yt">
-                                                    <rect key="frame" x="15" y="11.666666666666666" width="225" height="20.333333333333336"/>
+                                                    <rect key="frame" x="15" y="11.666666666666666" width="225" height="20.666666666666671"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="225" id="CJB-k6-EgI"/>
                                                         <constraint firstAttribute="height" constant="20.5" id="XV4-LR-bSQ"/>
@@ -399,14 +399,14 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3dh-Ds-91D">
-                                                    <rect key="frame" x="251" y="6.3333333333333321" width="51" height="30.999999999999996"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="installSSHSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="AGM-WP-sSL"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(Re)Install OpenSSH" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JYe-1k-t3p">
-                                                    <rect key="frame" x="15" y="11.666666666666666" width="225" height="20.333333333333336"/>
+                                                    <rect key="frame" x="15" y="11.666666666666666" width="225" height="20.666666666666671"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="225" id="JhT-Qg-3zq"/>
                                                         <constraint firstAttribute="height" constant="20.5" id="bQG-Xb-9Xz"/>
@@ -433,14 +433,14 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yfj-Yg-BHr">
-                                                    <rect key="frame" x="251" y="6.3333333333333321" width="51" height="30.999999999999996"/>
+                                                    <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="installCydiaSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="Fkf-2z-R9P"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reinstall Cydia" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="agx-Hc-m1X">
-                                                    <rect key="frame" x="15" y="11.666666666666666" width="225" height="20.333333333333336"/>
+                                                    <rect key="frame" x="15" y="11.666666666666666" width="225" height="20.666666666666671"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="225" id="YRk-rR-9FG"/>
                                                         <constraint firstAttribute="height" constant="20.5" id="nsq-x7-yh1"/>
@@ -467,7 +467,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dZz-WS-G1u">
-                                                    <rect key="frame" x="251" y="6.3333333333333321" width="51" height="30.999999999999996"/>
+                                                    <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="reloadSystemDaemonsSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="v10-1a-JBv"/>
@@ -501,7 +501,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="okw-vN-Hf5">
-                                                    <rect key="frame" x="251" y="6.3333333333333321" width="51" height="30.999999999999996"/>
+                                                    <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="hideLogWindowSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="4Ry-u8-eLR"/>
@@ -535,7 +535,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5ao-Ni-cdG">
-                                                    <rect key="frame" x="251" y="6.3333333333333321" width="51" height="30.999999999999996"/>
+                                                    <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="resetCydiaCacheSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="gQf-60-QkP"/>
@@ -569,7 +569,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rYA-6q-037">
-                                                    <rect key="frame" x="251" y="6.3333333333333321" width="51" height="30.999999999999996"/>
+                                                    <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="sshOnlySwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="YJ7-k5-jX0"/>
@@ -603,7 +603,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZUT-0k-3Ie">
-                                                    <rect key="frame" x="251" y="6.3333333333333321" width="51" height="30.999999999999996"/>
+                                                    <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="enableGetTaskAllowSwitchTriggered:" destination="ScN-Hx-Um8" eventType="valueChanged" id="ish-Sv-CH9"/>
@@ -637,7 +637,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pFK-3o-h3F">
-                                                    <rect key="frame" x="251" y="6.3333333333333321" width="51" height="30.999999999999996"/>
+                                                    <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="setCSDebugged:" destination="ScN-Hx-Um8" eventType="valueChanged" id="Ymm-xh-9VM"/>
@@ -681,7 +681,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="6Xx-ol-UYF">
-                                                    <rect key="frame" x="157" y="8" width="155" height="29"/>
+                                                    <rect key="frame" x="212" y="8" width="155" height="29"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="155" id="TF2-Tk-s34"/>
                                                         <constraint firstAttribute="height" constant="28" id="iH5-4V-9vm"/>
@@ -716,7 +716,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="0x292dd10b56d87a3a" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="AmI-8O-WbP">
-                                                    <rect key="frame" x="121" y="11.333333333333336" width="179" height="21"/>
+                                                    <rect key="frame" x="176" y="11.333333333333336" width="179" height="21"/>
                                                     <nil key="textColor"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits"/>
@@ -756,7 +756,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textField opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="XXXXXXXXXXXXXXXX" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="s5y-Jh-zXs">
-                                                    <rect key="frame" x="117.66666666666667" y="11.333333333333336" width="182.33333333333331" height="21"/>
+                                                    <rect key="frame" x="172.66666666666663" y="11.333333333333336" width="182.33333333333337" height="21"/>
                                                     <nil key="textColor"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits"/>
@@ -803,7 +803,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <textField opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="365 Days" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Ggb-8F-dfb">
-                                                    <rect key="frame" x="223" y="11.333333333333336" width="77" height="21"/>
+                                                    <rect key="frame" x="278" y="11.333333333333336" width="77" height="21"/>
                                                     <nil key="textColor"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits"/>
@@ -836,7 +836,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <textField opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="365 Days" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="bqj-Fm-PHO">
-                                                    <rect key="frame" x="223" y="11.333333333333336" width="77" height="21"/>
+                                                    <rect key="frame" x="278" y="11.333333333333336" width="77" height="21"/>
                                                     <nil key="textColor"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits"/>
@@ -863,7 +863,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cVO-Jp-zmf">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="320" height="33"/>
+                                                    <rect key="frame" x="15" y="5.3333333333333321" width="375" height="33"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Restart"/>
                                                     <connections>
@@ -887,7 +887,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j3u-pn-SGo">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="320" height="33"/>
+                                                    <rect key="frame" x="15" y="5.3333333333333321" width="375" height="33"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Share Diagnostics Data"/>
                                                     <connections>
@@ -911,7 +911,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="m4Q-Ej-PFv">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="320" height="33"/>
+                                                    <rect key="frame" x="15" y="5.3333333333333321" width="375" height="33"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Open Cydia"/>
                                                     <connections>
@@ -935,7 +935,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eJw-Wg-0Qe">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="320" height="33"/>
+                                                    <rect key="frame" x="15" y="5.3333333333333321" width="375" height="33"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="View Source Code"/>
                                                     <connections>
@@ -959,7 +959,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2T7-5o-whm">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="320" height="33"/>
+                                                    <rect key="frame" x="15" y="5.3333333333333321" width="375" height="33"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Automatically Select Exploit"/>
                                                     <connections>
@@ -983,7 +983,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sBD-7B-tON">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="320" height="33"/>
+                                                    <rect key="frame" x="15" y="5.3333333333333321" width="375" height="33"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Restart SpringBoard"/>
                                                     <connections>
@@ -1007,7 +1007,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UTa-KC-4fJ">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="320" height="33"/>
+                                                    <rect key="frame" x="15" y="5.3333333333333321" width="375" height="33"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Clean Diagnostics Data"/>
                                                     <connections>
@@ -1031,7 +1031,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zPL-cO-2ug">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="320" height="33"/>
+                                                    <rect key="frame" x="15" y="5.3333333333333321" width="375" height="33"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Check For Update"/>
                                                     <connections>
@@ -1369,7 +1369,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pKD-a4-xWL">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="196" height="33"/>
+                                                    <rect key="frame" x="15" y="5.6666666666666679" width="196" height="33"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="77" id="OAn-z2-lOQ"/>
                                                         <constraint firstAttribute="height" constant="33" id="w4f-wL-yAV"/>
@@ -1398,7 +1398,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q5T-o4-Ooh">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="197" height="33"/>
+                                                    <rect key="frame" x="15" y="5.6666666666666679" width="197" height="33"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="77" id="NLs-ES-Bcy"/>
                                                         <constraint firstAttribute="height" constant="33" id="xJH-fv-VHv"/>
@@ -1427,7 +1427,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yYy-t3-H1S">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="187" height="33"/>
+                                                    <rect key="frame" x="15" y="5.6666666666666679" width="187" height="33"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="33" id="dqg-zu-QEx"/>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="77" id="v3k-zg-NWG"/>
@@ -1456,7 +1456,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JX2-EB-fBY">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="229" height="33"/>
+                                                    <rect key="frame" x="15" y="5.6666666666666679" width="229" height="33"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="33" id="8Rz-Wq-cnw"/>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="77" id="HvY-y9-6YT"/>
@@ -2081,51 +2081,6 @@
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Clouds" translatesAutoresizingMaskIntoConstraints="NO" id="5iF-M0-uCV">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                             </imageView>
-                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="26H-7Y-fZy">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="778"/>
-                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="7pa-4I-E7e">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="778"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your device is not compatible." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CWz-yQ-Zxy">
-                                            <rect key="frame" x="64.666666666666686" y="70" width="246" height="21"/>
-                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
-                                            <color key="textColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Lte-bo-MS4">
-                                            <rect key="frame" x="149.66666666666666" y="706" width="76" height="42"/>
-                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="25"/>
-                                            <state key="normal" title="Ok... :(">
-                                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            </state>
-                                            <connections>
-                                                <action selector="dismissInitialError:" destination="8Rh-by-Kaz" eventType="touchUpInside" id="mLo-dR-4Bm"/>
-                                            </connections>
-                                        </button>
-                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="You should downgrade this device to lower version of iOS, or this device is not compatible." textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="zyc-ID-3nR">
-                                            <rect key="frame" x="67.666666666666686" y="351.66666666666669" width="240" height="75"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="240" id="3VF-Ib-0jI"/>
-                                                <constraint firstAttribute="height" constant="75" id="HDw-dk-O63"/>
-                                            </constraints>
-                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                        </textView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="CWz-yQ-Zxy" firstAttribute="top" secondItem="7pa-4I-E7e" secondAttribute="top" constant="70" id="9EV-6u-It5"/>
-                                        <constraint firstItem="zyc-ID-3nR" firstAttribute="centerX" secondItem="7pa-4I-E7e" secondAttribute="centerX" id="EDO-Jt-CIs"/>
-                                        <constraint firstItem="zyc-ID-3nR" firstAttribute="centerY" secondItem="7pa-4I-E7e" secondAttribute="centerY" id="NDb-ju-Rxz"/>
-                                        <constraint firstAttribute="bottom" secondItem="Lte-bo-MS4" secondAttribute="bottom" constant="30" id="V6Z-lx-ZK9"/>
-                                        <constraint firstItem="CWz-yQ-Zxy" firstAttribute="centerX" secondItem="7pa-4I-E7e" secondAttribute="centerX" id="gB5-Hf-75Z"/>
-                                        <constraint firstItem="Lte-bo-MS4" firstAttribute="centerX" secondItem="7pa-4I-E7e" secondAttribute="centerX" id="kx1-xk-ArY"/>
-                                    </constraints>
-                                </view>
-                                <blurEffect style="dark"/>
-                            </visualEffectView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="X8q-QA-Wer">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="778"/>
                                 <subviews>
@@ -2485,6 +2440,51 @@
                                     <constraint firstItem="kcV-R2-upo" firstAttribute="centerX" secondItem="ARy-vV-Xbs" secondAttribute="centerX" id="xHs-vL-7O5"/>
                                 </constraints>
                             </view>
+                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="26H-7Y-fZy">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="778"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="7pa-4I-E7e">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="778"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your device is not compatible." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CWz-yQ-Zxy">
+                                            <rect key="frame" x="64.666666666666686" y="70" width="246" height="21"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                            <color key="textColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Lte-bo-MS4">
+                                            <rect key="frame" x="149.66666666666666" y="706" width="76" height="42"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="25"/>
+                                            <state key="normal" title="Ok... :(">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="dismissInitialError:" destination="8Rh-by-Kaz" eventType="touchUpInside" id="mLo-dR-4Bm"/>
+                                            </connections>
+                                        </button>
+                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="You should downgrade this device to lower version of iOS, or this device is not compatible." textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="zyc-ID-3nR">
+                                            <rect key="frame" x="67.666666666666686" y="351.66666666666669" width="240" height="75"/>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="240" id="3VF-Ib-0jI"/>
+                                                <constraint firstAttribute="height" constant="75" id="HDw-dk-O63"/>
+                                            </constraints>
+                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                        </textView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="CWz-yQ-Zxy" firstAttribute="top" secondItem="7pa-4I-E7e" secondAttribute="top" constant="70" id="9EV-6u-It5"/>
+                                        <constraint firstItem="zyc-ID-3nR" firstAttribute="centerX" secondItem="7pa-4I-E7e" secondAttribute="centerX" id="EDO-Jt-CIs"/>
+                                        <constraint firstItem="zyc-ID-3nR" firstAttribute="centerY" secondItem="7pa-4I-E7e" secondAttribute="centerY" id="NDb-ju-Rxz"/>
+                                        <constraint firstAttribute="bottom" secondItem="Lte-bo-MS4" secondAttribute="bottom" constant="30" id="V6Z-lx-ZK9"/>
+                                        <constraint firstItem="CWz-yQ-Zxy" firstAttribute="centerX" secondItem="7pa-4I-E7e" secondAttribute="centerX" id="gB5-Hf-75Z"/>
+                                        <constraint firstItem="Lte-bo-MS4" firstAttribute="centerX" secondItem="7pa-4I-E7e" secondAttribute="centerX" id="kx1-xk-ArY"/>
+                                    </constraints>
+                                </view>
+                                <blurEffect style="dark"/>
+                            </visualEffectView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
