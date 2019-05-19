@@ -1081,12 +1081,17 @@ bool verifyECID(NSString *ecid) {
 bool canOpen(const char *URL) {
     __block bool canOpenURL = false;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_block_t block = ^{
         if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@(URL)]]) {
             canOpenURL = true;
         }
         dispatch_semaphore_signal(semaphore);
-    });
+    };
+    if ([[NSThread currentThread] isMainThread]) {
+        block();
+    } else {
+        dispatch_async(dispatch_get_main_queue(), block);
+    }
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
     return canOpenURL;
 }
