@@ -1562,18 +1562,22 @@ void jailbreak()
             
             progress(localize(@"Loading Tweaks..."));
             if (prefs->reload_system_daemons && !needStrap) {
-                rv = system("nohup bash -c \""
-                            "sleep 1 ;"
-                            "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
-                            "ldrestart ;"
-                            "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
-                            "\" >/dev/null 2>&1 &");
+                rv = systemf("nohup bash -c \""
+                             "while ps -p %d;"
+                             "do :;"
+                             "done;"
+                             "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
+                             "ldrestart ;"
+                             "launchctl load /System/Library/LaunchDaemons/com.apple.backboardd.plist"
+                             "\" >/dev/null 2>&1 &", myPid);
             } else {
-                rv = system("nohup bash -c \""
-                            "sleep 1 ;"
-                            "launchctl stop com.apple.mDNSResponder ;"
-                            "sbreload"
-                            "\" >/dev/null 2>&1 &");
+                rv = systemf("nohup bash -c \""
+                             "while ps -p %d;"
+                             "do :;"
+                             "done;"
+                             "launchctl stop com.apple.mDNSResponder ;"
+                             "sbreload"
+                             "\" >/dev/null 2>&1 &", myPid);
             }
             _assert(WEXITSTATUS(rv) == ERR_SUCCESS, localize(@"Unable to load tweaks."), true);
             LOG("Successfully loaded Tweaks.");
@@ -1609,9 +1613,15 @@ out:;
     insertstatus(([NSString stringWithFormat:@"\nRead %zu bytes from kernel memory\nWrote %zu bytes to kernel memory\n", kreads, kwrites]));
     insertstatus(([NSString stringWithFormat:@"\nJailbroke in %ld seconds\n", time(NULL) - start_time]));
     status(localize(@"Jailbroken"), false, false);
-    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", localize(@"Jailbreak Completed with Status:"), status, localize((prefs->exploit == mach_swap_exploit || prefs->exploit == mach_swap_2_exploit) && !usedPersistedKernelTaskPort ? @"The device will now respring." : @"The app will now exit.")], true, false);
+    bool forceRespring = (prefs->exploit == mach_swap_exploit);
+    forceRespring |= (prefs->exploit == mach_swap_2_exploit);
+    forceRespring &= (!usedPersistedKernelTaskPort);
+    forceRespring &= (!prefs->load_tweaks);
+    bool willRespring = (forceRespring);
+    willRespring |= (prefs->load_tweaks);
+    showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", localize(@"Jailbreak Completed with Status:"), status, localize(willRespring ? @"The device will now respring." : @"The app will now exit.")], true, false);
     if (sharedController.canExit) {
-        if ((prefs->exploit == mach_swap_exploit || prefs->exploit == mach_swap_2_exploit) && !usedPersistedKernelTaskPort) {
+        if (forceRespring) {
             WriteKernel64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL), ReadKernel64(kernelCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL)));
             WriteKernel64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_UID), 0);
             release_prefs(&prefs);
