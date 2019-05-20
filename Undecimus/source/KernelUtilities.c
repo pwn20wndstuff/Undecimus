@@ -282,7 +282,7 @@ out:;
 kptr_t get_kernel_cred_addr()
 {
     kptr_t ret = KPTR_NULL;
-    kptr_t const kernel_proc_struct_addr = get_proc_struct_for_pid(0);
+    kptr_t const kernel_proc_struct_addr = get_kernel_proc_struct_addr();
     _assert(KERN_POINTER_VALID(kernel_proc_struct_addr));
     kptr_t const kernel_ucred_struct_addr = ReadKernel64(kernel_proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_UCRED));
     _assert(KERN_POINTER_VALID(kernel_ucred_struct_addr));
