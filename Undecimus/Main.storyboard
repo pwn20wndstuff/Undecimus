@@ -2415,6 +2415,9 @@
                                                 <integer key="value" value="28"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="tappedOnJailbreak:" destination="8Rh-by-Kaz" eventType="touchUpInside" id="D7a-5f-wTK"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="0.83999999999999997" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
