@@ -8,6 +8,7 @@
 #include <iokit.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 #include "KernelMemory.h"
 #include "KernelOffsets.h"
@@ -58,6 +59,8 @@ extern bool is_directory(const char *filename);
 
 #define CS_OPS_STATUS 0
 #define CS_OPS_ENTITLEMENTS_BLOB 7
+
+#define VSHARED_DYLD 0x000200 /* vnode is a dyld shared cache file */
 
 #define FILE_READ_EXC_KEY "com.apple.security.exception.files.absolute-path.read-only"
 #define MACH_LOOKUP_EXC_KEY "com.apple.security.exception.mach-lookup.global-name"
@@ -811,7 +814,6 @@ kptr_t OSDictionary_GetItem(kptr_t OSDictionary, const char *key) {
     _assert(KERN_POINTER_VALID(kstr));
     ret = kexec(function, OSDictionary, kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL && (ret>>32) == KPTR_NULL) ret = zm_fix_addr(ret);
-    _assert(KERN_POINTER_VALID(ret));
 out:;
     SafeSFreeNULL(kstr);
     return ret;
@@ -2001,5 +2003,46 @@ bool revalidate_process_with_task_port(task_t task_port) {
     _assert(revalidate_process(pid));
     ret = true;
 out:;
+    return ret;
+}
+
+bool enable_mapping_for_library(const char *lib) {
+    bool ret = false;
+    kptr_t vnode = KPTR_NULL;
+    _assert(lib != NULL);
+    vnode = get_vnode_for_path(lib);
+    _assert(KERN_POINTER_VALID(vnode));
+    kptr_t v_flags_addr = vnode + koffset(KSTRUCT_OFFSET_VNODE_V_FLAG);
+    uint32_t v_flags = ReadKernel32(v_flags_addr);
+    v_flags |= VSHARED_DYLD;
+    _assert(WriteKernel32(v_flags_addr, v_flags));
+    ret = true;
+out:;
+    if (KERN_POINTER_VALID(vnode)) vnode_put(vnode); vnode = KPTR_NULL;
+    return ret;
+}
+
+bool enable_mapping_for_libraries(const char *libs) {
+    bool ret = false;
+    CFURLRef libraries = NULL;
+    CFBundleRef folder = NULL;
+    _assert(libs != NULL);
+    libraries = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, (const UInt8 *)libs, strlen(libs), true);
+    _assert(libraries != NULL);
+    folder = CFBundleCreate(kCFAllocatorDefault, libraries);
+    _assert(folder != NULL);
+    CFArrayRef dylibs = CFBundleCopyResourceURLsOfType(folder, CFSTR("dylib"), NULL);
+    _assert(dylibs != NULL);
+    for (CFIndex i = 0, count = CFArrayGetCount(dylibs); i != count; i++) {
+        CFURLRef dylib = (CFURLRef)CFArrayGetValueAtIndex(dylibs, i);
+        char path[PATH_MAX];
+        CFURLGetFileSystemRepresentation(dylib, true, (UInt8 *)path, sizeof(path));
+        LOG("Enabling mapping for library: %s", path);
+        _assert(enable_mapping_for_library(path));
+    }
+    ret = true;
+out:;
+    CFSafeReleaseNULL(libraries);
+    CFSafeReleaseNULL(folder);
     return ret;
 }

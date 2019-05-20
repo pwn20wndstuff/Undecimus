@@ -164,5 +164,7 @@ bool unrestrict_process(pid_t pid);
 bool unrestrict_process_with_task_port(task_t task_port);
 bool revalidate_process(pid_t pid);
 bool revalidate_process_with_task_port(task_t task_port);
+bool enable_mapping_for_library(const char *lib);
+bool enable_mapping_for_libraries(const char *libs);
 
 #endif /* kutils_h */
