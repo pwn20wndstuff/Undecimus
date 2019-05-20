@@ -20,6 +20,13 @@
 #include "KernelExecution.h"
 #include "pac.h"
 #include "kernel_call.h"
+#ifdef UNDECIMUS
+extern char *get_path_for_pid(pid_t pid);
+extern bool is_symlink(const char *filename);
+extern bool is_directory(const char *filename);
+#else
+#include "utils.h"
+#endif
 
 #define _assert(test) do { \
     if (test) break; \
@@ -82,13 +89,11 @@ static const char *mach_register_exceptions[] = {
 int csops(pid_t pid, unsigned int  ops, void * useraddr, size_t usersize);
 int memorystatus_control(uint32_t command, int32_t pid, uint32_t flags, void *buffer, size_t buffersize);
 
-extern char *get_path_for_pid(pid_t pid);
-
-kptr_t cached_proc_struct_addr = KPTR_NULL;
 kptr_t kernel_base = KPTR_NULL;
 kptr_t offset_options = KPTR_NULL;
 bool found_offsets = false;
 kptr_t cached_task_self_addr = KPTR_NULL;
+kptr_t cached_proc_struct_addr = KPTR_NULL;
 static bool weird_offsets = false;
 
 #define find_port(port, disposition) (have_kmem_read() && found_offsets ? get_address_of_port(getpid(), port) : find_port_address(port, disposition))
@@ -243,13 +248,11 @@ out:;
     return proc;
 }
 
-kptr_t proc_struct_addr() {
+kptr_t proc_struct_addr()
+{
     kptr_t ret = KPTR_NULL;
-    if (KERN_POINTER_VALID(cached_proc_struct_addr)) {
-        ret = cached_proc_struct_addr;
-    } else {
-        cached_proc_struct_addr = get_proc_struct_for_pid(getpid());
-    }
+    if (KERN_POINTER_VALID((ret = cached_proc_struct_addr))) goto out;
+    cached_proc_struct_addr = get_proc_struct_for_pid(getpid());
 out:;
     return cached_proc_struct_addr;
 }
@@ -601,12 +604,10 @@ bool set_file_extension(kptr_t sandbox, const char *exc_key, const char *path) {
     _assert(path != NULL);
     ext_kptr = smalloc(sizeof(kptr_t));
     _assert(KERN_POINTER_VALID(ext_kptr));
-    int const ret_extension_create_file = extension_create_file(ext_kptr, sandbox, path, strlen(path), 0);
-    _assert(ret_extension_create_file == 0);
+    _assert(extension_create_file(ext_kptr, sandbox, path, strlen(path), 0) == 0);
     ext = ReadKernel64(ext_kptr);
     _assert(KERN_POINTER_VALID(ext));
-    int const ret_extension_add = extension_add(ext, sandbox, exc_key);
-    _assert(KERN_POINTER_VALID(ret_extension_add));
+    _assert(extension_add(ext, sandbox, exc_key) == 0);
     ret = true;
 out:;
     if (KERN_POINTER_VALID(ext_kptr) && (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 || ext == KPTR_NULL)) extension_release(ext_kptr);
@@ -1098,7 +1099,7 @@ bool entitle_process(kptr_t amfi_entitlements, const char *key, kptr_t val) {
     _assert(KERN_POINTER_VALID(amfi_entitlements));
     _assert(key != NULL);
     _assert(KERN_POINTER_VALID(val));
-    _assert(OSDictionary_SetItem(amfi_entitlements, key, val));
+    _assert((ret = OSDictionary_SetItem(amfi_entitlements, key, val)));
 out:;
     return ret;
 }
@@ -1188,7 +1189,6 @@ kptr_t get_amfi_entitlements(kptr_t cr_label) {
     kptr_t amfi_entitlements = KPTR_NULL;
     _assert(KERN_POINTER_VALID(cr_label));
     amfi_entitlements = ReadKernel64(cr_label + 0x8);
-    _assert(KERN_POINTER_VALID(amfi_entitlements));
 out:;
     return amfi_entitlements;
 }
@@ -1197,7 +1197,6 @@ kptr_t get_sandbox(kptr_t cr_label) {
     kptr_t sandbox = KPTR_NULL;
     _assert(KERN_POINTER_VALID(cr_label));
     sandbox = ReadKernel64(cr_label + 0x8 + 0x8);
-    _assert(KERN_POINTER_VALID(sandbox));
 out:;
     return sandbox;
 }
@@ -1862,13 +1861,14 @@ bool unrestrict_process(pid_t pid) {
     gid_t file_gid = 0;
     uint32_t csflags = 0;
     bool is_platform_application = false;
+    char *path = NULL;
     if (!analyze_pid(pid,
                     &proc,
                     &proc_ucred,
                     NULL,
                     &amfi_entitlements,
                     &sandbox,
-                    NULL,
+                    &path,
                     &is_setuid,
                     &is_setgid,
                     &file_uid,
@@ -1934,6 +1934,14 @@ bool unrestrict_process(pid_t pid) {
             ret = false;
         }
     }
+    if (strcmp(path, "/usr/libexec/securityd") == 0 &&
+        access("/Library/substrate", F_OK) == 0 &&
+        is_directory("/Library/substrate") &&
+        access("/usr/lib/substrate", F_OK) == 0 &&
+        is_symlink("/usr/lib/substrate")) {
+        LOG("Skipping exceptions for pid %d", pid);
+        goto out;
+    }
     LOG("Setting exceptions for pid %d", pid);
     if (!set_exceptions(sandbox, amfi_entitlements)) {
         LOG("Unable to set exceptions for pid %d", pid);
@@ -1941,6 +1949,7 @@ bool unrestrict_process(pid_t pid) {
     }
 out:;
     if (KERN_POINTER_VALID(proc)) proc_rele(proc);
+    SafeFreeNULL(path);
     return ret;
 }
 
