@@ -1619,21 +1619,19 @@ out:;
     forceRespring &= (!prefs->load_tweaks);
     bool willRespring = (forceRespring);
     willRespring |= (prefs->load_tweaks);
+    release_prefs(&prefs);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", localize(@"Jailbreak Completed with Status:"), status, localize(willRespring ? @"The device will now respring." : @"The app will now exit.")], true, false);
     if (sharedController.canExit) {
         if (forceRespring) {
             WriteKernel64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL), ReadKernel64(kernelCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL)));
             WriteKernel64(myCredAddr + koffset(KSTRUCT_OFFSET_UCRED_CR_UID), 0);
-            release_prefs(&prefs);
             _assert(restartSpringBoard(), localize(@"Unable to restart SpringBoard."), true);
         } else {
-            release_prefs(&prefs);
             exit(EXIT_SUCCESS);
             _assert(false, localize(@"Unable to exit."), true);
         }
     }
     sharedController.canExit = YES;
-    release_prefs(&prefs);
 #undef insertstatus
 }
 
