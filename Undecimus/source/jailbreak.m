@@ -1351,8 +1351,8 @@ void jailbreak()
         
         // Make sure everything's at least as new as what we bundled
         rv = system("dpkg --configure -a");
-        _assert(WEXITSTATUS(rv) == ERR_SUCCESS, localize(@"Unable to configure installed packages."), true);
-        _assert(aptUpgrade(), localize(@"Unable to upgrade apt packages."), true);
+        _assert(WEXITSTATUS(rv) == ERR_SUCCESS, localize(@"Unable to configure installed packages."), false);
+        _assert(aptUpgrade(), localize(@"Unable to upgrade apt packages."), false);
         
         clean_file("/jb/tar");
         clean_file("/jb/lzma");
