@@ -350,7 +350,7 @@ void jailbreak()
         
         progress(localize(@"Initializing jailbreak..."));
         LOG("Escaping sandbox...");
-        myProcAddr = get_proc_struct_for_pid(myPid);
+        myProcAddr = proc_struct_addr();
         LOG("myProcAddr = " ADDR, myProcAddr);
         _assert(KERN_POINTER_VALID(myProcAddr), localize(@"Unable to find my process in kernel memory."), true);
         kernelCredAddr = get_kernel_cred_addr();

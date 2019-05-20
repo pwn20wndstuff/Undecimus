@@ -84,6 +84,7 @@ int memorystatus_control(uint32_t command, int32_t pid, uint32_t flags, void *bu
 
 extern char *get_path_for_pid(pid_t pid);
 
+kptr_t cached_proc_struct_addr = KPTR_NULL;
 kptr_t kernel_base = KPTR_NULL;
 kptr_t offset_options = KPTR_NULL;
 bool found_offsets = false;
@@ -240,6 +241,17 @@ kptr_t get_proc_struct_for_pid(pid_t pid)
     _assert(iterate_proc_list(handler));
 out:;
     return proc;
+}
+
+kptr_t proc_struct_addr() {
+    kptr_t ret = KPTR_NULL;
+    if (KERN_POINTER_VALID(cached_proc_struct_addr)) {
+        ret = cached_proc_struct_addr;
+    } else {
+        cached_proc_struct_addr = get_proc_struct_for_pid(getpid());
+    }
+out:;
+    return cached_proc_struct_addr;
 }
 
 kptr_t get_address_of_port(pid_t pid, mach_port_t port)
