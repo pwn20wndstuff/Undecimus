@@ -50,7 +50,6 @@ while (false)
 @property (weak, nonatomic) IBOutlet UIButton *goButton;
 @property (weak, nonatomic) IBOutlet UITextView *outputView;
 @property (readonly) JailbreakViewController *sharedController;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *goButtonSpacing;
 
 //New Outlets
 @property (weak, nonatomic) IBOutlet UIView *mainView;

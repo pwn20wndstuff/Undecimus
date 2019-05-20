@@ -69,7 +69,7 @@ extern int maxStage;
     status_with_stage(stage, maxStage); \
     dispatch_async(dispatch_get_main_queue(), ^{ \
         [UIView performWithoutAnimation:^{ \
-            [[[ViewController sharedController] jailbreakProgressView] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
+            [[[JailbreakViewController sharedController] jailbreakProgressView] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
         }]; \
     if (stage == maxStage)  {\
         UIApplication *app = [UIApplication sharedApplication];\

@@ -167,7 +167,7 @@ BOOL showSwipeUpGesture = NO;
     if (prefs->hide_log_window) {
         _outputView.hidden = YES;
         _outputView = nil;
-        _goButtonSpacing.constant += 80;
+
         _goButton.hidden = YES;
         showSwipeUpGesture = YES;
     }
