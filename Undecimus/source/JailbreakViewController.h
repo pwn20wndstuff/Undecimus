@@ -81,6 +81,7 @@ while (false)
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *initialErrorViewLabelTopConstraint;
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *initialErrorViewButtonBottomConstraint;
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *swipeUpLabelBottomConstraint;
+@property (weak,nonatomic) IBOutlet NSLayoutConstraint *undecimusLogoCentreConstraint;
 
 
 @property (assign) BOOL canExit;

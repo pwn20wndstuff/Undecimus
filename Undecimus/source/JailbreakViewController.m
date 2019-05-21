@@ -144,8 +144,7 @@ BOOL showSwipeUpGesture = NO;
     _canExit = YES;
     
     
-    swipeUpTimer = [NSTimer scheduledTimerWithTimeInterval:1.6 target:self selector:@selector(swipeUpAnimation:) userInfo:nil
-                                                   repeats:YES];
+
     self.creditsTransitionView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.25, 0.25);
     self.settingsTransitionView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.25, 0.25);
     self.settingsButtonView.layer.cornerRadius = 30;
@@ -154,6 +153,8 @@ BOOL showSwipeUpGesture = NO;
     self.jailbreakView.alpha = 0;
     self.creditsButtonView.layer.cornerRadius = 30;
     self.creditsButtonView.clipsToBounds = YES;
+    self.outputView.layer.cornerRadius = 10;
+    self.outputView.clipsToBounds = YES;
     
     [self.settingsNavBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
     [self.settingsNavBar setShadowImage:[UIImage new]];
@@ -167,10 +168,14 @@ BOOL showSwipeUpGesture = NO;
     if (prefs->hide_log_window) {
         _outputView.hidden = YES;
         _outputView = nil;
-
         _goButton.hidden = YES;
+        _swipeUpLabel.alpha = 1;
         showSwipeUpGesture = YES;
+        swipeUpTimer = [NSTimer scheduledTimerWithTimeInterval:1.6 target:self selector:@selector(swipeUpAnimation:) userInfo:nil repeats:YES];
+        _undecimusLogoCentreConstraint.constant = -70;
     }
+
+
     release_prefs(&prefs);
     sharedController = self;
     bundledResources = bundledResourcesVersion();
