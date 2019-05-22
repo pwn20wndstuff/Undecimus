@@ -115,6 +115,7 @@ void jailbreak()
     UIProgressHUD *hud = addProgressHUD();
     JailbreakViewController *sharedController = [JailbreakViewController sharedController];
     NSMutableArray *resources = [NSMutableArray new];
+    NSFileManager *const fileManager = [NSFileManager defaultManager];
 #define insertstatus(x) do { [status appendString:x]; } while (false)
 #define progress(x) do { LOG("Progress: %@", x); updateProgressHUD(hud, x); } while (false)
 #define sync_prefs() do { _assert(set_prefs(prefs), localize(@"Unable to synchronize app preferences. Please restart the app and try again."), true); } while (false)
@@ -948,7 +949,6 @@ void jailbreak()
                 }
             }
         }
-        NSFileManager *const fileManager = [NSFileManager defaultManager];
         NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtURL:[NSURL URLWithString:@"/jb"] includingPropertiesForKeys:@[NSURLIsDirectoryKey] options:0 errorHandler:nil];
         _assert(directoryEnumerator != nil, localize(@"Unable to create directory enumerator."), true);
         for (id URL in directoryEnumerator) {
@@ -1155,7 +1155,7 @@ void jailbreak()
                 _assert(clean_file("/var/lib/dpkg"), localize(@"Unable to clean old dpkg database."), true);
             } else {
                 LOG(@"Moving /var/lib/dpkg to /Library/dpkg...");
-                _assert([[NSFileManager defaultManager] moveItemAtPath:@"/var/lib/dpkg" toPath:@"/Library/dpkg" error:nil], localize(@"Unable to restore dpkg database."), true);
+                _assert([fileManager moveItemAtPath:@"/var/lib/dpkg" toPath:@"/Library/dpkg" error:nil], localize(@"Unable to restore dpkg database."), true);
             }
         }
         
@@ -1204,7 +1204,7 @@ void jailbreak()
             access("/usr/lib/substrate", F_OK) == ERR_SUCCESS &&
             is_symlink("/usr/lib/substrate")) {
             _assert(clean_file("/usr/lib/substrate"), localize(@"Unable to clean old substrate directory."), true);
-            _assert([[NSFileManager defaultManager] moveItemAtPath:@"/Library/substrate" toPath:@"/usr/lib/substrate" error:nil], localize(@"Unable to move substrate directory."), true);
+            _assert([fileManager moveItemAtPath:@"/Library/substrate" toPath:@"/usr/lib/substrate" error:nil], localize(@"Unable to move substrate directory."), true);
         }
         _assert(runCommand("/usr/libexec/substrate", NULL) == ERR_SUCCESS, localize(skipSubstrate?@"Unable to restart Substrate.":@"Unable to start Substrate."), skipSubstrate?false:true);
         LOG("Successfully started Substrate.");
