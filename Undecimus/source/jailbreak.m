@@ -114,6 +114,7 @@ void jailbreak()
     time_t const start_time = time(NULL);
     UIProgressHUD *hud = addProgressHUD();
     JailbreakViewController *sharedController = [JailbreakViewController sharedController];
+    NSMutableArray *resources = [NSMutableArray new];
 #define insertstatus(x) do { [status appendString:x]; } while (false)
 #define progress(x) do { LOG("Progress: %@", x); updateProgressHUD(hud, x); } while (false)
 #define sync_prefs() do { _assert(set_prefs(prefs), localize(@"Unable to synchronize app preferences. Please restart the app and try again."), true); } while (false)
@@ -1122,12 +1123,12 @@ void jailbreak()
         // Inject trust cache
         
         progress(localize(@"Injecting trust cache..."));
-        NSArray *resources = [NSArray arrayWithContentsOfFile:@"/usr/share/jailbreak/injectme.plist"];
+        [resources addObjectsFromArray:[NSArray arrayWithContentsOfFile:@"/usr/share/jailbreak/injectme.plist"]];
         // If substrate is already running but was broken, skip injecting again
         if (!skipSubstrate) {
-            resources = [@[@"/usr/libexec/substrate"] arrayByAddingObjectsFromArray:resources];
+            [resources addObject:@"/usr/libexec/substrate"];
         }
-        resources = [@[@"/usr/libexec/substrated"] arrayByAddingObjectsFromArray:resources];
+        [resources addObject:@"/usr/libexec/substrated"];
         for (id file in resources) {
             if (![toInjectToTrustCache containsObject:file]) {
                 [toInjectToTrustCache addObject:file];
@@ -1353,6 +1354,10 @@ void jailbreak()
         rv = system("dpkg --configure -a");
         _assert(WEXITSTATUS(rv) == ERR_SUCCESS, localize(@"Unable to configure installed packages."), false);
         _assert(aptUpgrade(), localize(@"Unable to upgrade apt packages."), false);
+        
+        // Make sure resources are injected to trust cache
+        [toInjectToTrustCache addObjectsFromArray:resources];
+        inject_trust_cache();
         
         clean_file("/jb/tar");
         clean_file("/jb/lzma");
