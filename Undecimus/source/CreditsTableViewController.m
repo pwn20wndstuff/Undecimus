@@ -118,10 +118,6 @@
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"saurik"] options:@{} completionHandler:nil];
 }
 
--(IBAction)tappedOnUndecimusResources:(id)sender{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus-Resources"] options:@{} completionHandler:nil];
-}
-
 -(IBAction)tappedOnTihmstar:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"tihmstar"] options:@{} completionHandler:nil];
 }
@@ -168,10 +164,6 @@
 
 -(IBAction)tappedOnLibimobiledevice:(id)sender{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/libimobiledevice"] options:@{} completionHandler:nil];
-}
-
--(IBAction)tappedOnCoolStar:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"coolstarorg"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnBen:(id)sender{
