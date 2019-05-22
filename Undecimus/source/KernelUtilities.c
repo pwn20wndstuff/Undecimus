@@ -99,7 +99,7 @@ kptr_t cached_task_self_addr = KPTR_NULL;
 kptr_t cached_proc_struct_addr = KPTR_NULL;
 static bool weird_offsets = false;
 
-#define find_port(port, disposition) (have_kmem_read() && found_offsets ? get_address_of_port(getpid(), port) : find_port_address(port, disposition))
+#define find_port(port, disposition) (have_kmem_read() && found_offsets ? get_address_of_port(proc_struct_addr(), port) : find_port_address(port, disposition))
 
 kptr_t task_self_addr()
 {
@@ -260,13 +260,12 @@ out:;
     return cached_proc_struct_addr;
 }
 
-kptr_t get_address_of_port(pid_t pid, mach_port_t port)
+kptr_t get_address_of_port(kptr_t proc, mach_port_t port)
 {
     kptr_t ret = KPTR_NULL;
+    _assert(KERN_POINTER_VALID(proc));
     _assert(MACH_PORT_VALID(port));
-    kptr_t const proc_struct_addr = get_proc_struct_for_pid(pid);
-    _assert(KERN_POINTER_VALID(proc_struct_addr));
-    kptr_t const task_addr = ReadKernel64(proc_struct_addr + koffset(KSTRUCT_OFFSET_PROC_TASK));
+    kptr_t const task_addr = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_TASK));
     _assert(KERN_POINTER_VALID(task_addr));
     kptr_t const itk_space = ReadKernel64(task_addr + koffset(KSTRUCT_OFFSET_TASK_ITK_SPACE));
     _assert(KERN_POINTER_VALID(itk_space));
@@ -378,7 +377,7 @@ out:;
 bool set_host_type(host_t host, uint32_t type) {
     bool ret = false;
     _assert(MACH_PORT_VALID(host));
-    kptr_t const hostport_addr = get_address_of_port(getpid(), host);
+    kptr_t const hostport_addr = get_address_of_port(proc_struct_addr(), host);
     _assert(KERN_POINTER_VALID(hostport_addr));
     _assert(WriteKernel32(hostport_addr, type));
     ret = true;
@@ -1448,7 +1447,7 @@ bool convert_port_to_task_port(mach_port_t port, kptr_t space, kptr_t task_kaddr
     _assert(MACH_PORT_VALID(port));
     _assert(KERN_POINTER_VALID(space));
     _assert(KERN_POINTER_VALID(task_kaddr));
-    kptr_t const port_kaddr = get_address_of_port(getpid(), port);
+    kptr_t const port_kaddr = get_address_of_port(proc_struct_addr(), port);
     _assert(KERN_POINTER_VALID(port_kaddr));
     _assert(WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_BITS), IO_BITS_ACTIVE | IKOT_TASK));
     _assert(WriteKernel32(port_kaddr + koffset(KSTRUCT_OFFSET_IPC_PORT_IO_REFERENCES), 0xf00d));
@@ -1546,12 +1545,11 @@ bool set_hsp4(task_t port) {
     _assert(remapped_task_addr != kernel_task_addr);
     kr = mach_vm_wire(host, km_fake_task_port, remapped_task_addr, sizeof_task, VM_PROT_READ | VM_PROT_WRITE);
     _assert(kr == KERN_SUCCESS);
-    pid_t const pid = getpid();
-    kptr_t const port_addr = get_address_of_port(pid, port);
+    kptr_t const port_addr = get_address_of_port(proc_struct_addr(), port);
     _assert(KERN_POINTER_VALID(port_addr));
     _assert(make_port_fake_task_port(port, remapped_task_addr));
     _assert(ReadKernel64(port_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT)) == remapped_task_addr);
-    kptr_t const host_priv_addr = get_address_of_port(pid, host);
+    kptr_t const host_priv_addr = get_address_of_port(proc_struct_addr(), host);
     _assert(KERN_POINTER_VALID(host_priv_addr));
     kptr_t const realhost_addr = ReadKernel64(host_priv_addr + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
     _assert(KERN_POINTER_VALID(realhost_addr));

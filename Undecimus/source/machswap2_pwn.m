@@ -1538,7 +1538,7 @@ value = value | ((uint64_t)read64_tmp << 32);\
     host = mach_host_self();
     mach_port_t hsp4;
     ret = host_get_special_port(host, HOST_LOCAL_NODE, 4, &hsp4);
-    mach_port_deallocate(mach_host_self(), host);
+    mach_port_deallocate(mach_task_self(), host);
     host = original_host;
     
     /* de-elevate */

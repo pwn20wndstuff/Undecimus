@@ -121,6 +121,14 @@ void jailbreak()
     _assert(create_file(file, 0, 0644), localize(@"Unable to create test file."), true); \
     _assert(clean_file(file), localize(@"Unable to clean test file."), true); \
 } while (false)
+#define inject_trust_cache() do { \
+    if (toInjectToTrustCache.count <= 0) break; \
+    LOG("Injecting %lu files to trust cache", toInjectToTrustCache.count); \
+    _assert(injectTrustCache(toInjectToTrustCache, getoffset(trustcache), pmap_load_trust_cache) == 0, localize(@"Unable to inject trust cache"), true); \
+    LOG("Injected %lu files to trust cache", toInjectToTrustCache.count); \
+    [toInjectToTrustCache removeAllObjects]; \
+    injectedToTrustCache = true; \
+} while(false)
     
     upstage();
     
@@ -852,7 +860,7 @@ void jailbreak()
             _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, localize(@"Unable to verify mounted snapshot."), true);
             _assert(extractDebsForPkg(@"rsync", nil, false), localize(@"Unable to extract rsync."), true);
             _assert(extractDebsForPkg(@"uikittools", nil, false), localize(@"Unable to extract uikittools."), true);
-            _assert(injectTrustCache(@[@"/usr/bin/rsync", @"/usr/bin/uicache", @"/usr/bin/find"], getoffset(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, localize(@"Unable to inject rsync and uicache to trust cache."), true);
+            inject_trust_cache();
             if (kCFCoreFoundationVersionNumber < kCFCoreFoundationVersionNumber_iOS_11_3) {
                 _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "--exclude=/usr/bin/uicache", "--exclude=/usr/bin/find", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, localize(@"Unable to sync /Applications."), true);
             } else {
@@ -933,8 +941,8 @@ void jailbreak()
             for (id file in binpack64.files.allKeys) {
                 NSString *const path = [@"/jb" stringByAppendingPathComponent:file];
                 if (cdhashFor(path) != nil) {
-                    if (![toInject containsObject:path]) {
-                        [toInject addObject:path];
+                    if (![toInjectToTrustCache containsObject:path]) {
+                        [toInjectToTrustCache addObject:path];
                     }
                 }
             }
@@ -945,8 +953,8 @@ void jailbreak()
         for (id URL in directoryEnumerator) {
             NSString *const path = [URL path];
             if (cdhashFor(path) != nil) {
-                if (![toInject containsObject:path]) {
-                    [toInject addObject:path];
+                if (![toInjectToTrustCache containsObject:path]) {
+                    [toInjectToTrustCache addObject:path];
                 }
             }
         }
@@ -960,15 +968,13 @@ void jailbreak()
             for (id URL in directoryEnumerator) {
                 NSString *const path = [URL path];
                 if (cdhashFor(path) != nil) {
-                    if (![toInject containsObject:path]) {
-                        [toInject addObject:path];
+                    if (![toInjectToTrustCache containsObject:path]) {
+                        [toInjectToTrustCache addObject:path];
                     }
                 }
             }
         }
-        if (toInject.count > 0) {
-            _assert(injectTrustCache(toInject, getoffset(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, localize(@"Unable to inject binaries to trust cache."), true);
-        }
+        inject_trust_cache();
         NSString *const binpackMessage = localize(@"Unable to setup binpack.");
         _assert(ensure_symlink("/jb/usr/bin/scp", "/usr/bin/scp"), binpackMessage, true);
         _assert(ensure_directory("/usr/local/lib", 0, 0755), binpackMessage, true);
@@ -1127,9 +1133,7 @@ void jailbreak()
                 [toInjectToTrustCache addObject:file];
             }
         }
-        _assert(injectTrustCache(toInjectToTrustCache, getoffset(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, localize(@"Unable to inject binaries to trust cache."), true);
-        [toInjectToTrustCache removeAllObjects];
-        injectedToTrustCache = true;
+        inject_trust_cache();
         LOG("Successfully injected trust cache.");
         insertstatus(localize(@"Injected trust cache.\n"));
     }
@@ -1216,9 +1220,7 @@ void jailbreak()
         if (!pkgIsConfigured("xz")) {
             removePkg("lzma", true);
             extractDebsForPkg(@"lzma", debsToInstall, false);
-            _assert(injectTrustCache(toInjectToTrustCache, getoffset(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, localize(@"Unable to inject newly extracted lzma to trust cache."), true);
-            [toInjectToTrustCache removeAllObjects];
-            injectedToTrustCache = true;
+            inject_trust_cache();
         }
         
         if (pkgIsInstalled("openssl") && compareInstalledVersion("openssl", "lt", "1.0.2q")) {
@@ -1229,9 +1231,7 @@ void jailbreak()
         if (!pkgIsConfigured("dpkg")) {
             LOG("Extracting dpkg...");
             _assert(extractDebsForPkg(@"dpkg", debsToInstall, false), localize(@"Unable to extract dpkg."), true);
-            _assert(injectTrustCache(toInjectToTrustCache, getoffset(trustcache), pmap_load_trust_cache) == ERR_SUCCESS, localize(@"Unable to inject newly extracted dpkg to trust cache."), true);
-            [toInjectToTrustCache removeAllObjects];
-            injectedToTrustCache = true;
+            inject_trust_cache();
             NSString *const dpkg_deb = debForPkg(@"dpkg");
             _assert(installDeb(dpkg_deb.UTF8String, true), localize(@"Unable to install deb for dpkg."), true);
             [debsToInstall removeObject:dpkg_deb];
@@ -1589,6 +1589,7 @@ void jailbreak()
 out:;
 #undef sync_prefs
 #undef write_test_file
+#undef inject_trust_cache
     progress(localize(@"Deinitializing jailbreak..."));
     LOG("Deinitializing kernel code execution...");
     term_kexec();

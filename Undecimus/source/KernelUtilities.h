@@ -63,7 +63,7 @@ kptr_t get_kernel_proc_struct_addr(void);
 bool iterate_proc_list(void (^handler)(kptr_t, pid_t, bool *));
 kptr_t get_proc_struct_for_pid(pid_t pid);
 kptr_t proc_struct_addr(void);
-kptr_t get_address_of_port(pid_t pid, mach_port_t port);
+kptr_t get_address_of_port(kptr_t proc, mach_port_t port);
 kptr_t get_kernel_cred_addr(void);
 kptr_t give_creds_to_process_at_addr(kptr_t proc, kptr_t cred_addr);
 bool set_platform_binary(kptr_t proc, bool set);
