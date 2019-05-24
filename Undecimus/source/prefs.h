@@ -34,6 +34,7 @@
 #define K_ENABLE_GET_TASK_ALLOW    "DoEnableGetTaskAllow"
 #define K_SET_CS_DEBUGGED          "SetCSDebugged"
 #define K_AUTO_RESPRING            "AutoRespring"
+#define K_HIDE_PROGRESS_HUD        "HideProgressHUD"
 
 typedef struct {
     bool load_tweaks;
@@ -57,6 +58,7 @@ typedef struct {
     bool set_cs_debugged;
     bool hide_log_window;
     bool auto_respring;
+    bool hide_progress_hud;
     int exploit;
 } prefs_t;
 

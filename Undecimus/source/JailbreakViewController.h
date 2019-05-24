@@ -75,6 +75,9 @@ static inline UIProgressHUD *addProgressHUD() {
 }
 
 static inline void removeProgressHUD(UIProgressHUD *hud) {
+    if (hud == nil) {
+        return;
+    }
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
         [hud hide];
@@ -85,6 +88,9 @@ static inline void removeProgressHUD(UIProgressHUD *hud) {
 }
 
 static inline void updateProgressHUD(UIProgressHUD *hud, NSString *msg) {
+    if (hud == nil) {
+        return;
+    }
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
         [hud setText:msg];

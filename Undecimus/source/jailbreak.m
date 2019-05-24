@@ -113,7 +113,7 @@ void jailbreak()
     NSMutableString *status = [NSMutableString new];
     bool const betaFirmware = isBetaFirmware();
     time_t const start_time = time(NULL);
-    UIProgressHUD *hud = addProgressHUD();
+    UIProgressHUD *hud = prefs->hide_progress_hud ? nil : addProgressHUD();
     JailbreakViewController *sharedController = [JailbreakViewController sharedController];
     NSMutableArray *resources = [NSMutableArray new];
     NSFileManager *const fileManager = [NSFileManager defaultManager];
