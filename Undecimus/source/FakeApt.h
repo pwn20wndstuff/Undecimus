@@ -14,7 +14,7 @@ NSDictionary *parseDependsOrProvides(NSString *string);
 BOOL compareDpkgVersion(NSString *version1, NSString *op, NSString *version2, BOOL *result);
 NSString *versionOfPkg(NSString *pkg);
 NSArray *resolveDepsForPkg(NSString * _Nonnull pkg, BOOL noPreDeps);
-BOOL extractDebsForPkg(NSString *pkg, NSMutableArray *installed, BOOL preDeps);
+BOOL extractDebsForPkg(NSString *pkg, NSMutableArray *installed, BOOL preDeps, bool doInject);
 NSDictionary *getPkgs(void);
 NSString *debForPkg(NSString *pkg);
 NSArray <NSString*> *debsForPkgs(NSArray <NSString*> *pkgs);

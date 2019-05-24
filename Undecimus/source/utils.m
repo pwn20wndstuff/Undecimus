@@ -234,7 +234,7 @@ bool runDpkg(NSArray <NSString*> *args, bool forceDeps, bool forceAll) {
     return !WEXITSTATUS(rv);
 }
 
-bool extractDeb(NSString *debPath) {
+bool extractDeb(NSString *debPath, bool doInject) {
     if (![debPath hasSuffix:@".deb"]) {
         LOG(@"%@: not a deb", debPath);
         return NO;
@@ -262,7 +262,7 @@ bool extractDeb(NSString *debPath) {
         [deb extractFileNum:3 toFd:pipe.fileHandleForWriting.fileDescriptor];
     });
     bool result = [tar extractToPath:@"/"];
-    if ((kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0) && result) {
+    if (doInject && result) {
         chdir("/");
         NSMutableArray *toInject = [NSMutableArray new];
         NSDictionary *files = tar.files;
@@ -287,13 +287,13 @@ bool extractDeb(NSString *debPath) {
     return result;
 }
 
-bool extractDebs(NSArray <NSString *> *debPaths) {
+bool extractDebs(NSArray <NSString *> *debPaths, bool doInject) {
     if ([debPaths count] < 1) {
         LOG("%s: Nothing to install", __FUNCTION__);
         return false;
     }
     for (NSString *debPath in debPaths) {
-        if (!extractDeb(debPath))
+        if (!extractDeb(debPath, doInject))
             return NO;
     }
     return YES;

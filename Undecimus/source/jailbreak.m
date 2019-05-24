@@ -116,6 +116,7 @@ void jailbreak()
     JailbreakViewController *sharedController = [JailbreakViewController sharedController];
     NSMutableArray *resources = [NSMutableArray new];
     NSFileManager *const fileManager = [NSFileManager defaultManager];
+    bool const doInject = (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0);
 #define insertstatus(x) do { [status appendString:x]; } while (false)
 #define progress(x) do { LOG("Progress: %@", x); updateProgressHUD(hud, x); } while (false)
 #define sync_prefs() do { _assert(set_prefs(prefs), localize(@"Unable to synchronize app preferences. Please restart the app and try again."), true); } while (false)
@@ -860,8 +861,8 @@ void jailbreak()
             _assert(fs_snapshot_mount(rootfd, systemSnapshotMountPoint, snapshot, 0) == ERR_SUCCESS, localize(@"Unable to mount original snapshot."), true);
             const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
             _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, localize(@"Unable to verify mounted snapshot."), true);
-            _assert(extractDebsForPkg(@"rsync", nil, false), localize(@"Unable to extract rsync."), true);
-            _assert(extractDebsForPkg(@"uikittools", nil, false), localize(@"Unable to extract uikittools."), true);
+            _assert(extractDebsForPkg(@"rsync", nil, false, true), localize(@"Unable to extract rsync."), true);
+            _assert(extractDebsForPkg(@"uikittools", nil, false, true), localize(@"Unable to extract uikittools."), true);
             inject_trust_cache();
             if (kCFCoreFoundationVersionNumber < kCFCoreFoundationVersionNumber_iOS_11_3) {
                 _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "--exclude=/usr/bin/uicache", "--exclude=/usr/bin/find", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, localize(@"Unable to sync /Applications."), true);
@@ -1057,7 +1058,7 @@ void jailbreak()
             NSString *const substrateDeb = debForPkg(@"mobilesubstrate");
             _assert(substrateDeb != nil, localize(@"Unable to get deb for Substrate."), true);
             if (pidOfProcess("/usr/libexec/substrated") == 0) {
-                _assert(extractDeb(substrateDeb), localize(@"Unable to extract Substrate."), true);
+                _assert(extractDeb(substrateDeb, doInject), localize(@"Unable to extract Substrate."), true);
             } else {
                 skipSubstrate = YES;
                 LOG("Substrate is running, not extracting again for now.");
@@ -1096,7 +1097,7 @@ void jailbreak()
             LOG(@"(Re-)Extracting \"%@\".", pkgsToRepair);
             NSArray <NSString *> *const debsToRepair = debsForPkgs(pkgsToRepair);
             _assert(debsToRepair.count == pkgsToRepair.count, localize(@"Unable to get debs for packages to repair."), true);
-            _assert(extractDebs(debsToRepair), localize(@"Unable to repair packages."), true);
+            _assert(extractDebs(debsToRepair, doInject), localize(@"Unable to repair packages."), true);
             [debsToInstall addObjectsFromArray:debsToRepair];
         }
         
@@ -1220,7 +1221,7 @@ void jailbreak()
         
         if (!pkgIsConfigured("xz")) {
             removePkg("lzma", true);
-            extractDebsForPkg(@"lzma", debsToInstall, false);
+            extractDebsForPkg(@"lzma", debsToInstall, false, doInject);
             inject_trust_cache();
         }
         
@@ -1231,7 +1232,7 @@ void jailbreak()
         // Test dpkg
         if (!pkgIsConfigured("dpkg")) {
             LOG("Extracting dpkg...");
-            _assert(extractDebsForPkg(@"dpkg", debsToInstall, false), localize(@"Unable to extract dpkg."), true);
+            _assert(extractDebsForPkg(@"dpkg", debsToInstall, false, doInject), localize(@"Unable to extract dpkg."), true);
             inject_trust_cache();
             NSString *const dpkg_deb = debForPkg(@"dpkg");
             _assert(installDeb(dpkg_deb.UTF8String, true), localize(@"Unable to install deb for dpkg."), true);
