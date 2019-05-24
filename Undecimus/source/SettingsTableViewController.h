@@ -39,6 +39,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *SSHOnlySwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *EnableGetTaskAllowSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *SetCSDebuggedSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *AutoRespringSwitch;
 
 + (NSDictionary *)provisioningProfileAtPath:(NSString *)path;
 

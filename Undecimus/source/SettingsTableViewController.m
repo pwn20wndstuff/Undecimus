@@ -104,6 +104,7 @@
     [self.SSHOnlySwitch setOn:(BOOL)prefs->ssh_only];
     [self.EnableGetTaskAllowSwitch setOn:(BOOL)prefs->enable_get_task_allow];
     [self.SetCSDebuggedSwitch setOn:(BOOL)prefs->set_cs_debugged];
+    [self.AutoRespringSwitch setOn:(BOOL)prefs->auto_respring];
     [self.RestartSpringBoardButton setEnabled:respringSupported()];
     [self.restartButton setEnabled:restartSupported()];
     release_prefs(&prefs);
@@ -398,6 +399,14 @@
 - (IBAction)setCSDebugged:(id)sender {
     prefs_t *prefs = copy_prefs();
     prefs->set_cs_debugged = (bool)self.SetCSDebuggedSwitch.isOn;
+    set_prefs(prefs);
+    release_prefs(&prefs);
+    [self reloadData];
+}
+
+- (IBAction)setAutoRespring:(id)sender {
+    prefs_t *prefs = copy_prefs();
+    prefs->auto_respring = (bool)self.AutoRespringSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
