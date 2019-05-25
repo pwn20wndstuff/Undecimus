@@ -777,6 +777,52 @@ out:;
     return ret;
 }
 
+int vnode_getfromfd(kptr_t ctx, int fd, kptr_t *vpp) {
+    int ret = -1;
+    size_t vpp_kptr_size = 0;
+    kptr_t vpp_kptr = KPTR_NULL;
+    _assert(KERN_POINTER_VALID(ctx));
+    _assert(fd > 0);
+    _assert(vpp != NULL);
+    kptr_t const function = getoffset(vnode_getfromfd);
+    _assert(KERN_POINTER_VALID(function));
+    vpp_kptr_size = sizeof(kptr_t);
+    vpp_kptr = smalloc(vpp_kptr_size);
+    _assert(KERN_POINTER_VALID(vpp_kptr));
+    ret = (int)kexec(function, ctx, (kptr_t)fd, vpp_kptr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    _assert(rkbuffer(vpp_kptr, vpp, vpp_kptr_size));
+out:;
+    SafeSFreeNULL(vpp_kptr);
+    return ret;
+}
+
+int vn_getpath(kptr_t vp, char *pathbuf, int *len) {
+    int ret = -1;
+    size_t pathbuf_kptr_size = 0;
+    kptr_t pathbuf_kptr = KPTR_NULL;
+    size_t len_kptr_size = 0;
+    kptr_t len_kptr = KPTR_NULL;
+    _assert(KERN_POINTER_VALID(vp));
+    _assert(pathbuf != NULL);
+    _assert(len != NULL);
+    kptr_t const function = getoffset(vn_getpath);
+    _assert(KERN_POINTER_VALID(function));
+    pathbuf_kptr_size = *len;
+    pathbuf_kptr = smalloc(pathbuf_kptr_size);
+    _assert(KERN_POINTER_VALID(pathbuf_kptr));
+    len_kptr_size = sizeof(*len);
+    len_kptr = smalloc(len_kptr_size);
+    _assert(KERN_POINTER_VALID(len_kptr));
+    _assert(wkbuffer(len_kptr, len, len_kptr_size));
+    ret = (int)kexec(function, vp, pathbuf_kptr, len_kptr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    _assert(rkbuffer(pathbuf_kptr, pathbuf, pathbuf_kptr_size));
+    _assert(rkbuffer(len_kptr, len, len_kptr_size));
+out:;
+    SafeSFreeNULL(pathbuf_kptr);
+    SafeSFreeNULL(len_kptr);
+    return ret;
+}
+
 int vnode_put(kptr_t vp) {
     int ret = -1;
     _assert(KERN_POINTER_VALID(vp));
@@ -1576,6 +1622,47 @@ kptr_t get_vnode_for_path(const char *path) {
     ret = vnode;
 out:;
     SafeFreeNULL(vpp);
+    return ret;
+}
+
+kptr_t get_vnode_for_fd(int fd) {
+    kptr_t ret = KPTR_NULL;
+    kptr_t *vpp = NULL;
+    _assert(fd > 0);
+    kptr_t const vfs_context = vfs_context_current();
+    _assert(KERN_POINTER_VALID(vfs_context));
+    vpp = malloc(sizeof(kptr_t));
+    _assert(vpp != NULL);
+    bzero(vpp, sizeof(kptr_t));
+    _assert(vnode_getfromfd(vfs_context, fd, vpp) == 0);
+    kptr_t const vnode = *vpp;
+    _assert(KERN_POINTER_VALID(vnode));
+    ret = vnode;
+out:;
+    SafeFreeNULL(vpp);
+    return ret;
+}
+
+char *get_path_for_fd(int fd) {
+    char *ret = NULL;
+    kptr_t vnode = KPTR_NULL;
+    int *len = NULL;
+    char *pathbuf = NULL;
+    _assert(fd > 0);
+    vnode = get_vnode_for_fd(fd);
+    _assert(KERN_POINTER_VALID(vnode));
+    len = malloc(sizeof(int));
+    _assert(len != NULL);
+    *len = MAXPATHLEN;
+    pathbuf = malloc(*len);
+    _assert(pathbuf != NULL);
+    _assert(vn_getpath(vnode, pathbuf, len) == 0);
+    _assert(strlen(pathbuf) + 1 == *len);
+    ret = strdup(pathbuf);
+out:;
+    if (KERN_POINTER_VALID(vnode)) vnode_put(vnode); vnode = KPTR_NULL;
+    SafeFreeNULL(pathbuf);
+    SafeFreeNULL(len);
     return ret;
 }
 

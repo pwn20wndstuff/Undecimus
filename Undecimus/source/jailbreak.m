@@ -353,6 +353,8 @@ void jailbreak()
         find_offset(strlen, NULL, true);
         find_offset(issue_extension_for_mach_service, NULL, true);
         find_offset(issue_extension_for_absolute_path, NULL, true);
+        find_offset(vnode_getfromfd, NULL, true);
+        find_offset(vn_getpath, NULL, true);
         found_offsets = true;
         LOG("Successfully found offsets.");
         
