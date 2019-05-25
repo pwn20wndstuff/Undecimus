@@ -119,6 +119,10 @@ void jailbreak()
     NSFileManager *const fileManager = [NSFileManager defaultManager];
     bool const doInject = (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0);
     const char *success_file = [temporaryDirectory stringByAppendingPathComponent:@"jailbreak.completed"].UTF8String;
+    NSString *const NSJailbreakDirectory = @"/jb";
+    const char *jailbreakDirectory = NSJailbreakDirectory.UTF8String;
+#define NSJailbreakFile(x) ([NSJailbreakDirectory stringByAppendingPathComponent:x])
+#define jailbreak_file(x) (NSJailbreakFile(@(x)).UTF8String)
     _assert(clean_file(success_file), localize(@"Unable to clean success file."), true);
 #define insertstatus(x) do { [status appendString:x]; } while (false)
 #define progress(x) do { LOG("Progress: %@", x); updateProgressHUD(hud, x); } while (false)
@@ -762,8 +766,8 @@ void jailbreak()
         // Create jailbreak directory.
         
         progress(localize(@"Creating jailbreak directory..."));
-        _assert(ensure_directory("/jb", 0, 0755), localize(@"Unable to create jailbreak directory."), true);
-        _assert(chdir("/jb") == ERR_SUCCESS, localize(@"Unable to change working directory to jailbreak directory."), true);
+        _assert(ensure_directory(jailbreakDirectory, 0, 0755), localize(@"Unable to create jailbreak directory."), true);
+        _assert(chdir(jailbreakDirectory) == ERR_SUCCESS, localize(@"Unable to change working directory to jailbreak directory."), true);
         LOG("Successfully created jailbreak directory.");
         insertstatus(localize(@"Created jailbreak directory.\n"));
     }
@@ -771,7 +775,7 @@ void jailbreak()
     upstage();
     
     {
-        NSString *const offsetsFile = @"/jb/offsets.plist";
+        NSString *const offsetsFile = NSJailbreakFile(@"offsets.plist");
         NSMutableDictionary *dictionary = [NSMutableDictionary new];
 #define cache_address(value, name) do { \
     dictionary[@(name)] = ADDRSTRING(value); \
@@ -868,9 +872,9 @@ void jailbreak()
             _assert(extractDebsForPkg(@"uikittools", nil, false, true), localize(@"Unable to extract uikittools."), true);
             inject_trust_cache();
             if (kCFCoreFoundationVersionNumber < kCFCoreFoundationVersionNumber_iOS_11_3) {
-                _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "--exclude=/usr/bin/uicache", "--exclude=/usr/bin/find", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, localize(@"Unable to sync /Applications."), true);
+                _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete-after", "--exclude=/Developer", "--exclude=/usr/bin/uicache", "--exclude=/usr/bin/find", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"."].UTF8String, "/", NULL) == 0, localize(@"Unable to sync /."), true);
             } else {
-                _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"Applications/."].UTF8String, "/Applications", NULL) == 0, localize(@"Unable to sync /."), true);
+                _assert(runCommand("/usr/bin/rsync", "-vaxcH", "--progress", "--delete", [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"Applications/."].UTF8String, "/Applications", NULL) == 0, localize(@"Unable to sync /Applications."), true);
             }
             _assert(unmount(systemSnapshotMountPoint, MNT_FORCE) == ERR_SUCCESS, localize(@"Unable to unmount original snapshot mount point."), true);
             close(rootfd);
@@ -943,9 +947,9 @@ void jailbreak()
         if (!verifySums(pathForResource(@"binpack64-256.md5sums"), HASHTYPE_MD5)) {
             ArchiveFile *const binpack64 = [ArchiveFile archiveWithFile:pathForResource(@"binpack64-256.tar.lzma")];
             _assert(binpack64 != nil, localize(@"Unable to open binpack."), true);
-            _assert([binpack64 extractToPath:@"/jb"], localize(@"Unable to extract binpack."), true);
+            _assert([binpack64 extractToPath:NSJailbreakDirectory], localize(@"Unable to extract binpack."), true);
             for (id file in binpack64.files.allKeys) {
-                NSString *const path = [@"/jb" stringByAppendingPathComponent:file];
+                NSString *const path = [NSJailbreakDirectory stringByAppendingPathComponent:file];
                 if (cdhashFor(path) != nil) {
                     if (![toInjectToTrustCache containsObject:path]) {
                         [toInjectToTrustCache addObject:path];
@@ -953,7 +957,7 @@ void jailbreak()
                 }
             }
         }
-        NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtURL:[NSURL URLWithString:@"/jb"] includingPropertiesForKeys:@[NSURLIsDirectoryKey] options:0 errorHandler:nil];
+        NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtURL:[NSURL URLWithString:NSJailbreakDirectory] includingPropertiesForKeys:@[NSURLIsDirectoryKey] options:0 errorHandler:nil];
         _assert(directoryEnumerator != nil, localize(@"Unable to create directory enumerator."), true);
         for (id URL in directoryEnumerator) {
             NSString *const path = [URL path];
@@ -981,24 +985,24 @@ void jailbreak()
         }
         inject_trust_cache();
         NSString *const binpackMessage = localize(@"Unable to setup binpack.");
-        _assert(ensure_symlink("/jb/usr/bin/scp", "/usr/bin/scp"), binpackMessage, true);
+        _assert(ensure_symlink(jailbreak_file("usr/bin/scp"), "/usr/bin/scp"), binpackMessage, true);
         _assert(ensure_directory("/usr/local/lib", 0, 0755), binpackMessage, true);
         _assert(ensure_directory("/usr/local/lib/zsh", 0, 0755), binpackMessage, true);
         _assert(ensure_directory("/usr/local/lib/zsh/5.0.8", 0, 0755), binpackMessage, true);
-        _assert(ensure_symlink("/jb/usr/local/lib/zsh/5.0.8/zsh", "/usr/local/lib/zsh/5.0.8/zsh"), binpackMessage, true);
-        _assert(ensure_symlink("/jb/bin/zsh", "/bin/zsh"), binpackMessage, true);
-        _assert(ensure_symlink("/jb/etc/zshrc", "/etc/zshrc"), binpackMessage, true);
-        _assert(ensure_symlink("/jb/usr/share/terminfo", "/usr/share/terminfo"), binpackMessage, true);
-        _assert(ensure_symlink("/jb/usr/local/bin", "/usr/local/bin"), binpackMessage, true);
-        _assert(ensure_symlink("/jb/etc/profile", "/etc/profile"), binpackMessage, true);
+        _assert(ensure_symlink("/usr/local/lib/zsh/5.0.8/zsh", "/usr/local/lib/zsh/5.0.8/zsh"), binpackMessage, true);
+        _assert(ensure_symlink(jailbreak_file("bin/zsh"), "/bin/zsh"), binpackMessage, true);
+        _assert(ensure_symlink(jailbreak_file("etc/zshrc"), "/etc/zshrc"), binpackMessage, true);
+        _assert(ensure_symlink(jailbreak_file("usr/share/terminfo"), "/usr/share/terminfo"), binpackMessage, true);
+        _assert(ensure_symlink(jailbreak_file("usr/local/bin"), "/usr/local/bin"), binpackMessage, true);
+        _assert(ensure_symlink(jailbreak_file("etc/profile"), "/etc/profile"), binpackMessage, true);
         _assert(ensure_directory("/etc/dropbear", 0, 0755), binpackMessage, true);
-        _assert(ensure_directory("/jb/Library", 0, 0755), binpackMessage, true);
-        _assert(ensure_directory("/jb/Library/LaunchDaemons", 0, 0755), binpackMessage, true);
-        _assert(ensure_directory("/jb/etc/rc.d", 0, 0755), binpackMessage, true);
-        if (access("/jb/Library/LaunchDaemons/dropbear.plist", F_OK) != ERR_SUCCESS) {
+        _assert(ensure_directory(jailbreak_file("Library"), 0, 0755), binpackMessage, true);
+        _assert(ensure_directory(jailbreak_file("Library/LaunchDaemons"), 0, 0755), binpackMessage, true);
+        _assert(ensure_directory(jailbreak_file("etc/rc.d"), 0, 0755), binpackMessage, true);
+        if (access(jailbreak_file("Library/LaunchDaemons/dropbear.plist"), F_OK) != ERR_SUCCESS) {
             NSMutableDictionary *dropbear_plist = [NSMutableDictionary new];
             _assert(dropbear_plist, localize(@"Unable to allocate memory for dropbear plist."), true);
-            dropbear_plist[@"Program"] = @"/jb/usr/local/bin/dropbear";
+            dropbear_plist[@"Program"] = NSJailbreakFile(@"usr/local/bin/dropbear");
             dropbear_plist[@"RunAtLoad"] = @YES;
             dropbear_plist[@"Label"] = @"ShaiHulud";
             dropbear_plist[@"KeepAlive"] = @YES;
@@ -1007,28 +1011,28 @@ void jailbreak()
             dropbear_plist[@"ProgramArguments"][1] = @"-F";
             dropbear_plist[@"ProgramArguments"][2] = @"-R";
             dropbear_plist[@"ProgramArguments"][3] = @"--shell";
-            dropbear_plist[@"ProgramArguments"][4] = @"/jb/bin/bash";
+            dropbear_plist[@"ProgramArguments"][4] = NSJailbreakFile(@"bin/bash");
             dropbear_plist[@"ProgramArguments"][5] = @"-p";
             dropbear_plist[@"ProgramArguments"][6] = @"22";
-            _assert([dropbear_plist writeToFile:@"/jb/Library/LaunchDaemons/dropbear.plist" atomically:YES], localize(@"Unable to create dropbear launch daemon."), true);
-            _assert(init_file("/jb/Library/LaunchDaemons/dropbear.plist", 0, 0644), localize(@"Unable to initialize dropbear launch daemon."), true);
+            _assert([dropbear_plist writeToFile:NSJailbreakFile(@"Library/LaunchDaemons/dropbear.plist") atomically:YES], localize(@"Unable to create dropbear launch daemon."), true);
+            _assert(init_file(jailbreak_file("Library/LaunchDaemons/dropbear.plist"), 0, 0644), localize(@"Unable to initialize dropbear launch daemon."), true);
         }
         if (prefs->load_daemons) {
-            for (id file in [fileManager contentsOfDirectoryAtPath:@"/jb/Library/LaunchDaemons" error:nil]) {
-                NSString *const path = [@"/jb/Library/LaunchDaemons" stringByAppendingPathComponent:file];
-                runCommand("/jb/bin/launchctl", "load", path.UTF8String, NULL);
+            for (id file in [fileManager contentsOfDirectoryAtPath:NSJailbreakFile(@"Library/LaunchDaemons") error:nil]) {
+                NSString *const path = [NSJailbreakFile(@"Library/LaunchDaemons") stringByAppendingPathComponent:file];
+                runCommand(jailbreak_file("bin/launchctl"), "load", path.UTF8String, NULL);
             }
-            for (id file in [fileManager contentsOfDirectoryAtPath:@"/jb/etc/rc.d" error:nil]) {
-                NSString *const path = [@"/jb/etc/rc.d" stringByAppendingPathComponent:file];
+            for (id file in [fileManager contentsOfDirectoryAtPath:NSJailbreakFile(@"etc/rc.d") error:nil]) {
+                NSString *const path = [NSJailbreakFile(@"etc/rc.d") stringByAppendingPathComponent:file];
                 if ([fileManager isExecutableFileAtPath:path]) {
-                    runCommand("/jb/bin/bash", "-c", path.UTF8String, NULL);
+                    runCommand(jailbreak_file("bin/bash"), "-c", path.UTF8String, NULL);
                 }
             }
         }
         if (prefs->run_uicache) {
-            _assert(runCommand("/jb/usr/bin/uicache", NULL) == ERR_SUCCESS, localize(@"Unable to refresh icon cache."), true);
+            _assert(runCommand(jailbreak_file("usr/bin/uicache"), NULL) == ERR_SUCCESS, localize(@"Unable to refresh icon cache."), true);
         }
-        _assert(runCommand("/jb/bin/launchctl", "stop", "com.apple.cfprefsd.xpc.daemon", NULL) == ERR_SUCCESS, localize(@"Unable to flush preference cache."), true);
+        _assert(runCommand(jailbreak_file("bin/launchctl"), "stop", "com.apple.cfprefsd.xpc.daemon", NULL) == ERR_SUCCESS, localize(@"Unable to flush preference cache."), true);
         LOG("Successfully enabled SSH.");
         insertstatus(localize(@"Enabled SSH.\n"));
     }
@@ -1113,9 +1117,9 @@ void jailbreak()
         
         // These don't need to lay around
         clean_file("/Library/LaunchDaemons/jailbreakd.plist");
-        clean_file("/jb/jailbreakd.plist");
-        clean_file("/jb/amfid_payload.dylib");
-        clean_file("/jb/libjailbreak.dylib");
+        clean_file(jailbreak_file("jailbreakd.plist"));
+        clean_file(jailbreak_file("amfid_payload.dylib"));
+        clean_file(jailbreak_file("libjailbreak.dylib"));
         
         LOG("Successfully copied over resources to RootFS.");
         insertstatus(localize(@"Copied over resources to RootFS.\n"));
@@ -1363,9 +1367,9 @@ void jailbreak()
         [toInjectToTrustCache addObjectsFromArray:resources];
         inject_trust_cache();
         
-        clean_file("/jb/tar");
-        clean_file("/jb/lzma");
-        clean_file("/jb/substrate.tar.lzma");
+        clean_file(jailbreak_file("tar"));
+        clean_file(jailbreak_file("lzma"));
+        clean_file(jailbreak_file("substrate.tar.lzma"));
         clean_file("/electra");
         clean_file("/chimera");
         clean_file("/.bootstrapped_electra");
