@@ -36,6 +36,7 @@
 #import <patchfinder64.h>
 #import <offsetcache.h>
 #import <kerneldec.h>
+#include <pwd.h>
 #import "JailbreakViewController.h"
 #include "KernelOffsets.h"
 #include "empty_list_sploit.h"
@@ -94,8 +95,8 @@ void jailbreak()
 {
     int rv = 0;
     bool usedPersistedKernelTaskPort = NO;
-    pid_t const myPid = getpid();
-    uid_t const myUid = getuid();
+    pid_t const my_pid = getpid();
+    uid_t const my_uid = getuid();
     host_t myHost = HOST_NULL;
     host_t myOriginalHost = HOST_NULL;
     kptr_t myProcAddr = KPTR_NULL;
@@ -121,6 +122,9 @@ void jailbreak()
     const char *success_file = [temporaryDirectory stringByAppendingPathComponent:@"jailbreak.completed"].UTF8String;
     NSString *const NSJailbreakDirectory = @"/jb";
     const char *jailbreakDirectory = NSJailbreakDirectory.UTF8String;
+    struct passwd *const root_pw = getpwnam("root");
+    struct passwd *const mobile_pw = getpwnam("mobile");
+    _assert(my_uid == mobile_pw->pw_uid, localize(@"Unable to verify my user id."), true);
 #define NSJailbreakFile(x) ([NSJailbreakDirectory stringByAppendingPathComponent:x])
 #define jailbreak_file(x) (NSJailbreakFile(@(x)).UTF8String)
     _assert(clean_file(success_file), localize(@"Unable to clean success file."), true);
@@ -128,7 +132,7 @@ void jailbreak()
 #define progress(x) do { LOG("Progress: %@", x); updateProgressHUD(hud, x); } while (false)
 #define sync_prefs() do { _assert(set_prefs(prefs), localize(@"Unable to synchronize app preferences. Please restart the app and try again."), true); } while (false)
 #define write_test_file(file) do { \
-    _assert(create_file(file, 0, 0644), localize(@"Unable to create test file."), true); \
+    _assert(create_file(file, root_pw->pw_uid, 0644), localize(@"Unable to create test file."), true); \
     _assert(clean_file(file), localize(@"Unable to clean test file."), true); \
 } while (false)
 #define inject_trust_cache() do { \
@@ -260,7 +264,7 @@ void jailbreak()
             }
             char *kernelVersion = getKernelVersion();
             _assert(kernelVersion != NULL, localize(@"Unable to get kernel version."), true);
-            if (init_kernel(NULL, 0, decompressed_kernel_cache_path) != ERR_SUCCESS ||
+            if (init_kernel(NULL, KPTR_NULL, decompressed_kernel_cache_path) != ERR_SUCCESS ||
                 find_strref(kernelVersion, 1, string_base_const, true, false) == KPTR_NULL) {
                 _assert(clean_file(decompressed_kernel_cache_path), localize(@"Unable to clean corrupted kernelcache."), true);
                 _assert(false, localize(@"Unable to initialize patchfinder."), true);
@@ -388,8 +392,8 @@ void jailbreak()
         myOriginalCredAddr = give_creds_to_process_at_addr(myProcAddr, myCredAddr);
         LOG("myOriginalCredAddr = " ADDR, myOriginalCredAddr);
         _assert(KERN_POINTER_VALID(myOriginalCredAddr), localize(@"Unable to steal kernel's credentials."), true);
-        _assert(setuid(0) == ERR_SUCCESS, localize(@"Unable to set user id."), true);
-        _assert(getuid() == 0, localize(@"Unable to verify user id."), true);
+        _assert(setuid(root_pw->pw_uid) == ERR_SUCCESS, localize(@"Unable to set user id."), true);
+        _assert(getuid() == root_pw->pw_uid, localize(@"Unable to verify user id."), true);
         myHost = mach_host_self();
         _assert(MACH_PORT_VALID(myHost), localize(@"Unable to upgrade host port."), true);
         LOG("Successfully escaped sandbox.");
@@ -497,7 +501,7 @@ void jailbreak()
         NSData *const fileData = [[NSString stringWithFormat:@(ADDR "\n"), kernel_slide] dataUsingEncoding:NSUTF8StringEncoding];
         if (![[NSData dataWithContentsOfFile:file] isEqual:fileData]) {
             _assert(clean_file(file.UTF8String), localize(@"Unable to clean old kernel slide log."), true);
-            _assert(create_file_data(file.UTF8String, 0, 0644, fileData), localize(@"Unable to log kernel slide."), true);
+            _assert(create_file_data(file.UTF8String, root_pw->pw_uid, 0644, fileData), localize(@"Unable to log kernel slide."), true);
         }
         LOG("Successfully logged slide.");
         insertstatus(localize(@"Logged slide.\n"));
@@ -545,7 +549,7 @@ void jailbreak()
             
             progress(localize(@"Enabling Auto Updates..."));
             for (id path in array) {
-                ensure_directory([path UTF8String], 0, 0755);
+                ensure_directory([path UTF8String], root_pw->pw_uid, 0755);
             }
             _assert(modifyPlist(@"/var/mobile/Library/Preferences/com.apple.Preferences.plist", ^(id plist) {
                 plist[@"kBadgedForSoftwareUpdateKey"] = @YES;
@@ -601,7 +605,7 @@ void jailbreak()
             if (is_mountpoint(hardwareMountPoint)) {
                 _assert(unmount(hardwareMountPoint, MNT_FORCE) == ERR_SUCCESS, localize(@"Unable to unmount hardware mount point."), true);
             }
-            _assert(ensure_directory(rootFsMountPoint, 0, 0755), localize(@"Unable to create RootFS mount point."), true);
+            _assert(ensure_directory(rootFsMountPoint, root_pw->pw_uid, 0755), localize(@"Unable to create RootFS mount point."), true);
             const char *argv[] = {"/sbin/mount_apfs", thedisk, rootFsMountPoint, NULL};
             _assert(runCommandv(argv[0], 3, argv, ^(pid_t pid) {
                 kptr_t const procStructAddr = get_proc_struct_for_pid(pid);
@@ -768,7 +772,7 @@ void jailbreak()
         // Create jailbreak directory.
         
         progress(localize(@"Creating jailbreak directory..."));
-        _assert(ensure_directory(jailbreakDirectory, 0, 0755), localize(@"Unable to create jailbreak directory."), true);
+        _assert(ensure_directory(jailbreakDirectory, root_pw->pw_uid, 0755), localize(@"Unable to create jailbreak directory."), true);
         _assert(chdir(jailbreakDirectory) == ERR_SUCCESS, localize(@"Unable to change working directory to jailbreak directory."), true);
         LOG("Successfully created jailbreak directory.");
         insertstatus(localize(@"Created jailbreak directory.\n"));
@@ -830,7 +834,7 @@ void jailbreak()
             
             progress(localize(@"Caching offsets..."));
             _assert(([dictionary writeToFile:offsetsFile atomically:YES]), localize(@"Unable to cache offsets to file."), true);
-            _assert(init_file(offsetsFile.UTF8String, 0, 0644), localize(@"Unable to set permissions for offset cache file."), true);
+            _assert(init_file(offsetsFile.UTF8String, root_pw->pw_uid, 0644), localize(@"Unable to set permissions for offset cache file."), true);
             LOG("Successfully cached offsets.");
             insertstatus(localize(@"Cached Offsets.\n"));
         }
@@ -866,7 +870,7 @@ void jailbreak()
                 _assert(unmount(systemSnapshotMountPoint, MNT_FORCE) == ERR_SUCCESS, localize(@"Unable to unmount old snapshot mount point."), true);
             }
             _assert(clean_file(systemSnapshotMountPoint), localize(@"Unable to clean old snapshot mount point."), true);
-            _assert(ensure_directory(systemSnapshotMountPoint, 0, 0755), localize(@"Unable to create snapshot mount point."), true);
+            _assert(ensure_directory(systemSnapshotMountPoint, root_pw->pw_uid, 0755), localize(@"Unable to create snapshot mount point."), true);
             _assert(fs_snapshot_mount(rootfd, systemSnapshotMountPoint, snapshot, 0) == ERR_SUCCESS, localize(@"Unable to mount original snapshot."), true);
             const char *systemSnapshotLaunchdPath = [@(systemSnapshotMountPoint) stringByAppendingPathComponent:@"sbin/launchd"].UTF8String;
             _assert(waitForFile(systemSnapshotLaunchdPath) == ERR_SUCCESS, localize(@"Unable to verify mounted snapshot."), true);
@@ -988,19 +992,19 @@ void jailbreak()
         inject_trust_cache();
         NSString *const binpackMessage = localize(@"Unable to setup binpack.");
         _assert(ensure_symlink(jailbreak_file("usr/bin/scp"), "/usr/bin/scp"), binpackMessage, true);
-        _assert(ensure_directory("/usr/local/lib", 0, 0755), binpackMessage, true);
-        _assert(ensure_directory("/usr/local/lib/zsh", 0, 0755), binpackMessage, true);
-        _assert(ensure_directory("/usr/local/lib/zsh/5.0.8", 0, 0755), binpackMessage, true);
+        _assert(ensure_directory("/usr/local/lib", root_pw->pw_uid, 0755), binpackMessage, true);
+        _assert(ensure_directory("/usr/local/lib/zsh", root_pw->pw_uid, 0755), binpackMessage, true);
+        _assert(ensure_directory("/usr/local/lib/zsh/5.0.8", root_pw->pw_uid, 0755), binpackMessage, true);
         _assert(ensure_symlink("/usr/local/lib/zsh/5.0.8/zsh", "/usr/local/lib/zsh/5.0.8/zsh"), binpackMessage, true);
         _assert(ensure_symlink(jailbreak_file("bin/zsh"), "/bin/zsh"), binpackMessage, true);
         _assert(ensure_symlink(jailbreak_file("etc/zshrc"), "/etc/zshrc"), binpackMessage, true);
         _assert(ensure_symlink(jailbreak_file("usr/share/terminfo"), "/usr/share/terminfo"), binpackMessage, true);
         _assert(ensure_symlink(jailbreak_file("usr/local/bin"), "/usr/local/bin"), binpackMessage, true);
         _assert(ensure_symlink(jailbreak_file("etc/profile"), "/etc/profile"), binpackMessage, true);
-        _assert(ensure_directory("/etc/dropbear", 0, 0755), binpackMessage, true);
-        _assert(ensure_directory(jailbreak_file("Library"), 0, 0755), binpackMessage, true);
-        _assert(ensure_directory(jailbreak_file("Library/LaunchDaemons"), 0, 0755), binpackMessage, true);
-        _assert(ensure_directory(jailbreak_file("etc/rc.d"), 0, 0755), binpackMessage, true);
+        _assert(ensure_directory("/etc/dropbear", root_pw->pw_uid, 0755), binpackMessage, true);
+        _assert(ensure_directory(jailbreak_file("Library"), root_pw->pw_uid, 0755), binpackMessage, true);
+        _assert(ensure_directory(jailbreak_file("Library/LaunchDaemons"), root_pw->pw_uid, 0755), binpackMessage, true);
+        _assert(ensure_directory(jailbreak_file("etc/rc.d"), root_pw->pw_uid, 0755), binpackMessage, true);
         if (access(jailbreak_file("Library/LaunchDaemons/dropbear.plist"), F_OK) != ERR_SUCCESS) {
             NSMutableDictionary *dropbear_plist = [NSMutableDictionary new];
             _assert(dropbear_plist, localize(@"Unable to allocate memory for dropbear plist."), true);
@@ -1017,7 +1021,7 @@ void jailbreak()
             dropbear_plist[@"ProgramArguments"][5] = @"-p";
             dropbear_plist[@"ProgramArguments"][6] = @"22";
             _assert([dropbear_plist writeToFile:NSJailbreakFile(@"Library/LaunchDaemons/dropbear.plist") atomically:YES], localize(@"Unable to create dropbear launch daemon."), true);
-            _assert(init_file(jailbreak_file("Library/LaunchDaemons/dropbear.plist"), 0, 0644), localize(@"Unable to initialize dropbear launch daemon."), true);
+            _assert(init_file(jailbreak_file("Library/LaunchDaemons/dropbear.plist"), root_pw->pw_uid, 0644), localize(@"Unable to initialize dropbear launch daemon."), true);
         }
         if (prefs->load_daemons) {
             for (id file in [fileManager contentsOfDirectoryAtPath:NSJailbreakFile(@"Library/LaunchDaemons") error:nil]) {
@@ -1156,7 +1160,7 @@ void jailbreak()
         
         progress(localize(@"Repairing filesystem..."));
         
-        _assert(ensure_directory("/var/lib", 0, 0755), localize(@"Unable to repair state information directory"), true);
+        _assert(ensure_directory("/var/lib", root_pw->pw_uid, 0755), localize(@"Unable to repair state information directory"), true);
         
         // Make sure dpkg is not corrupted
         if (is_directory("/var/lib/dpkg")) {
@@ -1170,9 +1174,9 @@ void jailbreak()
         }
         
         _assert(ensure_symlink("/Library/dpkg", "/var/lib/dpkg"), localize(@"Unable to symlink dpkg database."), true);
-        _assert(ensure_directory("/Library/dpkg", 0, 0755), localize(@"Unable to repair dpkg database."), true);
-        _assert(ensure_file("/var/lib/dpkg/status", 0, 0644), localize(@"Unable to repair dpkg status file."), true);
-        _assert(ensure_file("/var/lib/dpkg/available", 0, 0644), localize(@"Unable to repair dpkg available file."), true);
+        _assert(ensure_directory("/Library/dpkg", root_pw->pw_uid, 0755), localize(@"Unable to repair dpkg database."), true);
+        _assert(ensure_file("/var/lib/dpkg/status", root_pw->pw_uid, 0644), localize(@"Unable to repair dpkg status file."), true);
+        _assert(ensure_file("/var/lib/dpkg/available", root_pw->pw_uid, 0644), localize(@"Unable to repair dpkg available file."), true);
         
         // Make sure firmware-sbin package is not corrupted.
         NSString *file = [NSString stringWithContentsOfFile:@"/var/lib/dpkg/info/firmware-sbin.list" encoding:NSUTF8StringEncoding error:nil];
@@ -1187,7 +1191,7 @@ void jailbreak()
         _assert(ensure_symlink("/usr/lib", "/usr/lib/_ncurses"), localize(@"Unable to repair ncurses."), true);
         
         // This needs to be there for Substrate to work properly
-        _assert(ensure_directory("/Library/Caches", 0, S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO), localize(@"Unable to repair caches directory for Substrate."), true);
+        _assert(ensure_directory("/Library/Caches", root_pw->pw_uid, S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO), localize(@"Unable to repair caches directory for Substrate."), true);
         LOG("Successfully repaired filesystem.");
         
         insertstatus(localize(@"Repaired Filesystem.\n"));
@@ -1203,7 +1207,7 @@ void jailbreak()
         if (prefs->load_tweaks) {
             clean_file("/var/tmp/.substrated_disable_loader");
         } else {
-            _assert(create_file("/var/tmp/.substrated_disable_loader", 0, 644), localize(@"Unable to disable Substrate's loader."), true);
+            _assert(create_file("/var/tmp/.substrated_disable_loader", root_pw->pw_uid, 644), localize(@"Unable to disable Substrate's loader."), true);
         }
         LOG("Successfully set Disable Loader.");
         
@@ -1290,7 +1294,7 @@ void jailbreak()
             _assert(installDebs(debsToInstall, true, true), localize(@"Unable to install manually extracted debs."), true);
         }
         
-        _assert(ensure_directory("/etc/apt/undecimus", 0, 0755), localize(@"Unable to create local repo."), true);
+        _assert(ensure_directory("/etc/apt/undecimus", root_pw->pw_uid, 0755), localize(@"Unable to create local repo."), true);
         clean_file("/etc/apt/sources.list.d/undecimus.list");
         char const *listPath = "/etc/apt/undecimus/undecimus.list";
         NSString *const listContents = @"deb file:///var/lib/undecimus/apt ./\n";
@@ -1299,7 +1303,7 @@ void jailbreak()
             clean_file(listPath);
             [listContents writeToFile:@(listPath) atomically:NO encoding:NSUTF8StringEncoding error:nil];
         }
-        init_file(listPath, 0, 0644);
+        init_file(listPath, root_pw->pw_uid, 0644);
         const char *prefsPath = "/etc/apt/undecimus/preferences";
         NSString *prefsContents = @"Package: *\nPin: release o=Undecimus\nPin-Priority: 1001\n";
         NSString *existingPrefs = [NSString stringWithContentsOfFile:@(prefsPath) encoding:NSUTF8StringEncoding error:nil];
@@ -1307,10 +1311,10 @@ void jailbreak()
             clean_file(prefsPath);
             [prefsContents writeToFile:@(prefsPath) atomically:NO encoding:NSUTF8StringEncoding error:nil];
         }
-        init_file(prefsPath, 0, 0644);
+        init_file(prefsPath, root_pw->pw_uid, 0644);
         NSString *const repoPath = pathForResource(@"apt");
         _assert(repoPath != nil, localize(@"Unable to get repo path."), true);
-        ensure_directory("/var/lib/undecimus", 0, 0755);
+        ensure_directory("/var/lib/undecimus", root_pw->pw_uid, 0755);
         ensure_symlink([repoPath UTF8String], "/var/lib/undecimus/apt");
         if (!pkgIsConfigured("apt1.4") || !aptUpdate()) {
             NSArray *const aptNeeded = resolveDepsForPkg(@"apt1.4", false);
@@ -1355,10 +1359,10 @@ void jailbreak()
         NSData *const file_data = [[NSString stringWithFormat:@"%f\n", kCFCoreFoundationVersionNumber] dataUsingEncoding:NSUTF8StringEncoding];
         if (![[NSData dataWithContentsOfFile:@"/.installed_unc0ver"] isEqual:file_data]) {
             _assert(clean_file("/.installed_unc0ver"), localize(@"Unable to clean old bootstrap marker file."), true);
-            _assert(create_file_data("/.installed_unc0ver", 0, 0644, file_data), localize(@"Unable to create bootstrap marker file."), true);
+            _assert(create_file_data("/.installed_unc0ver", root_pw->pw_uid, 0644, file_data), localize(@"Unable to create bootstrap marker file."), true);
         }
         
-        _assert(ensure_file("/.cydia_no_stash", 0, 0644), localize(@"Unable to disable stashing."), true);
+        _assert(ensure_file("/.cydia_no_stash", root_pw->pw_uid, 0644), localize(@"Unable to disable stashing."), true);
         
         // Make sure everything's at least as new as what we bundled
         rv = system("dpkg --configure -a");
@@ -1579,7 +1583,7 @@ void jailbreak()
             NSMutableString *waitCommand = [NSMutableString new];
             [waitCommand appendFormat:@"while [[ ! -f %s ]]; do :; done;", success_file];
             if (!prefs->auto_respring) {
-                [waitCommand appendFormat:@"while ps -p %d; do :; done;", myPid];
+                [waitCommand appendFormat:@"while ps -p %d; do :; done;", my_pid];
             }
             if (prefs->reload_system_daemons && !needStrap) {
                 rv = systemf("nohup bash -c \""
@@ -1616,8 +1620,8 @@ out:;
     myCredAddr = myOriginalCredAddr;
     _assert(give_creds_to_process_at_addr(myProcAddr, myCredAddr) == kernelCredAddr, localize(@"Unable to drop kernel's credentials."), true);
     LOG("Downgrading host port...");
-    _assert(setuid(myUid) == ERR_SUCCESS, localize(@"Unable to set user id."), true);
-    _assert(getuid() == myUid, localize(@"Unable to verify user id."), true);
+    _assert(setuid(my_uid) == ERR_SUCCESS, localize(@"Unable to set user id."), true);
+    _assert(getuid() == my_uid, localize(@"Unable to verify user id."), true);
     LOG("Restoring shenanigans pointer...");
     _assert(WriteKernel64(getoffset(shenanigans), Shenanigans), localize(@"Unable to restore shenanigans in kernel memory."), true);
     LOG("Deallocating ports...");
@@ -1637,7 +1641,7 @@ out:;
     bool willRespring = (forceRespring);
     willRespring |= (prefs->load_tweaks);
     release_prefs(&prefs);
-    _assert(create_file(success_file, 501, 644), localize(@"Unable to create success file."), true);
+    _assert(create_file(success_file, mobile_pw->pw_uid, 644), localize(@"Unable to create success file."), true);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", localize(@"Jailbreak Completed with Status:"), status, localize(willRespring ? @"The device will now respring." : @"The app will now exit.")], true, false);
     if (sharedController.canExit) {
         if (forceRespring) {
