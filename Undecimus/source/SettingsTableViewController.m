@@ -291,7 +291,15 @@
     if ((bool)self.RestoreRootFSSwitch.isOn) {
         [JailbreakViewController sharedController].swipeUpLabel.text = @"Swipe up to restore root filesystem";
     } else {
-        [JailbreakViewController sharedController].swipeUpLabel.text = @"Swipe up to jailbreak";
+        if (!jailbreakSupported()) {
+            status(localize(@"Unsupported"), false, true);
+            [JailbreakViewController sharedController].swipeUpLabel.text = @"Unsupported Device";
+        } else if (jailbreakEnabled()) {
+            status(localize(@"Re-Jailbreak"), true, true);
+            [JailbreakViewController sharedController].swipeUpLabel.text = @"Swipe up to re-jailbreak";
+        } else if (jailbreakSupported()) {
+            [JailbreakViewController sharedController].swipeUpLabel.text = @"Swipe up to jailbreak";
+        }
     }
     [self reloadData];
 }
