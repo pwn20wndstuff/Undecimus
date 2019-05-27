@@ -67,6 +67,19 @@ extern int maxStage;
     __COUNTER__; \
     stage++; \
     status_with_stage(stage, maxStage); \
+    dispatch_async(dispatch_get_main_queue(), ^{ \
+        [UIView performWithoutAnimation:^{ \
+            [[[JailbreakViewController sharedController] jailbreakProgressView] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
+                }]; \
+        if (stage == maxStage)  {\
+            UIApplication *app = [UIApplication sharedApplication];\
+            [app performSelector:@selector(suspend)];\
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC));\
+            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){\
+                exit(0);\
+            }); \
+        }\
+    }); \
 } while (false)
 
 #define find_offset(x, symbol, critical) do { \
@@ -1599,6 +1612,18 @@ void jailbreak()
             LOG("Successfully loaded Tweaks.");
             
             insertstatus(localize(@"Loaded Tweaks.\n"));
+        } else {
+            //WHEN NOT LOADING TWEAKS
+            
+            
+            UIApplication *app = [UIApplication sharedApplication];
+            [app performSelector:@selector(suspend)];
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC));
+            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                exit(0);
+            });
+            
+            
         }
     }
     
