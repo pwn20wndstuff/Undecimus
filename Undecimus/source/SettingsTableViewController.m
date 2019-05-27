@@ -108,6 +108,7 @@
     [self.HideProgressHUDSwitch setOn:(BOOL)prefs->hide_progress_hud];
     [self.RestartSpringBoardButton setEnabled:respringSupported()];
     [self.restartButton setEnabled:restartSupported()];
+    [[JailbreakViewController sharedController] updateStatus];
     release_prefs(&prefs);
     [self.tableView reloadData];
 }
@@ -288,19 +289,6 @@
     prefs->restore_rootfs = (bool)self.RestoreRootFSSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
-    if ((bool)self.RestoreRootFSSwitch.isOn) {
-        [JailbreakViewController sharedController].swipeUpLabel.text = @"Swipe up to restore root filesystem";
-    } else {
-        if (!jailbreakSupported()) {
-            status(localize(@"Unsupported"), false, true);
-            [JailbreakViewController sharedController].swipeUpLabel.text = @"Unsupported Device";
-        } else if (jailbreakEnabled()) {
-            status(localize(@"Re-Jailbreak"), true, true);
-            [JailbreakViewController sharedController].swipeUpLabel.text = @"Swipe up to re-jailbreak";
-        } else if (jailbreakSupported()) {
-            [JailbreakViewController sharedController].swipeUpLabel.text = @"Swipe up to jailbreak";
-        }
-    }
     [self reloadData];
 }
 

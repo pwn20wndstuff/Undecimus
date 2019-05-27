@@ -49,10 +49,6 @@ while (false)
 @property (weak, nonatomic) IBOutlet UITextView *outputView;
 @property (readonly) JailbreakViewController *sharedController;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *goButtonSpacing;
-
-
-
-//New Outlets
 @property (weak, nonatomic) IBOutlet UIView *mainView;
 @property (weak, nonatomic) IBOutlet UIView *jailbreakView;
 @property (weak, nonatomic) IBOutlet UILabel *swipeUpLabel;
@@ -92,6 +88,7 @@ NSString *hexFromInt(NSInteger val);
 - (IBAction)tappedOnJailbreak:(id)sender;
 +(JailbreakViewController*)sharedController;
 - (void)appendTextToOutput:(NSString*)text;
+- (void)updateStatus;
 
 @end
 
