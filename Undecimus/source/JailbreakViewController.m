@@ -75,10 +75,10 @@ CGFloat movementConstant = 0;
             _swipeUpLabelBottomConstraint.constant = _swipeUpLabelBottomConstraint.constant + 44;
             _mainViewTopConstraint.constant = -44;
             _mainViewBottomConstraint.constant = -44;
-            _settingsViewTopConstraint.constant = -44;
-            _settingsViewBottomConstraint.constant = 44;
-            _creditsViewTopConstraint.constant = -44;
-            _creditsViewBottomConstraint.constant = 44;
+            _settingsViewTopConstraint.constant = 44;
+            _settingsViewBottomConstraint.constant = -44;
+            _creditsViewTopConstraint.constant = 44;
+            _creditsViewBottomConstraint.constant = -44;
         
             _jailbreakViewTopConstraint.constant = -44;
             _jailbreakViewBottomConstraint.constant = 44;
@@ -139,8 +139,8 @@ BOOL showSwipeUpGesture = NO;
         
         _jailbreakButtonLeftSpacing.constant = 220;
         _jailbreakButttonRightSpacing.constant = 220;
-        _consoleLogLeftSpacing.constant = 220;
-        _consoleLogRightSpacing.constant = 220;
+        _consoleLogLeftSpacing.constant = 180;
+        _consoleLogRightSpacing.constant = 180;
         
         
     }
