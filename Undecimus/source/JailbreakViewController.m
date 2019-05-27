@@ -209,17 +209,6 @@ CGFloat moveOnValidNumber;
 }
 
 
--(void)noHaptic {
-    
-    AudioServicesPlaySystemSound(1519);
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.15 * NSEC_PER_SEC) , dispatch_get_main_queue(), ^(void){
-        
-        AudioServicesPlaySystemSound(1519);
-        
-    });
-}
-
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [touches anyObject];
     CGPoint secondaryLocation = [touch locationInView: _mainView];
@@ -228,11 +217,6 @@ CGFloat moveOnValidNumber;
     
     if (([touch view] == _mainView) && (showSwipeUpGesture == YES) && (jailbreakSupported())) {
         initialYLocation = yLocation;
-        
-        if (!jailbreakSupported()) {
-            [self noHaptic];
-        }
-        
     } else if ([touch view] == _creditsButtonView) {
         [self touchBeganHapticTouchButtons:_creditsButtonView];
     } else if ([touch view] == _settingsButtonView) {
