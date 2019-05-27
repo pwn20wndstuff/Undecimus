@@ -111,7 +111,7 @@ NSTimer *swipeUpTimer;
         
         up = NO;
         
-    } else  if (!up) {
+    } else {
         
         [UIView animateWithDuration:1.6 delay:0.4 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             
