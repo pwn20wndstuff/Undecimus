@@ -288,6 +288,11 @@
     prefs->restore_rootfs = (bool)self.RestoreRootFSSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
+    if ((bool)self.RestoreRootFSSwitch.isOn) {
+        [JailbreakViewController sharedController].swipeUpLabel.text = @"Swipe up to restore root filesystem";
+    } else {
+        [JailbreakViewController sharedController].swipeUpLabel.text = @"Swipe up to jailbreak";
+    }
     [self reloadData];
 }
 

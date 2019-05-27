@@ -50,8 +50,10 @@ CGFloat movementConstant = 0;
         _swipeUpLabel.text = @"Unsupported Device";
     } else if (prefs->restore_rootfs) {
         status(localize(@"Restore RootFS"), true, true);
+        _swipeUpLabel.text = @"Swipe up to restore root filesystem";
     } else if (jailbreakEnabled()) {
         status(localize(@"Re-Jailbreak"), true, true);
+        _swipeUpLabel.text = @"Swipe up to re-jailbreak";
     } else {
         status(localize(@"Jailbreak"), true, true);
     }
@@ -73,18 +75,18 @@ CGFloat movementConstant = 0;
         UIWindow *mainWindow = [[[UIApplication sharedApplication] delegate] window];
         if (mainWindow.safeAreaInsets.top > 24.0) {
             notchedDevice = YES;
-            _swipeUpLabelBottomConstraint.constant = _swipeUpLabelBottomConstraint.constant + 44;
-            _mainViewTopConstraint.constant = -44;
-            _mainViewBottomConstraint.constant = -44;
-            _settingsViewTopConstraint.constant = 44;
-            _settingsViewBottomConstraint.constant = -44;
-            _creditsViewTopConstraint.constant = 44;
-            _creditsViewBottomConstraint.constant = -44;
+            self.swipeUpLabelBottomConstraint.constant = self.swipeUpLabelBottomConstraint.constant + 44;
+            self.mainViewTopConstraint.constant = -44;
+            self.mainViewBottomConstraint.constant = -44;
+            self.settingsViewTopConstraint.constant = 44;
+            self.settingsViewBottomConstraint.constant = -44;
+            self.creditsViewTopConstraint.constant = 44;
+            self.creditsViewBottomConstraint.constant = -44;
         
-            _jailbreakViewTopConstraint.constant = -44;
-            _jailbreakViewBottomConstraint.constant = 44;
-            _creditsHapticTouchBottomConstraint.constant = _creditsHapticTouchBottomConstraint.constant + 44;
-            _settingssHapticTouchBottomConstraint.constant = _settingssHapticTouchBottomConstraint.constant + 44;
+            self.jailbreakViewTopConstraint.constant = -44;
+            self.jailbreakViewBottomConstraint.constant = 44;
+            self.creditsHapticTouchBottomConstraint.constant = self.creditsHapticTouchBottomConstraint.constant + 44;
+            self.settingssHapticTouchBottomConstraint.constant = self.settingssHapticTouchBottomConstraint.constant + 44;
 
         }
     }
@@ -96,17 +98,7 @@ bool up = NO;
 NSTimer *swipeUpTimer;
 - (void) swipeUpAnimation:(NSTimer *)timer {
     
-    if (up == NO) {
-        
-        [UIView animateWithDuration:1.6 delay:0.4 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            
-            self.swipeUpLabel.alpha = 1;
-            self.swipeUpLabel.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, -50);
-        } completion:nil];
-        
-        up = YES;
-        
-    } else if (up == YES) {
+    if (up) {
         
         [UIView animateWithDuration:1.6 delay:0.4 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             
@@ -119,8 +111,17 @@ NSTimer *swipeUpTimer;
         
         up = NO;
         
+    } else  if (!up) {
+        
+        [UIView animateWithDuration:1.6 delay:0.4 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            
+            self.swipeUpLabel.alpha = 1;
+            self.swipeUpLabel.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, -50);
+        } completion:nil];
+        
+        up = YES;
+        
     }
-    
 }
 
 BOOL showSwipeUpGesture = NO;
@@ -129,7 +130,6 @@ BOOL showSwipeUpGesture = NO;
     [super viewDidLoad];
     _canExit = YES;
     if ([UIScreen mainScreen].bounds.size.height == 568) {
-        
         self.goButton.titleLabel.font = [UIFont systemFontOfSize:13];
     }
 
@@ -137,8 +137,6 @@ BOOL showSwipeUpGesture = NO;
         
         _jailbreakButtonLeftSpacing.constant = 220;
         _jailbreakButttonRightSpacing.constant = 220;
-
-        
         
     }
     
@@ -170,7 +168,7 @@ BOOL showSwipeUpGesture = NO;
         _goButton.hidden = YES;
         showSwipeUpGesture = YES;
         swipeUpTimer = [NSTimer scheduledTimerWithTimeInterval:1.6 target:self selector:@selector(swipeUpAnimation:) userInfo:nil repeats:YES];
-        _undecimusLogoCentreConstraint.constant = -70;
+        self.undecimusLogoCentreConstraint.constant = -70;
     }
     release_prefs(&prefs);
     sharedController = self;
@@ -222,35 +220,26 @@ CGFloat moveOnValidNumber;
     });
 }
 
-
-
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [touches anyObject];
     CGPoint secondaryLocation = [touch locationInView: _mainView];
     
     CGFloat yLocation = secondaryLocation.y;
     
-    if (([touch view] == _mainView) && (showSwipeUpGesture == YES)) {
+    if (([touch view] == _mainView) && (showSwipeUpGesture == YES) && (jailbreakSupported())) {
         initialYLocation = yLocation;
         
         if (!jailbreakSupported()) {
-
             [self noHaptic];
-            
         }
         
     } else if ([touch view] == _creditsButtonView) {
         [self touchBeganHapticTouchButtons:_creditsButtonView];
-        
     } else if ([touch view] == _settingsButtonView) {
-        
         [self touchBeganHapticTouchButtons:_settingsButtonView];
-        
-        
     }
     
 }
-
 
 -(void)touchBeganHapticTouchButtons:(UIView *)buttonView {
     
@@ -260,8 +249,6 @@ CGFloat moveOnValidNumber;
     
     [self hapticTouchFeedback];
 }
-
-
 
 
 -(void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -309,9 +296,7 @@ CGFloat moveOnValidNumber;
                 self.jailbreakView.alpha = 0;
                 
             } completion:nil];
-            
-            
-            
+        
         }
         
     } else if ([touch view] == _settingsButtonView) {
@@ -371,12 +356,6 @@ CGFloat moveOnValidNumber;
         
     } completion:nil];
 }
-
-
-
-
-
-
 
 - (IBAction)tappedOnPwn:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
