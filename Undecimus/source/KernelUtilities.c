@@ -503,13 +503,13 @@ kptr_t sstrdup(const char *str) {
     kptr_t const function = getoffset(sstrdup);
     _assert(KERN_POINTER_VALID(function));
     kstr_size = strlen(str) + 1;
-    kstr = kmem_alloc(kstr_size);
+    kstr = IOMalloc(kstr_size);
     _assert(KERN_POINTER_VALID(kstr));
     _assert(wkbuffer(kstr, (void *)str, kstr_size));
     ret = kexec(function, kstr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
     if (ret != KPTR_NULL) ret = zm_fix_addr(ret);
 out:;
-    if (kstr_size != 0 && KERN_POINTER_VALID(kstr)) kmem_free(kstr, kstr_size); kstr = KPTR_NULL;
+    SafeIOFreeNULL(kstr, kstr_size);
     return ret;
 }
 
@@ -528,6 +528,26 @@ void sfree(kptr_t ptr) {
     kptr_t const function = getoffset(sfree);
     _assert(KERN_POINTER_VALID(function));
     kexec(function, ptr, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+out:;
+}
+
+
+kptr_t IOMalloc(vm_size_t size) {
+    kptr_t ret = KPTR_NULL;
+    kptr_t const function = getoffset(IOMalloc);
+    _assert(KERN_POINTER_VALID(function));
+    ret = kexec(function, (kptr_t)size, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
+    if (ret != KPTR_NULL) ret = zm_fix_addr(ret);
+out:;
+    return ret;
+}
+
+void IOFree(kptr_t address, vm_size_t size) {
+    _assert(KERN_POINTER_VALID(address));
+    _assert(size > 0);
+    kptr_t const function = getoffset(IOFree);
+    _assert(KERN_POINTER_VALID(function));
+    kexec(function, address, (kptr_t)size, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL, KPTR_NULL);
 out:;
 }
 
@@ -1524,7 +1544,7 @@ kptr_t make_fake_task(kptr_t vm_map) {
     void *fake_task = NULL;
     _assert(KERN_POINTER_VALID(vm_map));
     fake_task_size = 0x1000;
-    fake_task_kaddr = kmem_alloc(fake_task_size);
+    fake_task_kaddr = IOMalloc(fake_task_size);
     _assert(KERN_POINTER_VALID(fake_task_kaddr));
     fake_task = malloc(fake_task_size);
     _assert(fake_task != NULL);
@@ -1536,7 +1556,7 @@ kptr_t make_fake_task(kptr_t vm_map) {
     _assert(wkbuffer(fake_task_kaddr, fake_task, fake_task_size));
     ret = fake_task_kaddr;
 out:;
-    if (!KERN_POINTER_VALID(ret) && KERN_POINTER_VALID(fake_task_kaddr)) kmem_free(fake_task_kaddr, fake_task_size); fake_task_kaddr = KPTR_NULL;
+    if (!KERN_POINTER_VALID(ret) && KERN_POINTER_VALID(fake_task_kaddr)) SafeIOFreeNULL(fake_task_kaddr, fake_task_size);
     SafeFreeNULL(fake_task);
     return ret;
 }
@@ -1668,19 +1688,16 @@ out:;
 
 kptr_t get_vnode_for_snapshot(int fd, char *name) {
     kptr_t ret = KPTR_NULL;
-    kptr_t snap_vnode = KPTR_NULL;
-    kptr_t rvpp_ptr = KPTR_NULL;
-    kptr_t sdvpp_ptr = KPTR_NULL;
-    kptr_t ndp_buf = KPTR_NULL;
-    kptr_t sdvpp = KPTR_NULL;
-    kptr_t snap_meta_ptr = KPTR_NULL;
-    kptr_t old_name_ptr = KPTR_NULL;
-    kptr_t ndp_old_name = KPTR_NULL;
-    rvpp_ptr = smalloc(sizeof(kptr_t));
+    kptr_t snap_vnode, rvpp_ptr, sdvpp_ptr, ndp_buf, sdvpp, snap_meta_ptr, old_name_ptr, ndp_old_name;
+    snap_vnode = rvpp_ptr = sdvpp_ptr = ndp_buf = sdvpp = snap_meta_ptr = old_name_ptr = ndp_old_name = KPTR_NULL;
+    size_t rvpp_ptr_size, sdvpp_ptr_size, ndp_buf_size, snap_meta_ptr_size, old_name_ptr_size;
+    ndp_buf_size = 816;
+    rvpp_ptr_size = sdvpp_ptr_size = snap_meta_ptr_size = old_name_ptr_size = sizeof(kptr_t);
+    rvpp_ptr = IOMalloc(rvpp_ptr_size);
     _assert(KERN_POINTER_VALID(rvpp_ptr));
-    sdvpp_ptr = smalloc(sizeof(kptr_t));
+    sdvpp_ptr = IOMalloc(sdvpp_ptr_size);
     _assert(KERN_POINTER_VALID(sdvpp_ptr));
-    ndp_buf = smalloc(816);
+    ndp_buf = IOMalloc(ndp_buf_size);
     _assert(KERN_POINTER_VALID(ndp_buf));
     kptr_t const vfs_context = vfs_context_current();
     _assert(KERN_POINTER_VALID(vfs_context));
@@ -1691,9 +1708,9 @@ kptr_t get_vnode_for_snapshot(int fd, char *name) {
     _assert(KERN_POINTER_VALID(sdvpp_v_mount));
     kptr_t const sdvpp_v_mount_mnt_data = ReadKernel64(sdvpp_v_mount + koffset(KSTRUCT_OFFSET_MOUNT_MNT_DATA));
     _assert(KERN_POINTER_VALID(sdvpp_v_mount_mnt_data));
-    snap_meta_ptr = smalloc(sizeof(kptr_t));
+    snap_meta_ptr = IOMalloc(snap_meta_ptr_size);
     _assert(KERN_POINTER_VALID(snap_meta_ptr));
-    old_name_ptr = smalloc(sizeof(kptr_t));
+    old_name_ptr = IOMalloc(old_name_ptr_size);
     _assert(KERN_POINTER_VALID(old_name_ptr));
     ndp_old_name = ReadKernel64(ndp_buf + 336 + 40);
     _assert(KERN_POINTER_VALID(ndp_old_name));
@@ -1707,10 +1724,10 @@ kptr_t get_vnode_for_snapshot(int fd, char *name) {
     ret = snap_vnode;
 out:
     if (KERN_POINTER_VALID(sdvpp)) vnode_put(sdvpp); sdvpp = KPTR_NULL;
-    SafeSFreeNULL(sdvpp_ptr);
-    SafeSFreeNULL(ndp_buf);
-    SafeSFreeNULL(snap_meta_ptr);
-    SafeSFreeNULL(old_name_ptr);
+    SafeIOFreeNULL(sdvpp_ptr, sdvpp_ptr_size);
+    SafeIOFreeNULL(ndp_buf, ndp_buf_size);
+    SafeIOFreeNULL(snap_meta_ptr, snap_meta_ptr_size);
+    SafeIOFreeNULL(old_name_ptr, old_name_ptr_size);
     return ret;
 }
 
@@ -1758,7 +1775,7 @@ bool set_kernel_task_info() {
     _assert(task_dyld_info->all_image_info_size == kernel_slide);
     ret = true;
 out:;
-    if (!ret && KERN_POINTER_VALID(kernel_cache_blob)) kmem_free(kernel_cache_blob, cache_size); kernel_cache_blob = KPTR_NULL;
+    if (!ret && KERN_POINTER_VALID(kernel_cache_blob)) SafeIOFreeNULL(kernel_cache_blob, cache_size);
     SafeFreeNULL(task_dyld_info);
     SafeFreeNULL(task_dyld_info_count);
     SafeFreeNULL(cache);

