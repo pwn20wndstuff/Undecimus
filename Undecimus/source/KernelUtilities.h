@@ -92,6 +92,8 @@ size_t kstrlen(kptr_t ptr);
 kptr_t sstrdup(const char *str);
 kptr_t smalloc(size_t size);
 void sfree(kptr_t ptr);
+kptr_t IOMalloc(vm_size_t size);
+void IOFree(kptr_t address, vm_size_t size);
 int extension_create_file(kptr_t saveto, kptr_t sb, const char *path, size_t path_len, uint32_t subtype);
 int extension_create_mach(kptr_t saveto, kptr_t sb, const char *name, uint32_t subtype);
 int extension_add(kptr_t ext, kptr_t sb, const char *desc);

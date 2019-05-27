@@ -27,6 +27,8 @@ extern void NSLog(CFStringRef, ...);
 #define CFSafeReleaseNULL(x) do { CFSafeRelease(x); (x) = NULL; } while(false)
 #define SafeSFree(x) do { if (KERN_POINTER_VALID(x)) sfree(x); } while(false)
 #define SafeSFreeNULL(x) do { SafeSFree(x); (x) = KPTR_NULL; } while(false)
+#define SafeIOFree(x, size) do { if (KERN_POINTER_VALID(x)) IOFree(x, size); } while(false)
+#define SafeIOFreeNULL(x, size) do { SafeIOFree(x, size); (x) = KPTR_NULL; } while(false)
 
 #define kCFCoreFoundationVersionNumber_iOS_12_0 1535.12
 #define kCFCoreFoundationVersionNumber_iOS_11_3 1452.23

@@ -359,6 +359,8 @@ void jailbreak()
         find_offset(issue_extension_for_absolute_path, NULL, true);
         find_offset(vnode_getfromfd, NULL, true);
         find_offset(vn_getpath, NULL, true);
+        find_offset(IOMalloc, NULL, true);
+        find_offset(IOFree, NULL, true);
         found_offsets = true;
         LOG("Successfully found offsets.");
         
@@ -397,14 +399,17 @@ void jailbreak()
         myHost = mach_host_self();
         _assert(MACH_PORT_VALID(myHost), localize(@"Unable to upgrade host port."), true);
         LOG("Successfully escaped sandbox.");
-        LOG("Setting HSP4 as TFP0...");
-        _assert(set_hsp4(tfp0), localize(@"Unable to set HSP4."), true);
-        _assert(set_kernel_task_info(), localize(@"Unable to set kernel task info."), true);
-        LOG("Successfully set HSP4 as TFP0.");
-        insertstatus(localize(@"Set HSP4 as TFP0.\n"));
         LOG("Initializing kernel code execution...");
         _assert(init_kexec(), localize(@"Unable to initialize kernel code execution."), true);
         LOG("Successfully initialized kernel code execution.");
+        LOG("Setting HSP4 as TFP0...");
+        _assert(set_hsp4(tfp0), localize(@"Unable to set HSP4."), true);
+        LOG("Successfully set HSP4 as TFP0.");
+        insertstatus(localize(@"Set HSP4 as TFP0.\n"));
+        LOG("Setting kernel task info...");
+        _assert(set_kernel_task_info(), localize(@"Unable to set kernel task info."), true);
+        LOG("Successfully set kernel task info.");
+        insertstatus(localize(@"Set kernel task info.\n"));
         LOG("Platformizing...");
         _assert(set_platform_binary(myProcAddr, true), localize(@"Unable to make my task a platform task."), true);
         _assert(set_cs_platform_binary(myProcAddr, true), localize(@"Unable to make my codesign blob a platform blob."), true);
