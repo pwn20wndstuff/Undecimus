@@ -68,6 +68,11 @@ extern int maxStage;
     __COUNTER__; \
     stage++; \
     status_with_stage(stage, maxStage); \
+    dispatch_async(dispatch_get_main_queue(), ^{ \
+        [UIView performWithoutAnimation:^{ \
+            [[[JailbreakViewController sharedController] jailbreakProgressView] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
+                }]; \
+    }); \
 } while (false)
 
 #define find_offset(x, symbol, critical) do { \
@@ -114,7 +119,7 @@ void jailbreak()
     NSMutableString *status = [NSMutableString new];
     bool const betaFirmware = isBetaFirmware();
     time_t const start_time = time(NULL);
-    UIProgressHUD *hud = prefs->hide_progress_hud ? nil : addProgressHUD();
+    UIProgressHUD *hud = prefs->hide_progress_hud || prefs->hide_log_window ? nil : addProgressHUD();
     JailbreakViewController *sharedController = [JailbreakViewController sharedController];
     NSMutableArray *resources = [NSMutableArray new];
     NSFileManager *const fileManager = [NSFileManager defaultManager];
@@ -1609,6 +1614,8 @@ void jailbreak()
             
             insertstatus(localize(@"Loaded Tweaks.\n"));
         }
+        
+
     }
     
 out:;
