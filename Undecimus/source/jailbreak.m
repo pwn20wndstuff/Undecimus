@@ -1612,7 +1612,9 @@ void jailbreak()
             LOG("Successfully loaded Tweaks.");
             
             insertstatus(localize(@"Loaded Tweaks.\n"));
-        } else {
+        }
+        
+        if (!(prefs->load_tweaks)) {
             //WHEN NOT LOADING TWEAKS
             
             
