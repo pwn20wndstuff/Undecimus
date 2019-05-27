@@ -2396,51 +2396,6 @@
                                     <constraint firstItem="BoE-IK-nd3" firstAttribute="centerX" secondItem="6GA-Vn-Bn6" secondAttribute="centerX" id="qQ3-YD-yOK"/>
                                 </constraints>
                             </view>
-                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ct8-Uq-NqE">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="862"/>
-                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="guG-ln-Mtc">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="862"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your device is not compatible." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V9b-Mh-Cb7">
-                                            <rect key="frame" x="84" y="70" width="246" height="21"/>
-                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
-                                            <color key="textColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YYJ-rm-ihS">
-                                            <rect key="frame" x="169" y="790" width="76" height="42"/>
-                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="25"/>
-                                            <state key="normal" title="Ok... :(">
-                                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            </state>
-                                            <connections>
-                                                <action selector="dismissInitialError:" destination="u30-8p-wjb" eventType="touchUpInside" id="eUb-Oz-YHq"/>
-                                            </connections>
-                                        </button>
-                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="You should downgrade this device to lower version of iOS, or this device is not compatible." textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="BSd-Cs-dC0">
-                                            <rect key="frame" x="87" y="393.5" width="240" height="75"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="240" id="XEu-jh-K8n"/>
-                                                <constraint firstAttribute="height" constant="75" id="elx-fk-aB8"/>
-                                            </constraints>
-                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                        </textView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="V9b-Mh-Cb7" firstAttribute="top" secondItem="guG-ln-Mtc" secondAttribute="top" constant="70" id="EbO-XD-hJZ"/>
-                                        <constraint firstAttribute="bottom" secondItem="YYJ-rm-ihS" secondAttribute="bottom" constant="30" id="EpE-2n-YQi"/>
-                                        <constraint firstItem="YYJ-rm-ihS" firstAttribute="centerX" secondItem="guG-ln-Mtc" secondAttribute="centerX" id="Gz7-Dq-GG1"/>
-                                        <constraint firstItem="BSd-Cs-dC0" firstAttribute="centerX" secondItem="guG-ln-Mtc" secondAttribute="centerX" id="a73-WX-Q0v"/>
-                                        <constraint firstItem="BSd-Cs-dC0" firstAttribute="centerY" secondItem="guG-ln-Mtc" secondAttribute="centerY" id="mk1-wo-wGf"/>
-                                        <constraint firstItem="V9b-Mh-Cb7" firstAttribute="centerX" secondItem="guG-ln-Mtc" secondAttribute="centerX" id="xe7-Yk-xTH"/>
-                                    </constraints>
-                                </view>
-                                <blurEffect style="dark"/>
-                            </visualEffectView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iLz-uE-DHb">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                 <subviews>
@@ -2483,7 +2438,6 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="fYE-oh-zPC" firstAttribute="bottom" secondItem="ct8-Uq-NqE" secondAttribute="bottom" id="0o4-jK-G6K"/>
                             <constraint firstItem="zfp-UR-bnk" firstAttribute="leading" secondItem="pIw-lg-sJl" secondAttribute="leading" id="2p3-xO-ggF"/>
                             <constraint firstItem="iLz-uE-DHb" firstAttribute="trailing" secondItem="V76-GR-rSh" secondAttribute="trailing" id="6kE-xl-0zJ"/>
                             <constraint firstItem="6GA-Vn-Bn6" firstAttribute="top" secondItem="pIw-lg-sJl" secondAttribute="top" id="71A-69-QMW"/>
@@ -2492,16 +2446,13 @@
                             <constraint firstItem="V76-GR-rSh" firstAttribute="leading" secondItem="pIw-lg-sJl" secondAttribute="leading" id="IoD-Zk-Mof"/>
                             <constraint firstItem="zfp-UR-bnk" firstAttribute="top" secondItem="pIw-lg-sJl" secondAttribute="top" id="Lrn-Ng-Zoe"/>
                             <constraint firstItem="1cY-8T-e4N" firstAttribute="top" secondItem="pIw-lg-sJl" secondAttribute="top" id="NuP-Pv-ggM"/>
-                            <constraint firstItem="ct8-Uq-NqE" firstAttribute="top" secondItem="pIw-lg-sJl" secondAttribute="top" id="Ovv-1e-7c7"/>
                             <constraint firstItem="zfp-UR-bnk" firstAttribute="bottom" secondItem="fYE-oh-zPC" secondAttribute="bottom" id="QHV-Ub-Z5C"/>
                             <constraint firstItem="1cY-8T-e4N" firstAttribute="bottom" secondItem="fYE-oh-zPC" secondAttribute="bottom" id="TPn-iU-yjA"/>
-                            <constraint firstItem="fYE-oh-zPC" firstAttribute="trailing" secondItem="ct8-Uq-NqE" secondAttribute="trailing" id="WXa-xC-6Ij"/>
                             <constraint firstItem="iLz-uE-DHb" firstAttribute="leading" secondItem="6GA-Vn-Bn6" secondAttribute="leading" id="Wxn-P5-m9C"/>
                             <constraint firstAttribute="bottom" secondItem="iLz-uE-DHb" secondAttribute="bottom" id="X3p-sv-uGd"/>
                             <constraint firstAttribute="trailing" secondItem="V76-GR-rSh" secondAttribute="trailing" id="Z3U-Mi-JBu"/>
                             <constraint firstItem="zfp-UR-bnk" firstAttribute="trailing" secondItem="fYE-oh-zPC" secondAttribute="trailing" id="bND-vW-cWc"/>
                             <constraint firstItem="V76-GR-rSh" firstAttribute="bottom" secondItem="6GA-Vn-Bn6" secondAttribute="bottom" id="gKS-6R-lWz"/>
-                            <constraint firstItem="ct8-Uq-NqE" firstAttribute="leading" secondItem="fYE-oh-zPC" secondAttribute="leading" id="jPg-ee-GHj"/>
                             <constraint firstItem="V76-GR-rSh" firstAttribute="top" secondItem="6GA-Vn-Bn6" secondAttribute="top" id="lb2-zh-zgO"/>
                             <constraint firstItem="1cY-8T-e4N" firstAttribute="leading" secondItem="fYE-oh-zPC" secondAttribute="leading" id="qQB-RP-Pbu"/>
                             <constraint firstItem="V76-GR-rSh" firstAttribute="trailing" secondItem="6GA-Vn-Bn6" secondAttribute="trailing" id="qek-X6-8t7"/>
@@ -2520,14 +2471,7 @@
                         <outlet property="creditsTransitionView" destination="iLz-uE-DHb" id="sng-Pd-C6U"/>
                         <outlet property="creditsViewBottomConstraint" destination="j7S-30-YXR" id="guS-RD-iZM"/>
                         <outlet property="creditsViewTopConstraint" destination="QEJ-9d-m49" id="dvQ-Z0-ZoL"/>
-                        <outlet property="errorMessage" destination="BSd-Cs-dC0" id="0oC-8P-J2T"/>
-                        <outlet property="errorStatus" destination="V9b-Mh-Cb7" id="Qq5-iM-KCv"/>
                         <outlet property="goButton" destination="BoE-IK-nd3" id="NUL-sg-2TH"/>
-                        <outlet property="initalErrorView" destination="ct8-Uq-NqE" id="hQD-x1-Llh"/>
-                        <outlet property="initialErrorViewBottomConstraint" destination="0o4-jK-G6K" id="8t1-m0-sxe"/>
-                        <outlet property="initialErrorViewButtonBottomConstraint" destination="EpE-2n-YQi" id="bQS-Bs-oCM"/>
-                        <outlet property="initialErrorViewLabelTopConstraint" destination="EbO-XD-hJZ" id="hwK-id-OFa"/>
-                        <outlet property="initialErrorViewTopConstraint" destination="Ovv-1e-7c7" id="qN2-Rm-FL4"/>
                         <outlet property="jailbreakButtonLeftSpacing" destination="6Mq-BK-Kpp" id="imr-vy-RTY"/>
                         <outlet property="jailbreakButttonRightSpacing" destination="AGP-1d-rQ3" id="JUY-iE-EMd"/>
                         <outlet property="jailbreakProgressView" destination="bXb-wR-wqY" id="ZZu-dd-WbR"/>

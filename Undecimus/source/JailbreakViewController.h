@@ -63,9 +63,6 @@ while (false)
 @property (weak, nonatomic) IBOutlet UIView *creditsTransitionView;
 @property (weak,nonatomic) IBOutlet UINavigationBar *settingsNavBar;
 @property (weak,nonatomic) IBOutlet UINavigationBar *creditsNavBar;
-@property (weak,nonatomic) IBOutlet UIVisualEffectView *initalErrorView;
-@property (weak,nonatomic) IBOutlet UITextView *errorMessage;
-@property (weak,nonatomic) IBOutlet UILabel *errorStatus;
 @property (weak,nonatomic) IBOutlet UIProgressView *jailbreakProgressView;
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *mainViewTopConstraint;
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *mainViewBottomConstraint;
@@ -77,10 +74,6 @@ while (false)
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *jailbreakViewBottomConstraint;
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *creditsHapticTouchBottomConstraint;
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *settingssHapticTouchBottomConstraint;
-@property (weak,nonatomic) IBOutlet NSLayoutConstraint *initialErrorViewTopConstraint;
-@property (weak,nonatomic) IBOutlet NSLayoutConstraint *initialErrorViewBottomConstraint;
-@property (weak,nonatomic) IBOutlet NSLayoutConstraint *initialErrorViewLabelTopConstraint;
-@property (weak,nonatomic) IBOutlet NSLayoutConstraint *initialErrorViewButtonBottomConstraint;
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *swipeUpLabelBottomConstraint;
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *undecimusLogoCentreConstraint;
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *jailbreakButtonLeftSpacing;

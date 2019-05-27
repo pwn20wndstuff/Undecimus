@@ -71,14 +71,6 @@ extern int maxStage;
         [UIView performWithoutAnimation:^{ \
             [[[JailbreakViewController sharedController] jailbreakProgressView] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
                 }]; \
-        if (stage == maxStage)  {\
-            UIApplication *app = [UIApplication sharedApplication];\
-            [app performSelector:@selector(suspend)];\
-            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC));\
-            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){\
-                exit(0);\
-            }); \
-        }\
     }); \
 } while (false)
 
@@ -126,7 +118,7 @@ void jailbreak()
     NSMutableString *status = [NSMutableString new];
     bool const betaFirmware = isBetaFirmware();
     time_t const start_time = time(NULL);
-    UIProgressHUD *hud = prefs->hide_progress_hud ? nil : addProgressHUD();
+    UIProgressHUD *hud = prefs->hide_progress_hud || prefs->hide_log_window ? nil : addProgressHUD();
     JailbreakViewController *sharedController = [JailbreakViewController sharedController];
     NSMutableArray *resources = [NSMutableArray new];
     NSFileManager *const fileManager = [NSFileManager defaultManager];
@@ -1614,19 +1606,7 @@ void jailbreak()
             insertstatus(localize(@"Loaded Tweaks.\n"));
         }
         
-        if (!(prefs->load_tweaks)) {
-            //WHEN NOT LOADING TWEAKS
-            
-            
-            UIApplication *app = [UIApplication sharedApplication];
-            [app performSelector:@selector(suspend)];
-            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC));
-            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                exit(0);
-            });
-            
-            
-        }
+
     }
     
 out:;

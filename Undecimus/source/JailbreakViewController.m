@@ -47,6 +47,7 @@ CGFloat movementConstant = 0;
     prefs_t *prefs = copy_prefs();
     if (!jailbreakSupported()) {
         status(localize(@"Unsupported"), false, true);
+        _swipeUpLabel.text = @"Unsupported Device";
     } else if (prefs->restore_rootfs) {
         status(localize(@"Restore RootFS"), true, true);
     } else if (jailbreakEnabled()) {
@@ -64,7 +65,7 @@ CGFloat movementConstant = 0;
         
     }
     
-    self.initalErrorView.alpha = 0;
+
     self.settingsTransitionView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, movementConstant, 0);
     self.creditsTransitionView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, -movementConstant, 0);
     
@@ -84,10 +85,7 @@ CGFloat movementConstant = 0;
             _jailbreakViewBottomConstraint.constant = 44;
             _creditsHapticTouchBottomConstraint.constant = _creditsHapticTouchBottomConstraint.constant + 44;
             _settingssHapticTouchBottomConstraint.constant = _settingssHapticTouchBottomConstraint.constant + 44;
-            _initialErrorViewTopConstraint.constant = -44;
-            _initialErrorViewBottomConstraint.constant = -44;
-            _initialErrorViewLabelTopConstraint.constant = _initialErrorViewLabelTopConstraint.constant + 44;
-            _initialErrorViewButtonBottomConstraint.constant = _initialErrorViewButtonBottomConstraint.constant + 44;
+
         }
     }
     
@@ -237,12 +235,7 @@ CGFloat moveOnValidNumber;
         initialYLocation = yLocation;
         
         if (!jailbreakSupported()) {
-            
-            [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                self.initalErrorView.alpha = 1;
-                
-            } completion:nil];
-            
+
             [self noHaptic];
             
         }
@@ -384,15 +377,6 @@ CGFloat moveOnValidNumber;
 
 
 
-- (IBAction)dismissInitialError:(id)sender {
-    
-    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        
-        self.initalErrorView.alpha = 0;
-        
-    } completion:nil];
-    
-}
 
 
 - (IBAction)tappedOnPwn:(id)sender{
