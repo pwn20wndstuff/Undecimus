@@ -137,8 +137,8 @@ BOOL showSwipeUpGesture = NO;
         
         _jailbreakButtonLeftSpacing.constant = 220;
         _jailbreakButttonRightSpacing.constant = 220;
-        _consoleLogLeftSpacing.constant = 180;
-        _consoleLogRightSpacing.constant = 180;
+        //_consoleLogLeftSpacing.constant = 180;
+        //_consoleLogRightSpacing.constant = 180;
         
         
     }
