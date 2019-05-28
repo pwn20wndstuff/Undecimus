@@ -541,7 +541,7 @@ void jailbreak()
                                  @"/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation",
                                  @"/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate",
                                  @"/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation"];
-        if (prefs->disable_auto_updates) {
+        if (prefs->disable_auto_updates && !(prefs->restore_rootfs)) {
             // Disable Auto Updates.
             
             progress(localize(@"Disabling Auto Updates..."));
@@ -915,25 +915,6 @@ void jailbreak()
             }
             
             LOG("Successfully cleaned up.");
-            
-            // Enable auto updates
-            
-            LOG("Enabling auto updates...");
-            NSArray *const update_array = @[@"/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate",
-                                     @"/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdateDocumentation",
-                                     @"/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdate",
-                                     @"/var/MobileAsset/AssetsV2/com_apple_MobileAsset_SoftwareUpdateDocumentation"];
-            
-            progress(localize(@"Enabling Auto Updates..."));
-            for (id path in update_array) {
-                ensure_directory([path UTF8String], root_pw->pw_uid, 0755);
-            }
-            _assert(modifyPlist(@"/var/mobile/Library/Preferences/com.apple.Preferences.plist", ^(id plist) {
-                plist[@"kBadgedForSoftwareUpdateKey"] = @YES;
-                plist[@"kBadgedForSoftwareUpdateJumpOnceKey"] = @YES;;
-            }), localize(@"Unable to enable software update badge."), true);
-            
-            LOG("Enabled auto updates.");
             
             // Disallow SpringBoard to show non-default system apps.
             
