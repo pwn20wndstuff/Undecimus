@@ -633,6 +633,10 @@ void jailbreak()
             LOG("Snapshots on newly mounted RootFS:");
             for (const char **snapshot = snapshots; *snapshot; snapshot++) {
                 LOG("\t%s", *snapshot);
+                if (strcmp(*snapshot, original_snapshot) == 0) {
+                    LOG("Clearing old original system snapshot...");
+                    _assert(fs_snapshot_delete(rootfd, original_snapshot, 0) == ERR_SUCCESS, localize(@"Unable to clear old original system snapshot."), true);
+                }
             }
             SafeFreeNULL(snapshots);
             NSString *const systemVersionPlist = @"/System/Library/CoreServices/SystemVersion.plist";
