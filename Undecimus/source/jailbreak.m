@@ -1646,7 +1646,7 @@ out:;
     forceRespring &= (!usedPersistedKernelTaskPort);
     forceRespring &= (!prefs->load_tweaks);
     bool willRespring = (forceRespring);
-    willRespring |= (prefs->load_tweaks);
+    willRespring |= (prefs->load_tweaks && !prefs->ssh_only);
     release_prefs(&prefs);
     _assert(create_file(success_file, mobile_pw->pw_uid, 644), localize(@"Unable to create success file."), true);
     showAlert(@"Jailbreak Completed", [NSString stringWithFormat:@"%@\n\n%@\n%@", localize(@"Jailbreak Completed with Status:"), status, localize(willRespring ? @"The device will now respring." : @"The app will now exit.")], true, false);
