@@ -76,7 +76,14 @@ while (false)
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *jailbreakButttonRightSpacing;
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *consoleLogLeftSpacing;
 @property (weak,nonatomic) IBOutlet NSLayoutConstraint *consoleLogRightSpacing;
-
+@property (weak,nonatomic) IBOutlet UILabel *uncoverDescriptionLabel;
+@property (weak,nonatomic) IBOutlet UILabel *byLabel;
+@property (weak,nonatomic) IBOutlet UILabel *firstAndLabel;
+@property (weak,nonatomic) IBOutlet UILabel *uiByLabel;
+@property (weak,nonatomic) IBOutlet UILabel *secondAndLabel;
+@property (weak,nonatomic) IBOutlet UILabel *thirdAndLabel;
+@property (weak,nonatomic) IBOutlet UILabel *jailbreakViewUOLabel;
+@property (weak,nonatomic) IBOutlet UIActivityIndicatorView *jailbreakActivityIndicator;
 
 
 @property (assign) BOOL canExit;

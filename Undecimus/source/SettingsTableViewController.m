@@ -44,8 +44,52 @@
     [self reloadData];
 }
 
+-(void)darkModeSettings {
+    
+    self.TweakInjectionLabel.textColor = UIColor.whiteColor;
+    self.LoadDaemonsLabel.textColor = UIColor.whiteColor;
+    self.DumpAPTicketLabel.textColor = UIColor.whiteColor;
+    self.RefreshIconCacheLabel.textColor = UIColor.whiteColor;
+    self.DisableAutoUpdatesLabel.textColor = UIColor.whiteColor;
+    self.DisableAppRevokesLabel.textColor = UIColor.whiteColor;
+    self.OverwriteBootNonceLabel.textColor = UIColor.whiteColor;
+    self.ExportKernelTaskPortLabel.textColor = UIColor.whiteColor;
+    self.RestoreRootFSLabel.textColor = UIColor.whiteColor;
+    self.installCydiaLabel.textColor = UIColor.whiteColor;
+    self.installSSHLabel.textColor = UIColor.whiteColor;
+    self.IncreaseMemoryLimitLabel.textColor = UIColor.whiteColor;
+    self.ReloadSystemDaemonsLabel.textColor = UIColor.whiteColor;
+    self.HideLogWindowLabel.textColor = UIColor.whiteColor;
+    self.DarkModeLabel.textColor = UIColor.whiteColor;
+    self.ResetCydiaCacheLabel.textColor = UIColor.whiteColor;
+    self.SSHOnlyLabel.textColor = UIColor.whiteColor;
+    self.EnableGetTaskAllowLabel.textColor = UIColor.whiteColor;
+    self.SetCSDebuggedLabel.textColor = UIColor.whiteColor;
+    self.AutoRespringLabel.textColor = UIColor.whiteColor;
+    self.HideProgressHUDLabel.textColor = UIColor.whiteColor;
+    self.kernelExploitLabel.textColor = UIColor.whiteColor;
+    
+    [self.bootNonceButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.BootNonceTextField setTintColor:[UIColor whiteColor]];
+    
+    [self.BootNonceTextField setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.ECIDLabel setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.ecidDarkModeButton setTitleColor:[UIColor whiteColor] forState: normal];
+    
+    
+    self.expiryDarkModeLabel.textColor = UIColor.whiteColor;
+    [self.ExpiryLabel setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.UptimeLabel setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
+    self.upTimeLabel.textColor = UIColor.whiteColor;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
+    prefs_t *prefs = copy_prefs();
+    if (prefs->dark_mode) {
+        [self darkModeSettings];
+    }
+    
     [self.BootNonceTextField setDelegate:self];
     self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
     self.tap.cancelsTouchesInView = NO;
@@ -91,6 +135,7 @@
     if (prefs->ecid) [self.ECIDLabel setPlaceholder:hexFromInt([@(prefs->ecid) integerValue])];
     [self.ReloadSystemDaemonsSwitch setOn:(BOOL)prefs->reload_system_daemons];
     [self.HideLogWindowSwitch setOn:(BOOL)prefs->hide_log_window];
+    [self.DarkModeSwitch setOn:(BOOL)prefs->dark_mode];
     [self.ResetCydiaCacheSwitch setOn:(BOOL)prefs->reset_cydia_cache];
     [self.SSHOnlySwitch setOn:(BOOL)prefs->ssh_only];
     [self.EnableGetTaskAllowSwitch setOn:(BOOL)prefs->enable_get_task_allow];
@@ -355,6 +400,19 @@
 - (IBAction)hideLogWindowSwitchTriggered:(id)sender {
     prefs_t *prefs = copy_prefs();
     prefs->hide_log_window = (bool)self.HideLogWindowSwitch.isOn;
+    set_prefs(prefs);
+    release_prefs(&prefs);
+    [self reloadData];
+    void (^const block)(void) = ^(void) {
+        notice(localize(@"Preference was changed. The app will now exit."), true, false);
+        exit(EXIT_SUCCESS);
+    };
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), block);
+}
+
+- (IBAction)enableDarkModeTriggered:(id)sender {
+    prefs_t *prefs = copy_prefs();
+    prefs->dark_mode = (bool)self.DarkModeSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];

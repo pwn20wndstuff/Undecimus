@@ -64,6 +64,32 @@ static CGFloat largestLengthScreen = 0;
     release_prefs(&prefs);
 }
 
+-(void)darkMode {
+    self.mainView.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:0.9];
+    self.settingsTransitionView.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:0.9];
+    self.creditsTransitionView.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:0.9];
+    self.jailbreakView.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:0.9];
+    self.uOLabel.textColor = UIColor.whiteColor;
+    self.swipeUpLabel.textColor = UIColor.whiteColor;
+    
+    [self.settingsNavBar setTintColor:[UIColor whiteColor]];
+    [self.settingsNavBar setLargeTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor whiteColor]}];
+    [self.creditsNavBar setTintColor:[UIColor whiteColor]];
+    [self.creditsNavBar setLargeTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor whiteColor]}];
+    
+    self.uncoverDescriptionLabel.textColor = UIColor.whiteColor;
+    self.byLabel.textColor = UIColor.whiteColor;
+    self.firstAndLabel.textColor = UIColor.whiteColor;
+    self.uiByLabel.textColor = UIColor.whiteColor;
+    self.secondAndLabel.textColor = UIColor.whiteColor;
+    self.thirdAndLabel.textColor = UIColor.whiteColor;
+    self.jailbreakViewUOLabel.textColor = UIColor.whiteColor;
+    self.jailbreakActivityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+    self.jailbreakProgressView.progressTintColor = UIColor.whiteColor;
+}
+
+
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
@@ -163,6 +189,10 @@ static CGFloat largestLengthScreen = 0;
         self.undecimusLogoCentreConstraint.constant = -70;
     }
     
+    if (prefs->dark_mode) {
+        [self darkMode];
+    }
+    
     release_prefs(&prefs);
     
     sharedController = self;
@@ -183,7 +213,13 @@ static CGFloat largestLengthScreen = 0;
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    return UIStatusBarStyleDefault;
+    prefs_t *prefs = copy_prefs();
+    
+    if (prefs->dark_mode) {
+        return UIStatusBarStyleLightContent;
+    } else {
+        return UIStatusBarStyleDefault;
+    }
 }
 
 -(void)hapticTouchFeedback {

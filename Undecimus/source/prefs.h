@@ -29,6 +29,7 @@
 #define K_INSTALL_CYDIA            "InstallCydia"
 #define K_RELOAD_SYSTEM_DAEMONS    "DoReloadSystemDaemons"
 #define K_HIDE_LOG_WINDOW          "HideLogWindow"
+#define K_DARK_MODE                "DarkMode"
 #define K_RESET_CYDIA_CACHE        "ResetCydiaCache"
 #define K_SSH_ONLY                 "SSHOnly"
 #define K_ENABLE_GET_TASK_ALLOW    "DoEnableGetTaskAllow"
@@ -57,6 +58,7 @@ typedef struct {
     bool enable_get_task_allow;
     bool set_cs_debugged;
     bool hide_log_window;
+    bool dark_mode;
     bool auto_respring;
     bool hide_progress_hud;
     int exploit;

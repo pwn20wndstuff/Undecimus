@@ -16,6 +16,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    prefs_t *prefs = copy_prefs();
+    if (prefs->dark_mode) {
+        [self darkModeCreditsView];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -36,6 +41,42 @@
         return [NSURL URLWithString:[NSString stringWithFormat:@"https://mobile.twitter.com/%@", userName]];
     }
 }
+
+-(void) darkModeCreditsView {
+    
+    [self.IanBeerButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.BazadButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.MorpheusButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.XerubButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.PsychoTeaButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.StekButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.NinjaPrawnButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.CrypticButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.XerusDesignButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.AppleDryButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.RobButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.MidnightChipButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.GeoSn0wButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.SwaggoButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.JailbreakbusterButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.JakeashacksButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.JonathanSealsButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.SaurikButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.TihmstarButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.SiguzaButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.S0rryMyBadButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.ExternalistButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.RealBrightiupButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.NitoTVButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.MatchsticButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.UmanghereButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.MiscMistyButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.SemaphoreButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.PimskeksButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.LibimobiledeviceButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.BenButton setTitleColor:[UIColor whiteColor] forState: normal];
+}
+
 
 -(IBAction)tappedOnIanBeer:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"i41nbeer"] options:@{} completionHandler:nil];
