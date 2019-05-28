@@ -22,7 +22,7 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="GAs-vX-6zY">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="746"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <sections>
                             <tableViewSection id="XCt-Li-vAj">
                                 <cells>
@@ -1142,7 +1142,7 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="XeG-pE-Kqy">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="698"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <sections>
                             <tableViewSection id="jVv-CN-a4D">
                                 <cells>
@@ -2075,6 +2075,7 @@
                                 <subviews>
                                     <navigationBar contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WJk-R7-nNN">
                                         <rect key="frame" x="0.0" y="20" width="414" height="96"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <items>
                                             <navigationItem title="Settings" id="yTh-LH-d6X">
                                                 <barButtonItem key="rightBarButtonItem" style="done" id="zjF-aR-uXf">
@@ -2101,7 +2102,7 @@
                                         </connections>
                                     </containerView>
                                 </subviews>
-                                <color key="backgroundColor" red="0.93725490570000003" green="0.93725490570000003" blue="0.95686274770000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" white="1" alpha="0.83999999999999997" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="f6D-JC-GjA" secondAttribute="bottom" id="KYm-GA-kPK"/>
                                     <constraint firstAttribute="trailing" secondItem="f6D-JC-GjA" secondAttribute="trailing" id="UUw-cc-t1J"/>
@@ -2401,6 +2402,7 @@
                                 <subviews>
                                     <navigationBar contentMode="scaleToFill" misplaced="YES" largeTitles="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RZ7-xv-9EY">
                                         <rect key="frame" x="0.0" y="52" width="414" height="96"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <items>
                                             <navigationItem title="Credits" largeTitleDisplayMode="always" id="Y6G-Wc-bdg">
                                                 <barButtonItem key="rightBarButtonItem" style="done" id="Wfv-7m-BPR">
