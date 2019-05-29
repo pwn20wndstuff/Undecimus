@@ -49,12 +49,13 @@ while (false)
 @property (weak, nonatomic) IBOutlet UITextView *outputView;
 @property (weak, nonatomic) IBOutlet UIButton *darkModeButton;
 @property (weak, nonatomic) IBOutlet UIButton *settingsButton;
+@property (weak, nonatomic) IBOutlet UIButton *mainDevsButton;
 
 @property (weak, nonatomic) IBOutlet UILabel *exploitProgressLabel;
 @property (weak, nonatomic) IBOutlet UILabel *exploitMessageLabel;
 @property (weak, nonatomic) IBOutlet UILabel *u0Label;
-@property (weak, nonatomic) IBOutlet UILabel *jailbreakLabel;
-@property (weak, nonatomic) IBOutlet UILabel *supportediOSLabel;
+//@property (weak, nonatomic) IBOutlet UILabel *jailbreakLabel;
+//@property (weak, nonatomic) IBOutlet UILabel *supportediOSLabel;
 @property (weak, nonatomic) IBOutlet UILabel *uOVersionLabel;
 
 @property (weak, nonatomic) IBOutlet UIProgressView *jailbreakProgressBar;
@@ -62,7 +63,19 @@ while (false)
 @property (weak, nonatomic) IBOutlet UIView *mainView;
 @property (weak, nonatomic) IBOutlet UIView *creditsView;
 @property (weak, nonatomic) IBOutlet UIView *settingsView;
-@property (weak, nonatomic) IBOutlet UIView *specialThanksView;
+@property (weak, nonatomic) IBOutlet UIView *mainDevView;
+@property (weak, nonatomic) IBOutlet UIView *backgroundView;
+
+@property (weak, nonatomic) IBOutlet UINavigationBar *settingsNavBar;
+@property (weak, nonatomic) IBOutlet UINavigationBar *creditsNavBar;
+
+@property (weak, nonatomic) IBOutlet UILabel *jailbreakLabel;
+@property (weak, nonatomic) IBOutlet UILabel *byLabel;
+@property (weak, nonatomic) IBOutlet UILabel *UIByLabel;
+@property (weak, nonatomic) IBOutlet UILabel *firstAndLabel;
+@property (weak, nonatomic) IBOutlet UILabel *secondAndLabel;
+@property (weak, nonatomic) IBOutlet UILabel *thirdAndLabel;
+@property (weak, nonatomic) IBOutlet UILabel *fourthAndLabel;
 
 
 @property (readonly) JailbreakViewController *sharedController;

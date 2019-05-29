@@ -64,9 +64,10 @@
 		22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 22CFED9121CDFE6B00A216BE /* libmis.tbd */; };
 		22F91CDB21E02CF300B2FCAE /* inject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CD921E02CF200B2FCAE /* inject.m */; };
 		22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CE221E033A500B2FCAE /* libsnappy.c */; };
-		5143507D229E279D00446FBA /* unc0ver-light.png in Resources */ = {isa = PBXBuildFile; fileRef = 5143507C229E279D00446FBA /* unc0ver-light.png */; };
 		5143507F229E2E3300446FBA /* DarkMode-Light.png in Resources */ = {isa = PBXBuildFile; fileRef = 5143507E229E2E3200446FBA /* DarkMode-Light.png */; };
 		51435081229E2F0C00446FBA /* Settings-Light.png in Resources */ = {isa = PBXBuildFile; fileRef = 51435080229E2F0C00446FBA /* Settings-Light.png */; };
+		51F1DB24229ED54400B81A6F /* DarkMode-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 51F1DB22229ED54300B81A6F /* DarkMode-Dark.png */; };
+		51F1DB25229ED54400B81A6F /* Settings-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 51F1DB23229ED54400B81A6F /* Settings-Dark.png */; };
 		8D592A68218E47F60035D2BC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D592A67218E47F60035D2BC /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -192,10 +193,15 @@
 		22F91CDA21E02CF300B2FCAE /* inject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inject.h; path = Injector/inject.h; sourceTree = SOURCE_ROOT; };
 		22F91CDE21E02EB000B2FCAE /* snappy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = snappy.h; path = snappy/snappy.h; sourceTree = SOURCE_ROOT; };
 		22F91CE221E033A500B2FCAE /* libsnappy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libsnappy.c; path = snappy/libsnappy.c; sourceTree = SOURCE_ROOT; };
-		5143507C229E279D00446FBA /* unc0ver-light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "unc0ver-light.png"; sourceTree = "<group>"; };
 		5143507E229E2E3200446FBA /* DarkMode-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "DarkMode-Light.png"; path = "../../../DarkMode-Light.png"; sourceTree = "<group>"; };
 		51435080229E2F0C00446FBA /* Settings-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings-Light.png"; sourceTree = "<group>"; };
-		51435083229E3D4900446FBA /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
+		51F1DB22229ED54300B81A6F /* DarkMode-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DarkMode-Dark.png"; sourceTree = "<group>"; };
+		51F1DB23229ED54400B81A6F /* Settings-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings-Dark.png"; sourceTree = "<group>"; };
+		51F1DB26229F2AD200B81A6F /* RobotoMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Regular.ttf"; sourceTree = "<group>"; };
+		51F1DB27229F2BC700B81A6F /* RobotoMono-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Bold.ttf"; sourceTree = "<group>"; };
+		51F1DB28229F31C400B81A6F /* DarkMode-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DarkMode-Light.png"; sourceTree = "<group>"; };
+		51F1DB29229F31D300B81A6F /* DarkMode-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "DarkMode-Light.png"; path = "../../../../DarkMode-Light.png"; sourceTree = "<group>"; };
+		51F1DB2A229F325700B81A6F /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
 		8D592A67218E47F60035D2BC /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -371,6 +377,13 @@
 			isa = PBXGroup;
 			children = (
 				21FED6A42168DB460024BC95 /* Painting_With_Chocolate.ttf */,
+				51F1DB26229F2AD200B81A6F /* RobotoMono-Regular.ttf */,
+				51F1DB27229F2BC700B81A6F /* RobotoMono-Bold.ttf */,
+				51F1DB28229F31C400B81A6F /* DarkMode-Light.png */,
+				51F1DB22229ED54300B81A6F /* DarkMode-Dark.png */,
+				51F1DB23229ED54400B81A6F /* Settings-Dark.png */,
+				51435080229E2F0C00446FBA /* Settings-Light.png */,
+				51F1DB29229F31D300B81A6F /* DarkMode-Light.png */,
 			);
 			path = resources;
 			sourceTree = "<group>";
@@ -475,10 +488,8 @@
 				2170BD3421B192750059BD10 /* include */,
 				8D592A67218E47F60035D2BC /* Main.storyboard */,
 				5143507E229E2E3200446FBA /* DarkMode-Light.png */,
+				51F1DB2A229F325700B81A6F /* multi_path.entitlements */,
 				21C0FC7321369EB800849420 /* Assets.xcassets */,
-				5143507C229E279D00446FBA /* unc0ver-light.png */,
-				51435083229E3D4900446FBA /* multi_path.entitlements */,
-				51435080229E2F0C00446FBA /* Settings-Light.png */,
 				21C0FC7521369EB800849420 /* LaunchScreen.storyboard */,
 				21C0FC7821369EB800849420 /* Info.plist */,
 			);
@@ -593,9 +604,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5143507D229E279D00446FBA /* unc0ver-light.png in Resources */,
+				51F1DB25229ED54400B81A6F /* Settings-Dark.png in Resources */,
 				51435081229E2F0C00446FBA /* Settings-Light.png in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
+				51F1DB24229ED54400B81A6F /* DarkMode-Dark.png in Resources */,
 				8D592A68218E47F60035D2BC /* Main.storyboard in Resources */,
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
 				5143507F229E2E3300446FBA /* DarkMode-Light.png in Resources */,

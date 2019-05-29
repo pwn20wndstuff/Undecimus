@@ -42,6 +42,33 @@
 @property (weak, nonatomic) IBOutlet UISwitch *AutoRespringSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *HideProgressHUDSwitch;
 
+@property (weak, nonatomic) IBOutlet UILabel *specialThanksLabel;
+@property (weak, nonatomic) IBOutlet UILabel *TweakInjectionLabel;
+@property (weak, nonatomic) IBOutlet UILabel *LoadDaemonsLabel;
+@property (weak, nonatomic) IBOutlet UILabel *DumpAPTicketLabel;
+@property (weak, nonatomic) IBOutlet UILabel *RefreshIconCacheLabel;
+@property (weak, nonatomic) IBOutlet UILabel *DisableAutoUpdatesLabel;
+@property (weak, nonatomic) IBOutlet UILabel *DisableAppRevokesLabel;
+@property (weak, nonatomic) IBOutlet UILabel *OverwriteBootNonceLabel;
+@property (weak, nonatomic) IBOutlet UILabel *ExportKernelTaskPortLabel;
+@property (weak, nonatomic) IBOutlet UILabel *RestoreRootFSLabel;
+@property (weak, nonatomic) IBOutlet UILabel *installCydiaLabel;
+@property (weak, nonatomic) IBOutlet UILabel *installSSHLabel;
+@property (weak, nonatomic) IBOutlet UILabel *IncreaseMemoryLimitLabel;
+@property (weak, nonatomic) IBOutlet UILabel *ReloadSystemDaemonsLabel;
+@property (weak, nonatomic) IBOutlet UILabel *HideLogWindowLabel;
+@property (weak, nonatomic) IBOutlet UILabel *ResetCydiaCacheLabel;
+@property (weak, nonatomic) IBOutlet UILabel *SSHOnlyLabel;
+@property (weak, nonatomic) IBOutlet UILabel *EnableGetTaskAllowLabel;
+@property (weak, nonatomic) IBOutlet UILabel *SetCSDebuggedLabel;
+@property (weak, nonatomic) IBOutlet UILabel *AutoRespringLabel;
+@property (weak, nonatomic) IBOutlet UILabel *HideProgressHUDLabel;
+@property (weak, nonatomic) IBOutlet UILabel *kernelExploitLabel;
+@property (weak, nonatomic) IBOutlet UIButton *bootNonceButton;
+@property (weak, nonatomic) IBOutlet UIButton *ecidDarkModeButton;
+@property (weak, nonatomic) IBOutlet UILabel *expiryDarkModeLabel;
+@property (weak, nonatomic) IBOutlet UILabel *upTimeLabel;
+
 + (NSDictionary *)provisioningProfileAtPath:(NSString *)path;
 
 @end

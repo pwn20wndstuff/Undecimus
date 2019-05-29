@@ -65,6 +65,7 @@ bool load_prefs(prefs_t *prefs) {
     prefs->hide_log_window = (bool)[[userDefaults objectForKey:@K_HIDE_LOG_WINDOW inDomain:prefsFile] boolValue];
     prefs->auto_respring = (bool)[[userDefaults objectForKey:@K_AUTO_RESPRING inDomain:prefsFile] boolValue];
     prefs->hide_progress_hud = (bool)[[userDefaults objectForKey:@K_HIDE_PROGRESS_HUD inDomain:prefsFile] boolValue];
+    prefs->dark_mode = (bool)[[userDefaults objectForKey:@K_DARK_MODE inDomain:prefsFile] boolValue];
     return true;
 }
 
@@ -95,6 +96,7 @@ bool set_prefs(prefs_t *prefs) {
     [userDefaults setObject:[NSNumber numberWithBool:(BOOL)prefs->hide_log_window] forKey:@K_HIDE_LOG_WINDOW inDomain:prefsFile];
     [userDefaults setObject:[NSNumber numberWithBool:(BOOL)prefs->auto_respring] forKey:@K_AUTO_RESPRING inDomain:prefsFile];
     [userDefaults setObject:[NSNumber numberWithBool:(BOOL)prefs->hide_progress_hud] forKey:@K_HIDE_PROGRESS_HUD inDomain:prefsFile];
+    [userDefaults setObject:[NSNumber numberWithBool:(BOOL)prefs->dark_mode] forKey:@K_DARK_MODE inDomain:prefsFile];
     [userDefaults synchronize];
     return true;
 }
@@ -122,6 +124,7 @@ void register_default_prefs() {
     defaults[@K_HIDE_LOG_WINDOW] = @NO;
     defaults[@K_AUTO_RESPRING] = @NO;
     defaults[@K_HIDE_PROGRESS_HUD] = @NO;
+    defaults[@K_DARK_MODE] = @YES;
     defaults[@K_EXPLOIT] = [NSNumber numberWithInteger:recommendedJailbreakSupport()];
     [userDefaults registerDefaults:defaults];
 }

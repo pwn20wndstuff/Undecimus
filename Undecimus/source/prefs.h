@@ -31,6 +31,7 @@
 #define K_HIDE_LOG_WINDOW          "HideLogWindow"
 #define K_RESET_CYDIA_CACHE        "ResetCydiaCache"
 #define K_SSH_ONLY                 "SSHOnly"
+#define K_DARK_MODE                "DarkMode"
 #define K_ENABLE_GET_TASK_ALLOW    "DoEnableGetTaskAllow"
 #define K_SET_CS_DEBUGGED          "SetCSDebugged"
 #define K_AUTO_RESPRING            "AutoRespring"
@@ -59,6 +60,7 @@ typedef struct {
     bool hide_log_window;
     bool auto_respring;
     bool hide_progress_hud;
+    bool dark_mode;
     int exploit;
 } prefs_t;
 

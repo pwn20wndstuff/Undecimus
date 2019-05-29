@@ -72,7 +72,7 @@ extern int maxStage;
         [UIView performWithoutAnimation:^{ \
             [[[JailbreakViewController sharedController] jailbreakProgressBar] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
             [[[JailbreakViewController sharedController] jailbreakProgressBar] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
-            [[JailbreakViewController sharedController] exploitProgressLabel].text = [NSString stringWithFormat:@"%@ / %@", [NSString stringWithFormat:@"%i", stage], [NSString stringWithFormat:@"%i", maxStage]];;\
+            [[JailbreakViewController sharedController] exploitProgressLabel].text = [NSString stringWithFormat:@"%@/%@", [NSString stringWithFormat:@"%i", stage], [NSString stringWithFormat:@"%i", maxStage]];;\
         }]; \
     }); \
 } while (false)
