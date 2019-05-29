@@ -64,6 +64,9 @@
 		22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 22CFED9121CDFE6B00A216BE /* libmis.tbd */; };
 		22F91CDB21E02CF300B2FCAE /* inject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CD921E02CF200B2FCAE /* inject.m */; };
 		22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CE221E033A500B2FCAE /* libsnappy.c */; };
+		5143507D229E279D00446FBA /* unc0ver-light.png in Resources */ = {isa = PBXBuildFile; fileRef = 5143507C229E279D00446FBA /* unc0ver-light.png */; };
+		5143507F229E2E3300446FBA /* DarkMode-Light.png in Resources */ = {isa = PBXBuildFile; fileRef = 5143507E229E2E3200446FBA /* DarkMode-Light.png */; };
+		51435081229E2F0C00446FBA /* Settings-Light.png in Resources */ = {isa = PBXBuildFile; fileRef = 51435080229E2F0C00446FBA /* Settings-Light.png */; };
 		8D592A68218E47F60035D2BC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D592A67218E47F60035D2BC /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -161,7 +164,6 @@
 		21C130EA214C03690021AA9D /* CreditsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CreditsTableViewController.m; sourceTree = "<group>"; };
 		21C13117214D268F0021AA9D /* multi_path_sploit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = multi_path_sploit.c; sourceTree = "<group>"; };
 		21C13118214D268F0021AA9D /* multi_path_sploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multi_path_sploit.h; sourceTree = "<group>"; };
-		21C1312E214D5A710021AA9D /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
 		21CC3901227CDFDE0072D572 /* prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prefs.h; sourceTree = "<group>"; };
 		21CC3902227CDFDE0072D572 /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = prefs.m; sourceTree = "<group>"; };
 		21CC3903227CDFDE0072D572 /* diagnostics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = diagnostics.m; sourceTree = "<group>"; };
@@ -190,6 +192,10 @@
 		22F91CDA21E02CF300B2FCAE /* inject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inject.h; path = Injector/inject.h; sourceTree = SOURCE_ROOT; };
 		22F91CDE21E02EB000B2FCAE /* snappy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = snappy.h; path = snappy/snappy.h; sourceTree = SOURCE_ROOT; };
 		22F91CE221E033A500B2FCAE /* libsnappy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libsnappy.c; path = snappy/libsnappy.c; sourceTree = SOURCE_ROOT; };
+		5143507C229E279D00446FBA /* unc0ver-light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "unc0ver-light.png"; sourceTree = "<group>"; };
+		5143507E229E2E3200446FBA /* DarkMode-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "DarkMode-Light.png"; path = "../../../DarkMode-Light.png"; sourceTree = "<group>"; };
+		51435080229E2F0C00446FBA /* Settings-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings-Light.png"; sourceTree = "<group>"; };
+		51435083229E3D4900446FBA /* multi_path.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = multi_path.entitlements; sourceTree = "<group>"; };
 		8D592A67218E47F60035D2BC /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -468,10 +474,13 @@
 				2170BD3621B192B90059BD10 /* resources */,
 				2170BD3421B192750059BD10 /* include */,
 				8D592A67218E47F60035D2BC /* Main.storyboard */,
+				5143507E229E2E3200446FBA /* DarkMode-Light.png */,
 				21C0FC7321369EB800849420 /* Assets.xcassets */,
+				5143507C229E279D00446FBA /* unc0ver-light.png */,
+				51435083229E3D4900446FBA /* multi_path.entitlements */,
+				51435080229E2F0C00446FBA /* Settings-Light.png */,
 				21C0FC7521369EB800849420 /* LaunchScreen.storyboard */,
 				21C0FC7821369EB800849420 /* Info.plist */,
-				21C1312E214D5A710021AA9D /* multi_path.entitlements */,
 			);
 			path = Undecimus;
 			sourceTree = "<group>";
@@ -584,9 +593,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5143507D229E279D00446FBA /* unc0ver-light.png in Resources */,
+				51435081229E2F0C00446FBA /* Settings-Light.png in Resources */,
 				21C0FC7721369EB800849420 /* LaunchScreen.storyboard in Resources */,
 				8D592A68218E47F60035D2BC /* Main.storyboard in Resources */,
 				21C0FC7421369EB800849420 /* Assets.xcassets in Resources */,
+				5143507F229E2E3300446FBA /* DarkMode-Light.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

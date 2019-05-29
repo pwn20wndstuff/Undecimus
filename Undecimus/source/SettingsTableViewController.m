@@ -46,15 +46,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    UIImageView *const myImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Clouds"]];
-    [myImageView setContentMode:UIViewContentModeScaleAspectFill];
-    [myImageView setFrame:self.tableView.frame];
-    UIView *const myView = [[UIView alloc] initWithFrame:myImageView.frame];
-    [myView setBackgroundColor:[UIColor whiteColor]];
-    [myView setAlpha:0.84];
-    [myView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
-    [myImageView addSubview:myView];
-    [self.tableView setBackgroundView:myImageView];
+
     [self.BootNonceTextField setDelegate:self];
     self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
     self.tap.cancelsTouchesInView = NO;

@@ -47,8 +47,25 @@ while (false)
 @interface JailbreakViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UIButton *goButton;
 @property (weak, nonatomic) IBOutlet UITextView *outputView;
+@property (weak, nonatomic) IBOutlet UIButton *darkModeButton;
+@property (weak, nonatomic) IBOutlet UIButton *settingsButton;
+
+@property (weak, nonatomic) IBOutlet UILabel *exploitProgressLabel;
+@property (weak, nonatomic) IBOutlet UILabel *exploitMessageLabel;
+@property (weak, nonatomic) IBOutlet UILabel *u0Label;
+@property (weak, nonatomic) IBOutlet UILabel *jailbreakLabel;
+@property (weak, nonatomic) IBOutlet UILabel *supportediOSLabel;
+@property (weak, nonatomic) IBOutlet UILabel *uOVersionLabel;
+
+@property (weak, nonatomic) IBOutlet UIProgressView *jailbreakProgressBar;
+
+@property (weak, nonatomic) IBOutlet UIView *mainView;
+@property (weak, nonatomic) IBOutlet UIView *creditsView;
+@property (weak, nonatomic) IBOutlet UIView *settingsView;
+@property (weak, nonatomic) IBOutlet UIView *specialThanksView;
+
+
 @property (readonly) JailbreakViewController *sharedController;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *goButtonSpacing;
 @property (assign) BOOL canExit;
 
 double uptime(void);

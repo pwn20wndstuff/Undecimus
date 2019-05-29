@@ -68,6 +68,13 @@ extern int maxStage;
     __COUNTER__; \
     stage++; \
     status_with_stage(stage, maxStage); \
+    dispatch_async(dispatch_get_main_queue(), ^{ \
+        [UIView performWithoutAnimation:^{ \
+            [[[JailbreakViewController sharedController] jailbreakProgressBar] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
+            [[[JailbreakViewController sharedController] jailbreakProgressBar] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
+            [[JailbreakViewController sharedController] exploitProgressLabel].text = [NSString stringWithFormat:@"%@ / %@", [NSString stringWithFormat:@"%i", stage], [NSString stringWithFormat:@"%i", maxStage]];;\
+        }]; \
+    }); \
 } while (false)
 
 #define find_offset(x, symbol, critical) do { \

@@ -26,6 +26,9 @@ static NSString *bundledResources = nil;
 
 - (IBAction)tappedOnJailbreak:(id)sender
 {
+    self.exploitMessageLabel.alpha = 1;
+    self.exploitProgressLabel.alpha = 1;
+    self.jailbreakProgressBar.alpha = 1;
     status(localize(@"Jailbreak"), false, false);
     void (^const block)(void) = ^(void) {
         _assert(bundledResources != nil, localize(@"Bundled Resources version missing."), true);
@@ -40,18 +43,34 @@ static NSString *bundledResources = nil;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    self.exploitProgressLabel.alpha = 0;
+    self.jailbreakProgressBar.progress = 0;
+    self.jailbreakProgressBar.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 2);
+    self.exploitMessageLabel.alpha = 0;
     prefs_t *prefs = copy_prefs();
     if (!jailbreakSupported()) {
         status(localize(@"Unsupported"), false, true);
+        //self.exploitMessageLabel.text = @"Unsupported";
     } else if (prefs->restore_rootfs) {
         status(localize(@"Restore RootFS"), true, true);
+        //self.exploitMessageLabel.text = @"Ready to restore RootFS";
     } else if (jailbreakEnabled()) {
         status(localize(@"Re-Jailbreak"), true, true);
+        //self.exploitMessageLabel.text = @"Ready to re-jailbreak";
     } else {
         status(localize(@"Jailbreak"), true, true);
+        //self.exploitMessageLabel.text = @"Ready to jailbreak";
     }
+    
+    self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7);
+    self.settingsView.alpha = 0;
+    self.creditsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7);
+    self.creditsView.alpha = 0;
     release_prefs(&prefs);
 }
+
+int now = 1;
+int max = 33;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -59,14 +78,16 @@ static NSString *bundledResources = nil;
     // Do any additional setup after loading the view, typically from a nib.
     prefs_t *prefs = copy_prefs();
     if (prefs->hide_log_window) {
-        _outputView.hidden = YES;
-        _outputView = nil;
-        _goButtonSpacing.constant += 80;
+        //_outputView.hidden = YES;
+        // _outputView = nil;
     }
+    
+    //self.exploitProgressLabel.text = [NSString stringWithFormat:@"%@ / %@", [NSString stringWithFormat:@"%i", now], [NSString stringWithFormat:@"%i", max]];
     release_prefs(&prefs);
     sharedController = self;
     bundledResources = bundledResourcesVersion();
     LOG("unc0ver Version: %@", appVersion());
+    self.uOVersionLabel.text = [NSString stringWithFormat:@"unc0ver Version: %@", appVersion()];
     printOSDetails();
     LOG("Bundled Resources Version: %@", bundledResources);
     if (bundledResources == nil) {
@@ -83,6 +104,24 @@ static NSString *bundledResources = nil;
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleDefault;
+}
+
+- (IBAction)openSettings:(id)sender{
+    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.settingsView.alpha = 1;
+        self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.3, 1.3);
+        self.mainView.alpha = 0;
+    } completion:nil];
+}
+
+- (IBAction)closeSettings:(id)sender{
+    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.mainView.alpha = 1;
+        self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7);
+        self.settingsView.alpha = 0;
+    } completion:nil];
 }
 
 - (IBAction)tappedOnPwn:(id)sender{
