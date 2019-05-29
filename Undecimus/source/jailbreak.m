@@ -68,6 +68,13 @@ extern int maxStage;
     __COUNTER__; \
     stage++; \
     status_with_stage(stage, maxStage); \
+    dispatch_async(dispatch_get_main_queue(), ^{ \
+        [UIView performWithoutAnimation:^{ \
+            [[[JailbreakViewController sharedController] jailbreakProgressBar] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
+            [[[JailbreakViewController sharedController] jailbreakProgressBar] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
+            [[JailbreakViewController sharedController] exploitProgressLabel].text = [NSString stringWithFormat:@"%d/%d", stage, maxStage]; \
+        }]; \
+    }); \
 } while (false)
 
 #define find_offset(x, symbol, critical) do { \
@@ -114,7 +121,6 @@ void jailbreak()
     NSMutableString *status = [NSMutableString new];
     bool const betaFirmware = isBetaFirmware();
     time_t const start_time = time(NULL);
-    UIProgressHUD *hud = prefs->hide_progress_hud ? nil : addProgressHUD();
     JailbreakViewController *sharedController = [JailbreakViewController sharedController];
     NSMutableArray *resources = [NSMutableArray new];
     NSFileManager *const fileManager = [NSFileManager defaultManager];
@@ -129,7 +135,6 @@ void jailbreak()
 #define jailbreak_file(x) (NSJailbreakFile(@(x)).UTF8String)
     _assert(clean_file(success_file), localize(@"Unable to clean success file."), true);
 #define insertstatus(x) do { [status appendString:x]; } while (false)
-#define progress(x) do { LOG("Progress: %@", x); updateProgressHUD(hud, x); } while (false)
 #define sync_prefs() do { _assert(set_prefs(prefs), localize(@"Unable to synchronize app preferences. Please restart the app and try again."), true); } while (false)
 #define write_test_file(file) do { \
     _assert(create_file(file, root_pw->pw_uid, 0644), localize(@"Unable to create test file."), true); \
@@ -1636,8 +1641,6 @@ out:;
     myHost = HOST_NULL;
     _assert(mach_port_deallocate(mach_task_self(), myOriginalHost) == KERN_SUCCESS, localize(@"Unable to deallocate my original host port."), true);
     myOriginalHost = HOST_NULL;
-#undef progress
-    removeProgressHUD(hud);
     insertstatus(([NSString stringWithFormat:@"\nRead %zu bytes from kernel memory\nWrote %zu bytes to kernel memory\n", kreads, kwrites]));
     insertstatus(([NSString stringWithFormat:@"\nJailbroke in %ld seconds\n", time(NULL) - start_time]));
     status(localize(@"Jailbroken"), false, false);

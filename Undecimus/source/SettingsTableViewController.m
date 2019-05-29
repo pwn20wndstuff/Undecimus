@@ -46,19 +46,85 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    UIImageView *const myImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Clouds"]];
-    [myImageView setContentMode:UIViewContentModeScaleAspectFill];
-    [myImageView setFrame:self.tableView.frame];
-    UIView *const myView = [[UIView alloc] initWithFrame:myImageView.frame];
-    [myView setBackgroundColor:[UIColor whiteColor]];
-    [myView setAlpha:0.84];
-    [myView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
-    [myImageView addSubview:myView];
-    [self.tableView setBackgroundView:myImageView];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(darkModeSettings:) name:@"darkModeSettings" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(lightModeSettings:) name:@"lightModeSettings" object:nil];
     [self.BootNonceTextField setDelegate:self];
     self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
     self.tap.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:self.tap];
+}
+
+
+-(void)darkModeSettings:(NSNotification *) notification  {
+    [self.specialThanksLabel setTextColor:[UIColor whiteColor]];
+    [self.TweakInjectionLabel setTextColor:[UIColor whiteColor]];
+    [self.LoadDaemonsLabel setTextColor:[UIColor whiteColor]];
+    [self.DumpAPTicketLabel setTextColor:[UIColor whiteColor]];
+    [self.RefreshIconCacheLabel setTextColor:[UIColor whiteColor]];
+    [self.DisableAutoUpdatesLabel setTextColor:[UIColor whiteColor]];
+    [self.DisableAppRevokesLabel setTextColor:[UIColor whiteColor]];
+    [self.OverwriteBootNonceLabel setTextColor:[UIColor whiteColor]];
+    [self.ExportKernelTaskPortLabel setTextColor:[UIColor whiteColor]];
+    [self.RestoreRootFSLabel setTextColor:[UIColor whiteColor]];
+    [self.installCydiaLabel setTextColor:[UIColor whiteColor]];
+    [self.installSSHLabel setTextColor:[UIColor whiteColor]];
+    [self.IncreaseMemoryLimitLabel setTextColor:[UIColor whiteColor]];
+    [self.ReloadSystemDaemonsLabel setTextColor:[UIColor whiteColor]];
+    [self.HideLogWindowLabel setTextColor:[UIColor whiteColor]];
+    [self.ResetCydiaCacheLabel setTextColor:[UIColor whiteColor]];
+    [self.SSHOnlyLabel setTextColor:[UIColor whiteColor]];
+    [self.EnableGetTaskAllowLabel setTextColor:[UIColor whiteColor]];
+    [self.SetCSDebuggedLabel setTextColor:[UIColor whiteColor]];
+    [self.AutoRespringLabel setTextColor:[UIColor whiteColor]];
+    [self.kernelExploitLabel setTextColor:[UIColor whiteColor]];
+    
+    [self.bootNonceButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.BootNonceTextField setTintColor:[UIColor whiteColor]];
+    
+    [self.BootNonceTextField setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.ECIDLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.ecidDarkModeButton setTitleColor:[UIColor whiteColor] forState:normal];
+    
+    [self.expiryDarkModeLabel setTextColor:[UIColor whiteColor]];
+    [self.ExpiryLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.UptimeLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.upTimeLabel setTextColor:[UIColor whiteColor]];
+}
+
+-(void)lightModeSettings:(NSNotification *) notification  {
+    [self.specialThanksLabel setTextColor:[UIColor blackColor]];
+    [self.TweakInjectionLabel setTextColor:[UIColor blackColor]];
+    [self.LoadDaemonsLabel setTextColor:[UIColor blackColor]];
+    [self.DumpAPTicketLabel setTextColor:[UIColor blackColor]];
+    [self.RefreshIconCacheLabel setTextColor:[UIColor blackColor]];
+    [self.DisableAutoUpdatesLabel setTextColor:[UIColor blackColor]];
+    [self.DisableAppRevokesLabel setTextColor:[UIColor blackColor]];
+    [self.OverwriteBootNonceLabel setTextColor:[UIColor blackColor]];
+    [self.ExportKernelTaskPortLabel setTextColor:[UIColor blackColor]];
+    [self.RestoreRootFSLabel setTextColor:[UIColor blackColor]];
+    [self.installCydiaLabel setTextColor:[UIColor blackColor]];
+    [self.installSSHLabel setTextColor:[UIColor blackColor]];
+    [self.IncreaseMemoryLimitLabel setTextColor:[UIColor blackColor]];
+    [self.ReloadSystemDaemonsLabel setTextColor:[UIColor blackColor]];
+    [self.HideLogWindowLabel setTextColor:[UIColor blackColor]];
+    [self.ResetCydiaCacheLabel setTextColor:[UIColor blackColor]];
+    [self.SSHOnlyLabel setTextColor:[UIColor blackColor]];
+    [self.EnableGetTaskAllowLabel setTextColor:[UIColor blackColor]];
+    [self.SetCSDebuggedLabel setTextColor:[UIColor blackColor]];
+    [self.AutoRespringLabel setTextColor:[UIColor blackColor]];
+    [self.kernelExploitLabel setTextColor:[UIColor blackColor]];
+    
+    [self.bootNonceButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.BootNonceTextField setTintColor:[UIColor blackColor]];
+    
+    [self.BootNonceTextField setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.ECIDLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.ecidDarkModeButton setTitleColor:[UIColor blackColor] forState:normal];
+    
+    [self.expiryDarkModeLabel setTextColor:[UIColor blackColor]];
+    [self.ExpiryLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.UptimeLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.upTimeLabel setTextColor:[UIColor blackColor]];
 }
 
 - (void)userTappedAnyware:(UITapGestureRecognizer *) sender
@@ -105,11 +171,15 @@
     [self.EnableGetTaskAllowSwitch setOn:(BOOL)prefs->enable_get_task_allow];
     [self.SetCSDebuggedSwitch setOn:(BOOL)prefs->set_cs_debugged];
     [self.AutoRespringSwitch setOn:(BOOL)prefs->auto_respring];
-    [self.HideProgressHUDSwitch setOn:(BOOL)prefs->hide_progress_hud];
     [self.RestartSpringBoardButton setEnabled:respringSupported()];
     [self.restartButton setEnabled:restartSupported()];
     release_prefs(&prefs);
     [self.tableView reloadData];
+}
+
+- (IBAction)selectedSpecialThanks:(id)sender {
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"showSpecialThanks" object:self];
 }
 
 - (IBAction)TweakInjectionSwitchTriggered:(id)sender {
@@ -408,14 +478,6 @@
 - (IBAction)setAutoRespring:(id)sender {
     prefs_t *prefs = copy_prefs();
     prefs->auto_respring = (bool)self.AutoRespringSwitch.isOn;
-    set_prefs(prefs);
-    release_prefs(&prefs);
-    [self reloadData];
-}
-
-- (IBAction)setHideProgressHUD:(id)sender {
-    prefs_t *prefs = copy_prefs();
-    prefs->hide_progress_hud = (bool)self.HideProgressHUDSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];

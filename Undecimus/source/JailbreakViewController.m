@@ -23,9 +23,15 @@
 static JailbreakViewController *sharedController = nil;
 static NSMutableString *output = nil;
 static NSString *bundledResources = nil;
+extern int maxStage;
+static BOOL darkMode = NO;
 
 - (IBAction)tappedOnJailbreak:(id)sender
 {
+    [self.exploitMessageLabel setAlpha:1];
+    [self.exploitProgressLabel setAlpha:1];
+    [self.jailbreakProgressBar setAlpha:1];
+    
     status(localize(@"Jailbreak"), false, false);
     void (^const block)(void) = ^(void) {
         _assert(bundledResources != nil, localize(@"Bundled Resources version missing."), true);
@@ -40,16 +46,33 @@ static NSString *bundledResources = nil;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    [self.jailbreakProgressBar setProgress:0];
+    [self.jailbreakProgressBar setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 1, 2)];
+    
     prefs_t *prefs = copy_prefs();
+    
     if (!jailbreakSupported()) {
         status(localize(@"Unsupported"), false, true);
+        progress(localize(@"Unsupported"));
     } else if (prefs->restore_rootfs) {
         status(localize(@"Restore RootFS"), true, true);
+        progress(@"Ready to restore RootFS");
     } else if (jailbreakEnabled()) {
         status(localize(@"Re-Jailbreak"), true, true);
+        progress(@"Ready to re-jailbreak");
     } else {
         status(localize(@"Jailbreak"), true, true);
+        progress(localize(@"Ready to jailbreak"));
     }
+    
+    [self.settingsView setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7)];
+    [self.settingsView setAlpha:0];
+    [self.mainDevView setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7)];
+    [self.mainDevView setAlpha:0];
+    [self.creditsView setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7)];
+    [self.creditsView setAlpha:0];
+    
     release_prefs(&prefs);
 }
 
@@ -58,12 +81,27 @@ static NSString *bundledResources = nil;
     _canExit = YES;
     // Do any additional setup after loading the view, typically from a nib.
     prefs_t *prefs = copy_prefs();
+    
     if (prefs->hide_log_window) {
         _outputView.hidden = YES;
         _outputView = nil;
-        _goButtonSpacing.constant += 80;
     }
+    
+    if (prefs->dark_mode) {
+        darkMode = YES;
+        [self darkMode];
+    }
+    
     release_prefs(&prefs);
+    
+    [self.settingsNavBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
+    [self.settingsNavBar setShadowImage:[UIImage new]];
+    [self.creditsNavBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
+    [self.creditsNavBar setShadowImage:[UIImage new]];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showSpeicalThanks:) name:@"showSpecialThanks" object:nil];
+    [self.exploitProgressLabel setText:[NSString stringWithFormat:@"%d/%d", 0, maxStage]];
+    [self.uOVersionLabel setText:[NSString stringWithFormat:@"unc0ver Version: %@", appVersion()]];
+    
     sharedController = self;
     bundledResources = bundledResourcesVersion();
     LOG("unc0ver Version: %@", appVersion());
@@ -76,30 +114,163 @@ static NSString *bundledResources = nil;
     }
 }
 
+- (void)darkMode {
+    darkMode = YES;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"darkModeSettings" object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"darkModeCredits" object:self];
+    
+    [self.darkModeButton setImage:[UIImage imageNamed:@"DarkMode-Dark"] forState:UIControlStateNormal];
+    [self.settingsButton setImage:[UIImage imageNamed:@"Settings-Dark"] forState:UIControlStateNormal];
+    [self.exploitProgressLabel setTextColor:[UIColor whiteColor]];
+    [self.exploitMessageLabel setTextColor:[UIColor whiteColor]];
+    [self.u0Label setTextColor:[UIColor whiteColor]];
+    [self.uOVersionLabel setTextColor:[UIColor whiteColor]];
+    [self.jailbreakLabel setTextColor:[UIColor whiteColor]];
+    [self.byLabel setTextColor:[UIColor whiteColor]];
+    [self.UIByLabel setTextColor:[UIColor whiteColor]];
+    [self.firstAndLabel setTextColor:[UIColor whiteColor]];
+    [self.secondAndLabel setTextColor:[UIColor whiteColor]];
+    [self.thirdAndLabel setTextColor:[UIColor whiteColor]];
+    [self.fourthAndLabel setTextColor:[UIColor whiteColor]];
+    [self.outputView setTextColor:[UIColor whiteColor]];
+    [self.backgroundView setBackgroundColor:[UIColor colorWithRed:17.0f/255.0f green:20.0f/255.0f blue:24.0f/255.0f alpha:0.95f]];
+    [self.mainDevsButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.settingsNavBar setTintColor:[UIColor whiteColor]];
+    [self.settingsNavBar setLargeTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
+    [self.creditsNavBar setTintColor:[UIColor whiteColor]];
+    [self.creditsNavBar setLargeTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
+    
+    [self setNeedsStatusBarAppearanceUpdate];
+}
+
+- (void)lightMode {
+    darkMode = NO;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"lightModeSettings" object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"lightModeCredits" object:self];
+    
+    [self.darkModeButton setImage:[UIImage imageNamed:@"DarkMode-Light"] forState:UIControlStateNormal];
+    [self.settingsButton setImage:[UIImage imageNamed:@"Settings-Light"] forState:UIControlStateNormal];
+    [self.exploitProgressLabel setTextColor:[UIColor blackColor]];
+    [self.exploitMessageLabel setTextColor:[UIColor blackColor]];
+    [self.u0Label setTextColor:[UIColor blackColor]];
+    [self.jailbreakLabel setTextColor:[UIColor blackColor]];
+    [self.byLabel setTextColor:[UIColor blackColor]];
+    [self.UIByLabel setTextColor:[UIColor blackColor]];
+    [self.firstAndLabel setTextColor:[UIColor blackColor]];
+    [self.secondAndLabel setTextColor:[UIColor blackColor]];
+    [self.thirdAndLabel setTextColor:[UIColor blackColor]];
+    [self.fourthAndLabel setTextColor:[UIColor blackColor]];
+    [self.uOVersionLabel setTextColor:[UIColor blackColor]];
+    [self.outputView setTextColor:[UIColor blackColor]];
+    [self.backgroundView setBackgroundColor:[UIColor.whiteColor colorWithAlphaComponent:0.84]];
+    [self.settingsNavBar setTintColor:[UIColor blackColor]];
+    [self.settingsNavBar setLargeTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor blackColor]}];
+    [self.creditsNavBar setTintColor:[UIColor blackColor]];
+    [self.creditsNavBar setLargeTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor blackColor]}];
+    
+    [self setNeedsStatusBarAppearanceUpdate];
+}
+
+- (IBAction)enableDarkMode:(id)sender {
+    
+    [UIView animateWithDuration:2 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        if (darkMode) {
+            [self lightMode];
+        } else {
+            [self darkMode];
+        }
+    } completion:nil];
+    
+    prefs_t *prefs = copy_prefs();
+    prefs->dark_mode = (bool)darkMode;
+    set_prefs(prefs);
+    release_prefs(&prefs);
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    return UIStatusBarStyleDefault;
+    if (darkMode) {
+        return UIStatusBarStyleLightContent;
+    } else {
+        return UIStatusBarStyleDefault;
+    }
+}
+
+- (IBAction)openSettings:(id)sender {
+    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.settingsView.alpha = 1;
+        self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.3, 1.3);
+        self.mainView.alpha = 0;
+    } completion:nil];
+}
+
+- (void) showSpeicalThanks:(NSNotification *) notification {
+    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.creditsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.creditsView.alpha = 1;
+        self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.3, 1.3);
+        self.settingsView.alpha = 0;
+    } completion:nil];
+}
+
+- (IBAction)dismissSpeicalThanks:(id)sender{
+    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.settingsView.alpha = 1;
+        self.creditsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7);
+        self.creditsView.alpha = 0;
+    } completion:nil];
+}
+
+- (IBAction)openMainDevView:(id)sender {
+    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.mainDevView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.mainDevView.alpha = 1;
+        self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.3, 1.3);
+        self.mainView.alpha = 0;
+    } completion:nil];
+}
+
+- (IBAction)closeMainDevView:(id)sender{
+    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.mainView.alpha = 1;
+        self.mainDevView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7);
+        self.mainDevView.alpha = 0;
+    } completion:nil];
+}
+
+- (IBAction)closeSettings:(id)sender{
+    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+        self.mainView.alpha = 1;
+        self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7);
+        self.settingsView.alpha = 0;
+    } completion:nil];
 }
 
 - (IBAction)tappedOnPwn:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
 }
 
-- (IBAction)tappedOnDennis:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
-}
-
 - (IBAction)tappedOnSamB:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
 }
 
-- (IBAction)tappedOnSamG:(id)sender{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://reddit.com/u/Samg_is_a_Ninja"] options:@{} completionHandler:nil];
+- (IBAction)tappendOnJoonwoo:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"iOS_App_Dev"] options:@{} completionHandler:nil];
 }
+- (IBAction)tappendOnUbik:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"HiMyNameIsUbik"] options:@{} completionHandler:nil];
+}
+
 
 // This intentionally returns nil if called before it's been created by a proper init
 +(JailbreakViewController *)sharedController {
