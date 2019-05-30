@@ -174,6 +174,7 @@
     [self.restartSpringBoardButton setEnabled:respringSupported()];
     [self.restartButton setEnabled:restartSupported()];
     release_prefs(&prefs);
+    [JailbreakViewController.sharedController updateStatus];
     [self.tableView reloadData];
 }
 

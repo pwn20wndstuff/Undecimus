@@ -44,12 +44,7 @@ static BOOL darkMode = NO;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), block);
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    [self.jailbreakProgressBar setProgress:0];
-    [self.jailbreakProgressBar setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 1, 2)];
-    
+- (void)updateStatus {
     prefs_t *prefs = copy_prefs();
     
     if (!jailbreakSupported()) {
@@ -66,14 +61,21 @@ static BOOL darkMode = NO;
         progress(localize(@"Ready to jailbreak"));
     }
     
+    release_prefs(&prefs);
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self.jailbreakProgressBar setProgress:0];
+    [self.jailbreakProgressBar setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 1, 2)];
+    
     [self.settingsView setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7)];
     [self.settingsView setAlpha:0];
     [self.mainDevView setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7)];
     [self.mainDevView setAlpha:0];
     [self.creditsView setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7)];
     [self.creditsView setAlpha:0];
-    
-    release_prefs(&prefs);
 }
 
 - (void)viewDidLoad {

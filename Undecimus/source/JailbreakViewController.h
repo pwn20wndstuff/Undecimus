@@ -94,6 +94,7 @@ NSString *hexFromInt(NSInteger val);
 - (IBAction)tappedOnJailbreak:(id)sender;
 +(JailbreakViewController*)sharedController;
 - (void)appendTextToOutput:(NSString*)text;
+- (void)updateStatus;
 
 @end
 
