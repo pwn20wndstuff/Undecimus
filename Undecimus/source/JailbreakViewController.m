@@ -268,10 +268,6 @@ bool darkMode = NO;
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Pwn20wnd"] options:@{} completionHandler:nil];
 }
 
-- (IBAction)tappedOnDennis:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
-}
-
 - (IBAction)tappedOnSamB:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"sbingner"] options:@{} completionHandler:nil];
 }
@@ -283,10 +279,6 @@ bool darkMode = NO;
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"HiMyNameIsUbik"] options:@{} completionHandler:nil];
 }
 
-
-- (IBAction)tappedOnSamG:(id)sender{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://reddit.com/u/Samg_is_a_Ninja"] options:@{} completionHandler:nil];
-}
 
 // This intentionally returns nil if called before it's been created by a proper init
 +(JailbreakViewController *)sharedController {

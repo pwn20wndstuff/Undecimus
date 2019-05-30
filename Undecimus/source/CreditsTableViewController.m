@@ -58,6 +58,8 @@
     [self.PimskeksButton setTitleColor:[UIColor whiteColor] forState: normal];
     [self.LibimobiledeviceButton setTitleColor:[UIColor whiteColor] forState: normal];
     [self.BenButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.SamGButton setTitleColor:[UIColor whiteColor] forState: normal];
+    [self.DennisButton setTitleColor:[UIColor whiteColor] forState: normal];
 }
 
 -(void) lightModeCreditsView:(NSNotification *) notification  {
@@ -93,6 +95,8 @@
     [self.PimskeksButton setTitleColor:[UIColor blackColor] forState: normal];
     [self.LibimobiledeviceButton setTitleColor:[UIColor blackColor] forState: normal];
     [self.BenButton setTitleColor:[UIColor blackColor] forState: normal];
+    [self.SamGButton setTitleColor:[UIColor blackColor] forState: normal];
+    [self.DennisButton setTitleColor:[UIColor blackColor] forState: normal];
 }
 
 + (NSURL *)getURLForUserName:(NSString *)userName {
@@ -231,6 +235,14 @@
 
 -(IBAction)tappedOnBen:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"benjweaverdev"] options:@{} completionHandler:nil];
+}
+
+- (IBAction)tappedOnSamG:(id)sender{
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://reddit.com/u/Samg_is_a_Ninja"] options:@{} completionHandler:nil];
+}
+
+- (IBAction)tappedOnDennis:(id)sender{
+    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"DennisBednarz"] options:@{} completionHandler:nil];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {

@@ -43,5 +43,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *PimskeksButton;
 @property (weak, nonatomic) IBOutlet UIButton *LibimobiledeviceButton;
 @property (weak, nonatomic) IBOutlet UIButton *BenButton;
+@property (weak, nonatomic) IBOutlet UIButton *SamGButton;
+@property (weak, nonatomic) IBOutlet UIButton *DennisButton;
 
 @end

@@ -4,7 +4,7 @@
 
 unc0ver jailbreak for iOS 11.0 - 12.1.2<br/>
 by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
-UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](https://reddit.com/u/Samg_is_a_Ninja)<br/>
+UI by [@iOS_App_Dev](https://twitter.com/iOS_App_Dev) & [@HiMyNameIsUbik](https://twitter.com/HiMyNameIsUbik)<br/>
 
 ## The most outstanding changes over the other jailbreaks
 * One app to jailbreak all firmwares
