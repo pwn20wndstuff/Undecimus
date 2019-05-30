@@ -175,7 +175,7 @@ static BOOL darkMode = NO;
 
 - (IBAction)enableDarkMode:(id)sender {
     
-    [UIView animateWithDuration:2 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         if (darkMode) {
             [self lightMode];
         } else {
@@ -203,7 +203,7 @@ static BOOL darkMode = NO;
 }
 
 - (IBAction)openSettings:(id)sender {
-    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
         self.settingsView.alpha = 1;
         self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.3, 1.3);
@@ -212,7 +212,7 @@ static BOOL darkMode = NO;
 }
 
 - (void) showSpeicalThanks:(NSNotification *) notification {
-    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.creditsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
         self.creditsView.alpha = 1;
         self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.3, 1.3);
@@ -221,7 +221,7 @@ static BOOL darkMode = NO;
 }
 
 - (IBAction)dismissSpeicalThanks:(id)sender{
-    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
         self.settingsView.alpha = 1;
         self.creditsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7);
@@ -230,7 +230,7 @@ static BOOL darkMode = NO;
 }
 
 - (IBAction)openMainDevView:(id)sender {
-    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.mainDevView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
         self.mainDevView.alpha = 1;
         self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.3, 1.3);
@@ -239,7 +239,7 @@ static BOOL darkMode = NO;
 }
 
 - (IBAction)closeMainDevView:(id)sender{
-    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
         self.mainView.alpha = 1;
         self.mainDevView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7);
@@ -248,7 +248,7 @@ static BOOL darkMode = NO;
 }
 
 - (IBAction)closeSettings:(id)sender{
-    [UIView animateWithDuration:1 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
         self.mainView.alpha = 1;
         self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7);
