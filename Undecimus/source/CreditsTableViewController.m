@@ -45,7 +45,6 @@
     [self.JakeashacksButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.JonathanSealsButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.SaurikButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.TihmstarButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.SiguzaButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.S0rryMyBadButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.ExternalistButton setTitleColor:[UIColor whiteColor] forState:normal];
@@ -54,9 +53,6 @@
     [self.MatchsticButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.UmanghereButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.MiscMistyButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.SemaphoreButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.PimskeksButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.LibimobiledeviceButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.BenButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.SamGButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.DennisButton setTitleColor:[UIColor whiteColor] forState:normal];
@@ -82,7 +78,6 @@
     [self.JakeashacksButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.JonathanSealsButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.SaurikButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.TihmstarButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.SiguzaButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.S0rryMyBadButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.ExternalistButton setTitleColor:[UIColor blackColor] forState:normal];
@@ -91,9 +86,6 @@
     [self.MatchsticButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.UmanghereButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.MiscMistyButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.SemaphoreButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.PimskeksButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.LibimobiledeviceButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.BenButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.SamGButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.DennisButton setTitleColor:[UIColor blackColor] forState:normal];
@@ -177,16 +169,8 @@
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"Jakeashacks"] options:@{} completionHandler:nil];
 }
 
--(IBAction)tappedOnJonathanSeals:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"JonathanSeals"] options:@{} completionHandler:nil];
-}
-
 -(IBAction)tappedOnSaurik:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"saurik"] options:@{} completionHandler:nil];
-}
-
--(IBAction)tappedOnTihmstar:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"tihmstar"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnSiguza:(id)sender{
@@ -219,18 +203,6 @@
 
 -(IBAction)tappedOnMiscMisty:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"MiscMisty"] options:@{} completionHandler:nil];
-}
-
--(IBAction)tappedOnSemaphore:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"notcom"] options:@{} completionHandler:nil];
-}
-
--(IBAction)tappedOnPimskeks:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"pimskeks"] options:@{} completionHandler:nil];
-}
-
--(IBAction)tappedOnLibimobiledevice:(id)sender{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/libimobiledevice"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnBen:(id)sender{

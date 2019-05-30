@@ -30,7 +30,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *JakeashacksButton;
 @property (weak, nonatomic) IBOutlet UIButton *JonathanSealsButton;
 @property (weak, nonatomic) IBOutlet UIButton *SaurikButton;
-@property (weak, nonatomic) IBOutlet UIButton *TihmstarButton;
 @property (weak, nonatomic) IBOutlet UIButton *SiguzaButton;
 @property (weak, nonatomic) IBOutlet UIButton *S0rryMyBadButton;
 @property (weak, nonatomic) IBOutlet UIButton *ExternalistButton;
@@ -39,9 +38,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *MatchsticButton;
 @property (weak, nonatomic) IBOutlet UIButton *UmanghereButton;
 @property (weak, nonatomic) IBOutlet UIButton *MiscMistyButton;
-@property (weak, nonatomic) IBOutlet UIButton *SemaphoreButton;
-@property (weak, nonatomic) IBOutlet UIButton *PimskeksButton;
-@property (weak, nonatomic) IBOutlet UIButton *LibimobiledeviceButton;
 @property (weak, nonatomic) IBOutlet UIButton *BenButton;
 @property (weak, nonatomic) IBOutlet UIButton *SamGButton;
 @property (weak, nonatomic) IBOutlet UIButton *DennisButton;
