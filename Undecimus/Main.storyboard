@@ -422,7 +422,7 @@
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RkG-8h-RlE">
                                                     <rect key="frame" x="0.0" y="0.0" width="341" height="44"/>
                                                     <connections>
-                                                        <action selector="selectedSpecialThanks:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="9Fa-rR-biA"/>
+                                                        <action selector="selectedSpecialThanks:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="afj-w0-YEH"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -458,7 +458,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="TweakInjectionSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="2gZ-aO-C93"/>
+                                                        <action selector="tweakInjectionSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="NYu-Bz-l8D"/>
                                                     </connections>
                                                 </switch>
                                             </subviews>
@@ -482,7 +482,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="LoadDaemonsSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="M6k-1M-Zv7"/>
+                                                        <action selector="loadDaemonsSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="MV2-I2-Y7R"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Load Daemons" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bBi-OR-hpE">
@@ -516,7 +516,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="DumpAPTicketSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="9RP-JP-PyD"/>
+                                                        <action selector="dumpAPTicketSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="sle-OD-zm9"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dump APTicket" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gi9-pl-mUW">
@@ -550,7 +550,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="RefreshIconCacheSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="xYr-Cm-rTs"/>
+                                                        <action selector="refreshIconCacheSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="KJ8-4a-wbv"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Refresh Icon Cache" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SVp-PX-97M">
@@ -584,7 +584,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="DisableAutoUpdatesSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="erW-xy-F5o"/>
+                                                        <action selector="disableAutoUpdatesSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="Wve-TJ-4ZC"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Disable Auto Updates" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="78K-TY-Swa">
@@ -618,7 +618,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="DisableAppRevokesSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="npR-r2-VnB"/>
+                                                        <action selector="disableAppRevokesSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="9Al-O3-kkW"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Disable App Revokes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lop-s2-QoX">
@@ -652,7 +652,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="OverwriteBootNonceSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="Fjk-rG-xS9"/>
+                                                        <action selector="overwriteBootNonceSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="bvL-iv-UsM"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Overwrite Boot Nonce" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Ee-VR-cUR">
@@ -686,7 +686,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="exportKernelTaskPortSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="QeR-lE-N4K"/>
+                                                        <action selector="exportKernelTaskPortSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="wZF-jq-Js5"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Export TFP0 (Unsafe)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0lM-oV-NGn">
@@ -720,7 +720,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="RestoreRootFSSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="pLp-YZ-bsD"/>
+                                                        <action selector="restoreRootFSSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="cYY-Dl-NMN"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Restore RootFS (rec0ver)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PbX-3H-DcH">
@@ -754,7 +754,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="IncreaseMemoryLimitSwitch:" destination="fNC-SN-4Tk" eventType="valueChanged" id="Fp2-ug-Vog"/>
+                                                        <action selector="increaseMemoryLimitSwitch:" destination="fNC-SN-4Tk" eventType="valueChanged" id="D2p-4J-htC"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Increase Memory Limit (Beta)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PFy-VA-xz7">
@@ -788,7 +788,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="installSSHSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="DST-CE-fCV"/>
+                                                        <action selector="installSSHSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="ZFM-xj-8ke"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(Re)Install OpenSSH" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dhz-O8-Ohi">
@@ -822,7 +822,7 @@
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="installCydiaSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="1HQ-Fn-Wtq"/>
+                                                        <action selector="installCydiaSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="YdO-Cz-L1v"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reinstall Cydia" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SRa-i1-KjM">
@@ -856,7 +856,7 @@
                                                     <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="reloadSystemDaemonsSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="TUn-1V-7lp"/>
+                                                        <action selector="reloadSystemDaemonsSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="bSh-et-4Xh"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reload System Daemons" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GIt-S3-wBe">
@@ -890,7 +890,7 @@
                                                     <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="hideLogWindowSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="svJ-cH-4tF"/>
+                                                        <action selector="hideLogWindowSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="1AB-eN-NwQ"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hide Log Window" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NGj-U7-Rke">
@@ -924,7 +924,7 @@
                                                     <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="resetCydiaCacheSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="L15-AL-wb2"/>
+                                                        <action selector="resetCydiaCacheSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="wJN-KD-Fqr"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reset Cydia Cache" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fyE-Sj-TNL">
@@ -958,7 +958,7 @@
                                                     <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="sshOnlySwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="vtR-O9-pLA"/>
+                                                        <action selector="sshOnlySwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="Jwo-8o-OsX"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SSH Only" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wpf-g8-fV1">
@@ -985,14 +985,14 @@
                                         <rect key="frame" x="0.0" y="783" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="pV6-qi-GAD" id="q8X-Sq-CZl">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8XW-8v-iqw">
                                                     <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="enableGetTaskAllowSwitchTriggered:" destination="fNC-SN-4Tk" eventType="valueChanged" id="RwP-bd-BLY"/>
+                                                        <action selector="enableGetTaskAllowSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="go1-oJ-WAZ"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Enable get-task-allow" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S6S-NE-WJ9">
@@ -1019,14 +1019,14 @@
                                         <rect key="frame" x="0.0" y="827" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hgh-Yu-0a3" id="kDJ-82-gLZ">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ySK-nk-1pp">
                                                     <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="setCSDebugged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="poK-UQ-DRd"/>
+                                                        <action selector="setCSDebugged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="6nq-FD-V5e"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Set CS_DEBUGGED" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Eq9-Ns-zey">
@@ -1053,14 +1053,14 @@
                                         <rect key="frame" x="0.0" y="871" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="tTs-N5-uOC" id="vhz-uj-0CS">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5re-LQ-4Mq">
                                                     <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
-                                                        <action selector="setAutoRespring:" destination="fNC-SN-4Tk" eventType="valueChanged" id="gst-Su-IAb"/>
+                                                        <action selector="setAutoRespring:" destination="fNC-SN-4Tk" eventType="valueChanged" id="KJs-ya-ipQ"/>
                                                     </connections>
                                                 </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Automatically respring" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b6w-j2-Rh6">
@@ -1087,7 +1087,7 @@
                                         <rect key="frame" x="0.0" y="915" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="2rx-1W-kCF" id="tFj-Pb-1b2">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Kernel Exploit" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tpd-rk-NGn">
@@ -1115,7 +1115,7 @@
                                                         <segment title="M2"/>
                                                     </segments>
                                                     <connections>
-                                                        <action selector="KernelExploitSegmentedControl:" destination="fNC-SN-4Tk" eventType="valueChanged" id="Uk9-BY-eBZ"/>
+                                                        <action selector="kernelExploitSegmentedControlValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="tNs-i3-NIf"/>
                                                     </connections>
                                                 </segmentedControl>
                                             </subviews>
@@ -1132,7 +1132,7 @@
                                         <rect key="frame" x="0.0" y="959" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rPc-2y-tM4" id="L04-Pa-FuS">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="0x292dd10b56d87a3a" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="lf3-Mh-TY2">
@@ -1141,7 +1141,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits"/>
                                                     <connections>
-                                                        <action selector="BootNonceTextFieldTriggered:" destination="fNC-SN-4Tk" eventType="editingDidEnd" id="yhH-sY-Ono"/>
+                                                        <action selector="bootNonceTextFieldEditingDidEnd:" destination="fNC-SN-4Tk" eventType="editingDidEnd" id="bDv-vK-P2r"/>
                                                     </connections>
                                                 </textField>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xim-1p-tCK">
@@ -1155,7 +1155,7 @@
                                                         <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </state>
                                                     <connections>
-                                                        <action selector="tappedOnCopyNonce:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="H5x-P8-ppr"/>
+                                                        <action selector="tappedOnCopyNonce:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="Rm9-4i-G2t"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -1172,7 +1172,7 @@
                                         <rect key="frame" x="0.0" y="1003" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="zqK-az-X3i" id="M6J-d1-iVA">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textField opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="XXXXXXXXXXXXXXXX" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="T5g-8V-gBQ">
@@ -1192,7 +1192,7 @@
                                                         <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </state>
                                                     <connections>
-                                                        <action selector="tappedOnCopyECID:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="nRP-BF-Bcv"/>
+                                                        <action selector="tappedOnCopyECID:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="pMw-xl-2M3"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -1209,7 +1209,7 @@
                                         <rect key="frame" x="0.0" y="1047" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="50K-ZT-rCL" id="VHZ-mu-KDn">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Expiry" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DB2-gn-cs4">
@@ -1242,7 +1242,7 @@
                                         <rect key="frame" x="0.0" y="1091" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="KNH-Ue-vDj" id="ub8-hS-Yjb">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Uptime" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TmA-aA-qbT">
@@ -1279,7 +1279,7 @@
                                         <rect key="frame" x="0.0" y="1198.3333333333333" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Mlr-hr-tQG" id="Hgr-HX-5d0">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HS8-A8-Kos">
@@ -1287,7 +1287,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Restart"/>
                                                     <connections>
-                                                        <action selector="tappedOnRestart:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="ctt-lF-G1A"/>
+                                                        <action selector="tappedOnRestart:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="yMN-bA-CEu"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -1303,7 +1303,7 @@
                                         <rect key="frame" x="0.0" y="1242.3333333333333" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="r8e-kx-aSd" id="Lqw-02-0KP">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8U8-1D-Tj2">
@@ -1311,7 +1311,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Share Diagnostics Data"/>
                                                     <connections>
-                                                        <action selector="tappedOnShareDiagnosticsData:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="6vH-OD-FQf"/>
+                                                        <action selector="tappedOnShareDiagnosticsData:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="gmf-f7-8V1"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -1327,7 +1327,7 @@
                                         <rect key="frame" x="0.0" y="1286.3333333333333" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Y99-0P-KuE" id="ZVO-er-yhw">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MCD-u6-GW4">
@@ -1335,7 +1335,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Open Cydia"/>
                                                     <connections>
-                                                        <action selector="tappedOnOpenCydia:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="qr0-m2-rW8"/>
+                                                        <action selector="tappedOnOpenCydia:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="0kn-Lx-H0Z"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -1351,7 +1351,7 @@
                                         <rect key="frame" x="0.0" y="1330.3333333333333" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rmy-js-Gio" id="maG-te-mhV">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MpC-W0-1eR">
@@ -1359,7 +1359,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="View Source Code"/>
                                                     <connections>
-                                                        <action selector="tappedOnOpenGithub:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="ysZ-4F-BDA"/>
+                                                        <action selector="tappedOnOpenGithub:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="b0J-gC-fhN"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -1375,7 +1375,7 @@
                                         <rect key="frame" x="0.0" y="1374.3333333333333" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="XPg-DX-EHi" id="SGb-8j-4PJ">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hxh-hf-wUi">
@@ -1383,7 +1383,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Automatically Select Exploit"/>
                                                     <connections>
-                                                        <action selector="tappedOnAutomaticallySelectExploit:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="xCX-9s-OeR"/>
+                                                        <action selector="tappedOnAutomaticallySelectExploit:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="uKn-bW-aPj"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -1399,7 +1399,7 @@
                                         <rect key="frame" x="0.0" y="1418.3333333333335" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="MaL-RH-Tez" id="wff-5C-BLY">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MKZ-Zb-eq1">
@@ -1407,7 +1407,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Restart SpringBoard"/>
                                                     <connections>
-                                                        <action selector="tappedRestartSpringBoard:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="aBQ-3T-0lc"/>
+                                                        <action selector="tappedRestartSpringBoard:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="B7X-KI-SWX"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -1431,7 +1431,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Clean Diagnostics Data"/>
                                                     <connections>
-                                                        <action selector="tappedOnCleanDiagnosticsData:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="m1C-JM-THV"/>
+                                                        <action selector="tappedOnCleanDiagnosticsData:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="N2e-y1-yUG"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -1455,7 +1455,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <state key="normal" title="Check For Update"/>
                                                     <connections>
-                                                        <action selector="tappedOnCheckForUpdate:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="2lr-Us-G0X"/>
+                                                        <action selector="tappedOnCheckForUpdate:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="Vo8-oV-aj6"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -1477,59 +1477,59 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Settings" id="VHD-vl-rR6"/>
                     <connections>
-                        <outlet property="AutoRespringLabel" destination="b6w-j2-Rh6" id="JLQ-hw-zTo"/>
-                        <outlet property="AutoRespringSwitch" destination="5re-LQ-4Mq" id="8jl-u2-ZRE"/>
-                        <outlet property="BootNonceTextField" destination="lf3-Mh-TY2" id="t3a-dK-Wma"/>
-                        <outlet property="DisableAppRevokesLabel" destination="Lop-s2-QoX" id="pTR-4W-bDO"/>
-                        <outlet property="DisableAppRevokesSwitch" destination="KkO-Ob-FBd" id="txJ-IO-BdG"/>
-                        <outlet property="DisableAutoUpdatesLabel" destination="78K-TY-Swa" id="HFI-wZ-0kp"/>
-                        <outlet property="DisableAutoUpdatesSwitch" destination="SP2-qK-5ej" id="Y8e-KJ-ATo"/>
-                        <outlet property="DumpAPTicketLabel" destination="gi9-pl-mUW" id="w5M-2E-Ofx"/>
-                        <outlet property="DumpAPTicketSwitch" destination="aXK-sQ-Yhm" id="xUA-wK-rH8"/>
-                        <outlet property="ECIDLabel" destination="T5g-8V-gBQ" id="mSa-xf-fpS"/>
-                        <outlet property="EnableGetTaskAllowLabel" destination="S6S-NE-WJ9" id="LbQ-EH-CYz"/>
-                        <outlet property="EnableGetTaskAllowSwitch" destination="8XW-8v-iqw" id="QIi-Wb-lhw"/>
-                        <outlet property="ExpiryLabel" destination="min-G7-4yH" id="WgM-LP-Rqi"/>
-                        <outlet property="ExportKernelTaskPortLabel" destination="0lM-oV-NGn" id="Ine-ai-B5s"/>
-                        <outlet property="ExportKernelTaskPortSwitch" destination="gLz-Bc-vIw" id="ziY-Yw-Mea"/>
-                        <outlet property="HideLogWindowLabel" destination="NGj-U7-Rke" id="HUT-zq-0n3"/>
-                        <outlet property="HideLogWindowSwitch" destination="X88-cm-23O" id="qxP-Fv-pB6"/>
-                        <outlet property="IncreaseMemoryLimitLabel" destination="PFy-VA-xz7" id="1px-lV-ybi"/>
-                        <outlet property="IncreaseMemoryLimitSwitch" destination="bla-co-6aU" id="jiP-BR-BoA"/>
-                        <outlet property="KernelExploitSegmentedControl" destination="utS-Y2-9Wz" id="mJ5-ld-fMI"/>
-                        <outlet property="LoadDaemonsLabel" destination="bBi-OR-hpE" id="4wm-1v-lFs"/>
-                        <outlet property="LoadDaemonsSwitch" destination="F5r-kF-yjs" id="Gff-bY-oVo"/>
-                        <outlet property="OpenCydiaButton" destination="MCD-u6-GW4" id="xQl-Dy-QGA"/>
-                        <outlet property="OverwriteBootNonceLabel" destination="5Ee-VR-cUR" id="TkT-NL-JdO"/>
-                        <outlet property="OverwriteBootNonceSwitch" destination="T4c-Yf-ufc" id="hpP-XG-Urz"/>
-                        <outlet property="RefreshIconCacheLabel" destination="SVp-PX-97M" id="1de-8q-G1F"/>
-                        <outlet property="RefreshIconCacheSwitch" destination="nUw-6v-I0P" id="r1y-lm-quH"/>
-                        <outlet property="ReloadSystemDaemonsLabel" destination="GIt-S3-wBe" id="ezt-n9-fEK"/>
-                        <outlet property="ReloadSystemDaemonsSwitch" destination="woU-mq-fIz" id="6bx-NV-4Ct"/>
-                        <outlet property="ResetCydiaCacheLabel" destination="fyE-Sj-TNL" id="OrG-90-kPs"/>
-                        <outlet property="ResetCydiaCacheSwitch" destination="DM2-Dw-FZN" id="Vae-VZ-mwC"/>
-                        <outlet property="RestartSpringBoardButton" destination="MKZ-Zb-eq1" id="nZc-6y-AXB"/>
-                        <outlet property="RestoreRootFSLabel" destination="PbX-3H-DcH" id="oZ3-gI-hee"/>
-                        <outlet property="RestoreRootFSSwitch" destination="89P-cD-Lme" id="yN9-67-fHF"/>
-                        <outlet property="SSHOnlyLabel" destination="Wpf-g8-fV1" id="LEf-oW-FCG"/>
-                        <outlet property="SSHOnlySwitch" destination="11j-p9-hrg" id="w9a-FU-uvM"/>
-                        <outlet property="SetCSDebuggedLabel" destination="Eq9-Ns-zey" id="ifh-Hc-BZM"/>
-                        <outlet property="SetCSDebuggedSwitch" destination="ySK-nk-1pp" id="YXj-iX-lI4"/>
-                        <outlet property="ShareDiagnosticsDataButton" destination="8U8-1D-Tj2" id="wSx-3F-T1j"/>
-                        <outlet property="TweakInjectionLabel" destination="MyV-qW-zdt" id="svc-5T-crh"/>
-                        <outlet property="TweakInjectionSwitch" destination="KoE-B0-zag" id="6et-ri-afY"/>
-                        <outlet property="UptimeLabel" destination="Zx2-Kx-0aV" id="WOu-WZ-CkI"/>
-                        <outlet property="bootNonceButton" destination="xim-1p-tCK" id="pqs-KZ-Tv1"/>
-                        <outlet property="ecidDarkModeButton" destination="K0V-OH-Xnc" id="cF9-rM-bFg"/>
-                        <outlet property="expiryDarkModeLabel" destination="DB2-gn-cs4" id="GBY-3U-aKg"/>
-                        <outlet property="installCydiaLabel" destination="SRa-i1-KjM" id="rU1-HX-5ty"/>
-                        <outlet property="installCydiaSwitch" destination="mLJ-TX-0ah" id="55W-oY-bYA"/>
-                        <outlet property="installSSHLabel" destination="Dhz-O8-Ohi" id="uQs-bG-cb4"/>
-                        <outlet property="installSSHSwitch" destination="SJL-oV-WyH" id="yFP-rc-ViH"/>
-                        <outlet property="kernelExploitLabel" destination="tpd-rk-NGn" id="I4o-Nr-MG4"/>
-                        <outlet property="restartButton" destination="HS8-A8-Kos" id="umH-hm-4qe"/>
-                        <outlet property="specialThanksLabel" destination="usV-YE-yxE" id="kOf-op-nfs"/>
-                        <outlet property="upTimeLabel" destination="TmA-aA-qbT" id="bpu-ZA-9mh"/>
+                        <outlet property="autoRespringLabel" destination="b6w-j2-Rh6" id="9Bo-L5-axn"/>
+                        <outlet property="autoRespringSwitch" destination="5re-LQ-4Mq" id="xRO-lw-fVb"/>
+                        <outlet property="bootNonceButton" destination="xim-1p-tCK" id="Wjn-eD-eeC"/>
+                        <outlet property="bootNonceTextField" destination="lf3-Mh-TY2" id="oyD-4L-cQB"/>
+                        <outlet property="disableAppRevokesLabel" destination="Lop-s2-QoX" id="5Cc-Ky-Ghj"/>
+                        <outlet property="disableAppRevokesSwitch" destination="KkO-Ob-FBd" id="gfV-1K-Ske"/>
+                        <outlet property="disableAutoUpdatesLabel" destination="78K-TY-Swa" id="mDj-pk-Guf"/>
+                        <outlet property="disableAutoUpdatesSwitch" destination="SP2-qK-5ej" id="Kop-9a-gv8"/>
+                        <outlet property="dumpAPTicketLabel" destination="gi9-pl-mUW" id="efj-Te-LJf"/>
+                        <outlet property="dumpAPTicketSwitch" destination="aXK-sQ-Yhm" id="etn-Dw-kYU"/>
+                        <outlet property="ecidDarkModeButton" destination="K0V-OH-Xnc" id="CGI-Hw-iVK"/>
+                        <outlet property="ecidLabel" destination="T5g-8V-gBQ" id="43Q-85-7Yq"/>
+                        <outlet property="enableGetTaskAllowLabel" destination="S6S-NE-WJ9" id="KAN-P5-fb9"/>
+                        <outlet property="enableGetTaskAllowSwitch" destination="8XW-8v-iqw" id="QQA-ER-MJF"/>
+                        <outlet property="expiryDarkModeLabel" destination="DB2-gn-cs4" id="iu7-LX-8Dw"/>
+                        <outlet property="expiryLabel" destination="min-G7-4yH" id="L7n-Wh-FaC"/>
+                        <outlet property="exportKernelTaskPortLabel" destination="0lM-oV-NGn" id="ajQ-6Z-d40"/>
+                        <outlet property="exportKernelTaskPortSwitch" destination="gLz-Bc-vIw" id="XDh-UC-Lqe"/>
+                        <outlet property="hideLogWindowLabel" destination="NGj-U7-Rke" id="bfJ-6q-ked"/>
+                        <outlet property="hideLogWindowSwitch" destination="X88-cm-23O" id="Ki6-x7-ROC"/>
+                        <outlet property="increaseMemoryLimitLabel" destination="PFy-VA-xz7" id="YlZ-6A-cbH"/>
+                        <outlet property="increaseMemoryLimitSwitch" destination="bla-co-6aU" id="poj-cI-AHR"/>
+                        <outlet property="installCydiaLabel" destination="SRa-i1-KjM" id="45A-qg-exv"/>
+                        <outlet property="installCydiaSwitch" destination="mLJ-TX-0ah" id="Oz1-YS-kkm"/>
+                        <outlet property="installSSHLabel" destination="Dhz-O8-Ohi" id="0IJ-EH-iXc"/>
+                        <outlet property="installSSHSwitch" destination="SJL-oV-WyH" id="2Sx-B2-ZaA"/>
+                        <outlet property="kernelExploitLabel" destination="tpd-rk-NGn" id="PJf-0x-p3M"/>
+                        <outlet property="kernelExploitSegmentedControl" destination="utS-Y2-9Wz" id="Dsu-lg-XLg"/>
+                        <outlet property="loadDaemonsLabel" destination="bBi-OR-hpE" id="9oG-Vo-CpY"/>
+                        <outlet property="loadDaemonsSwitch" destination="F5r-kF-yjs" id="suE-SO-jWf"/>
+                        <outlet property="openCydiaButton" destination="MCD-u6-GW4" id="ldE-Tk-8ik"/>
+                        <outlet property="overwriteBootNonceLabel" destination="5Ee-VR-cUR" id="A8c-uf-szj"/>
+                        <outlet property="overwriteBootNonceSwitch" destination="T4c-Yf-ufc" id="hDs-LR-yTH"/>
+                        <outlet property="refreshIconCacheLabel" destination="SVp-PX-97M" id="a5f-v9-20k"/>
+                        <outlet property="refreshIconCacheSwitch" destination="nUw-6v-I0P" id="ofZ-rW-Htp"/>
+                        <outlet property="reloadSystemDaemonsLabel" destination="GIt-S3-wBe" id="i9V-rt-Ps5"/>
+                        <outlet property="reloadSystemDaemonsSwitch" destination="woU-mq-fIz" id="8Ss-a2-2zm"/>
+                        <outlet property="resetCydiaCacheLabel" destination="fyE-Sj-TNL" id="Ray-1X-QYf"/>
+                        <outlet property="resetCydiaCacheSwitch" destination="DM2-Dw-FZN" id="Az3-TV-WIl"/>
+                        <outlet property="restartButton" destination="HS8-A8-Kos" id="I9A-pb-8l0"/>
+                        <outlet property="restartSpringBoardButton" destination="MKZ-Zb-eq1" id="tT2-qR-tat"/>
+                        <outlet property="restoreRootFSLabel" destination="PbX-3H-DcH" id="Bb4-tc-bfm"/>
+                        <outlet property="restoreRootFSSwitch" destination="89P-cD-Lme" id="qTp-E7-KFa"/>
+                        <outlet property="setCSDebuggedLabel" destination="Eq9-Ns-zey" id="nWv-R1-szy"/>
+                        <outlet property="setCSDebuggedSwitch" destination="ySK-nk-1pp" id="G8Q-qo-kAq"/>
+                        <outlet property="shareDiagnosticsDataButton" destination="8U8-1D-Tj2" id="Lrh-vm-JH2"/>
+                        <outlet property="specialThanksLabel" destination="usV-YE-yxE" id="XAE-sr-MYQ"/>
+                        <outlet property="sshOnlyLabel" destination="Wpf-g8-fV1" id="Juq-S0-aq6"/>
+                        <outlet property="sshOnlySwitch" destination="11j-p9-hrg" id="g4g-ah-YgX"/>
+                        <outlet property="tweakInjectionLabel" destination="MyV-qW-zdt" id="Y2G-6J-9bM"/>
+                        <outlet property="tweakInjectionSwitch" destination="KoE-B0-zag" id="kmW-of-PNx"/>
+                        <outlet property="upTimeLabel" destination="TmA-aA-qbT" id="gkz-Bs-QDV"/>
+                        <outlet property="uptimeLabel" destination="Zx2-Kx-0aV" id="Wez-W8-YE3"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aCk-uV-F94" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1837,44 +1837,15 @@
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="9du-wd-pgy">
-                                        <rect key="frame" x="0.0" y="475" width="375" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="9du-wd-pgy" id="zID-rE-uNO">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UvO-qF-f3J">
-                                                    <rect key="frame" x="15" y="5.6666666666666679" width="229" height="33"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="77" id="fXW-lM-zc6"/>
-                                                        <constraint firstAttribute="height" constant="33" id="muQ-d4-rmm"/>
-                                                    </constraints>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <state key="normal" title="@S0rryMyBad (Development)">
-                                                        <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    </state>
-                                                    <connections>
-                                                        <action selector="tappedOnS0rryMyBad:" destination="mna-s8-kAY" eventType="touchUpInside" id="IdP-ng-Yha"/>
-                                                    </connections>
-                                                </button>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="UvO-qF-f3J" firstAttribute="centerY" secondItem="zID-rE-uNO" secondAttribute="centerY" id="IcV-Qk-MlD"/>
-                                                <constraint firstItem="UvO-qF-f3J" firstAttribute="leading" secondItem="zID-rE-uNO" secondAttribute="leading" constant="15" id="e79-yW-3zm"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="l4y-fB-FBm">
-                                        <rect key="frame" x="0.0" y="519" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="475" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="l4y-fB-FBm" id="mGp-9z-jhF">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7IF-fV-7yG">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="214" height="33"/>
+                                                    <rect key="frame" x="15" y="5.6666666666666679" width="214" height="33"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="33" id="VRy-Ak-fXb"/>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="77" id="uym-Zs-I9b"/>
@@ -1896,14 +1867,14 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="gVl-W7-A8d">
-                                        <rect key="frame" x="0.0" y="563" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="519" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="gVl-W7-A8d" id="TAx-u9-Bx6">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="egd-uq-xg0">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="231" height="33"/>
+                                                    <rect key="frame" x="15" y="5.6666666666666679" width="231" height="33"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="77" id="7Wa-lb-yiB"/>
                                                         <constraint firstAttribute="height" constant="33" id="dxg-6x-bAT"/>
@@ -1925,14 +1896,14 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="JxB-gz-Zuc">
-                                        <rect key="frame" x="0.0" y="607" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="563" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="JxB-gz-Zuc" id="nX1-ls-Dw4">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="usK-kT-lNG">
-                                                    <rect key="frame" x="15" y="5.3333333333333321" width="182" height="33"/>
+                                                    <rect key="frame" x="15" y="5.6666666666666679" width="182" height="33"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="33" id="NZf-Lj-pMm"/>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="77" id="mwt-wA-Ay5"/>
@@ -1954,10 +1925,10 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="sJc-T8-pNr">
-                                        <rect key="frame" x="0.0" y="651" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="607" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="sJc-T8-pNr" id="Z9s-Nq-gxx">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gSs-Qr-0L6">
@@ -1983,10 +1954,10 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="rO4-Ce-LhG">
-                                        <rect key="frame" x="0.0" y="695" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="651" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rO4-Ce-LhG" id="7is-w0-02C">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N6S-5q-UzE">
@@ -2012,10 +1983,10 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="QBO-7C-So3">
-                                        <rect key="frame" x="0.0" y="739" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="695" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="QBO-7C-So3" id="mdq-iP-5zb">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cUa-LX-1Nb">
@@ -2041,10 +2012,10 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="dmj-OW-7j7">
-                                        <rect key="frame" x="0.0" y="783" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="739" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="dmj-OW-7j7" id="cce-2D-G2c">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Ub-TS-0eH">
@@ -2070,10 +2041,10 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="G6c-of-7es">
-                                        <rect key="frame" x="0.0" y="827" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="783" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="G6c-of-7es" id="Ju8-wz-ixv">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="llG-m4-fQ6">
@@ -2099,7 +2070,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="99g-qV-P3b">
-                                        <rect key="frame" x="0.0" y="871" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="827" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="99g-qV-P3b" id="NxB-9B-xgo">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
@@ -2128,7 +2099,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="9qD-cf-QyW">
-                                        <rect key="frame" x="0.0" y="915" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="871" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="9qD-cf-QyW" id="1VE-rH-2UR">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
@@ -2157,7 +2128,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="PZW-Af-Cp9">
-                                        <rect key="frame" x="0.0" y="959" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="915" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="PZW-Af-Cp9" id="0Mb-1T-dMl">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
@@ -2186,7 +2157,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="nfG-4f-dUv">
-                                        <rect key="frame" x="0.0" y="1003" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="959" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="nfG-4f-dUv" id="v0s-fe-Kd8">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
@@ -2215,7 +2186,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="9xd-NI-t29">
-                                        <rect key="frame" x="0.0" y="1047" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="1003" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="9xd-NI-t29" id="pJp-xn-NCf">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
@@ -2244,7 +2215,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="FTH-8s-Rmg">
-                                        <rect key="frame" x="0.0" y="1091" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="1047" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="FTH-8s-Rmg" id="Kzw-zP-0ob">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
@@ -2273,7 +2244,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="rXu-iG-KxG">
-                                        <rect key="frame" x="0.0" y="1135" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="1091" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rXu-iG-KxG" id="mmv-o1-SwT">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
@@ -2302,7 +2273,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="qPp-gx-H0p">
-                                        <rect key="frame" x="0.0" y="1179" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="1135" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="qPp-gx-H0p" id="Vy3-9b-VJi">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
@@ -2331,7 +2302,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="e9F-yX-Kaw">
-                                        <rect key="frame" x="0.0" y="1223" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="1179" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="e9F-yX-Kaw" id="jMr-Q3-hEl">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
@@ -2369,34 +2340,33 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Special Thanks" id="6zY-vq-3l3"/>
                     <connections>
-                        <outlet property="AppleDryButton" destination="Wla-bb-g2P" id="Z3H-PZ-UC4"/>
-                        <outlet property="BazadButton" destination="k2H-ae-KOW" id="C3g-uy-eaG"/>
-                        <outlet property="BenButton" destination="4tc-UD-CU7" id="ZRb-YE-XZP"/>
-                        <outlet property="CrypticButton" destination="llG-m4-fQ6" id="reM-Py-NhM"/>
-                        <outlet property="DennisButton" destination="Yjg-h2-gt3" id="VIo-pG-GFe"/>
-                        <outlet property="ExternalistButton" destination="7IF-fV-7yG" id="Kp9-dQ-YCW"/>
-                        <outlet property="GeoSn0wButton" destination="w92-OW-keF" id="kNX-JY-U5F"/>
-                        <outlet property="IanBeerButton" destination="gQp-2a-3sA" id="vYk-0h-RCe"/>
-                        <outlet property="JailbreakbusterButton" destination="qTU-ae-H2n" id="zXi-Pm-D6y"/>
-                        <outlet property="JakeashacksButton" destination="6Ub-TS-0eH" id="oVk-ct-DSs"/>
-                        <outlet property="MatchsticButton" destination="gSs-Qr-0L6" id="OIY-Xy-gZv"/>
-                        <outlet property="MidnightChipButton" destination="Vdc-gW-04x" id="qg4-qB-z9q"/>
-                        <outlet property="MiscMistyButton" destination="cUa-LX-1Nb" id="IZw-SI-8TZ"/>
-                        <outlet property="MorpheusButton" destination="Dwp-7m-i0T" id="uU0-y1-9Sl"/>
-                        <outlet property="NinjaPrawnButton" destination="V0w-3F-HRY" id="ePu-cE-R2F"/>
-                        <outlet property="NitoTVButton" destination="usK-kT-lNG" id="Wdp-Bi-p3b"/>
-                        <outlet property="PsychoTeaButton" destination="Aay-Mz-cvw" id="P3B-le-zVJ"/>
-                        <outlet property="RealBrightiupButton" destination="egd-uq-xg0" id="FGr-L5-Ijl"/>
-                        <outlet property="RobButton" destination="nxt-hY-cmG" id="i1d-TK-mrR"/>
-                        <outlet property="S0rryMyBadButton" destination="UvO-qF-f3J" id="30l-yt-JXG"/>
-                        <outlet property="SamGButton" destination="h4e-3L-EW3" id="0jy-88-wyL"/>
-                        <outlet property="SaurikButton" destination="BXZ-in-r3I" id="Bsd-ls-aib"/>
-                        <outlet property="SiguzaButton" destination="ifQ-0r-Hnb" id="r5T-qM-N6D"/>
-                        <outlet property="StekButton" destination="BYM-yS-ubl" id="NG4-Le-nIg"/>
-                        <outlet property="SwaggoButton" destination="r2t-59-cIz" id="o5Z-w0-IMZ"/>
-                        <outlet property="UmanghereButton" destination="N6S-5q-UzE" id="YH6-BI-7Di"/>
-                        <outlet property="XerubButton" destination="yj7-t7-Qxc" id="ywB-ai-INU"/>
-                        <outlet property="XerusDesignButton" destination="DMu-MO-TiW" id="TSH-XZ-tJM"/>
+                        <outlet property="appleDryButton" destination="Wla-bb-g2P" id="yUe-bq-gpC"/>
+                        <outlet property="bazadButton" destination="k2H-ae-KOW" id="87r-Mi-cmg"/>
+                        <outlet property="benButton" destination="4tc-UD-CU7" id="vh2-PV-HxU"/>
+                        <outlet property="crypticButton" destination="llG-m4-fQ6" id="yAY-tG-zz1"/>
+                        <outlet property="dennisButton" destination="Yjg-h2-gt3" id="qXA-cU-IaX"/>
+                        <outlet property="externalistButton" destination="7IF-fV-7yG" id="Mnq-Og-bdy"/>
+                        <outlet property="geoSn0wButton" destination="w92-OW-keF" id="a2V-5V-aKy"/>
+                        <outlet property="ianBeerButton" destination="gQp-2a-3sA" id="iKy-yG-lAz"/>
+                        <outlet property="jailbreakbusterButton" destination="qTU-ae-H2n" id="Kpf-ky-TMN"/>
+                        <outlet property="jakeashacksButton" destination="6Ub-TS-0eH" id="ddj-B4-wbo"/>
+                        <outlet property="matchsticButton" destination="gSs-Qr-0L6" id="6Lj-x4-dvj"/>
+                        <outlet property="midnightChipButton" destination="Vdc-gW-04x" id="oyF-Fk-2AY"/>
+                        <outlet property="miscMistyButton" destination="cUa-LX-1Nb" id="CmK-3o-ewS"/>
+                        <outlet property="morpheusButton" destination="Dwp-7m-i0T" id="DN8-c5-MGf"/>
+                        <outlet property="ninjaPrawnButton" destination="V0w-3F-HRY" id="RxZ-Rp-ra7"/>
+                        <outlet property="nitoTVButton" destination="usK-kT-lNG" id="7Za-3w-cMO"/>
+                        <outlet property="psychoTeaButton" destination="Aay-Mz-cvw" id="yiT-JN-JBm"/>
+                        <outlet property="realBrightiupButton" destination="egd-uq-xg0" id="XJA-RC-5Ti"/>
+                        <outlet property="robButton" destination="nxt-hY-cmG" id="Qxq-Wr-F7k"/>
+                        <outlet property="samGButton" destination="h4e-3L-EW3" id="AeO-tO-gV6"/>
+                        <outlet property="saurikButton" destination="BXZ-in-r3I" id="nHo-Oo-xun"/>
+                        <outlet property="siguzaButton" destination="ifQ-0r-Hnb" id="Zay-uZ-YQn"/>
+                        <outlet property="stekButton" destination="BYM-yS-ubl" id="ArC-2Y-0wJ"/>
+                        <outlet property="swaggoButton" destination="r2t-59-cIz" id="3c6-94-YR7"/>
+                        <outlet property="umanghereButton" destination="N6S-5q-UzE" id="tlR-tj-JAQ"/>
+                        <outlet property="xerubButton" destination="yj7-t7-Qxc" id="plC-9F-vYg"/>
+                        <outlet property="xerusDesignButton" destination="DMu-MO-TiW" id="NUv-DB-KcD"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fIZ-6u-FmJ" userLabel="First Responder" sceneMemberID="firstResponder"/>

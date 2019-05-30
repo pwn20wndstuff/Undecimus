@@ -48,7 +48,7 @@
     [super viewDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(darkModeSettings:) name:@"darkModeSettings" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(lightModeSettings:) name:@"lightModeSettings" object:nil];
-    [self.BootNonceTextField setDelegate:self];
+    [self.bootNonceTextField setDelegate:self];
     self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
     self.tap.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:self.tap];
@@ -57,73 +57,73 @@
 
 -(void)darkModeSettings:(NSNotification *) notification  {
     [self.specialThanksLabel setTextColor:[UIColor whiteColor]];
-    [self.TweakInjectionLabel setTextColor:[UIColor whiteColor]];
-    [self.LoadDaemonsLabel setTextColor:[UIColor whiteColor]];
-    [self.DumpAPTicketLabel setTextColor:[UIColor whiteColor]];
-    [self.RefreshIconCacheLabel setTextColor:[UIColor whiteColor]];
-    [self.DisableAutoUpdatesLabel setTextColor:[UIColor whiteColor]];
-    [self.DisableAppRevokesLabel setTextColor:[UIColor whiteColor]];
-    [self.OverwriteBootNonceLabel setTextColor:[UIColor whiteColor]];
-    [self.ExportKernelTaskPortLabel setTextColor:[UIColor whiteColor]];
-    [self.RestoreRootFSLabel setTextColor:[UIColor whiteColor]];
+    [self.tweakInjectionLabel setTextColor:[UIColor whiteColor]];
+    [self.loadDaemonsLabel setTextColor:[UIColor whiteColor]];
+    [self.dumpAPTicketLabel setTextColor:[UIColor whiteColor]];
+    [self.refreshIconCacheLabel setTextColor:[UIColor whiteColor]];
+    [self.disableAutoUpdatesLabel setTextColor:[UIColor whiteColor]];
+    [self.disableAppRevokesLabel setTextColor:[UIColor whiteColor]];
+    [self.overwriteBootNonceLabel setTextColor:[UIColor whiteColor]];
+    [self.exportKernelTaskPortLabel setTextColor:[UIColor whiteColor]];
+    [self.restoreRootFSLabel setTextColor:[UIColor whiteColor]];
     [self.installCydiaLabel setTextColor:[UIColor whiteColor]];
     [self.installSSHLabel setTextColor:[UIColor whiteColor]];
-    [self.IncreaseMemoryLimitLabel setTextColor:[UIColor whiteColor]];
-    [self.ReloadSystemDaemonsLabel setTextColor:[UIColor whiteColor]];
-    [self.HideLogWindowLabel setTextColor:[UIColor whiteColor]];
-    [self.ResetCydiaCacheLabel setTextColor:[UIColor whiteColor]];
-    [self.SSHOnlyLabel setTextColor:[UIColor whiteColor]];
-    [self.EnableGetTaskAllowLabel setTextColor:[UIColor whiteColor]];
-    [self.SetCSDebuggedLabel setTextColor:[UIColor whiteColor]];
-    [self.AutoRespringLabel setTextColor:[UIColor whiteColor]];
+    [self.increaseMemoryLimitLabel setTextColor:[UIColor whiteColor]];
+    [self.reloadSystemDaemonsLabel setTextColor:[UIColor whiteColor]];
+    [self.hideLogWindowLabel setTextColor:[UIColor whiteColor]];
+    [self.resetCydiaCacheLabel setTextColor:[UIColor whiteColor]];
+    [self.sshOnlyLabel setTextColor:[UIColor whiteColor]];
+    [self.enableGetTaskAllowLabel setTextColor:[UIColor whiteColor]];
+    [self.setCSDebuggedLabel setTextColor:[UIColor whiteColor]];
+    [self.autoRespringLabel setTextColor:[UIColor whiteColor]];
     [self.kernelExploitLabel setTextColor:[UIColor whiteColor]];
     
     [self.bootNonceButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.BootNonceTextField setTintColor:[UIColor whiteColor]];
+    [self.bootNonceTextField setTintColor:[UIColor whiteColor]];
     
-    [self.BootNonceTextField setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
-    [self.ECIDLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.bootNonceTextField setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.ecidLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.ecidDarkModeButton setTitleColor:[UIColor whiteColor] forState:normal];
     
     [self.expiryDarkModeLabel setTextColor:[UIColor whiteColor]];
-    [self.ExpiryLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
-    [self.UptimeLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.expiryLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.uptimeLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.upTimeLabel setTextColor:[UIColor whiteColor]];
 }
 
 -(void)lightModeSettings:(NSNotification *) notification  {
     [self.specialThanksLabel setTextColor:[UIColor blackColor]];
-    [self.TweakInjectionLabel setTextColor:[UIColor blackColor]];
-    [self.LoadDaemonsLabel setTextColor:[UIColor blackColor]];
-    [self.DumpAPTicketLabel setTextColor:[UIColor blackColor]];
-    [self.RefreshIconCacheLabel setTextColor:[UIColor blackColor]];
-    [self.DisableAutoUpdatesLabel setTextColor:[UIColor blackColor]];
-    [self.DisableAppRevokesLabel setTextColor:[UIColor blackColor]];
-    [self.OverwriteBootNonceLabel setTextColor:[UIColor blackColor]];
-    [self.ExportKernelTaskPortLabel setTextColor:[UIColor blackColor]];
-    [self.RestoreRootFSLabel setTextColor:[UIColor blackColor]];
+    [self.tweakInjectionLabel setTextColor:[UIColor blackColor]];
+    [self.loadDaemonsLabel setTextColor:[UIColor blackColor]];
+    [self.dumpAPTicketLabel setTextColor:[UIColor blackColor]];
+    [self.refreshIconCacheLabel setTextColor:[UIColor blackColor]];
+    [self.disableAutoUpdatesLabel setTextColor:[UIColor blackColor]];
+    [self.disableAppRevokesLabel setTextColor:[UIColor blackColor]];
+    [self.overwriteBootNonceLabel setTextColor:[UIColor blackColor]];
+    [self.exportKernelTaskPortLabel setTextColor:[UIColor blackColor]];
+    [self.restoreRootFSLabel setTextColor:[UIColor blackColor]];
     [self.installCydiaLabel setTextColor:[UIColor blackColor]];
     [self.installSSHLabel setTextColor:[UIColor blackColor]];
-    [self.IncreaseMemoryLimitLabel setTextColor:[UIColor blackColor]];
-    [self.ReloadSystemDaemonsLabel setTextColor:[UIColor blackColor]];
-    [self.HideLogWindowLabel setTextColor:[UIColor blackColor]];
-    [self.ResetCydiaCacheLabel setTextColor:[UIColor blackColor]];
-    [self.SSHOnlyLabel setTextColor:[UIColor blackColor]];
-    [self.EnableGetTaskAllowLabel setTextColor:[UIColor blackColor]];
-    [self.SetCSDebuggedLabel setTextColor:[UIColor blackColor]];
-    [self.AutoRespringLabel setTextColor:[UIColor blackColor]];
+    [self.increaseMemoryLimitLabel setTextColor:[UIColor blackColor]];
+    [self.reloadSystemDaemonsLabel setTextColor:[UIColor blackColor]];
+    [self.hideLogWindowLabel setTextColor:[UIColor blackColor]];
+    [self.resetCydiaCacheLabel setTextColor:[UIColor blackColor]];
+    [self.sshOnlyLabel setTextColor:[UIColor blackColor]];
+    [self.enableGetTaskAllowLabel setTextColor:[UIColor blackColor]];
+    [self.setCSDebuggedLabel setTextColor:[UIColor blackColor]];
+    [self.autoRespringLabel setTextColor:[UIColor blackColor]];
     [self.kernelExploitLabel setTextColor:[UIColor blackColor]];
     
     [self.bootNonceButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.BootNonceTextField setTintColor:[UIColor blackColor]];
+    [self.bootNonceTextField setTintColor:[UIColor blackColor]];
     
-    [self.BootNonceTextField setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
-    [self.ECIDLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.bootNonceTextField setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.ecidLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.ecidDarkModeButton setTitleColor:[UIColor blackColor] forState:normal];
     
     [self.expiryDarkModeLabel setTextColor:[UIColor blackColor]];
-    [self.ExpiryLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
-    [self.UptimeLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.expiryLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.uptimeLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.upTimeLabel setTextColor:[UIColor blackColor]];
 }
 
@@ -139,39 +139,39 @@
 
 - (void)reloadData {
     prefs_t *prefs = copy_prefs();
-    [self.TweakInjectionSwitch setOn:(BOOL)prefs->load_tweaks];
-    [self.LoadDaemonsSwitch setOn:(BOOL)prefs->load_daemons];
-    [self.DumpAPTicketSwitch setOn:(BOOL)prefs->dump_apticket];
-    [self.BootNonceTextField setPlaceholder:@(prefs->boot_nonce)];
-    [self.BootNonceTextField setText:nil];
-    [self.RefreshIconCacheSwitch setOn:(BOOL)prefs->run_uicache];
-    [self.KernelExploitSegmentedControl setSelectedSegmentIndex:(int)prefs->exploit];
-    [self.DisableAutoUpdatesSwitch setOn:(BOOL)prefs->disable_auto_updates];
-    [self.DisableAppRevokesSwitch setOn:(BOOL)prefs->disable_app_revokes];
-    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(empty_list_exploit) forSegmentAtIndex:empty_list_exploit];
-    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(multi_path_exploit) forSegmentAtIndex:multi_path_exploit];
-    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(async_wake_exploit) forSegmentAtIndex:async_wake_exploit];
-    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(voucher_swap_exploit) forSegmentAtIndex:voucher_swap_exploit];
-    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(mach_swap_exploit) forSegmentAtIndex:mach_swap_exploit];
-    [self.KernelExploitSegmentedControl setEnabled:supportsExploit(mach_swap_2_exploit) forSegmentAtIndex:mach_swap_2_exploit];
-    [self.OpenCydiaButton setEnabled:(BOOL)cydiaIsInstalled()];
-    [self.ExpiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[SettingsTableViewController provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, localize(@"Days")]];
-    [self.OverwriteBootNonceSwitch setOn:(BOOL)prefs->overwrite_boot_nonce];
-    [self.ExportKernelTaskPortSwitch setOn:(BOOL)prefs->export_kernel_task_port];
-    [self.RestoreRootFSSwitch setOn:(BOOL)prefs->restore_rootfs];
-    [self.UptimeLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)getUptime() / 86400, localize(@"Days")]];
-    [self.IncreaseMemoryLimitSwitch setOn:(BOOL)prefs->increase_memory_limit];
+    [self.tweakInjectionSwitch setOn:(BOOL)prefs->load_tweaks];
+    [self.loadDaemonsSwitch setOn:(BOOL)prefs->load_daemons];
+    [self.dumpAPTicketSwitch setOn:(BOOL)prefs->dump_apticket];
+    [self.bootNonceTextField setPlaceholder:@(prefs->boot_nonce)];
+    [self.bootNonceTextField setText:nil];
+    [self.refreshIconCacheSwitch setOn:(BOOL)prefs->run_uicache];
+    [self.kernelExploitSegmentedControl setSelectedSegmentIndex:(int)prefs->exploit];
+    [self.disableAutoUpdatesSwitch setOn:(BOOL)prefs->disable_auto_updates];
+    [self.disableAppRevokesSwitch setOn:(BOOL)prefs->disable_app_revokes];
+    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(empty_list_exploit) forSegmentAtIndex:empty_list_exploit];
+    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(multi_path_exploit) forSegmentAtIndex:multi_path_exploit];
+    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(async_wake_exploit) forSegmentAtIndex:async_wake_exploit];
+    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(voucher_swap_exploit) forSegmentAtIndex:voucher_swap_exploit];
+    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(mach_swap_exploit) forSegmentAtIndex:mach_swap_exploit];
+    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(mach_swap_2_exploit) forSegmentAtIndex:mach_swap_2_exploit];
+    [self.openCydiaButton setEnabled:(BOOL)cydiaIsInstalled()];
+    [self.expiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[SettingsTableViewController provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, localize(@"Days")]];
+    [self.overwriteBootNonceSwitch setOn:(BOOL)prefs->overwrite_boot_nonce];
+    [self.exportKernelTaskPortSwitch setOn:(BOOL)prefs->export_kernel_task_port];
+    [self.restoreRootFSSwitch setOn:(BOOL)prefs->restore_rootfs];
+    [self.uptimeLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)getUptime() / 86400, localize(@"Days")]];
+    [self.increaseMemoryLimitSwitch setOn:(BOOL)prefs->increase_memory_limit];
     [self.installSSHSwitch setOn:(BOOL)prefs->install_openssh];
     [self.installCydiaSwitch setOn:(BOOL)prefs->install_cydia];
-    if (prefs->ecid) [self.ECIDLabel setPlaceholder:hexFromInt([@(prefs->ecid) integerValue])];
-    [self.ReloadSystemDaemonsSwitch setOn:(BOOL)prefs->reload_system_daemons];
-    [self.HideLogWindowSwitch setOn:(BOOL)prefs->hide_log_window];
-    [self.ResetCydiaCacheSwitch setOn:(BOOL)prefs->reset_cydia_cache];
-    [self.SSHOnlySwitch setOn:(BOOL)prefs->ssh_only];
-    [self.EnableGetTaskAllowSwitch setOn:(BOOL)prefs->enable_get_task_allow];
-    [self.SetCSDebuggedSwitch setOn:(BOOL)prefs->set_cs_debugged];
-    [self.AutoRespringSwitch setOn:(BOOL)prefs->auto_respring];
-    [self.RestartSpringBoardButton setEnabled:respringSupported()];
+    if (prefs->ecid) [self.ecidLabel setPlaceholder:hexFromInt([@(prefs->ecid) integerValue])];
+    [self.reloadSystemDaemonsSwitch setOn:(BOOL)prefs->reload_system_daemons];
+    [self.hideLogWindowSwitch setOn:(BOOL)prefs->hide_log_window];
+    [self.resetCydiaCacheSwitch setOn:(BOOL)prefs->reset_cydia_cache];
+    [self.sshOnlySwitch setOn:(BOOL)prefs->ssh_only];
+    [self.enableGetTaskAllowSwitch setOn:(BOOL)prefs->enable_get_task_allow];
+    [self.setCSDebuggedSwitch setOn:(BOOL)prefs->set_cs_debugged];
+    [self.autoRespringSwitch setOn:(BOOL)prefs->auto_respring];
+    [self.restartSpringBoardButton setEnabled:respringSupported()];
     [self.restartButton setEnabled:restartSupported()];
     release_prefs(&prefs);
     [self.tableView reloadData];
@@ -182,33 +182,33 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"showSpecialThanks" object:self];
 }
 
-- (IBAction)TweakInjectionSwitchTriggered:(id)sender {
+- (IBAction)tweakInjectionSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->load_tweaks = (bool)self.TweakInjectionSwitch.isOn;
+    prefs->load_tweaks = (bool)self.tweakInjectionSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
 }
 
-- (IBAction)LoadDaemonsSwitchTriggered:(id)sender {
+- (IBAction)loadDaemonsSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->load_daemons = (bool)self.LoadDaemonsSwitch.isOn;
+    prefs->load_daemons = (bool)self.loadDaemonsSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
 }
 
-- (IBAction)DumpAPTicketSwitchTriggered:(id)sender {
+- (IBAction)dumpAPTicketSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->dump_apticket = (bool)self.DumpAPTicketSwitch.isOn;
+    prefs->dump_apticket = (bool)self.dumpAPTicketSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
 }
 
-- (IBAction)BootNonceTextFieldTriggered:(id)sender {
+- (IBAction)bootNonceTextFieldEditingDidEnd:(id)sender {
     uint64_t val = 0;
-    if ([[NSScanner scannerWithString:[self.BootNonceTextField text]] scanHexLongLong:&val] && val != HUGE_VAL && val != -HUGE_VAL) {
+    if ([[NSScanner scannerWithString:[self.bootNonceTextField text]] scanHexLongLong:&val] && val != HUGE_VAL && val != -HUGE_VAL) {
         prefs_t *prefs = copy_prefs();
         prefs->boot_nonce = [NSString stringWithFormat:@ADDR, val].UTF8String;
         set_prefs(prefs);
@@ -222,25 +222,25 @@
     [self reloadData];
 }
 
-- (IBAction)RefreshIconCacheSwitchTriggered:(id)sender {
+- (IBAction)refreshIconCacheSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->run_uicache = (bool)self.RefreshIconCacheSwitch.isOn;
+    prefs->run_uicache = (bool)self.refreshIconCacheSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
 }
 
-- (IBAction)KernelExploitSegmentedControl:(id)sender {
+- (IBAction)kernelExploitSegmentedControlValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->exploit = (int)self.KernelExploitSegmentedControl.selectedSegmentIndex;
+    prefs->exploit = (int)self.kernelExploitSegmentedControl.selectedSegmentIndex;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
 }
 
-- (IBAction)DisableAppRevokesSwitchTriggered:(id)sender {
+- (IBAction)disableAppRevokesSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->disable_app_revokes = (bool)self.DisableAppRevokesSwitch.isOn;
+    prefs->disable_app_revokes = (bool)self.disableAppRevokesSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
@@ -271,9 +271,9 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), block);
 }
 
-- (IBAction)DisableAutoUpdatesSwitchTriggered:(id)sender {
+- (IBAction)disableAutoUpdatesSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->disable_auto_updates = (bool)self.DisableAutoUpdatesSwitch.isOn;
+    prefs->disable_auto_updates = (bool)self.disableAutoUpdatesSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
@@ -284,7 +284,7 @@
     [getDiagnostics() writeToURL:URL error:nil];
     UIActivityViewController *const activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[URL] applicationActivities:nil];
     if ([activityViewController respondsToSelector:@selector(popoverPresentationController)]) {
-        [[activityViewController popoverPresentationController] setSourceView:self.ShareDiagnosticsDataButton];
+        [[activityViewController popoverPresentationController] setSourceView:self.shareDiagnosticsDataButton];
     }
     [self presentViewController:activityViewController animated:YES completion:nil];
 }
@@ -297,9 +297,9 @@
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus"] options:@{} completionHandler:nil];
 }
 
-- (IBAction)OverwriteBootNonceSwitchTriggered:(id)sender {
+- (IBAction)overwriteBootNonceSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->overwrite_boot_nonce = (bool)self.OverwriteBootNonceSwitch.isOn;
+    prefs->overwrite_boot_nonce = (bool)self.overwriteBootNonceSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
@@ -345,23 +345,23 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), block);
 }
 
-- (IBAction)exportKernelTaskPortSwitchTriggered:(id)sender {
+- (IBAction)exportKernelTaskPortSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->export_kernel_task_port = (bool)self.ExportKernelTaskPortSwitch.isOn;
+    prefs->export_kernel_task_port = (bool)self.exportKernelTaskPortSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
 }
 
-- (IBAction)RestoreRootFSSwitchTriggered:(id)sender {
+- (IBAction)restoreRootFSSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->restore_rootfs = (bool)self.RestoreRootFSSwitch.isOn;
+    prefs->restore_rootfs = (bool)self.restoreRootFSSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
 }
 
-- (IBAction)installCydiaSwitchTriggered:(id)sender {
+- (IBAction)installCydiaSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
     prefs->install_cydia = (bool)self.installCydiaSwitch.isOn;
     set_prefs(prefs);
@@ -369,7 +369,7 @@
     [self reloadData];
 }
 
-- (IBAction)installSSHSwitchTriggered:(id)sender {
+- (IBAction)installSSHSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
     prefs->install_openssh = (bool)self.installSSHSwitch.isOn;
     set_prefs(prefs);
@@ -382,9 +382,9 @@
     footerView.textLabel.textAlignment = NSTextAlignmentCenter;
 }
 
-- (IBAction)IncreaseMemoryLimitSwitch:(id)sender {
+- (IBAction)increaseMemoryLimitSwitch:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->increase_memory_limit = (bool)self.IncreaseMemoryLimitSwitch.isOn;
+    prefs->increase_memory_limit = (bool)self.increaseMemoryLimitSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
@@ -398,9 +398,9 @@
     [self reloadData];
 }
 
-- (IBAction)reloadSystemDaemonsSwitchTriggered:(id)sender {
+- (IBAction)reloadSystemDaemonsSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->reload_system_daemons = (bool)self.ReloadSystemDaemonsSwitch.isOn;
+    prefs->reload_system_daemons = (bool)self.reloadSystemDaemonsSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
@@ -430,9 +430,9 @@
     notice(localize(@"Cleaned diagnostics data."), false, false);
 }
 
-- (IBAction)hideLogWindowSwitchTriggered:(id)sender {
+- (IBAction)hideLogWindowSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->hide_log_window = (bool)self.HideLogWindowSwitch.isOn;
+    prefs->hide_log_window = (bool)self.hideLogWindowSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
@@ -443,25 +443,25 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), block);
 }
 
-- (IBAction)resetCydiaCacheSwitchTriggered:(id)sender {
+- (IBAction)resetCydiaCacheSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->reset_cydia_cache = (bool)self.ResetCydiaCacheSwitch.isOn;
+    prefs->reset_cydia_cache = (bool)self.resetCydiaCacheSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
 }
 
-- (IBAction)sshOnlySwitchTriggered:(id)sender {
+- (IBAction)sshOnlySwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->ssh_only = (bool)self.SSHOnlySwitch.isOn;
+    prefs->ssh_only = (bool)self.sshOnlySwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
 }
 
-- (IBAction)enableGetTaskAllowSwitchTriggered:(id)sender {
+- (IBAction)enableGetTaskAllowSwitchValueChanged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->enable_get_task_allow = (bool)self.EnableGetTaskAllowSwitch.isOn;
+    prefs->enable_get_task_allow = (bool)self.enableGetTaskAllowSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
@@ -469,7 +469,7 @@
 
 - (IBAction)setCSDebugged:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->set_cs_debugged = (bool)self.SetCSDebuggedSwitch.isOn;
+    prefs->set_cs_debugged = (bool)self.setCSDebuggedSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];
@@ -477,7 +477,7 @@
 
 - (IBAction)setAutoRespring:(id)sender {
     prefs_t *prefs = copy_prefs();
-    prefs->auto_respring = (bool)self.AutoRespringSwitch.isOn;
+    prefs->auto_respring = (bool)self.autoRespringSwitch.isOn;
     set_prefs(prefs);
     release_prefs(&prefs);
     [self reloadData];

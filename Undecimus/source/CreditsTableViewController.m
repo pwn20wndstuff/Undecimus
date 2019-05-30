@@ -27,68 +27,64 @@
 
 -(void) darkModeCreditsView:(NSNotification *) notification  {
     
-    [self.IanBeerButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.BazadButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.MorpheusButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.XerubButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.PsychoTeaButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.StekButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.NinjaPrawnButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.CrypticButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.XerusDesignButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.AppleDryButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.RobButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.MidnightChipButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.GeoSn0wButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.SwaggoButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.JailbreakbusterButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.JakeashacksButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.JonathanSealsButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.SaurikButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.SiguzaButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.S0rryMyBadButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.ExternalistButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.RealBrightiupButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.NitoTVButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.MatchsticButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.UmanghereButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.MiscMistyButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.BenButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.SamGButton setTitleColor:[UIColor whiteColor] forState:normal];
-    [self.DennisButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.ianBeerButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.bazadButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.morpheusButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.xerubButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.psychoTeaButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.stekButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.ninjaPrawnButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.crypticButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.xerusDesignButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.appleDryButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.robButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.midnightChipButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.geoSn0wButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.swaggoButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.jailbreakbusterButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.jakeashacksButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.saurikButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.siguzaButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.externalistButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.realBrightiupButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.nitoTVButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.matchsticButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.umanghereButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.miscMistyButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.benButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.samGButton setTitleColor:[UIColor whiteColor] forState:normal];
+    [self.dennisButton setTitleColor:[UIColor whiteColor] forState:normal];
 }
 
 -(void) lightModeCreditsView:(NSNotification *) notification  {
     
-    [self.IanBeerButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.BazadButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.MorpheusButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.XerubButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.PsychoTeaButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.StekButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.NinjaPrawnButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.CrypticButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.XerusDesignButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.AppleDryButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.RobButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.MidnightChipButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.GeoSn0wButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.SwaggoButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.JailbreakbusterButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.JakeashacksButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.JonathanSealsButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.SaurikButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.SiguzaButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.S0rryMyBadButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.ExternalistButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.RealBrightiupButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.NitoTVButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.MatchsticButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.UmanghereButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.MiscMistyButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.BenButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.SamGButton setTitleColor:[UIColor blackColor] forState:normal];
-    [self.DennisButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.ianBeerButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.bazadButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.morpheusButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.xerubButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.psychoTeaButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.stekButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.ninjaPrawnButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.crypticButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.xerusDesignButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.appleDryButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.robButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.midnightChipButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.geoSn0wButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.swaggoButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.jailbreakbusterButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.jakeashacksButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.saurikButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.siguzaButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.externalistButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.realBrightiupButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.nitoTVButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.matchsticButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.umanghereButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.miscMistyButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.benButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.samGButton setTitleColor:[UIColor blackColor] forState:normal];
+    [self.dennisButton setTitleColor:[UIColor blackColor] forState:normal];
 }
 
 + (NSURL *)getURLForUserName:(NSString *)userName {
@@ -175,10 +171,6 @@
 
 -(IBAction)tappedOnSiguza:(id)sender{
     [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"s1guza"] options:@{} completionHandler:nil];
-}
-
--(IBAction)tappedOnS0rryMyBad:(id)sender{
-    [[UIApplication sharedApplication] openURL:[CreditsTableViewController getURLForUserName:@"S0rryMyBad"] options:@{} completionHandler:nil];
 }
 
 -(IBAction)tappedOnExternalist:(id)sender{
