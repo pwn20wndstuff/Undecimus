@@ -63,11 +63,9 @@
 int stage = __COUNTER__;
 extern int maxStage;
 
-#define status_with_stage(Stage, MaxStage) status(([NSString stringWithFormat:@"%@ (%d/%d)", localize(@"Exploiting"), Stage, MaxStage]), false, false)
 #define upstage() do { \
     __COUNTER__; \
     stage++; \
-    status_with_stage(stage, maxStage); \
     dispatch_async(dispatch_get_main_queue(), ^{ \
         [UIView performWithoutAnimation:^{ \
             [[[JailbreakViewController sharedController] jailbreakProgressBar] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
@@ -100,6 +98,8 @@ extern int maxStage;
 
 void jailbreak()
 {
+    status(localize(@"Jailbreaking"), false, false);
+    
     int rv = 0;
     bool usedPersistedKernelTaskPort = NO;
     pid_t const my_pid = getpid();

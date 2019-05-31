@@ -32,7 +32,6 @@ static BOOL darkMode = NO;
     [self.exploitProgressLabel setAlpha:1];
     [self.jailbreakProgressBar setAlpha:1];
     
-    status(localize(@"Jailbreak"), false, false);
     void (^const block)(void) = ^(void) {
         _assert(bundledResources != nil, localize(@"Bundled Resources version missing."), true);
         if (!jailbreakSupported()) {
