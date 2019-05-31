@@ -63,14 +63,19 @@ extern bool is_directory(const char *filename);
 #define VSHARED_DYLD 0x000200 /* vnode is a dyld shared cache file */
 
 #define FILE_READ_EXC_KEY "com.apple.security.exception.files.absolute-path.read-only"
+#define FILE_READ_WRITE_EXC_KEY "com.apple.security.exception.files.absolute-path.read-write"
 #define MACH_LOOKUP_EXC_KEY "com.apple.security.exception.mach-lookup.global-name"
 #define MACH_REGISTER_EXC_KEY "com.apple.security.exception.mach-register.global-name"
 
 static const char *file_read_exceptions[] = {
     "/Library",
-    "/private/var/mobile/Library",
-    "/System/Library/Caches",
+    "/System",
     "/private/var/mnt",
+    NULL
+};
+
+static const char *file_read_write_exceptions[] = {
+    "/private/var/mobile/Library",
     NULL
 };
 
@@ -79,6 +84,8 @@ static const char *mach_lookup_exceptions[] = {
     "ch.ringwald.hidsupport.backboard",
     "com.rpetrich.rocketbootstrapd",
     "com.apple.BTLEAudioController.xpc",
+    "com.apple.backboard.hid.services",
+    "com.apple.commcenter.coretelephony.xpc",
     NULL
 };
 
@@ -1177,6 +1184,9 @@ bool set_sandbox_exceptions(kptr_t sandbox) {
     for (const char **exception = file_read_exceptions; *exception; exception++) {
         _assert(set_file_extension(sandbox, FILE_READ_EXC_KEY, *exception));
     }
+    for (const char **exception = file_read_write_exceptions; *exception; exception++) {
+        _assert(set_file_extension(sandbox, FILE_READ_WRITE_EXC_KEY, *exception));
+    }
     for (const char **exception = mach_lookup_exceptions; *exception; exception++) {
         _assert(set_mach_extension(sandbox, MACH_LOOKUP_EXC_KEY, *exception));
     }
@@ -1243,6 +1253,7 @@ bool set_exceptions(kptr_t sandbox, kptr_t amfi_entitlements) {
         _assert(set_sandbox_exceptions(sandbox));
         if (KERN_POINTER_VALID(amfi_entitlements)) {
             _assert(set_amfi_exceptions(amfi_entitlements, FILE_READ_EXC_KEY, file_read_exceptions, true));
+            _assert(set_amfi_exceptions(amfi_entitlements, FILE_READ_WRITE_EXC_KEY, file_read_write_exceptions, true));
             _assert(set_amfi_exceptions(amfi_entitlements, MACH_LOOKUP_EXC_KEY, mach_lookup_exceptions, false));
             _assert(set_amfi_exceptions(amfi_entitlements, MACH_REGISTER_EXC_KEY, mach_register_exceptions, false));
         }
