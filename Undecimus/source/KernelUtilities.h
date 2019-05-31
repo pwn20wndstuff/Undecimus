@@ -168,6 +168,8 @@ bool set_kernel_task_info(void);
 int issue_extension_for_mach_service(kptr_t sb, kptr_t ctx, const char *entry_name, void *desc);
 bool unrestrict_process(pid_t pid);
 bool unrestrict_process_with_task_port(task_t task_port);
+bool unrestrict_library(const char *path);
+bool unrestrict_library_with_fd(int fd);
 bool revalidate_process(pid_t pid);
 bool revalidate_process_with_task_port(task_t task_port);
 bool enable_mapping_for_library(const char *lib);

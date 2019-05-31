@@ -2067,6 +2067,28 @@ out:;
     return ret;
 }
 
+bool unrestrict_library(const char *path) {
+    bool ret = false;
+    _assert(path != NULL);
+    _assert(enable_mapping_for_library(path));
+    ret = true;
+out:;
+    return ret;
+}
+
+bool unrestrict_library_with_fd(int fd) {
+    bool ret = false;
+    char *path = NULL;
+    _assert(fd > 0);
+    path = get_path_for_fd(fd);
+    _assert(path != NULL);
+    _assert(unrestrict_library(path));
+    ret = true;
+out:;
+    SafeFreeNULL(path);
+    return ret;
+}
+
 bool revalidate_process(pid_t pid) {
     bool ret = true;
     kptr_t proc = KPTR_NULL;
