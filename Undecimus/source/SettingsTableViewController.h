@@ -66,6 +66,25 @@
 @property (weak, nonatomic) IBOutlet UIButton *ecidDarkModeButton;
 @property (weak, nonatomic) IBOutlet UILabel *expiryDarkModeLabel;
 @property (weak, nonatomic) IBOutlet UILabel *upTimeLabel;
+@property (weak, nonatomic) IBOutlet UIButton *loadTweaksInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *loadDaemonsInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *dumpAPTicketInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *refreshIconCacheInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *disableAutoUpdatesInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *disableAppRevokesInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *overwriteBootNonceInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *exportKernelTaskPortInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *restoreRootFSInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *increaseMemoryLimitInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *installSSHInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *installCydiaInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *reloadSystemDaemonsInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *hideLogWindowInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *resetCydiaSwitchInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *sshOnlyInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *enableGetTaskAllowInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *setCSDebuggedInfoButton;
+@property (weak, nonatomic) IBOutlet UIButton *autoRespringInfoButton;
 
 + (NSDictionary *)provisioningProfileAtPath:(NSString *)path;
 

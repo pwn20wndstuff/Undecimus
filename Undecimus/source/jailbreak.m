@@ -63,9 +63,7 @@
 int stage = __COUNTER__;
 extern int maxStage;
 
-#define upstage() do { \
-    __COUNTER__; \
-    stage++; \
+#define update_stage() do { \
     dispatch_async(dispatch_get_main_queue(), ^{ \
         [UIView performWithoutAnimation:^{ \
             [[[JailbreakViewController sharedController] jailbreakProgressBar] setProgress:(float)((float) stage/ (float) maxStage) animated:YES]; \
@@ -73,6 +71,12 @@ extern int maxStage;
             [[JailbreakViewController sharedController] exploitProgressLabel].text = [NSString stringWithFormat:@"%d/%d", stage, maxStage]; \
         }]; \
     }); \
+} while (false)
+
+#define upstage() do { \
+    __COUNTER__; \
+    stage++; \
+    update_stage(); \
 } while (false)
 
 #define find_offset(x, symbol, critical) do { \
@@ -1622,6 +1626,8 @@ out:;
 #undef sync_prefs
 #undef write_test_file
 #undef inject_trust_cache
+    stage = maxStage;
+    update_stage();
     progress(localize(@"Deinitializing jailbreak..."));
     LOG("Deinitializing kernel code execution...");
     term_kexec();

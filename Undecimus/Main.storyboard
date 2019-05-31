@@ -499,7 +499,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Load Tweaks" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MyV-qW-zdt">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Load Tweaks" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MyV-qW-zdt" userLabel="Load Tweaks Label">
                                                     <rect key="frame" x="14.999999999999993" y="11.666666666666664" width="112.33333333333331" height="21"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="99.5" id="fVO-e6-gd6"/>
@@ -509,13 +509,20 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KoE-B0-zag">
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KoE-B0-zag" userLabel="Load Tweaks Switch">
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="tweakInjectionSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="NYu-Bz-l8D"/>
                                                     </connections>
                                                 </switch>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rB2-3p-JsC">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnLoadTweaksInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="ac7-LQ-m49"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="KoE-B0-zag" firstAttribute="centerY" secondItem="xff-fH-UOA" secondAttribute="centerY" id="CcE-CH-4b0"/>
@@ -550,6 +557,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FEU-lh-5cs">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnLoadDaemonsInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="5dG-AL-Vam"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="F5r-kF-yjs" secondAttribute="trailing" constant="20" id="FPv-9F-n6n"/>
@@ -567,14 +581,14 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aXK-sQ-Yhm">
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aXK-sQ-Yhm" userLabel="Dump APTicket Switch">
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="dumpAPTicketSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="sle-OD-zm9"/>
                                                     </connections>
                                                 </switch>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dump APTicket" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gi9-pl-mUW">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dump APTicket" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gi9-pl-mUW" userLabel="Dump APTicket Label">
                                                     <rect key="frame" x="15" y="11.666666666666666" width="132.66666666666666" height="20.666666666666671"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="118.5" id="wct-D8-kyF"/>
@@ -584,6 +598,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ig2-bE-IuJ" userLabel="Dump APTicket Info Button">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnDumpAPTicketInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="jF8-ax-aLY"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="aXK-sQ-Yhm" firstAttribute="centerY" secondItem="Iv0-qq-a1D" secondAttribute="centerY" id="Bqs-CJ-4lT"/>
@@ -618,6 +639,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V1F-Wd-0UO">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnRefreshIconCacheInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="o6N-D8-pa2"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="SVp-PX-97M" firstAttribute="centerY" secondItem="dcr-VV-VaF" secondAttribute="centerY" id="0Ru-OM-0ZM"/>
@@ -652,6 +680,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hwx-kI-nTO">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnDisableAutoUpdatesInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="NqR-du-vje"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="78K-TY-Swa" firstAttribute="leading" secondItem="h0i-AC-l56" secondAttribute="leading" constant="15" id="1aP-hY-F9v"/>
@@ -686,6 +721,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="697-8R-u3u">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnDisableAppRevokesInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="wMS-Kf-He8"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="KkO-Ob-FBd" firstAttribute="centerY" secondItem="5JR-0p-0QR" secondAttribute="centerY" id="fID-vG-k4o"/>
@@ -720,6 +762,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YU5-OW-ZYs">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnOverwriteBootNonceInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="jPa-eE-rvF"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="T4c-Yf-ufc" secondAttribute="trailing" constant="20" id="2St-4l-UEz"/>
@@ -737,15 +786,15 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gLz-Bc-vIw">
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gLz-Bc-vIw" userLabel="Export TFP0 Switch">
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="exportKernelTaskPortSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="wZF-jq-Js5"/>
                                                     </connections>
                                                 </switch>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Export TFP0 (Unsafe)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0lM-oV-NGn">
-                                                    <rect key="frame" x="15" y="11.666666666666666" width="204.33333333333334" height="20.666666666666671"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Export TFP0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0lM-oV-NGn" userLabel="Export TFP0 Label">
+                                                    <rect key="frame" x="15" y="11.666666666666666" width="166" height="20.666666666666671"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="20.5" id="ADk-Zx-KCg"/>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="166" id="tuT-8v-PKU"/>
@@ -754,6 +803,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hOD-H9-3mk" userLabel="Export TFP0 Info Button">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnExportKernelTaskPortInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="s2C-Gt-sMK"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="0lM-oV-NGn" firstAttribute="leading" secondItem="qXw-8C-gwg" secondAttribute="leading" constant="15" id="20P-s9-0Lx"/>
@@ -788,6 +844,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JGp-bP-1SS">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnRestoreRootFSInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="mv6-AC-UTC"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="89P-cD-Lme" firstAttribute="centerY" secondItem="rq3-9R-OkJ" secondAttribute="centerY" id="8r8-CZ-QQi"/>
@@ -822,6 +885,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dGn-Zm-g8Z">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnIncreaseMemoryLimitInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="dIo-O6-wz4"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="bla-co-6aU" secondAttribute="trailing" constant="20" id="X1g-bm-9yu"/>
@@ -839,14 +909,14 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SJL-oV-WyH">
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SJL-oV-WyH" userLabel="Install SSH Switch">
                                                     <rect key="frame" x="306" y="6.6666666666666679" width="51" height="31.000000000000004"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="installSSHSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="ZFM-xj-8ke"/>
                                                     </connections>
                                                 </switch>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(Re)Install OpenSSH" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dhz-O8-Ohi">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(Re)Install OpenSSH" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dhz-O8-Ohi" userLabel="Install SSH Label">
                                                     <rect key="frame" x="15" y="11.666666666666666" width="225" height="20.666666666666671"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="225" id="tRK-NX-U5B"/>
@@ -856,6 +926,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OD0-wB-Y5u" userLabel="Install SSH Info Button">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnInstallSSHInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="bmC-zT-Kmf"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="SJL-oV-WyH" secondAttribute="trailing" constant="20" id="KZM-8a-bEx"/>
@@ -890,6 +967,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f9u-11-30x">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnInstallCydiaInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="q6O-Bn-aeQ"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="SRa-i1-KjM" firstAttribute="leading" secondItem="GeM-Vj-Z0Q" secondAttribute="leading" constant="15" id="brl-xd-8eT"/>
@@ -904,7 +988,7 @@
                                         <rect key="frame" x="0.0" y="607" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="WOK-Td-cxv" id="xi3-eC-Fum">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="woU-mq-fIz">
@@ -924,6 +1008,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nvJ-We-yM7">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnReloadSystemDaemonsInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="X7i-cE-JZl"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="GIt-S3-wBe" firstAttribute="leading" secondItem="xi3-eC-Fum" secondAttribute="leading" constant="15" id="74P-lL-KXB"/>
@@ -958,6 +1049,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="C8H-VU-YLA">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnHideLogWindowInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="wq3-Y8-vSX"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="X88-cm-23O" secondAttribute="trailing" constant="20" id="8sL-Ud-50w"/>
@@ -992,6 +1090,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7Nc-G6-xot" userLabel="Reset Cydia Cache Switch Info Button">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnResetCydiaCacheInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="3FT-8U-XP8"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="fyE-Sj-TNL" firstAttribute="centerY" secondItem="cgT-EM-7Rk" secondAttribute="centerY" id="Mmi-il-v0G"/>
@@ -1009,14 +1114,14 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="11j-p9-hrg">
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="11j-p9-hrg" userLabel="SSH Only Switch">
                                                     <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="sshOnlySwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="Jwo-8o-OsX"/>
                                                     </connections>
                                                 </switch>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SSH Only" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wpf-g8-fV1">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SSH Only" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wpf-g8-fV1" userLabel="SSH Only Label">
                                                     <rect key="frame" x="15" y="11.666666666666666" width="225" height="20.333333333333336"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="20.5" id="AOC-tH-fyo"/>
@@ -1026,6 +1131,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9xM-N2-Aj1" userLabel="SSH Only Info Button">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnSSHOnlyInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="KZZ-K2-e8y"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="11j-p9-hrg" secondAttribute="trailing" constant="20" id="J2p-zY-Jy0"/>
@@ -1043,14 +1155,14 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8XW-8v-iqw">
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8XW-8v-iqw" userLabel="Enable get-task-allow Switch">
                                                     <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="enableGetTaskAllowSwitchValueChanged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="go1-oJ-WAZ"/>
                                                     </connections>
                                                 </switch>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Enable get-task-allow" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S6S-NE-WJ9">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Enable get-task-allow" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S6S-NE-WJ9" userLabel="Enable get-task-allow Label">
                                                     <rect key="frame" x="15" y="11.666666666666666" width="225" height="20.333333333333336"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="225" id="Pp5-9B-bjU"/>
@@ -1060,6 +1172,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aeH-8c-pxr" userLabel="Enable get-task-allow Info Button">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnEnableGetTaskAllowInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="Dmc-5o-VWc"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="8XW-8v-iqw" firstAttribute="centerY" secondItem="q8X-Sq-CZl" secondAttribute="centerY" id="4Tf-3Q-Lr3"/>
@@ -1077,14 +1196,14 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ySK-nk-1pp">
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ySK-nk-1pp" userLabel="Set CS_DEBUGGED Switch">
                                                     <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <color key="onTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <connections>
                                                         <action selector="setCSDebugged:" destination="fNC-SN-4Tk" eventType="valueChanged" id="6nq-FD-V5e"/>
                                                     </connections>
                                                 </switch>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Set CS_DEBUGGED" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Eq9-Ns-zey">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Set CS_DEBUGGED" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Eq9-Ns-zey" userLabel="Set CS_DEBUGGED Label">
                                                     <rect key="frame" x="15" y="11.666666666666666" width="225" height="20.333333333333336"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="225" id="gFa-2T-fsj"/>
@@ -1094,6 +1213,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="e7X-CX-x7j" userLabel="Set CS_DEBUGGED Info Button">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnCSDebuggedInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="3XH-ko-X3n"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="ySK-nk-1pp" secondAttribute="trailing" constant="20" id="3a1-wB-VNJ"/>
@@ -1128,6 +1254,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LSV-ab-aq0">
+                                                    <rect key="frame" x="276" y="11" width="22" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="tappedOnAutoRespringInfoButton:" destination="fNC-SN-4Tk" eventType="touchUpInside" id="hgy-tC-nPs"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="5re-LQ-4Mq" firstAttribute="centerY" secondItem="vhz-uj-0CS" secondAttribute="centerY" id="QhA-BH-Mdo"/>
@@ -1297,7 +1430,7 @@
                                         <rect key="frame" x="0.0" y="1091" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="KNH-Ue-vDj" id="ub8-hS-Yjb">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Uptime" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TmA-aA-qbT">
@@ -1334,7 +1467,7 @@
                                         <rect key="frame" x="0.0" y="1198.3333333333333" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Mlr-hr-tQG" id="Hgr-HX-5d0">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HS8-A8-Kos">
@@ -1358,7 +1491,7 @@
                                         <rect key="frame" x="0.0" y="1242.3333333333333" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="r8e-kx-aSd" id="Lqw-02-0KP">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8U8-1D-Tj2">
@@ -1382,7 +1515,7 @@
                                         <rect key="frame" x="0.0" y="1286.3333333333333" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Y99-0P-KuE" id="ZVO-er-yhw">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MCD-u6-GW4">
@@ -1532,53 +1665,72 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Settings" id="VHD-vl-rR6"/>
                     <connections>
+                        <outlet property="autoRespringInfoButton" destination="LSV-ab-aq0" id="81t-wT-fUo"/>
                         <outlet property="autoRespringLabel" destination="b6w-j2-Rh6" id="9Bo-L5-axn"/>
                         <outlet property="autoRespringSwitch" destination="5re-LQ-4Mq" id="xRO-lw-fVb"/>
                         <outlet property="bootNonceButton" destination="xim-1p-tCK" id="Wjn-eD-eeC"/>
                         <outlet property="bootNonceTextField" destination="lf3-Mh-TY2" id="oyD-4L-cQB"/>
+                        <outlet property="disableAppRevokesInfoButton" destination="697-8R-u3u" id="8PV-jI-rke"/>
                         <outlet property="disableAppRevokesLabel" destination="Lop-s2-QoX" id="5Cc-Ky-Ghj"/>
                         <outlet property="disableAppRevokesSwitch" destination="KkO-Ob-FBd" id="gfV-1K-Ske"/>
+                        <outlet property="disableAutoUpdatesInfoButton" destination="Hwx-kI-nTO" id="Ggv-me-LrU"/>
                         <outlet property="disableAutoUpdatesLabel" destination="78K-TY-Swa" id="mDj-pk-Guf"/>
                         <outlet property="disableAutoUpdatesSwitch" destination="SP2-qK-5ej" id="Kop-9a-gv8"/>
+                        <outlet property="dumpAPTicketInfoButton" destination="ig2-bE-IuJ" id="T4F-rM-AZK"/>
                         <outlet property="dumpAPTicketLabel" destination="gi9-pl-mUW" id="efj-Te-LJf"/>
                         <outlet property="dumpAPTicketSwitch" destination="aXK-sQ-Yhm" id="etn-Dw-kYU"/>
                         <outlet property="ecidDarkModeButton" destination="K0V-OH-Xnc" id="CGI-Hw-iVK"/>
                         <outlet property="ecidLabel" destination="T5g-8V-gBQ" id="43Q-85-7Yq"/>
+                        <outlet property="enableGetTaskAllowInfoButton" destination="aeH-8c-pxr" id="9wa-q7-UvL"/>
                         <outlet property="enableGetTaskAllowLabel" destination="S6S-NE-WJ9" id="KAN-P5-fb9"/>
                         <outlet property="enableGetTaskAllowSwitch" destination="8XW-8v-iqw" id="QQA-ER-MJF"/>
                         <outlet property="expiryDarkModeLabel" destination="DB2-gn-cs4" id="iu7-LX-8Dw"/>
                         <outlet property="expiryLabel" destination="min-G7-4yH" id="L7n-Wh-FaC"/>
+                        <outlet property="exportKernelTaskPortInfoButton" destination="hOD-H9-3mk" id="NMR-tC-3uh"/>
                         <outlet property="exportKernelTaskPortLabel" destination="0lM-oV-NGn" id="ajQ-6Z-d40"/>
                         <outlet property="exportKernelTaskPortSwitch" destination="gLz-Bc-vIw" id="XDh-UC-Lqe"/>
+                        <outlet property="hideLogWindowInfoButton" destination="C8H-VU-YLA" id="VaV-VK-kKF"/>
                         <outlet property="hideLogWindowLabel" destination="NGj-U7-Rke" id="bfJ-6q-ked"/>
                         <outlet property="hideLogWindowSwitch" destination="X88-cm-23O" id="Ki6-x7-ROC"/>
+                        <outlet property="increaseMemoryLimitInfoButton" destination="dGn-Zm-g8Z" id="tII-0l-XFD"/>
                         <outlet property="increaseMemoryLimitLabel" destination="PFy-VA-xz7" id="YlZ-6A-cbH"/>
                         <outlet property="increaseMemoryLimitSwitch" destination="bla-co-6aU" id="poj-cI-AHR"/>
+                        <outlet property="installCydiaInfoButton" destination="f9u-11-30x" id="xiO-lq-3S8"/>
                         <outlet property="installCydiaLabel" destination="SRa-i1-KjM" id="45A-qg-exv"/>
                         <outlet property="installCydiaSwitch" destination="mLJ-TX-0ah" id="Oz1-YS-kkm"/>
+                        <outlet property="installSSHInfoButton" destination="OD0-wB-Y5u" id="gXN-1Q-xCP"/>
                         <outlet property="installSSHLabel" destination="Dhz-O8-Ohi" id="0IJ-EH-iXc"/>
                         <outlet property="installSSHSwitch" destination="SJL-oV-WyH" id="2Sx-B2-ZaA"/>
                         <outlet property="kernelExploitLabel" destination="tpd-rk-NGn" id="PJf-0x-p3M"/>
                         <outlet property="kernelExploitSegmentedControl" destination="utS-Y2-9Wz" id="Dsu-lg-XLg"/>
+                        <outlet property="loadDaemonsInfoButton" destination="FEU-lh-5cs" id="oSX-Ub-TwV"/>
                         <outlet property="loadDaemonsLabel" destination="bBi-OR-hpE" id="9oG-Vo-CpY"/>
                         <outlet property="loadDaemonsSwitch" destination="F5r-kF-yjs" id="suE-SO-jWf"/>
+                        <outlet property="loadTweaksInfoButton" destination="rB2-3p-JsC" id="BW2-tL-gck"/>
                         <outlet property="openCydiaButton" destination="MCD-u6-GW4" id="ldE-Tk-8ik"/>
+                        <outlet property="overwriteBootNonceInfoButton" destination="YU5-OW-ZYs" id="D5f-dn-vjx"/>
                         <outlet property="overwriteBootNonceLabel" destination="5Ee-VR-cUR" id="A8c-uf-szj"/>
                         <outlet property="overwriteBootNonceSwitch" destination="T4c-Yf-ufc" id="hDs-LR-yTH"/>
+                        <outlet property="refreshIconCacheInfoButton" destination="V1F-Wd-0UO" id="luF-zE-I55"/>
                         <outlet property="refreshIconCacheLabel" destination="SVp-PX-97M" id="a5f-v9-20k"/>
                         <outlet property="refreshIconCacheSwitch" destination="nUw-6v-I0P" id="ofZ-rW-Htp"/>
+                        <outlet property="reloadSystemDaemonsInfoButton" destination="nvJ-We-yM7" id="5s3-yy-sBX"/>
                         <outlet property="reloadSystemDaemonsLabel" destination="GIt-S3-wBe" id="i9V-rt-Ps5"/>
                         <outlet property="reloadSystemDaemonsSwitch" destination="woU-mq-fIz" id="8Ss-a2-2zm"/>
                         <outlet property="resetCydiaCacheLabel" destination="fyE-Sj-TNL" id="Ray-1X-QYf"/>
                         <outlet property="resetCydiaCacheSwitch" destination="DM2-Dw-FZN" id="Az3-TV-WIl"/>
+                        <outlet property="resetCydiaSwitchInfoButton" destination="7Nc-G6-xot" id="3Mm-2S-SGB"/>
                         <outlet property="restartButton" destination="HS8-A8-Kos" id="I9A-pb-8l0"/>
                         <outlet property="restartSpringBoardButton" destination="MKZ-Zb-eq1" id="tT2-qR-tat"/>
+                        <outlet property="restoreRootFSInfoButton" destination="JGp-bP-1SS" id="gem-bP-8l3"/>
                         <outlet property="restoreRootFSLabel" destination="PbX-3H-DcH" id="Bb4-tc-bfm"/>
                         <outlet property="restoreRootFSSwitch" destination="89P-cD-Lme" id="qTp-E7-KFa"/>
+                        <outlet property="setCSDebuggedInfoButton" destination="e7X-CX-x7j" id="BJ5-Ss-ufu"/>
                         <outlet property="setCSDebuggedLabel" destination="Eq9-Ns-zey" id="nWv-R1-szy"/>
                         <outlet property="setCSDebuggedSwitch" destination="ySK-nk-1pp" id="G8Q-qo-kAq"/>
                         <outlet property="shareDiagnosticsDataButton" destination="8U8-1D-Tj2" id="Lrh-vm-JH2"/>
                         <outlet property="specialThanksLabel" destination="usV-YE-yxE" id="XAE-sr-MYQ"/>
+                        <outlet property="sshOnlyInfoButton" destination="9xM-N2-Aj1" id="XYF-6B-97a"/>
                         <outlet property="sshOnlyLabel" destination="Wpf-g8-fV1" id="Juq-S0-aq6"/>
                         <outlet property="sshOnlySwitch" destination="11j-p9-hrg" id="g4g-ah-YgX"/>
                         <outlet property="tweakInjectionLabel" destination="MyV-qW-zdt" id="Y2G-6J-9bM"/>

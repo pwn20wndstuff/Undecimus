@@ -24,7 +24,6 @@ static JailbreakViewController *sharedController = nil;
 static NSMutableString *output = nil;
 static NSString *bundledResources = nil;
 extern int maxStage;
-static BOOL darkMode = NO;
 
 - (IBAction)tappedOnJailbreak:(id)sender
 {
@@ -89,8 +88,9 @@ static BOOL darkMode = NO;
     }
     
     if (prefs->dark_mode) {
-        darkMode = YES;
         [self darkMode];
+    } else {
+        [self lightMode];
     }
     
     release_prefs(&prefs);
@@ -116,8 +116,6 @@ static BOOL darkMode = NO;
 }
 
 - (void)darkMode {
-    darkMode = YES;
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"darkModeSettings" object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"darkModeCredits" object:self];
     
@@ -146,8 +144,6 @@ static BOOL darkMode = NO;
 }
 
 - (void)lightMode {
-    darkMode = NO;
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"lightModeSettings" object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"lightModeCredits" object:self];
     
@@ -175,18 +171,16 @@ static BOOL darkMode = NO;
 }
 
 - (IBAction)enableDarkMode:(id)sender {
-    
+    prefs_t *prefs = copy_prefs();
+    prefs->dark_mode = !prefs->dark_mode;
+    set_prefs(prefs);
     [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        if (darkMode) {
-            [self lightMode];
-        } else {
+        if (prefs->dark_mode) {
             [self darkMode];
+        } else {
+            [self lightMode];
         }
     } completion:nil];
-    
-    prefs_t *prefs = copy_prefs();
-    prefs->dark_mode = (bool)darkMode;
-    set_prefs(prefs);
     release_prefs(&prefs);
 }
 
@@ -196,11 +190,10 @@ static BOOL darkMode = NO;
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    if (darkMode) {
-        return UIStatusBarStyleLightContent;
-    } else {
-        return UIStatusBarStyleDefault;
-    }
+    prefs_t *prefs = copy_prefs();
+    UIStatusBarStyle statusBarStyle = prefs->dark_mode ? UIStatusBarStyleLightContent : UIStatusBarStyleDefault;
+    release_prefs(&prefs);
+    return statusBarStyle;
 }
 
 - (IBAction)openSettings:(id)sender {

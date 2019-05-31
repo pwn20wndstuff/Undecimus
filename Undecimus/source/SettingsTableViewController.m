@@ -508,6 +508,263 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), block);
 }
 
+- (IBAction)tappedOnLoadTweaksInfoButton:(id)sender {
+    showAlert(localize(@"Load Tweaks"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes Substrate load extensions that are commonly reffered to as tweaks in newly started processes."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7/A8/A9/A10/A11)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnLoadDaemonsInfoButton:(id)sender {
+    showAlert(localize(@"Load Daemons"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak load the launch daemons located at /Library/LaunchDaemons and execute files located at /etc/rc.d."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7/A8/A9/A10/A11/A12)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnDumpAPTicketInfoButton:(id)sender {
+    showAlert(localize(@"Dump APTicket"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak create a copy of the system APTicket located at /System/Library/Caches/apticket.der at its Documents directory which is accessible via iTunes File Sharing."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7/A8/A9/A10/A11/A12)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnRefreshIconCacheInfoButton:(id)sender {
+    showAlert(localize(@"Refresh Icon Cache"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak regenerate SpringBoard's system application installation cache to cause newly installed .app bundles to appear on the icon list."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7/A8/A9/A10/A11/A12)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnDisableAutoUpdatesInfoButton:(id)sender {
+    showAlert(localize(@"Disable Auto Updates"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak effectively disable the system's software update mechanism to prevent the system from automatically upgrading to the latest available firmware which may not be supported by the jailbreak at that time."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7/A8/A9/A10/A11/A12)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnDisableAppRevokesInfoButton:(id)sender {
+    showAlert(localize(@"Disable App Revokes"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak effectively disable the system's online certificate status protocol system to prevent enterprise certificates which the jailbreak may be signed with from getting revoked."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-11.4.1 on ARM64 SoCs (A7/A8/A9/A10/A11)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnOverwriteBootNonceInfoButton:(id)sender {
+    showAlert(localize(@"Overwrite Boot Nonce"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak set the persistent com.apple.System.boot-nonce variable in non-volatile random-access memory (NVRAM) which may be required to downgrade to an unsigned iOS firmware by using SHSH files."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7/A8/A9/A10/A11/A12)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnExportKernelTaskPortInfoButton:(id)sender {
+    showAlert(localize(@"Export TFP0"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak modify the host-port to grant any process access to the host-priv-port."
+                       "\n"
+                       "This option effectively grants any process access to the kernel task port (TFP0) and allows re-jailbreaking without exploiting again."
+                       "\n"
+                       "This option is considered unsafe as the privilege this option effectively grants to processes can be used for bad purposes by malicous apps."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7/A8/A9/A10/A11/A12)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnRestoreRootFSInfoButton:(id)sender {
+    showAlert(localize(@"Restore RootFS"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak restore the root filesystem (RootFS) to the snapshot which is created by the system when the device is restored."
+                       "\n"
+                       "This option effectively allows uninstalling the jailbreak without losing any user data."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7/A8/A9/A10/A11/A12)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnIncreaseMemoryLimitInfoButton:(id)sender {
+    showAlert(localize(@"Increase Memory Limit"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak modify the Jetsam configuration file to increase the memory limit that is enforced upon processes by Jetsam to the maximum value to effectively bypass that mechanism."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7/A8/A9/A10/A11)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnInstallSSHInfoButton:(id)sender {
+    showAlert(localize(@"(Re)Install OpenSSH"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makess the jailbreak (re)install the openssh package."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7/A8/A9/A10/A11)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnInstallCydiaInfoButton:(id)sender {
+    showAlert(localize(@"Reinstall Cydia"),
+              localize(@"Description:"
+                       "This option makes jailbreak reinstall the cydiainstaller package."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7/A8/A9/A10/A11)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnReloadSystemDaemonsInfoButton:(id)sender {
+    showAlert(localize(@"Reload System Daemons"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak reload all of the running system daemons to make the Substrate extensions (tweaks) load in them."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7/A8/A9/A10/A11)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnHideLogWindowInfoButton:(id)sender {
+    showAlert(localize(@"Hide Log Window"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option hides the log window or console in the jailbreak app for a more clean look."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnResetCydiaCacheInfoButton:(id)sender {
+    showAlert(localize(@"Reset Cydia Cache"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak reset Cydia's cache."
+                       "\n"
+                       "This option will cause Cydia to regenerate the repo lists and its cache."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7/A8/A9/A10/A11)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnSSHOnlyInfoButton:(id)sender {
+    showAlert(localize(@"SSH Only"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak skip installing Cydia and Substrate."
+                       "\n"
+                       "This option starts SSH on 127.0.0.1 (localhost) on port 22 via dropbear."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7/A8/A9/A10/A11/A12)."),
+              false,
+              false);
+}
+
+- (IBAction)tappedOnEnableGetTaskAllowInfoButton:(id)sender {
+    showAlert(localize(@"Enable get-task-allow"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak dynamically enable the get-task-allow entitlement for every new process."
+                       "\n"
+                       "This option makes dyld treat the processes unrestricted."
+                       "\n"
+                       "This option enables dyld environment variables such as DYLD_INSERT_LIBRARIES."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7/A8/A9/A10/A11)."),
+              false,
+              false);
+}
+- (IBAction)tappedOnCSDebuggedInfoButton:(id)sender {
+    showAlert(localize(@"Set CS_DEBUGGED"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak dynamically set the CS_DEBUGGED codesign flag for every new process."
+                       "\n"
+                       "This option makes the kernel allow processes to run with invalid executable pages."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7/A8/A9/A10/A11)."),
+              false,
+              false);
+}
+- (IBAction)tappedOnAutoRespringInfoButton:(id)sender {
+    showAlert(localize(@"Auto Respring"),
+              localize(@"Description:"
+                       "\n\n"
+                       "This option makes the jailbreak automatically restart the SpringBoard as soon as the jailbreak process is completed without the confirmation."
+                       "\n\n"
+                       "Compatibility:"
+                       "\n\n"
+                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7/A8/A9/A10/A11)."),
+              false,
+              false);
+}
+
+
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return 44;
 }
