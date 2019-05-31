@@ -132,7 +132,6 @@ static BOOL darkMode = NO;
     [self.byLabel setTextColor:[UIColor whiteColor]];
     [self.UIByLabel setTextColor:[UIColor whiteColor]];
     [self.firstAndLabel setTextColor:[UIColor whiteColor]];
-    [self.fourthAndLabel setTextColor:[UIColor whiteColor]];
     [self.uncoverLabel setTextColor:[UIColor whiteColor]];
     [self.supportedOSLabel setTextColor:[UIColor whiteColor]];
     [self.fourthAndLabel setTextColor:[UIColor whiteColor]];
