@@ -136,13 +136,13 @@ static BOOL darkMode = NO;
     [self.supportedOSLabel setTextColor:[UIColor whiteColor]];
     [self.fourthAndLabel setTextColor:[UIColor whiteColor]];
     [self.outputView setTextColor:[UIColor whiteColor]];
-    [self.backgroundView setBackgroundColor:[UIColor colorWithRed:17.0f/255.0f green:20.0f/255.0f blue:24.0f/255.0f alpha:0.95f]];
+    [self.backgroundView setBackgroundColor:[UIColor colorWithRed:10.0f/255.0f green:13.0f/255.0f blue:17.0f/255.0f alpha:0.97f]];
     [self.mainDevsButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.settingsNavBar setTintColor:[UIColor whiteColor]];
     [self.settingsNavBar setLargeTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
     [self.creditsNavBar setTintColor:[UIColor whiteColor]];
     [self.creditsNavBar setLargeTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
-    
+    self.jailbreakProgressBar.trackTintColor = [UIColor blackColor];
     [self setNeedsStatusBarAppearanceUpdate];
 }
 
@@ -171,7 +171,7 @@ static BOOL darkMode = NO;
     [self.settingsNavBar setLargeTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor blackColor]}];
     [self.creditsNavBar setTintColor:[UIColor blackColor]];
     [self.creditsNavBar setLargeTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor blackColor]}];
-    
+    self.jailbreakProgressBar.trackTintColor = [UIColor lightGrayColor]; 
     [self setNeedsStatusBarAppearanceUpdate];
 }
 
