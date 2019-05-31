@@ -48,12 +48,16 @@
     [super viewDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(darkModeSettings:) name:@"darkModeSettings" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(lightModeSettings:) name:@"lightModeSettings" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissKeyboardFromDoneButton:) name:@"dismissKeyboard" object:nil];
     [self.bootNonceTextField setDelegate:self];
     self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
     self.tap.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:self.tap];
 }
 
+-(void)dismissKeyboardFromDoneButton:(NSNotification *) notification {
+    [self.view endEditing:YES];
+}
 
 -(void)darkModeSettings:(NSNotification *) notification  {
     [self.specialThanksLabel setTextColor:[UIColor whiteColor]];
@@ -177,6 +181,17 @@
     [JailbreakViewController.sharedController updateStatus];
     [self.tableView reloadData];
 }
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    if (indexPath.row == 0) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"showSpecialThanks" object:self];
+    }
+    
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+}
+
 
 - (IBAction)selectedSpecialThanks:(id)sender {
     

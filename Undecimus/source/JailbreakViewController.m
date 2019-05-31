@@ -132,8 +132,9 @@ static BOOL darkMode = NO;
     [self.byLabel setTextColor:[UIColor whiteColor]];
     [self.UIByLabel setTextColor:[UIColor whiteColor]];
     [self.firstAndLabel setTextColor:[UIColor whiteColor]];
-    [self.secondAndLabel setTextColor:[UIColor whiteColor]];
-    [self.thirdAndLabel setTextColor:[UIColor whiteColor]];
+    [self.fourthAndLabel setTextColor:[UIColor whiteColor]];
+    [self.uncoverLabel setTextColor:[UIColor whiteColor]];
+    [self.supportedOSLabel setTextColor:[UIColor whiteColor]];
     [self.fourthAndLabel setTextColor:[UIColor whiteColor]];
     [self.outputView setTextColor:[UIColor whiteColor]];
     [self.backgroundView setBackgroundColor:[UIColor colorWithRed:17.0f/255.0f green:20.0f/255.0f blue:24.0f/255.0f alpha:0.95f]];
@@ -161,9 +162,9 @@ static BOOL darkMode = NO;
     [self.byLabel setTextColor:[UIColor blackColor]];
     [self.UIByLabel setTextColor:[UIColor blackColor]];
     [self.firstAndLabel setTextColor:[UIColor blackColor]];
-    [self.secondAndLabel setTextColor:[UIColor blackColor]];
-    [self.thirdAndLabel setTextColor:[UIColor blackColor]];
     [self.fourthAndLabel setTextColor:[UIColor blackColor]];
+    [self.uncoverLabel setTextColor:[UIColor blackColor]];
+    [self.supportedOSLabel setTextColor:[UIColor blackColor]];
     [self.uOVersionLabel setTextColor:[UIColor blackColor]];
     [self.outputView setTextColor:[UIColor blackColor]];
     [self.backgroundView setBackgroundColor:[UIColor.whiteColor colorWithAlphaComponent:0.84]];
@@ -231,24 +232,6 @@ static BOOL darkMode = NO;
     } completion:nil];
 }
 
-- (IBAction)openMainDevView:(id)sender {
-    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.mainDevView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
-        self.mainDevView.alpha = 1;
-        self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.3, 1.3);
-        self.mainView.alpha = 0;
-    } completion:nil];
-}
-
-- (IBAction)closeMainDevView:(id)sender{
-    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
-        self.mainView.alpha = 1;
-        self.mainDevView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7);
-        self.mainDevView.alpha = 0;
-    } completion:nil];
-}
-
 - (IBAction)closeSettings:(id)sender{
     [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.mainView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
@@ -256,6 +239,9 @@ static BOOL darkMode = NO;
         self.settingsView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.7, 0.7);
         self.settingsView.alpha = 0;
     } completion:nil];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"dismissKeyboard" object:self];
+
 }
 
 - (IBAction)tappedOnPwn:(id)sender{

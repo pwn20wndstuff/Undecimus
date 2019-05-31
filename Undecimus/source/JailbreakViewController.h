@@ -77,10 +77,10 @@ while (false)
 
 @property (weak, nonatomic) IBOutlet UILabel *jailbreakLabel;
 @property (weak, nonatomic) IBOutlet UILabel *byLabel;
+@property (weak, nonatomic) IBOutlet UILabel *uncoverLabel;
+@property (weak, nonatomic) IBOutlet UILabel *supportedOSLabel;
 @property (weak, nonatomic) IBOutlet UILabel *UIByLabel;
 @property (weak, nonatomic) IBOutlet UILabel *firstAndLabel;
-@property (weak, nonatomic) IBOutlet UILabel *secondAndLabel;
-@property (weak, nonatomic) IBOutlet UILabel *thirdAndLabel;
 @property (weak, nonatomic) IBOutlet UILabel *fourthAndLabel;
 
 
