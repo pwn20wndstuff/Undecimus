@@ -50,10 +50,10 @@ extern int maxStage;
         progress(localize(@"Unsupported"));
     } else if (prefs->restore_rootfs) {
         status(localize(@"Restore RootFS"), true, true);
-        progress(@"Ready to restore RootFS");
+        progress(localize(@"Ready to restore RootFS"));
     } else if (jailbreakEnabled()) {
         status(localize(@"Re-Jailbreak"), true, true);
-        progress(@"Ready to re-jailbreak");
+        progress(localize(@"Ready to re-jailbreak"));
     } else {
         status(localize(@"Jailbreak"), true, true);
         progress(localize(@"Ready to jailbreak"));
