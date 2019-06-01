@@ -664,6 +664,7 @@
 - (IBAction)tappedOnInstallCydiaInfoButton:(id)sender {
     showAlert(localize(@"Reinstall Cydia"),
               localize(@"Description:"
+                       "\n\n"
                        "This option makes jailbreak reinstall the cydiainstaller package."
                        "\n\n"
                        "Compatibility:"
