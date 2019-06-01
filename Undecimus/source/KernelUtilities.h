@@ -174,5 +174,7 @@ bool revalidate_process(pid_t pid);
 bool revalidate_process_with_task_port(task_t task_port);
 bool enable_mapping_for_library(const char *lib);
 bool enable_mapping_for_libraries(const char *libs);
+kptr_t find_vnode_with_fd(kptr_t proc, int fd);
+kptr_t find_vnode_with_path(const char *path);
 
 #endif /* kutils_h */

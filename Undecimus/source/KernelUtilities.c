@@ -2181,3 +2181,35 @@ out:;
     CFSafeReleaseNULL(folder);
     return ret;
 }
+
+kptr_t find_vnode_with_fd(kptr_t proc, int fd) {
+    kptr_t ret = KPTR_NULL;
+    _assert(fd > 0);
+    _assert(KERN_POINTER_VALID(proc));
+    kptr_t fdp = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_P_FD));
+    _assert(KERN_POINTER_VALID(fdp));
+    kptr_t ofp = ReadKernel64(fdp + koffset(KSTRUCT_OFFSET_FILEDESC_FD_OFILES));
+    _assert(KERN_POINTER_VALID(ofp));
+    kptr_t fpp = ReadKernel64(ofp + (fd * sizeof(kptr_t)));
+    _assert(KERN_POINTER_VALID(fpp));
+    kptr_t fgp = ReadKernel64(fpp + koffset(KSTRUCT_OFFSET_FILEPROC_F_FGLOB));
+    _assert(KERN_POINTER_VALID(fgp));
+    kptr_t vnode = ReadKernel64(fgp + koffset(KSTRUCT_OFFSET_FILEGLOB_FG_DATA));
+    _assert(KERN_POINTER_VALID(vnode));
+    ret = vnode;
+out:;
+    return ret;
+}
+
+kptr_t find_vnode_with_path(const char *path) {
+    kptr_t ret = KPTR_NULL;
+    int fd = 0;
+    _assert(path != NULL);
+    kptr_t const proc = proc_struct_addr();
+    _assert(KERN_POINTER_VALID(proc));
+    fd = open(path, O_RDONLY);
+    ret = find_vnode_with_fd(proc, fd);
+out:;
+    if (fd > 0) close(fd); fd = 0;
+    return ret;
+}
