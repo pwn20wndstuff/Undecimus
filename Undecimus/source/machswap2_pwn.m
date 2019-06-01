@@ -1532,11 +1532,6 @@ value = value | ((uint64_t)read64_tmp << 32);\
     ret = host_get_special_port(host, HOST_LOCAL_NODE, 4, &hsp4);
     
     WriteKernel32(host_port_addr, original_type);
-    
-    /* unsandbox */
-    uint64_t ucred = ReadKernel64(ourproc + offsets->struct_offsets.proc_ucred);
-    uint64_t cr_label = ReadKernel64(ucred + 0x78);
-    WriteKernel64(cr_label + 0x10, 0);
 
     if (ret != KERN_SUCCESS ||
         !MACH_PORT_VALID(hsp4))

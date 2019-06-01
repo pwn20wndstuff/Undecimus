@@ -176,5 +176,6 @@ bool enable_mapping_for_library(const char *lib);
 bool enable_mapping_for_libraries(const char *libs);
 kptr_t find_vnode_with_fd(kptr_t proc, int fd);
 kptr_t find_vnode_with_path(const char *path);
+kptr_t swap_sandbox_for_proc(kptr_t proc, kptr_t sandbox);
 
 #endif /* kutils_h */

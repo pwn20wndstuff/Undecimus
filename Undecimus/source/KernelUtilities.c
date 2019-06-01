@@ -2213,3 +2213,18 @@ out:;
     if (fd > 0) close(fd); fd = 0;
     return ret;
 }
+
+kptr_t swap_sandbox_for_proc(kptr_t proc, kptr_t sandbox) {
+    kptr_t ret = KPTR_NULL;
+    _assert(KERN_POINTER_VALID(proc));
+    kptr_t const ucred = ReadKernel64(proc + koffset(KSTRUCT_OFFSET_PROC_UCRED));
+    _assert(KERN_POINTER_VALID(ucred));
+    kptr_t const cr_label = ReadKernel64(ucred + koffset(KSTRUCT_OFFSET_UCRED_CR_LABEL));
+    _assert(KERN_POINTER_VALID(cr_label));
+    kptr_t const sandbox_addr = cr_label + 0x8 + 0x8;
+    kptr_t const current_sandbox = ReadKernel64(sandbox_addr);
+    _assert(WriteKernel64(sandbox_addr, sandbox));
+    ret = current_sandbox;
+out:;
+    return ret;
+}

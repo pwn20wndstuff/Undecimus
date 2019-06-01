@@ -263,6 +263,10 @@ void jailbreak()
             char *const original_kernel_cache_path = "/System/Library/Caches/com.apple.kernelcaches/kernelcache";
             const char *decompressed_kernel_cache_path = [homeDirectory stringByAppendingPathComponent:@"Documents/kernelcache.dec"].UTF8String;
             if (!canRead(decompressed_kernel_cache_path)) {
+                kptr_t sandbox = KPTR_NULL;
+                if (!canRead(original_kernel_cache_path)) {
+                    sandbox = swap_sandbox_for_proc(proc_struct_addr(), KPTR_NULL);
+                }
                 FILE *const original_kernel_cache = fopen(original_kernel_cache_path, "rb");
                 _assert(original_kernel_cache != NULL, localize(@"Unable to open original kernelcache for reading."), true);
                 FILE *const decompressed_kernel_cache = fopen(decompressed_kernel_cache_path, "w+b");
@@ -270,6 +274,9 @@ void jailbreak()
                 _assert(decompress_kernel(original_kernel_cache, decompressed_kernel_cache, NULL, true) == ERR_SUCCESS, localize(@"Unable to decompress kernelcache."), true);
                 fclose(decompressed_kernel_cache);
                 fclose(original_kernel_cache);
+                if (KERN_POINTER_VALID(sandbox)) {
+                    swap_sandbox_for_proc(proc_struct_addr(), sandbox);
+                }
             }
             char *kernelVersion = getKernelVersion();
             _assert(kernelVersion != NULL, localize(@"Unable to get kernel version."), true);
