@@ -93,6 +93,8 @@
     [self.expiryLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.uptimeLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.upTimeLabel setTextColor:[UIColor whiteColor]];
+    
+    [JailbreakViewController.sharedController.navigationController.navigationBar setLargeTitleTextAttributes:@{ NSForegroundColorAttributeName : [UIColor whiteColor] }];
 }
 
 -(void)lightModeSettings:(NSNotification *) notification  {
@@ -129,6 +131,8 @@
     [self.expiryLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.uptimeLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.upTimeLabel setTextColor:[UIColor blackColor]];
+    
+    [JailbreakViewController.sharedController.navigationController.navigationBar setLargeTitleTextAttributes:@{ NSForegroundColorAttributeName : [UIColor blackColor] }];
 }
 
 - (void)userTappedAnyware:(UITapGestureRecognizer *) sender
