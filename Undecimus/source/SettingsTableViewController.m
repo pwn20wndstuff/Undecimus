@@ -520,7 +520,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7-A11)."),
+                       "iOS 11.0-12.1.2 on arm64 SoCs (A7-A11)."),
               false,
               false);
 }
@@ -533,7 +533,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7-A12X)."),
+                       "iOS 11.0-12.1.2 on arm64/arm64e SoCs (A7-A12X)."),
               false,
               false);
 }
@@ -546,7 +546,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7-A12X)."),
+                       "iOS 11.0-12.1.2 on arm64/arm64e SoCs (A7-A12X)."),
               false,
               false);
 }
@@ -559,7 +559,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7-A12X)."),
+                       "iOS 11.0-12.1.2 on arm64/arm64e SoCs (A7-A12X)."),
               false,
               false);
 }
@@ -572,7 +572,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7-A12X)."),
+                       "iOS 11.0-12.1.2 on arm64/arm64e SoCs (A7-A12X)."),
               false,
               false);
 }
@@ -585,7 +585,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-11.4.1 on ARM64 SoCs (A7-A11)."),
+                       "iOS 11.0-11.4.1 on arm64 SoCs (A7-A11)."),
               false,
               false);
 }
@@ -598,7 +598,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7-A12X)."),
+                       "iOS 11.0-12.1.2 on arm64/arm64e SoCs (A7-A12X)."),
               false,
               false);
 }
@@ -615,7 +615,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7-A12X)."),
+                       "iOS 11.0-12.1.2 on arm64/arm64e SoCs (A7-A12X)."),
               false,
               false);
 }
@@ -630,7 +630,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7-A12X)."),
+                       "iOS 11.0-12.1.2 on arm64/arm64e SoCs (A7-A12X)."),
               false,
               false);
 }
@@ -643,7 +643,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7-A11)."),
+                       "iOS 11.0-12.1.2 on arm64 SoCs (A7-A11)."),
               false,
               false);
 }
@@ -656,7 +656,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7-A11)."),
+                       "iOS 11.0-12.1.2 on arm64 SoCs (A7-A11)."),
               false,
               false);
 }
@@ -669,7 +669,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7-A11)."),
+                       "iOS 11.0-12.1.2 on arm64 SoCs (A7-A11)."),
               false,
               false);
 }
@@ -682,7 +682,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7-A11)."),
+                       "iOS 11.0-12.1.2 on arm64 SoCs (A7-A11)."),
               false,
               false);
 }
@@ -706,7 +706,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7-A11)."),
+                       "iOS 11.0-12.1.2 on arm64 SoCs (A7-A11)."),
               false,
               false);
 }
@@ -721,7 +721,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64/ARM64E SoCs (A7-A12X)."),
+                       "iOS 11.0-12.1.2 on arm64/arm64e SoCs (A7-A12X)."),
               false,
               false);
 }
@@ -738,7 +738,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7-A11)."),
+                       "iOS 11.0-12.1.2 on arm64 SoCs (A7-A11)."),
               false,
               false);
 }
@@ -752,7 +752,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7-A11)."),
+                       "iOS 11.0-12.1.2 on arm64 SoCs (A7-A11)."),
               false,
               false);
 }
@@ -764,7 +764,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-12.1.2 on ARM64 SoCs (A7-A11)."),
+                       "iOS 11.0-12.1.2 on arm64 SoCs (A7-A11)."),
               false,
               false);
 }
