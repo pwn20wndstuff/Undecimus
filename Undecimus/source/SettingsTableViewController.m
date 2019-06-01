@@ -565,7 +565,7 @@
 }
 
 - (IBAction)tappedOnDisableAutoUpdatesInfoButton:(id)sender {
-    showAlert(localize(@"Disable Auto Updates"),
+    showAlert(localize(@"Disable Updates"),
               localize(@"Description:"
                        "\n\n"
                        "This option makes the jailbreak effectively disable the system's software update mechanism to prevent the system from automatically upgrading to the latest available firmware which may not be supported by the jailbreak at that time."
@@ -578,7 +578,7 @@
 }
 
 - (IBAction)tappedOnDisableAppRevokesInfoButton:(id)sender {
-    showAlert(localize(@"Disable App Revokes"),
+    showAlert(localize(@"Disable Revokes"),
               localize(@"Description:"
                        "\n\n"
                        "This option makes the jailbreak effectively disable the system's online certificate status protocol system to prevent enterprise certificates which the jailbreak may be signed with from getting revoked."
@@ -591,7 +591,7 @@
 }
 
 - (IBAction)tappedOnOverwriteBootNonceInfoButton:(id)sender {
-    showAlert(localize(@"Overwrite Boot Nonce"),
+    showAlert(localize(@"Set Boot Nonce"),
               localize(@"Description:"
                        "\n\n"
                        "This option makes the jailbreak set the persistent com.apple.System.boot-nonce variable in non-volatile random-access memory (NVRAM) which may be required to downgrade to an unsigned iOS firmware by using SHSH files."
@@ -636,7 +636,7 @@
 }
 
 - (IBAction)tappedOnIncreaseMemoryLimitInfoButton:(id)sender {
-    showAlert(localize(@"Increase Memory Limit"),
+    showAlert(localize(@"Max Memory Limit"),
               localize(@"Description:"
                        "\n\n"
                        "This option makes the jailbreak modify the Jetsam configuration file to increase the memory limit that is enforced upon processes by Jetsam to the maximum value to effectively bypass that mechanism."
@@ -674,7 +674,7 @@
 }
 
 - (IBAction)tappedOnReloadSystemDaemonsInfoButton:(id)sender {
-    showAlert(localize(@"Reload System Daemons"),
+    showAlert(localize(@"Reload Daemons"),
               localize(@"Description:"
                        "\n\n"
                        "This option makes the jailbreak reload all of the running system daemons to make the Substrate extensions (tweaks) load in them."
@@ -726,7 +726,7 @@
 }
 
 - (IBAction)tappedOnEnableGetTaskAllowInfoButton:(id)sender {
-    showAlert(localize(@"Enable get-task-allow"),
+    showAlert(localize(@"Set get-task-allow"),
               localize(@"Description:"
                        "\n\n"
                        "This option makes the jailbreak dynamically enable the get-task-allow entitlement for every new process."
