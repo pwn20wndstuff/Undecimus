@@ -909,7 +909,7 @@ void jailbreak()
             close(rootfd);
             SafeFreeNULL(snapshot);
             SafeFreeNULL(snapshots);
-            _assert(runCommand("/usr/bin/uicache", NULL) == ERR_SUCCESS, localize(@"Unable to refresh icon cache."), true);
+            _assert(runCommand("/usr/bin/uicache", NULL) >= 0, localize(@"Unable to refresh icon cache."), true);
             _assert(clean_file("/usr/bin/uicache"), localize(@"Unable to clean uicache binary."), true);
             _assert(clean_file("/usr/bin/find"), localize(@"Unable to clean find binary."), true);
             LOG("Successfully reverted back RootFS remount.");
@@ -1575,7 +1575,7 @@ void jailbreak()
             // Run uicache.
             
             progress(localize(@"Refreshing icon cache..."));
-            _assert(runCommand("/usr/bin/uicache", NULL) == ERR_SUCCESS, localize(@"Unable to refresh icon cache."), true);
+            _assert(runCommand("/usr/bin/uicache", NULL) >= 0, localize(@"Unable to refresh icon cache."), true);
             prefs->run_uicache = false;
             sync_prefs();
             LOG("Successfully ran uicache.");
