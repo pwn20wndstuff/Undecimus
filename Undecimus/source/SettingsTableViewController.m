@@ -50,9 +50,35 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(lightModeSettings:) name:@"lightModeSettings" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissKeyboardFromDoneButton:) name:@"dismissKeyboard" object:nil];
     [self.bootNonceTextField setDelegate:self];
+    [self.kernelExploitTextField setDelegate:self];
     self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
     self.tap.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:self.tap];
+    self.exploitPickerArray = [NSMutableArray new];
+    self.availableExploits = [NSMutableDictionary new];
+#define add_exploit(x) do { \
+    [_exploitPickerArray addObject:@(#x)]; \
+    if (supportsExploit(x ## _exploit)) [_availableExploits addEntriesFromDictionary:@{@(#x) : @(x ## _exploit)}]; \
+} while(false)
+    add_exploit(empty_list);
+    add_exploit(multi_path);
+    add_exploit(async_wake);
+    add_exploit(voucher_swap);
+    add_exploit(mach_swap);
+    add_exploit(mach_swap_2);
+#undef add_exploit
+    self.kernelExploitPickerView = [[UIPickerView alloc] init];
+    [self.kernelExploitPickerView setDataSource:self];
+    [self.kernelExploitPickerView setDelegate:self];
+    [self.kernelExploitTextField setInputView:_kernelExploitPickerView];
+    self.exploitPickerToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 320, 56)];
+    [self.exploitPickerToolbar setBarStyle:UIBarStyleDefault];
+    [self.exploitPickerToolbar sizeToFit];
+    UIBarButtonItem *alignRight = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
+    UIBarButtonItem *doneButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(pickerDoneAction)];
+    [self.exploitPickerToolbar setItems:[NSArray arrayWithObjects:alignRight, doneButtonItem, nil] animated:NO];
+    [self.kernelExploitTextField setInputAccessoryView:_exploitPickerToolbar];
+    self.isExploitPicking = NO;
 }
 
 -(void)dismissKeyboardFromDoneButton:(NSNotification *) notification {
@@ -84,8 +110,10 @@
     
     [self.bootNonceButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.bootNonceTextField setTintColor:[UIColor whiteColor]];
+    [self.kernelExploitTextField setTintColor:[UIColor whiteColor]];
     
     [self.bootNonceTextField setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.kernelExploitTextField setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.ecidLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.ecidDarkModeButton setTitleColor:[UIColor whiteColor] forState:normal];
     
@@ -93,7 +121,8 @@
     [self.expiryLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.uptimeLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.upTimeLabel setTextColor:[UIColor whiteColor]];
-    
+    [self.exploitPickerToolbar setBarTintColor:[UIColor darkTextColor]];
+    [self.kernelExploitPickerView setBackgroundColor:[UIColor blackColor]];
     [JailbreakViewController.sharedController.navigationController.navigationBar setLargeTitleTextAttributes:@{ NSForegroundColorAttributeName : [UIColor whiteColor] }];
 }
 
@@ -122,8 +151,10 @@
     
     [self.bootNonceButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.bootNonceTextField setTintColor:[UIColor blackColor]];
+    [self.kernelExploitTextField setTintColor:[UIColor blackColor]];
     
     [self.bootNonceTextField setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.kernelExploitTextField setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.ecidLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.ecidDarkModeButton setTitleColor:[UIColor blackColor] forState:normal];
     
@@ -131,13 +162,16 @@
     [self.expiryLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.uptimeLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.upTimeLabel setTextColor:[UIColor blackColor]];
-    
+    [self.exploitPickerToolbar setBarTintColor:[UIColor lightTextColor]];
+    [self.kernelExploitPickerView setBackgroundColor:[UIColor whiteColor]];
     [JailbreakViewController.sharedController.navigationController.navigationBar setLargeTitleTextAttributes:@{ NSForegroundColorAttributeName : [UIColor blackColor] }];
 }
 
 - (void)userTappedAnyware:(UITapGestureRecognizer *) sender
 {
-    [self.view endEditing:YES];
+    if (!self.isExploitPicking){
+        [self.view endEditing:YES];
+    }
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -162,6 +196,8 @@
     [self.kernelExploitSegmentedControl setEnabled:supportsExploit(voucher_swap_exploit) forSegmentAtIndex:voucher_swap_exploit];
     [self.kernelExploitSegmentedControl setEnabled:supportsExploit(mach_swap_exploit) forSegmentAtIndex:mach_swap_exploit];
     [self.kernelExploitSegmentedControl setEnabled:supportsExploit(mach_swap_2_exploit) forSegmentAtIndex:mach_swap_2_exploit];
+    [self.kernelExploitTextField setText:nil];
+    [self.kernelExploitTextField setPlaceholder:[_exploitPickerArray objectAtIndex:(int)prefs->exploit]];
     [self.openCydiaButton setEnabled:(BOOL)cydiaIsInstalled()];
     [self.expiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[SettingsTableViewController provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, localize(@"Days")]];
     [self.overwriteBootNonceSwitch setOn:(BOOL)prefs->overwrite_boot_nonce];
@@ -250,11 +286,39 @@
     [self reloadData];
 }
 
-- (IBAction)kernelExploitSegmentedControlValueChanged:(id)sender {
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
+    return 1;
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
+    return [self.availableExploits count];
+}
+
+- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
+    NSString *title = [[self.availableExploits allKeys] objectAtIndex:row];
+    return title;
+}
+
+- (NSAttributedString *)pickerView:(UIPickerView *)pickerView attributedTitleForRow:(NSInteger)row forComponent:(NSInteger)component {
+    NSString *title = [[self.availableExploits allKeys] objectAtIndex:row];
     prefs_t *prefs = copy_prefs();
-    prefs->exploit = (int)self.kernelExploitSegmentedControl.selectedSegmentIndex;
+    NSDictionary *attributes = @{NSForegroundColorAttributeName : prefs->dark_mode ? [UIColor whiteColor] : [UIColor blackColor] };
+    release_prefs(&prefs);
+    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:title attributes:attributes];
+    return attributedString;
+}
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+    self.isExploitPicking = YES;
+}
+
+- (void)pickerDoneAction{
+    self.isExploitPicking = NO;
+    prefs_t *prefs = copy_prefs();
+    prefs->exploit = [[_availableExploits objectForKey:[[_availableExploits allKeys] objectAtIndex:[[self kernelExploitPickerView] selectedRowInComponent:0]]] intValue];
     set_prefs(prefs);
     release_prefs(&prefs);
+    [[self kernelExploitTextField] resignFirstResponder];
     [self reloadData];
 }
 
