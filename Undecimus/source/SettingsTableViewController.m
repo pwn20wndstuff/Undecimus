@@ -516,7 +516,7 @@
     showAlert(localize(@"Load Tweaks"),
               localize(@"Description:"
                        "\n\n"
-                       "This option makes Substrate load extensions that are commonly reffered to as tweaks in newly started processes."
+                       "This option makes Substrate load extensions that are commonly referred to as tweaks in newly started processes."
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
