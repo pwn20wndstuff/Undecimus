@@ -117,8 +117,8 @@ void jailbreak()
     kptr_t Shenanigans = KPTR_NULL;
     prefs_t *prefs = copy_prefs();
     bool needStrap = NO;
-    bool needSubstrate = NO;
-    bool skipSubstrate = NO;
+    bool needSubstitutor = NO;
+    bool skipSubstitutor = NO;
     NSString *const homeDirectory = NSHomeDirectory();
     NSString *const temporaryDirectory = NSTemporaryDirectory();
     NSMutableArray *debsToInstall = [NSMutableArray new];
@@ -134,6 +134,7 @@ void jailbreak()
     const char *jailbreakDirectory = NSJailbreakDirectory.UTF8String;
     struct passwd *const root_pw = getpwnam("root");
     struct passwd *const mobile_pw = getpwnam("mobile");
+    substitutor_info_t *substitutor = NULL;
     _assert(my_uid == mobile_pw->pw_uid, localize(@"Unable to verify my user id."), true);
 #define NSJailbreakFile(x) ([NSJailbreakDirectory stringByAppendingPathComponent:x])
 #define jailbreak_file(x) (NSJailbreakFile(@(x)).UTF8String)
@@ -161,7 +162,7 @@ void jailbreak()
         progress(localize(@"Exploiting kernel..."));
         bool exploit_success = NO;
         myHost = mach_host_self();
-        _assert(MACH_PORT_VALID(myHost), localize(NSLocalizedString(@"Unable to get host port.", nil)), true);
+        _assert(MACH_PORT_VALID(myHost), localize(@"Unable to get host port."), true);
         myOriginalHost = myHost;
         if (restore_kernel_task_port(&tfp0) &&
             restore_kernel_base(&kernel_base, &kernel_slide) &&
@@ -295,7 +296,6 @@ void jailbreak()
             setoffset(auth_ptrs, true);
             LOG("Detected authentication pointers.");
             pmap_load_trust_cache = _pmap_load_trust_cache;
-            prefs->ssh_only = true;
             sync_prefs();
         }
         if (monolithic_kernel) {
@@ -1018,7 +1018,7 @@ void jailbreak()
         _assert(ensure_directory("/usr/local/lib", root_pw->pw_uid, 0755), binpackMessage, true);
         _assert(ensure_directory("/usr/local/lib/zsh", root_pw->pw_uid, 0755), binpackMessage, true);
         _assert(ensure_directory("/usr/local/lib/zsh/5.0.8", root_pw->pw_uid, 0755), binpackMessage, true);
-        _assert(ensure_symlink("/usr/local/lib/zsh/5.0.8/zsh", "/usr/local/lib/zsh/5.0.8/zsh"), binpackMessage, true);
+        _assert(ensure_symlink(jailbreak_file("/usr/local/lib/zsh/5.0.8/zsh"), "/usr/local/lib/zsh/5.0.8/zsh"), binpackMessage, true);
         _assert(ensure_symlink(jailbreak_file("bin/zsh"), "/bin/zsh"), binpackMessage, true);
         _assert(ensure_symlink(jailbreak_file("etc/zshrc"), "/etc/zshrc"), binpackMessage, true);
         _assert(ensure_symlink(jailbreak_file("usr/share/terminfo"), "/usr/share/terminfo"), binpackMessage, true);
@@ -1066,7 +1066,10 @@ void jailbreak()
         insertstatus(localize(@"Enabled SSH.\n"));
     }
     
-    if (auth_ptrs || prefs->ssh_only) {
+    if (prefs->code_substitutor != -1) {
+        substitutor = get_substitutor_info(prefs->code_substitutor);
+        _assert(substitutor != NULL, localize(@"Unable to get substitutor info."), true);
+    } else {
         goto out;
     }
     
@@ -1085,21 +1088,21 @@ void jailbreak()
         // Make sure we have an apt packages cache
         _assert(ensureAptPkgLists(), localize(@"Unable to extract apt package lists."), true);
         
-        needSubstrate = ( needStrap ||
-                         (access("/usr/libexec/substrate", F_OK) != ERR_SUCCESS) ||
-                         !verifySums(@"/var/lib/dpkg/info/mobilesubstrate.md5sums", HASHTYPE_MD5)
+        needSubstitutor = ( needStrap ||
+                         (access(substitutor->startup_executable, F_OK) != ERR_SUCCESS) ||
+                         !verifySums([NSString stringWithFormat:@"/var/lib/dpkg/info/%s.md5sums", substitutor->package_id], HASHTYPE_MD5)
                          );
-        if (needSubstrate) {
-            LOG(@"We need substrate.");
-            NSString *const substrateDeb = debForPkg(@"mobilesubstrate");
-            _assert(substrateDeb != nil, localize(@"Unable to get deb for Substrate."), true);
-            if (pidOfProcess("/usr/libexec/substrated") == 0) {
-                _assert(extractDeb(substrateDeb, doInject), localize(@"Unable to extract Substrate."), true);
+        if (needSubstitutor) {
+            LOG(@"We need %s.", substitutor->name);
+            NSString *const substitutorDeb = debForPkg(@(substitutor->package_id));
+            _assert(substitutor != nil, localize(@"Unable to get deb for %s.", substitutor->name), true);
+            if (pidOfProcess(substitutor->server_executable) == 0) {
+                _assert(extractDeb(substitutorDeb, doInject), localize(@"Unable to extract %s.", substitutor->name), true);
             } else {
-                skipSubstrate = YES;
-                LOG("Substrate is running, not extracting again for now.");
+                skipSubstitutor = YES;
+                LOG("%s is running, not extracting again for now.", substitutor->name);
             }
-            [debsToInstall addObject:substrateDeb];
+            [debsToInstall addObject:substitutorDeb];
         }
         
         NSArray *resourcesPkgs = resolveDepsForPkg(@"jailbreak-resources", true);
@@ -1115,8 +1118,8 @@ void jailbreak()
         NSMutableArray *pkgsToRepair = [NSMutableArray new];
         LOG("Resource Pkgs: \"%@\".", resourcesPkgs);
         for (id pkg in resourcesPkgs) {
-            // Ignore mobilesubstrate because we just handled that separately.
-            if ([pkg isEqualToString:@"mobilesubstrate"] || [pkg isEqualToString:@"firmware"])
+            // Ignore substitutor because we just handled that separately.
+            if ([pkg isEqualToString:@(substitutor->package_id)] || [pkg isEqualToString:@"firmware"])
                 continue;
             if (verifySums([NSString stringWithFormat:@"/var/lib/dpkg/info/%@.md5sums", pkg], HASHTYPE_MD5)) {
                 LOG("Pkg \"%@\" verified.", pkg);
@@ -1161,11 +1164,13 @@ void jailbreak()
         
         progress(localize(@"Injecting trust cache..."));
         [resources addObjectsFromArray:[NSArray arrayWithContentsOfFile:@"/usr/share/jailbreak/injectme.plist"]];
-        // If substrate is already running but was broken, skip injecting again
-        if (!skipSubstrate) {
-            [resources addObject:@"/usr/libexec/substrate"];
+        // If substitutor is already running but was broken, skip injecting again
+        if (!skipSubstitutor) {
+            [resources addObject:@(substitutor->startup_executable)];
         }
-        [resources addObject:@"/usr/libexec/substrated"];
+        for (char **resource = substitutor->resources; *resource; resource++) {
+            [resources addObject:@(*resource)];
+        }
         for (id file in resources) {
             if (![toInjectToTrustCache containsObject:file]) {
                 [toInjectToTrustCache addObject:file];
@@ -1213,8 +1218,8 @@ void jailbreak()
         // Make sure this is a symlink - usually handled by ncurses pre-inst
         _assert(ensure_symlink("/usr/lib", "/usr/lib/_ncurses"), localize(@"Unable to repair ncurses."), true);
         
-        // This needs to be there for Substrate to work properly
-        _assert(ensure_directory("/Library/Caches", root_pw->pw_uid, S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO), localize(@"Unable to repair caches directory for Substrate."), true);
+        // This needs to be there for substitutor to work properly
+        _assert(ensure_directory("/Library/Caches", root_pw->pw_uid, S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO), localize(@"Unable to repair caches directory for %s.", substitutor->name), true);
         LOG("Successfully repaired filesystem.");
         
         insertstatus(localize(@"Repaired Filesystem.\n"));
@@ -1223,30 +1228,30 @@ void jailbreak()
     upstage();
     
     {
-        // Load Substrate
+        // Load substitutor
         
-        // Set Disable Loader.
-        progress(localize(@"Setting Disable Loader..."));
+        // Configure substitutor.
+        progress(localize(@"Configuring %s...", substitutor->name));
         if (prefs->load_tweaks) {
-            clean_file("/var/tmp/.substrated_disable_loader");
+            clean_file(substitutor->loader_killswitch);
         } else {
-            _assert(create_file("/var/tmp/.substrated_disable_loader", root_pw->pw_uid, 644), localize(@"Unable to disable Substrate's loader."), true);
+            _assert(create_file(substitutor->loader_killswitch, root_pw->pw_uid, 644), localize(@"Unable to disable %s's loader.", substitutor->name), true);
         }
-        LOG("Successfully set Disable Loader.");
+        LOG("Successfully configured %s.", substitutor->name);
         
-        // Run substrate
-        progress(localize(@"Starting Substrate..."));
+        // Run substitutor
+        progress(localize(@"Starting %s...", substitutor->name));
         if (access("/Library/substrate", F_OK) == ERR_SUCCESS &&
             is_directory("/Library/substrate") &&
-            access("/usr/lib/substrate", F_OK) == ERR_SUCCESS &&
-            is_symlink("/usr/lib/substrate")) {
-            _assert(clean_file("/usr/lib/substrate"), localize(@"Unable to clean old substrate directory."), true);
-            _assert([fileManager moveItemAtPath:@"/Library/substrate" toPath:@"/usr/lib/substrate" error:nil], localize(@"Unable to move substrate directory."), true);
+            access(substitutor->bootstrap_tools, F_OK) == ERR_SUCCESS &&
+            is_symlink(substitutor->bootstrap_tools)) {
+            _assert(clean_file(substitutor->bootstrap_tools), localize(@"Unable to clean old %s bootstrap tools directory.", substitutor->name), true);
+            _assert([fileManager moveItemAtPath:@"/Library/substrate" toPath:@(substitutor->bootstrap_tools) error:nil], localize(@"Unable to move %s bootstrap tools directory.", substitutor->name), true);
         }
-        _assert(runCommand("/usr/libexec/substrate", NULL) == ERR_SUCCESS, localize(skipSubstrate?@"Unable to restart Substrate.":@"Unable to start Substrate."), skipSubstrate?false:true);
-        LOG("Successfully started Substrate.");
+        _assert(runCommand(substitutor->startup_executable, NULL) == ERR_SUCCESS, localize(@"Unable to %@ %s.", skipSubstitutor ? @"restart" : @"start", substitutor->name), skipSubstitutor?false:true);
+        LOG("Successfully started %s.", substitutor->name);
         
-        insertstatus(localize(@"Loaded Substrate.\n"));
+        insertstatus(localize(@"Loaded %s.\n", substitutor->name));
     }
     
     upstage();
@@ -1362,11 +1367,11 @@ void jailbreak()
             sync_prefs();
         }
         // Now that things are running, let's install the deb for the files we just extracted
-        if (needSubstrate) {
+        if (needSubstitutor) {
             if (pkgIsInstalled("com.ex.substitute")) {
                 _assert(removePkg("com.ex.substitute", true), localize(@"Unable to remove Substitute."), true);
             }
-            _assert(aptInstall(@[@"mobilesubstrate"]), localize(@"Unable to install Substrate."), true);
+            _assert(aptInstall(@[@(substitutor->package_id)]), localize(@"Unable to install %s.", substitutor->name), true);
         }
         if (!betaFirmware) {
             if (pkgIsInstalled("com.parrotgeek.nobetaalert")) {
@@ -1539,12 +1544,12 @@ void jailbreak()
                    "do echo loading $a;"
                    "launchctl load \"$a\" ;"
                    "done; ");
-            // Substrate is already running, no need to run it again
-            system("for file in /etc/rc.d/*; do "
-                   "if [[ -x \"$file\" && \"$file\" != \"/etc/rc.d/substrate\" ]]; then "
-                   "\"$file\";"
-                   "fi;"
-                   "done");
+            // Substitutor is already running, no need to run it again
+            systemf("for file in /etc/rc.d/*; do "
+                    "if [[ -x \"$file\" && \"$file\" != \"%s\" ]]; then "
+                    "\"$file\";"
+                    "fi;"
+                    "done", substitutor->run_command);
             LOG("Successfully loaded Daemons.");
             
             insertstatus(localize(@"Loaded Daemons.\n"));

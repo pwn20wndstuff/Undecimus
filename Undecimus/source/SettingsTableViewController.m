@@ -56,29 +56,48 @@
     [self.view addGestureRecognizer:self.tap];
     self.exploitPickerArray = [NSMutableArray new];
     self.availableExploits = [NSMutableDictionary new];
-#define add_exploit(x) do { \
-    [_exploitPickerArray addObject:@(#x)]; \
-    if (supportsExploit(x ## _exploit)) [_availableExploits addEntriesFromDictionary:@{@(#x) : @(x ## _exploit)}]; \
-} while(false)
-    add_exploit(empty_list);
-    add_exploit(multi_path);
-    add_exploit(async_wake);
-    add_exploit(voucher_swap);
-    add_exploit(mach_swap);
-    add_exploit(mach_swap_2);
-#undef add_exploit
+    for (size_t i = 0; exploit_infos[i]; i++) {
+        if (exploit_infos[i]->exploit_capability != jailbreak_capability) {
+            continue;
+        }
+        [_exploitPickerArray addObject:@(exploit_infos[i]->name)];
+        if (!checkDeviceSupport(exploit_infos[i]->device_support_info)) {
+            continue;
+        }
+        [_availableExploits addEntriesFromDictionary:@{@(exploit_infos[i]->name) : @(exploit_infos[i]->exploit)}];
+    }
+    self.substitutorPickerArray = [NSMutableArray new];
+    self.availableSubstitutors = [NSMutableDictionary new];
+    for (size_t i = 0; substitutor_infos[i]; i++) {
+        [_substitutorPickerArray addObject:@(substitutor_infos[i]->name)];
+        if (!checkDeviceSupport(substitutor_infos[i]->device_support_info)) {
+            continue;
+        }
+        [_availableSubstitutors addEntriesFromDictionary:@{@(substitutor_infos[i]->name) : @(substitutor_infos[i]->substitutor)}];
+    }
     self.kernelExploitPickerView = [[UIPickerView alloc] init];
     [self.kernelExploitPickerView setDataSource:self];
     [self.kernelExploitPickerView setDelegate:self];
+    self.codeSubstitutorPickerView = [[UIPickerView alloc] init];
+    [self.codeSubstitutorPickerView setDataSource:self];
+    [self.codeSubstitutorPickerView setDelegate:self];
     [self.kernelExploitTextField setInputView:_kernelExploitPickerView];
+    [self.codeSubstitutorTextField setInputView:_codeSubstitutorPickerView];
     self.exploitPickerToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 320, 56)];
     [self.exploitPickerToolbar setBarStyle:UIBarStyleDefault];
     [self.exploitPickerToolbar sizeToFit];
-    UIBarButtonItem *alignRight = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
-    UIBarButtonItem *doneButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(pickerDoneAction)];
-    [self.exploitPickerToolbar setItems:[NSArray arrayWithObjects:alignRight, doneButtonItem, nil] animated:NO];
+    self.substitutorPickerToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 320, 56)];
+    [self.substitutorPickerToolbar setBarStyle:UIBarStyleDefault];
+    [self.substitutorPickerToolbar sizeToFit];
+    UIBarButtonItem *exploitPickerAlignRight = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
+    UIBarButtonItem *exploitPickerDoneButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(exploitPickerDoneAction)];
+    [self.exploitPickerToolbar setItems:[NSArray arrayWithObjects:exploitPickerAlignRight, exploitPickerDoneButtonItem, nil] animated:NO];
     [self.kernelExploitTextField setInputAccessoryView:_exploitPickerToolbar];
-    self.isExploitPicking = NO;
+    UIBarButtonItem *substitutorPickerAlignRight = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
+    UIBarButtonItem *substitutorPickerDoneButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(substitutorPickerDoneAction)];
+    [self.substitutorPickerToolbar setItems:[NSArray arrayWithObjects:substitutorPickerAlignRight, substitutorPickerDoneButtonItem, nil] animated:NO];
+    [self.codeSubstitutorTextField setInputAccessoryView:_substitutorPickerToolbar];
+    self.isPicking = NO;
 }
 
 -(void)dismissKeyboardFromDoneButton:(NSNotification *) notification {
@@ -107,22 +126,24 @@
     [self.setCSDebuggedLabel setTextColor:[UIColor whiteColor]];
     [self.autoRespringLabel setTextColor:[UIColor whiteColor]];
     [self.kernelExploitLabel setTextColor:[UIColor whiteColor]];
-    
+    [self.codeSubstitutorLabel setTextColor:[UIColor whiteColor]];
     [self.bootNonceButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.bootNonceTextField setTintColor:[UIColor whiteColor]];
     [self.kernelExploitTextField setTintColor:[UIColor whiteColor]];
-    
+    [self.codeSubstitutorTextField setTintColor:[UIColor whiteColor]];
     [self.bootNonceTextField setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.kernelExploitTextField setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.codeSubstitutorTextField setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.ecidLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.ecidDarkModeButton setTitleColor:[UIColor whiteColor] forState:normal];
-    
     [self.expiryDarkModeLabel setTextColor:[UIColor whiteColor]];
     [self.expiryLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.uptimeLabel setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.upTimeLabel setTextColor:[UIColor whiteColor]];
     [self.exploitPickerToolbar setBarTintColor:[UIColor darkTextColor]];
+    [self.substitutorPickerToolbar setBarTintColor:[UIColor darkTextColor]];
     [self.kernelExploitPickerView setBackgroundColor:[UIColor blackColor]];
+    [self.codeSubstitutorPickerView setBackgroundColor:[UIColor blackColor]];
     [JailbreakViewController.sharedController.navigationController.navigationBar setLargeTitleTextAttributes:@{ NSForegroundColorAttributeName : [UIColor whiteColor] }];
 }
 
@@ -148,28 +169,30 @@
     [self.setCSDebuggedLabel setTextColor:[UIColor blackColor]];
     [self.autoRespringLabel setTextColor:[UIColor blackColor]];
     [self.kernelExploitLabel setTextColor:[UIColor blackColor]];
-    
+    [self.codeSubstitutorLabel setTextColor:[UIColor blackColor]];
     [self.bootNonceButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.bootNonceTextField setTintColor:[UIColor blackColor]];
     [self.kernelExploitTextField setTintColor:[UIColor blackColor]];
-    
+    [self.codeSubstitutorTextField setTintColor:[UIColor blackColor]];
     [self.bootNonceTextField setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.kernelExploitTextField setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [self.codeSubstitutorTextField setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.ecidLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.ecidDarkModeButton setTitleColor:[UIColor blackColor] forState:normal];
-    
     [self.expiryDarkModeLabel setTextColor:[UIColor blackColor]];
     [self.expiryLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.uptimeLabel setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
     [self.upTimeLabel setTextColor:[UIColor blackColor]];
     [self.exploitPickerToolbar setBarTintColor:[UIColor lightTextColor]];
+    [self.substitutorPickerToolbar setBarTintColor:[UIColor lightTextColor]];
     [self.kernelExploitPickerView setBackgroundColor:[UIColor whiteColor]];
+    [self.codeSubstitutorPickerView setBackgroundColor:[UIColor whiteColor]];
     [JailbreakViewController.sharedController.navigationController.navigationBar setLargeTitleTextAttributes:@{ NSForegroundColorAttributeName : [UIColor blackColor] }];
 }
 
 - (void)userTappedAnyware:(UITapGestureRecognizer *) sender
 {
-    if (!self.isExploitPicking){
+    if (!self.isPicking){
         [self.view endEditing:YES];
     }
 }
@@ -187,17 +210,22 @@
     [self.bootNonceTextField setPlaceholder:@(prefs->boot_nonce)];
     [self.bootNonceTextField setText:nil];
     [self.refreshIconCacheSwitch setOn:(BOOL)prefs->run_uicache];
-    [self.kernelExploitSegmentedControl setSelectedSegmentIndex:(int)prefs->exploit];
     [self.disableAutoUpdatesSwitch setOn:(BOOL)prefs->disable_auto_updates];
     [self.disableAppRevokesSwitch setOn:(BOOL)prefs->disable_app_revokes];
-    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(empty_list_exploit) forSegmentAtIndex:empty_list_exploit];
-    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(multi_path_exploit) forSegmentAtIndex:multi_path_exploit];
-    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(async_wake_exploit) forSegmentAtIndex:async_wake_exploit];
-    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(voucher_swap_exploit) forSegmentAtIndex:voucher_swap_exploit];
-    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(mach_swap_exploit) forSegmentAtIndex:mach_swap_exploit];
-    [self.kernelExploitSegmentedControl setEnabled:supportsExploit(mach_swap_2_exploit) forSegmentAtIndex:mach_swap_2_exploit];
     [self.kernelExploitTextField setText:nil];
-    [self.kernelExploitTextField setPlaceholder:[_exploitPickerArray objectAtIndex:(int)prefs->exploit]];
+    @try {
+        [self.kernelExploitTextField setPlaceholder:[_exploitPickerArray objectAtIndex:(int)prefs->exploit]];
+    } @catch (__unused NSException *exception) {
+        [self.kernelExploitTextField setPlaceholder:localize(@"Unavailable")];
+        [self.kernelExploitTextField setEnabled:NO];
+    }
+    [self.codeSubstitutorTextField setText:nil];
+    @try {
+        [self.codeSubstitutorTextField setPlaceholder:[_substitutorPickerArray objectAtIndex:(int)prefs->code_substitutor]];
+    } @catch (__unused NSException *exception) {
+        [self.codeSubstitutorTextField setPlaceholder:localize(@"Unavailable")];
+        [self.codeSubstitutorTextField setEnabled:NO];
+    }
     [self.openCydiaButton setEnabled:(BOOL)cydiaIsInstalled()];
     [self.expiryLabel setPlaceholder:[NSString stringWithFormat:@"%d %@", (int)[[SettingsTableViewController provisioningProfileAtPath:[[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"]][@"ExpirationDate"] timeIntervalSinceDate:[NSDate date]] / 86400, localize(@"Days")]];
     [self.overwriteBootNonceSwitch setOn:(BOOL)prefs->overwrite_boot_nonce];
@@ -229,9 +257,7 @@
     }
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
 }
-
 
 - (IBAction)selectedSpecialThanks:(id)sender {
     
@@ -291,16 +317,35 @@
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
-    return [self.availableExploits count];
+    NSInteger count = 0;
+    if (pickerView == _kernelExploitPickerView) {
+        count = [self.availableExploits count];
+    } else if (pickerView == _codeSubstitutorPickerView) {
+        count = [self.availableSubstitutors count];
+    }
+    return count;
 }
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    NSString *title = [[self.availableExploits allKeys] objectAtIndex:row];
+    NSString *title = nil;
+    if (pickerView == _kernelExploitPickerView) {
+        title = [[self.availableExploits allKeys] objectAtIndex:row];
+    } else if (pickerView == _codeSubstitutorPickerView) {
+        title = [[self.availableSubstitutors allKeys] objectAtIndex:row];
+    }
     return title;
 }
 
 - (NSAttributedString *)pickerView:(UIPickerView *)pickerView attributedTitleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    NSString *title = [[self.availableExploits allKeys] objectAtIndex:row];
+    NSString *title = nil;
+    if (pickerView == _kernelExploitPickerView) {
+        title = [self.availableExploits.allKeys objectAtIndex:row];
+    } else if (pickerView == _codeSubstitutorPickerView) {
+        title = [self.availableSubstitutors.allKeys objectAtIndex:row];
+    }
+    if (title == nil) {
+        return nil;
+    }
     prefs_t *prefs = copy_prefs();
     NSDictionary *attributes = @{NSForegroundColorAttributeName : prefs->dark_mode ? [UIColor whiteColor] : [UIColor blackColor] };
     release_prefs(&prefs);
@@ -309,16 +354,26 @@
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-    self.isExploitPicking = YES;
+    self.isPicking = YES;
 }
 
-- (void)pickerDoneAction{
-    self.isExploitPicking = NO;
+- (void)exploitPickerDoneAction {
+    self.isPicking = NO;
     prefs_t *prefs = copy_prefs();
     prefs->exploit = [[_availableExploits objectForKey:[[_availableExploits allKeys] objectAtIndex:[[self kernelExploitPickerView] selectedRowInComponent:0]]] intValue];
     set_prefs(prefs);
     release_prefs(&prefs);
     [[self kernelExploitTextField] resignFirstResponder];
+    [self reloadData];
+}
+
+- (void)substitutorPickerDoneAction {
+    self.isPicking = NO;
+    prefs_t *prefs = copy_prefs();
+    prefs->code_substitutor = [[_availableSubstitutors objectForKey:[[_availableSubstitutors allKeys] objectAtIndex:[[self codeSubstitutorPickerView] selectedRowInComponent:0]]] intValue];
+    set_prefs(prefs);
+    release_prefs(&prefs);
+    [[self codeSubstitutorTextField] resignFirstResponder];
     [self reloadData];
 }
 

@@ -21,8 +21,12 @@
 @property (nonatomic) NSMutableArray *exploitPickerArray;
 @property (nonatomic) NSMutableDictionary *availableExploits;
 @property (nonatomic) UIToolbar *exploitPickerToolbar;
-@property (nonatomic) BOOL isExploitPicking;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *kernelExploitSegmentedControl;
+@property (weak, nonatomic) IBOutlet UITextField *codeSubstitutorTextField;
+@property (nonatomic) UIPickerView *codeSubstitutorPickerView;
+@property (nonatomic) NSMutableArray *substitutorPickerArray;
+@property (nonatomic) NSMutableDictionary *availableSubstitutors;
+@property (nonatomic) UIToolbar *substitutorPickerToolbar;
+@property (nonatomic) BOOL isPicking;
 @property (weak, nonatomic) IBOutlet UIButton *restartButton;
 @property (weak, nonatomic) IBOutlet UISwitch *disableAutoUpdatesSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *disableAppRevokesSwitch;
@@ -68,6 +72,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *setCSDebuggedLabel;
 @property (weak, nonatomic) IBOutlet UILabel *autoRespringLabel;
 @property (weak, nonatomic) IBOutlet UILabel *kernelExploitLabel;
+@property (weak, nonatomic) IBOutlet UILabel *codeSubstitutorLabel;
 @property (weak, nonatomic) IBOutlet UIButton *bootNonceButton;
 @property (weak, nonatomic) IBOutlet UIButton *ecidDarkModeButton;
 @property (weak, nonatomic) IBOutlet UILabel *expiryDarkModeLabel;

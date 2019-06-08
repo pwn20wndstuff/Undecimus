@@ -35,6 +35,7 @@
 #define K_ENABLE_GET_TASK_ALLOW    "DoEnableGetTaskAllow"
 #define K_SET_CS_DEBUGGED          "SetCSDebugged"
 #define K_AUTO_RESPRING            "AutoRespring"
+#define K_CODE_SUBSTITUTOR         "CodeSubstitutor"
 
 typedef struct {
     bool load_tweaks;
@@ -60,6 +61,7 @@ typedef struct {
     bool auto_respring;
     bool dark_mode;
     int exploit;
+    int code_substitutor;
 } prefs_t;
 
 prefs_t *new_prefs(void);
