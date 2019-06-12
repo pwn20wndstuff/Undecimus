@@ -774,7 +774,7 @@
     showAlert(localize(@"(Re)Install OpenSSH"),
               localize(@"Description:"
                        "\n\n"
-                       "This option makess the jailbreak (re)install the openssh package."
+                       "This option makes the jailbreak (re)install the openssh package."
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
