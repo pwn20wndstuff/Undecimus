@@ -50,6 +50,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(lightModeSettings:) name:@"lightModeSettings" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissKeyboardFromDoneButton:) name:@"dismissKeyboard" object:nil];
     [self.bootNonceTextField setDelegate:self];
+    [self.bootNonceTextField setAutocorrectionType:UITextAutocorrectionTypeNo];
     [self.kernelExploitTextField setDelegate:self];
     self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userTappedAnyware:)];
     self.tap.cancelsTouchesInView = NO;
@@ -129,6 +130,7 @@
     [self.codeSubstitutorLabel setTextColor:[UIColor whiteColor]];
     [self.bootNonceButton setTitleColor:[UIColor whiteColor] forState:normal];
     [self.bootNonceTextField setTintColor:[UIColor whiteColor]];
+    [self.bootNonceTextField setTextColor:[UIColor whiteColor]];
     [self.kernelExploitTextField setTintColor:[UIColor whiteColor]];
     [self.codeSubstitutorTextField setTintColor:[UIColor whiteColor]];
     [self.bootNonceTextField setValue:[UIColor darkGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
@@ -172,6 +174,7 @@
     [self.codeSubstitutorLabel setTextColor:[UIColor blackColor]];
     [self.bootNonceButton setTitleColor:[UIColor blackColor] forState:normal];
     [self.bootNonceTextField setTintColor:[UIColor blackColor]];
+    [self.bootNonceTextField setTextColor:[UIColor blackColor]];
     [self.kernelExploitTextField setTintColor:[UIColor blackColor]];
     [self.codeSubstitutorTextField setTintColor:[UIColor blackColor]];
     [self.bootNonceTextField setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
