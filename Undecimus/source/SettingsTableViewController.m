@@ -477,7 +477,7 @@
     void (^const block)(void) = ^(void) {
         NSString *const update = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://github.com/pwn20wndstuff/Undecimus/raw/master/Update.txt"] encoding:NSUTF8StringEncoding error:nil];
         if (update == nil) {
-            notice(localize(@"Failed to check for update."), true, false);
+            notice(localize(@"Failed to check for updates."), true, false);
         } else if ([update compare:appVersion() options:NSNumericSearch] == NSOrderedDescending) {
             notice(localize(@"An update is available."), true, false);
         } else {
@@ -677,7 +677,7 @@
     showAlert(localize(@"Refresh Icon Cache"),
               localize(@"Description:"
                        "\n\n"
-                       "This option makes the jailbreak regenerate SpringBoard's system application installation cache to cause newly installed .app bundles to appear on the icon list."
+                       "This option makes the jailbreak regenerate SpringBoard's system application installation cache to cause newly installed .app bundles to appear on the home screen."
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
@@ -774,7 +774,7 @@
     showAlert(localize(@"(Re)Install OpenSSH"),
               localize(@"Description:"
                        "\n\n"
-                       "This option makes the jailbreak (re)install the openssh package."
+                       "This option makes the jailbreak (re)install the OpenSSH package."
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
@@ -787,7 +787,7 @@
     showAlert(localize(@"Reinstall Cydia"),
               localize(@"Description:"
                        "\n\n"
-                       "This option makes jailbreak reinstall the cydiainstaller package."
+                       "This option makes jailbreak reinstall the Cydia Installer package."
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
@@ -879,7 +879,7 @@
               false);
 }
 - (IBAction)tappedOnAutoRespringInfoButton:(id)sender {
-    showAlert(localize(@"Auto Respring"),
+    showAlert(localize(@"Automatic Respring"),
               localize(@"Description:"
                        "\n\n"
                        "This option makes the jailbreak automatically restart the SpringBoard as soon as the jailbreak process is completed without the confirmation."
