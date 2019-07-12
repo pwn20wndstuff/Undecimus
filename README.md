@@ -56,7 +56,7 @@ UI by [@iOS_App_Dev](https://twitter.com/iOS_App_Dev) & [@HiMyNameIsUbik](https:
 
 ## Special Thanks
 * [@i41nbeer](https://twitter.com/i41nbeer) for mach_portal, triple_fetch, async_wake, empty_list, multi_path and deja_xnu
-* [@bazad](https://twitter.com/bazad) for voucher_swap and PAC bypass
+* [@_bazad](https://twitter.com/_bazad) for voucher_swap and PAC bypass
 * [@Morpheus______](https://twitter.com/Morpheus______) for the QiLin Toolkit (No longer used)
 * [@xerub](https://twitter.com/xerub) for the original patchfinder64
 * [@iBSparkes](https://twitter.com/iBSparkes) for the machswap and machswap2
