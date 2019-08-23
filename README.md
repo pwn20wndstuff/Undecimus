@@ -5,7 +5,7 @@
   <h3 align="center">The most advanced jailbreak tool</h3>
 </center>
 
-unc0ver jailbreak for iOS 11.0 - 12.2<br/>
+unc0ver jailbreak for iOS 11.0 - 12.4 (Partial A12 Support)<br/>
 by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
 UI by [@iOS_App_Dev](https://twitter.com/iOS_App_Dev) & [@HiMyNameIsUbik](https://twitter.com/HiMyNameIsUbik)<br/>
 
