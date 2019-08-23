@@ -62,8 +62,8 @@ You can still download the latest version [here.](https://github.com/pwn20wndstu
 * [@bazad](https://twitter.com/bazad) for voucher_swap and PAC bypass
 * [@Morpheus______](https://twitter.com/Morpheus______) for the QiLin Toolkit (No longer used)
 * [@xerub](https://twitter.com/xerub) for the original patchfinder64
-* [@iBSparkes](https://twitter.com/iBSparkes) for the machswap and machswap2
-* [@NedWilliamson](https://twitter.com/NedWilliamson) for Sock Puppet
+* [@iBSparkes](https://twitter.com/iBSparkes) for the machswap and machswap2 exploits
+* [@NedWilliamson](https://twitter.com/NedWilliamson) for the Sock Puppet exploit
 * [@stek29](https://twitter.com/stek29) for the patchfinder64 additions, unlocknvram, host_get_special_port(4) patch and shenanigans bypass
 * [@theninjaprawn](https://twitter.com/theninjaprawn) for the patchfinder64 additions
 * [@saurik](https://twitter.com/saurik) for Cydia and Substrate
