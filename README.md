@@ -68,6 +68,7 @@ You can still download the latest version [here.](https://github.com/pwn20wndstu
 * [@theninjaprawn](https://twitter.com/theninjaprawn) for the patchfinder64 additions
 * [@saurik](https://twitter.com/saurik) for Cydia and Substrate
 * [@FCE365](https://twitter.com/FCE365) for the empty_list reliability improvements
+#### Credits for Undecimus Resources & Testing
 * [Samg_is_a_ninja](https://reddit.com/u/Samg_is_a_Ninja) for original UI development
 * [@DennisBednarz](https://twitter.com/DennisBednarz) for original UI design
 * [@Cryptiiiic](https://twitter.com/Cryptiiiic) for testing
@@ -78,5 +79,7 @@ You can still download the latest version [here.](https://github.com/pwn20wndstu
 * [@Swag_iOS](https://twitter.com/Swag_iOS) for testing
 * [@jailbreakbuster](https://twitter.com/jailbreakbuster) for testing
 * [@Jakeashacks](https://twitter.com/Jakeashacks) for testing and sock_port
+* [@coolstarorg](https://twitter.com/coolstarorg) for the snapshot rename idea
+
 
 
