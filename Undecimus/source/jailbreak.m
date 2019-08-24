@@ -766,7 +766,7 @@ void jailbreak()
         NSArray *const array = @[@"/var/Keychains/ocspcache.sqlite3",
                                  @"/var/Keychains/ocspcache.sqlite3-shm",
                                  @"/var/Keychains/ocspcache.sqlite3-wal"];
-        if (prefs->disable_app_revokes && kCFCoreFoundationVersionNumber < kCFCoreFoundationVersionNumber_iOS_12_0) {
+        if (prefs->disable_app_revokes && kCFCoreFoundationVersionNumber <= kCFCoreFoundationVersionNumber_iOS_12_4) {
             // Disable app revokes.
             progress(localize(@"Disabling app revokes..."));
             blockDomainWithName("ocsp.apple.com");
