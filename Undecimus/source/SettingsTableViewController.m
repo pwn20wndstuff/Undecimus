@@ -707,7 +707,7 @@
                        "\n\n"
                        "Compatibility:"
                        "\n\n"
-                       "iOS 11.0-11.4.1 on arm64 SoCs (A7-A11)."),
+                       "iOS 11.0-12.4 on arm64 SoCs (A7-A11)."),
               false,
               false);
 }
