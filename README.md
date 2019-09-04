@@ -2,7 +2,7 @@
 ### The most advanced jailbreak tool
 ![unc0ver logo](https://github.com/pwn20wndstuff/Undecimus/raw/master/Undecimus/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png)
 
-unc0ver jailbreak for iOS 11.0 - 12.2<br/>
+unc0ver jailbreak for iOS 11.0 - 12.2 • [unc0ver.dev](https://unc0ver.dev)<br/>
 by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
 UI by [@iOS_App_Dev](https://twitter.com/iOS_App_Dev) & [@HiMyNameIsUbik](https://twitter.com/HiMyNameIsUbik)<br/>
 
