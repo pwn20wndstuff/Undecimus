@@ -117,6 +117,7 @@ void jailbreak()
     kptr_t Shenanigans = KPTR_NULL;
     prefs_t *prefs = copy_prefs();
     bool needStrap = NO;
+    bool needLdrestart = NO;
     bool needSubstitutor = NO;
     bool skipSubstitutor = NO;
     NSString *const homeDirectory = NSHomeDirectory();
@@ -1114,6 +1115,30 @@ void jailbreak()
         if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0) {
             resourcesPkgs = [@[@"com.ps.letmeblock"] arrayByAddingObjectsFromArray:resourcesPkgs];
         }
+        // Fix Network permissions for mainland China models.
+        NSString *const ModelPlist = @"/var/containers/Shared/SystemGroup/systemgroup.com.apple.mobilegestaltcache/Library/Caches/com.apple.MobileGestalt.plist";
+        NSDictionary *const systemModelPlist = [NSDictionary dictionaryWithContentsOfFile:ModelPlist];
+        NSString *const mainlandChinamodels = @"^(CH/)[A-Z]$";
+        NSPredicate *const predicate = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", mainlandChinamodels];
+        NSString *const modelversion = systemModelPlist[@"CacheExtra"][@"zHeENZu+wbg7PUprwNwBWg"];
+        if (modelversion == nil){
+            if (ModelPlist == nil){
+                LOG("Unable to get com.apple.MobileGestalt.plist on UserFS.");
+                needLdrestart = YES;
+            } else {
+                LOG("File com.apple.MobileGestalt.plist is corrupted.");
+                _assert(clean_file("/var/containers/Shared/SystemGroup/systemgroup.com.apple.mobilegestaltcache/Library/Caches/com.apple.MobileGestalt.plist"), localize(@"Unable to clean corrupted file com.apple.MobileGestalt.plist."), true);
+                needLdrestart = YES;
+            }
+        }
+        if ([predicate evaluateWithObject:modelversion]) {
+            LOG("Detected mainland China models.");
+            if (!needStrap && !needLdrestart) {
+                LOG("Add Globalize to resource pkgs list.");
+                resourcesPkgs = [@[@"com.parrotgeek.globalize"] arrayByAddingObjectsFromArray:resourcesPkgs];
+                needLdrestart = YES;
+            }
+        }
         
         NSMutableArray *pkgsToRepair = [NSMutableArray new];
         LOG("Resource Pkgs: \"%@\".", resourcesPkgs);
@@ -1613,7 +1638,7 @@ void jailbreak()
             if (!prefs->auto_respring) {
                 [waitCommand appendFormat:@"while ps -p %d; do :; done;", my_pid];
             }
-            if (prefs->reload_system_daemons && !needStrap) {
+            if ((prefs->reload_system_daemons || needLdrestart) && !needStrap) {
                 rv = systemf("nohup bash -c \""
                              "%s"
                              "launchctl unload /System/Library/LaunchDaemons/com.apple.backboardd.plist && "
