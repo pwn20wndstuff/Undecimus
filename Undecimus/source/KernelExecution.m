@@ -58,7 +58,7 @@ bool init_kexec()
     if (!MACH_PORT_VALID(user_client)) return false;
 
     // From v0rtex - get the IOSurfaceRootUserClient port, and then the address of the actual client, and vtable
-    IOSurfaceRootUserClient_port = get_address_of_port(getpid(), user_client); // UserClients are just mach_ports, so we find its address
+    IOSurfaceRootUserClient_port = get_address_of_port(proc_struct_addr(), user_client); // UserClients are just mach_ports, so we find its address
     if (!KERN_POINTER_VALID(IOSurfaceRootUserClient_port)) return false;
 
     IOSurfaceRootUserClient_addr = ReadKernel64(IOSurfaceRootUserClient_port + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT)); // The UserClient itself (the C++ object) is at the kobject field

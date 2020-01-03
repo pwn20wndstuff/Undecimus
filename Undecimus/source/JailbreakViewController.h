@@ -10,12 +10,10 @@
 #import <UIProgressHUD.h>
 #import "common.h"
 
-#define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
-
 #define _assert(test, message, fatal) do \
     if (!(test)) { \
         int saved_errno = errno; \
-        LOG("__assert(%d:%s)@%s:%u[%s]", saved_errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
+        LOG("_assert(%d:%s)@%s:%u[%s]", saved_errno, #test, __FILENAME__, __LINE__, __FUNCTION__); \
         if (message != nil) \
             showAlert(fatal ? @"Error (Fatal)" : @"Error (Nonfatal)", [NSString stringWithFormat:@"Errno: %d\nTest: %s\nFilename: %s\nLine: %d\nFunction: %s\nDescription: %@", saved_errno, #test, __FILENAME__, __LINE__, __FUNCTION__, message], true, false); \
         else \
@@ -33,23 +31,60 @@ while (false)
 
 #define notice(msg, wait, destructive) showAlert(@"Notice", msg, wait, destructive)
 
-#define status(msg, btnenbld, tbenbld) do { \
-    LOG("Status: %@", msg); \
+#define status(msg, btnenbld, nvbenbld) do { \
     dispatch_async(dispatch_get_main_queue(), ^{ \
+        if ([[[[[JailbreakViewController sharedController] goButton] titleLabel] text] isEqualToString:msg]) return; \
+        LOG("Status: %@", msg); \
         [UIView performWithoutAnimation:^{ \
             [[[JailbreakViewController sharedController] goButton] setEnabled:btnenbld]; \
-            [[[[JailbreakViewController sharedController] tabBarController] tabBar] setUserInteractionEnabled:tbenbld]; \
+            [[[JailbreakViewController sharedController] settingsButton] setUserInteractionEnabled:nvbenbld]; \
             [[[JailbreakViewController sharedController] goButton] setTitle:msg forState: btnenbld ? UIControlStateNormal : UIControlStateDisabled]; \
             [[[JailbreakViewController sharedController] goButton] layoutIfNeeded]; \
         }]; \
     }); \
 } while (false)
 
+#define progress(x) do { \
+    dispatch_async(dispatch_get_main_queue(), ^{ \
+        if ([[[[JailbreakViewController sharedController] exploitMessageLabel] text] isEqualToString:x]) return; \
+        LOG("Progress: %@", x); \
+        [[[JailbreakViewController sharedController] exploitMessageLabel] setText:x]; \
+    }); \
+} while (false)
+
 @interface JailbreakViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UIButton *goButton;
 @property (weak, nonatomic) IBOutlet UITextView *outputView;
+@property (weak, nonatomic) IBOutlet UIButton *darkModeButton;
+@property (weak, nonatomic) IBOutlet UIButton *settingsButton;
+@property (weak, nonatomic) IBOutlet UIButton *mainDevsButton;
+
+@property (weak, nonatomic) IBOutlet UILabel *exploitProgressLabel;
+@property (weak, nonatomic) IBOutlet UILabel *exploitMessageLabel;
+@property (weak, nonatomic) IBOutlet UILabel *u0Label;
+@property (weak, nonatomic) IBOutlet UILabel *uOVersionLabel;
+
+@property (weak, nonatomic) IBOutlet UIProgressView *jailbreakProgressBar;
+
+@property (weak, nonatomic) IBOutlet UIView *mainView;
+@property (weak, nonatomic) IBOutlet UIView *creditsView;
+@property (weak, nonatomic) IBOutlet UIView *settingsView;
+@property (weak, nonatomic) IBOutlet UIView *mainDevView;
+@property (weak, nonatomic) IBOutlet UIView *backgroundView;
+
+@property (weak, nonatomic) IBOutlet UINavigationBar *settingsNavBar;
+@property (weak, nonatomic) IBOutlet UINavigationBar *creditsNavBar;
+
+@property (weak, nonatomic) IBOutlet UILabel *jailbreakLabel;
+@property (weak, nonatomic) IBOutlet UILabel *byLabel;
+@property (weak, nonatomic) IBOutlet UILabel *uncoverLabel;
+@property (weak, nonatomic) IBOutlet UILabel *supportedOSLabel;
+@property (weak, nonatomic) IBOutlet UILabel *UIByLabel;
+@property (weak, nonatomic) IBOutlet UILabel *firstAndLabel;
+@property (weak, nonatomic) IBOutlet UILabel *fourthAndLabel;
+
+
 @property (readonly) JailbreakViewController *sharedController;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *goButtonSpacing;
 @property (assign) BOOL canExit;
 
 double uptime(void);
@@ -59,6 +94,7 @@ NSString *hexFromInt(NSInteger val);
 - (IBAction)tappedOnJailbreak:(id)sender;
 +(JailbreakViewController*)sharedController;
 - (void)appendTextToOutput:(NSString*)text;
+- (void)updateStatus;
 
 @end
 
@@ -77,6 +113,9 @@ static inline UIProgressHUD *addProgressHUD() {
 }
 
 static inline void removeProgressHUD(UIProgressHUD *hud) {
+    if (hud == nil) {
+        return;
+    }
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
         [hud hide];
@@ -87,6 +126,9 @@ static inline void removeProgressHUD(UIProgressHUD *hud) {
 }
 
 static inline void updateProgressHUD(UIProgressHUD *hud, NSString *msg) {
+    if (hud == nil) {
+        return;
+    }
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
         [hud setText:msg];

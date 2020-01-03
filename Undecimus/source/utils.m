@@ -31,6 +31,149 @@ int logfd=-1;
 bool injectedToTrustCache = false;
 NSMutableArray *toInjectToTrustCache = nil;
 
+exploit_info_t *exploit_infos[] = {
+    &(exploit_info_t)
+    {
+        .exploit = empty_list_exploit,
+        .name = "Empty List",
+        .exploit_capability = jailbreak_capability,
+        .exploit_reliability = lowest_exploit_reliability,
+        .device_support_info.min_kernel_version = "4397.0.0.2.4~1",
+        .device_support_info.max_kernel_version = "4570.60.19~25",
+        .device_support_info.handler = NULL,
+    },
+    &(exploit_info_t)
+    {
+        .exploit = multi_path_exploit,
+        .name = "Multi Path",
+        .exploit_capability = jailbreak_capability,
+        .exploit_reliability = low_exploit_reliability,
+        .device_support_info.min_kernel_version = "4397.0.0.2.4~1",
+        .device_support_info.max_kernel_version = "4570.52.2~8",
+        .device_support_info.handler = ^bool (void) {
+            if (!multi_path_tcp_enabled())
+                return false;
+            return true;
+        },
+    },
+    &(exploit_info_t)
+    {
+        .exploit = async_wake_exploit,
+        .name = "Async Wake",
+        .exploit_capability = jailbreak_capability,
+        .exploit_reliability = highest_exploit_reliability,
+        .device_support_info.min_kernel_version = "4397.0.0.2.4~1",
+        .device_support_info.max_kernel_version = "4570.20.62~4",
+        .device_support_info.handler = NULL,
+    },
+    &(exploit_info_t)
+    {
+        .exploit = voucher_swap_exploit,
+        .name = "Voucher Swap",
+        .exploit_capability = jailbreak_capability,
+        .exploit_reliability = high_exploit_reliability,
+        .device_support_info.min_kernel_version = "4397.0.0.2.4~1",
+        .device_support_info.max_kernel_version = "4903.240.8~8",
+        .device_support_info.handler = ^bool (void) {
+            if (get_kernel_page_size() != 0x4000)
+                return false;
+            else if (machineNameContains("iPad5,") && kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0)
+                return false;
+            return true;
+        },
+    },
+    &(exploit_info_t)
+    {
+        .exploit = mach_swap_exploit,
+        .name = "Mach Swap",
+        .exploit_capability = jailbreak_capability,
+        .exploit_reliability = middle_exploit_reliability,
+        .device_support_info.min_kernel_version = "4397.0.0.2.4~1",
+        .device_support_info.max_kernel_version = "4903.240.8~8",
+        .device_support_info.handler = ^bool (void) {
+            if (get_kernel_page_size() != 0x1000 &&
+                !machineNameContains("iPad5,") &&
+                !machineNameContains("iPhone8,") &&
+                !machineNameContains("iPad6,"))
+                return false;
+            return true;
+        },
+    },
+    &(exploit_info_t)
+    {
+        .exploit = mach_swap_2_exploit,
+        .name = "Mach Swap 2",
+        .exploit_capability = jailbreak_capability,
+        .exploit_reliability = middle_exploit_reliability,
+        .device_support_info.min_kernel_version = "4397.0.0.2.4~1",
+        .device_support_info.max_kernel_version = "4903.240.8~8",
+        .device_support_info.handler = NULL,
+    },
+    &(exploit_info_t)
+    {
+        .exploit = deja_xnu_exploit,
+        .name = "Deja XNU",
+        .exploit_capability = respring_capability,
+        .exploit_reliability = middle_exploit_reliability,
+        .device_support_info.min_kernel_version = "4397.0.0.2.4~1",
+        .device_support_info.max_kernel_version = "4570.70.24~9",
+        .device_support_info.handler = ^bool (void) {
+            if (jailbreakEnabled())
+                return false;
+            return true;
+        },
+    },
+    &(exploit_info_t)
+    {
+        .exploit = necp_exploit,
+        .name = "Necp",
+        .exploit_capability = reboot_capability,
+        .exploit_reliability = highest_exploit_reliability,
+        .device_support_info.min_kernel_version = "4397.0.0.2.4~1",
+        .device_support_info.max_kernel_version = "4570.70.24~9",
+        .device_support_info.handler = NULL,
+    },
+    &(exploit_info_t)
+    {
+        .exploit = kalloc_crash,
+        .name = "Kalloc Crash",
+        .exploit_capability = reboot_capability,
+        .exploit_reliability = high_exploit_reliability,
+        .device_support_info.min_kernel_version = "4397.0.0.2.4~1",
+        .device_support_info.max_kernel_version = "4903.252.2~2",
+        .device_support_info.handler = NULL,
+    },
+    NULL,
+};
+
+substitutor_info_t *substitutor_infos[] = {
+    &(substitutor_info_t)
+    {
+        .substitutor = substrate_substitutor,
+        .name = "Substrate",
+        .package_id = "mobilesubstrate",
+        .startup_executable = "/usr/libexec/substrate",
+        .server_executable = "/usr/libexec/substrated",
+        .run_command = "/etc/rc.d/substrate",
+        .loader_killswitch = "/var/tmp/.substrated_disable_loader",
+        .bootstrap_tools = "/usr/lib/substrate",
+        .substitutor_stability = highest_substitutor_stability,
+        .device_support_info.min_kernel_version = "4397.0.0.2.4~1",
+        .device_support_info.max_kernel_version = "4903.240.8~8",
+        .device_support_info.handler = ^bool (void) {
+            if (machineNameContains("iPhone11,") || machineNameContains("iPad8,"))
+                return false;
+            return true;
+        },
+        .resources = (char **)&(const char*[]) {
+            "/usr/libexec/substrate",
+            "/usr/libexec/substrated",
+            NULL,
+        },
+    },
+    NULL,
+};
+
 NSData *lastSystemOutput=nil;
 void injectDir(NSString *dir) {
     NSFileManager *fm = [NSFileManager defaultManager];
@@ -204,7 +347,7 @@ bool compareInstalledVersion(const char *packageID, const char *op, const char *
     return rv;
 }
 
-bool runDpkg(NSArray <NSString*> *args, bool forceDeps) {
+bool runDpkg(NSArray <NSString*> *args, bool forceDeps, bool forceAll) {
     if ([args count] < 2) {
         LOG("%s: Nothing to do", __FUNCTION__);
         return false;
@@ -217,7 +360,9 @@ bool runDpkg(NSArray <NSString*> *args, bool forceDeps) {
                         @"--no-triggers"
                      ]];
     
-    if (forceDeps) {
+    if (forceAll) {
+        [command addObject:@"--force-all"];
+    } else if (forceDeps) {
         [command addObjectsFromArray:@[@"--force-depends", @"--force-remove-essential"]];
     }
     for (NSString *arg in args) {
@@ -232,7 +377,7 @@ bool runDpkg(NSArray <NSString*> *args, bool forceDeps) {
     return !WEXITSTATUS(rv);
 }
 
-bool extractDeb(NSString *debPath) {
+bool extractDeb(NSString *debPath, bool doInject) {
     if (![debPath hasSuffix:@".deb"]) {
         LOG(@"%@: not a deb", debPath);
         return NO;
@@ -260,7 +405,7 @@ bool extractDeb(NSString *debPath) {
         [deb extractFileNum:3 toFd:pipe.fileHandleForWriting.fileDescriptor];
     });
     bool result = [tar extractToPath:@"/"];
-    if ((kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0) && result) {
+    if (doInject && result) {
         chdir("/");
         NSMutableArray *toInject = [NSMutableArray new];
         NSDictionary *files = tar.files;
@@ -285,32 +430,32 @@ bool extractDeb(NSString *debPath) {
     return result;
 }
 
-bool extractDebs(NSArray <NSString *> *debPaths) {
+bool extractDebs(NSArray <NSString *> *debPaths, bool doInject) {
     if ([debPaths count] < 1) {
         LOG("%s: Nothing to install", __FUNCTION__);
         return false;
     }
     for (NSString *debPath in debPaths) {
-        if (!extractDeb(debPath))
+        if (!extractDeb(debPath, doInject))
             return NO;
     }
     return YES;
 }
 
 bool installDeb(const char *debName, bool forceDeps) {
-    return runDpkg(@[@"-i", @(debName)], forceDeps);
+    return runDpkg(@[@"-i", @(debName)], forceDeps, false);
 }
 
-bool installDebs(NSArray <NSString*> *debs, bool forceDeps) {
+bool installDebs(NSArray <NSString*> *debs, bool forceDeps, bool forceAll) {
     if ([debs count] < 1) {
         LOG("%s: Nothing to install", __FUNCTION__);
         return false;
     }
-    return runDpkg([@[@"-i"] arrayByAddingObjectsFromArray:debs], forceDeps);
+    return runDpkg([@[@"-i"] arrayByAddingObjectsFromArray:debs], forceDeps, forceAll);
 }
 
 bool removePkg(char *packageID, bool forceDeps) {
-    return runDpkg(@[@"-r", @(packageID)], forceDeps);
+    return runDpkg(@[@"-r", @(packageID)], forceDeps, false);
 }
 
 bool removePkgs(NSArray <NSString*> *pkgs, bool forceDeps) {
@@ -318,7 +463,7 @@ bool removePkgs(NSArray <NSString*> *pkgs, bool forceDeps) {
         LOG("%s: Nothing to remove", __FUNCTION__);
         return false;
     }
-    return runDpkg([@[@"-r"] arrayByAddingObjectsFromArray:pkgs], forceDeps);
+    return runDpkg([@[@"-r"] arrayByAddingObjectsFromArray:pkgs], forceDeps, false);
 }
 
 bool runApt(NSArray <NSString*> *args) {
@@ -340,7 +485,7 @@ bool runApt(NSArray <NSString*> *args) {
     }
     argv[command.count] = NULL;
     int rv = runCommandv(argv[0], (int)[command count], argv, NULL);
-    return !WEXITSTATUS(rv);
+    return WIFEXITED(rv) && !WEXITSTATUS(rv);
 }
 
 bool aptUpdate() {
@@ -354,6 +499,10 @@ bool aptInstall(NSArray <NSString*> *pkgs) {
 
 bool aptUpgrade() {
     return runApt(@[@"-y", @"--allow-unauthenticated", @"--allow-downgrades", @"-f", @"dist-upgrade"]);
+}
+
+bool aptRepair() {
+    return runApt(@[@"-o", @"Dir::Etc::preferences=undecimus/preferences", @"-o", @"Dir::Etc::preferencesparts=''", @"-y", @"--allow-unauthenticated", @"--allow-remove-essential", @"--allow-downgrades", @"-f", @"dist-upgrade"]);
 }
 
 bool extractAptPkgList(NSString *path, ArchiveFile* listcache, id_t owner)
@@ -373,6 +522,57 @@ bool ensureAptPkgLists() {
     if (!listsArchive) return false;
     bool success = extractAptPkgList(@"/var/lib/apt/lists", listsArchive, 0);
     return success && extractAptPkgList(@"/var/mobile/Library/Caches/com.saurik.Cydia/lists", listsArchive, 501);
+}
+
+bool removeURLFromSources(NSMutableString *sources, NSString *url)
+{
+    bool removed=false;
+    NSString *pattern = [NSString stringWithFormat:@"[^\\n](?:(?!\\n\\n).)*%@(?:(?!\\n\\n).)*\\n\\n",
+                         [url stringByReplacingOccurrencesOfString:@"." withString:@"\\."]
+                         ];
+    NSRegularExpression *sourceexp = [NSRegularExpression
+                                      regularExpressionWithPattern:pattern
+                                      options:NSRegularExpressionDotMatchesLineSeparators
+                                      error:nil];
+    
+    for (NSTextCheckingResult *source in [sourceexp matchesInString:sources options:0 range:NSMakeRange(0, sources.length)])
+    {
+        removed = true;
+        [sources deleteCharactersInRange:[source rangeAtIndex:0]];
+    }
+    return removed;
+}
+
+void deduplicateSillySources(void)
+{
+    NSString *cydia_list = [NSString stringWithContentsOfFile:@"/etc/apt/sources.list.d/cydia.list" encoding:NSUTF8StringEncoding error:nil];
+    NSMutableString *sileo_sources = [NSMutableString stringWithContentsOfFile:@"/etc/apt/sources.list.d/sileo.sources" encoding:NSUTF8StringEncoding error:nil];
+    if (cydia_list && sileo_sources) {
+        NSFileManager *fm = [NSFileManager defaultManager];
+        if (pkgIsInstalled("org.coolstar.sileo")) {
+            NSString *orig_sileo_sources = [sileo_sources copy];
+            NSRegularExpression *urlexp = [NSRegularExpression regularExpressionWithPattern:@"https?://(\\S+[^/\\s]|\\S+)/?\\s" options:0 error:nil];
+            
+            for (NSTextCheckingResult *match in [urlexp matchesInString:cydia_list options:0 range:NSMakeRange(0, cydia_list.length)])
+            {
+                NSString *url = [cydia_list substringWithRange:[match rangeAtIndex:1]];
+                if ([url hasPrefix:@"apt.thebigboss.org"] && removeURLFromSources(sileo_sources, @"repounclutter.coolstar.org")) {
+                    LOG("Removing duplicated source repounclutter from sileo.sources");
+                }
+                if (removeURLFromSources(sileo_sources, url)) {
+                    LOG("Removing duplicated source %@ from sileo.sources", url);
+                }
+            }
+            if (![sileo_sources isEqual:orig_sileo_sources]) {
+                [fm createFileAtPath:@"/etc/apt/sources.list.d/sileo.sources"
+                            contents:[sileo_sources dataUsingEncoding:NSUTF8StringEncoding]
+                          attributes:@{ NSFileOwnerAccountID:@(0), NSFileGroupOwnerAccountID:@(0), NSFilePosixPermissions:@(0644) }
+                 ];
+            }
+        } else {
+            [fm removeItemAtPath:@"/etc/apt/sources.list.d/sileo.sources" error:nil];
+        }
+    }
 }
 
 bool is_symlink(const char *filename) {
@@ -725,150 +925,171 @@ NSString *getKernelBuildVersion() {
     return kernelBuild;
 }
 
-bool supportsExploit(exploit_t exploit) {
-#ifdef CAN_HAS_UNSUPPORTED_EXPLOIT
+bool checkDeviceSupport(device_support_info_t device_support) {
+#ifdef CAN_HAS_UNSUPPORTED_DEVICE
     return true;
-#else /* !CAN_HAS_UNSUPPORTED_EXPLOIT */
-    
-    NSString *minKernelBuildVersion = nil;
-    NSString *maxKernelBuildVersion = nil;
-    
-    switch (exploit) {
-        case multi_path_exploit: {
-            if (!multi_path_tcp_enabled()) {
-                return false;
-            }
-            minKernelBuildVersion = @"4397.0.0.2.4~1";
-            maxKernelBuildVersion = @"4570.52.2~8";
-            break;
-        }
-        case voucher_swap_exploit: {
-            if (get_kernel_page_size() != 0x4000) {
-                return false;
-            }
-            if (machineNameContains("iPad5,") &&
-                kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0) {
-                return false;
-            }
-            minKernelBuildVersion = @"4397.0.0.2.4~1";
-            maxKernelBuildVersion = @"4903.240.8~8";
-            break;
-        }
-        case mach_swap_exploit: {
-            if (get_kernel_page_size() != 0x1000 &&
-                !machineNameContains("iPad5,") &&
-                !machineNameContains("iPhone8,") &&
-                !machineNameContains("iPad6,")) {
-                return false;
-            }
-            minKernelBuildVersion = @"4397.0.0.2.4~1";
-            maxKernelBuildVersion = @"4903.240.8~8";
-            break;
-        }
-        case mach_swap_2_exploit: {
-            minKernelBuildVersion = @"4397.0.0.2.4~1";
-            maxKernelBuildVersion = @"4903.240.8~8";
-            break;
-        }
-        case deja_xnu_exploit: {
-            if (jailbreakEnabled())
-                return false;
-            minKernelBuildVersion = @"4397.0.0.2.4~1";
-            maxKernelBuildVersion = @"4570.70.24~9";
-            break;
-        }
-        case empty_list_exploit: {
-            minKernelBuildVersion = @"4397.0.0.2.4~1";
-            maxKernelBuildVersion = @"4570.60.19~25";
-            break;
-        }
-        case async_wake_exploit: {
-            minKernelBuildVersion = @"4397.0.0.2.4~1";
-            maxKernelBuildVersion = @"4570.20.62~4";
-            break;
-        }
-        case necp_exploit: {
-            minKernelBuildVersion = @"4397.0.0.2.4~1";
-            maxKernelBuildVersion = @"4570.70.24~9";
-            break;
-        }
-        case kalloc_crash: {
-            minKernelBuildVersion = @"4397.0.0.2.4~1";
-            maxKernelBuildVersion = @"4903.252.2~2";
-            break;
-        }
-        default:
-            return false;
-            break;
-    }
-    
-    if (minKernelBuildVersion != nil && maxKernelBuildVersion != nil) {
+#else /* !CAN_HAS_UNSUPPORTED_DEVICE */
+    if (device_support.min_kernel_version != NULL && device_support.max_kernel_version != NULL) {
         NSString *kernelBuildVersion = getKernelBuildVersion();
-        if (kernelBuildVersion != nil) {
-            if ([kernelBuildVersion compare:minKernelBuildVersion options:NSNumericSearch] != NSOrderedAscending && [kernelBuildVersion compare:maxKernelBuildVersion options:NSNumericSearch] != NSOrderedDescending) {
-                return true;
-            }
+        if (kernelBuildVersion == nil) {
+            return false;
         }
-    } else {
-        return true;
+        if ([kernelBuildVersion compare:@(device_support.min_kernel_version) options:NSNumericSearch] == NSOrderedAscending || [kernelBuildVersion compare:@(device_support.max_kernel_version) options:NSNumericSearch] == NSOrderedDescending) {
+            return false;
+        }
     }
-
-    return false;
-#endif /* !CAN_HAS_UNSUPPORTED_EXPLOIT */
+    if (device_support.handler != NULL) {
+        if (!device_support.handler()) {
+            return false;
+        }
+    }
+    return true;
+#endif /* !CAN_HAS_UNSUPPORTED_DEVICE */
 }
 
 bool jailbreakSupported() {
-    return supportsExploit(empty_list_exploit) ||
-    supportsExploit(multi_path_exploit) ||
-    supportsExploit(async_wake_exploit) ||
-    supportsExploit(voucher_swap_exploit) ||
-    supportsExploit(mach_swap_exploit) ||
-    supportsExploit(mach_swap_2_exploit);
+    for (size_t i = 0; exploit_infos[i]; i++) {
+        if (exploit_infos[i]->exploit_capability != jailbreak_capability) {
+            continue;
+        }
+        if (!checkDeviceSupport(exploit_infos[i]->device_support_info)) {
+            continue;
+        }
+        return true;
+    }
+    return false;
+}
+
+bool substitutorSupported() {
+    for (size_t i = 0; substitutor_infos[i]; i++) {
+        if (!checkDeviceSupport(substitutor_infos[i]->device_support_info)) {
+            continue;
+        }
+        return true;
+    }
+    return false;
 }
 
 bool respringSupported() {
-    return supportsExploit(deja_xnu_exploit);
+    for (size_t i = 0; exploit_infos[i]; i++) {
+        if (exploit_infos[i]->exploit_capability != respring_capability) {
+            continue;
+        }
+        if (!checkDeviceSupport(exploit_infos[i]->device_support_info)) {
+            continue;
+        }
+        return true;
+    }
+    return false;
 }
 
 bool restartSupported() {
-    return supportsExploit(necp_exploit) ||
-    supportsExploit(voucher_swap_exploit) ||
-    supportsExploit(kalloc_crash);
+    for (size_t i = 0; exploit_infos[i]; i++) {
+        if (exploit_infos[i]->exploit_capability != reboot_capability) {
+            continue;
+        }
+        if (!checkDeviceSupport(exploit_infos[i]->device_support_info)) {
+            continue;
+        }
+        return true;
+    }
+    return false;
 }
 
 NSInteger recommendedJailbreakSupport() {
-    if (supportsExploit(mach_swap_exploit))
-        return mach_swap_exploit;
-    else if (supportsExploit(async_wake_exploit))
-        return async_wake_exploit;
-    else if (supportsExploit(voucher_swap_exploit))
-        return voucher_swap_exploit;
-    else if (supportsExploit(mach_swap_2_exploit))
-        return mach_swap_2_exploit;
-    else if (supportsExploit(multi_path_exploit))
-        return multi_path_exploit;
-    else if (supportsExploit(empty_list_exploit))
-        return empty_list_exploit;
-    else
-        return -1;
+    NSInteger exploit = -1;
+    exploit_info_t *exploit_info = NULL;
+    for (size_t i = 0; exploit_infos[i]; i++) {
+        if (exploit_infos[i]->exploit_capability != jailbreak_capability
+            ) {
+            continue;
+        }
+        if (!checkDeviceSupport(exploit_infos[i]->device_support_info)) {
+            continue;
+        }
+        if (exploit_info == NULL) {
+            exploit_info = exploit_infos[i];
+            continue;
+        }
+        if (exploit_infos[i]->exploit_reliability > exploit_info->exploit_reliability) {
+            exploit_info = exploit_infos[i];
+        }
+    }
+    if (exploit_info != NULL) {
+        exploit = (NSInteger)exploit_info->exploit;
+    }
+    return exploit;
+}
+
+NSInteger recommendedSubstitutorSupport() {
+    NSInteger substitutor = -1;
+    substitutor_info_t *substitutor_info = NULL;
+    for (size_t i = 0; substitutor_infos[i]; i++) {
+        if (!checkDeviceSupport(substitutor_infos[i]->device_support_info)) {
+            continue;
+        }
+        if (substitutor_info == NULL) {
+            substitutor_info = substitutor_infos[i];
+            continue;
+        }
+        if (substitutor_infos[i]->substitutor_stability > substitutor_info->substitutor_stability) {
+            substitutor_info = substitutor_infos[i];
+        }
+    }
+    if (substitutor_info != NULL) {
+        substitutor = (NSInteger)substitutor_info->substitutor;
+    }
+    return substitutor;
 }
 
 NSInteger recommendedRestartSupport() {
-    if (supportsExploit(necp_exploit))
-        return necp_exploit;
-    else if (supportsExploit(voucher_swap_exploit))
-        return voucher_swap_exploit;
-    else if (supportsExploit(kalloc_crash))
-        return kalloc_crash;
-    else
-        return -1;
+    NSInteger exploit = -1;
+    exploit_info_t *exploit_info = NULL;
+    for (size_t i = 0; exploit_infos[i]; i++) {
+        if (exploit_infos[i]->exploit_capability != reboot_capability
+            ) {
+            continue;
+        }
+        if (!checkDeviceSupport(exploit_infos[i]->device_support_info)) {
+            continue;
+        }
+        if (exploit_info == NULL) {
+            exploit_info = exploit_infos[i];
+            continue;
+        }
+        if (exploit_infos[i]->exploit_reliability > exploit_info->exploit_reliability) {
+            exploit_info = exploit_infos[i];
+        }
+    }
+    if (exploit_info != NULL) {
+        exploit = (NSInteger)exploit_info->exploit;
+    }
+    return exploit;
 }
 
 NSInteger recommendedRespringSupport() {
-    if (supportsExploit(deja_xnu_exploit))
-        return deja_xnu_exploit;
-    else
-        return -1;
+    NSInteger exploit = -1;
+    exploit_info_t *exploit_info = NULL;
+    for (size_t i = 0; exploit_infos[i]; i++) {
+        if (exploit_infos[i]->exploit_capability != respring_capability
+            ) {
+            continue;
+        }
+        if (!checkDeviceSupport(exploit_infos[i]->device_support_info)) {
+            continue;
+        }
+        if (exploit_info == NULL) {
+            exploit_info = exploit_infos[i];
+            continue;
+        }
+        if (exploit_infos[i]->exploit_reliability > exploit_info->exploit_reliability) {
+            exploit_info = exploit_infos[i];
+        }
+    }
+    if (exploit_info != NULL) {
+        exploit = (NSInteger)exploit_info->exploit;
+    }
+    return exploit;
 }
 
 bool daemonIsLoaded(char *daemonID) {
@@ -1024,12 +1245,17 @@ bool verifyECID(NSString *ecid) {
 bool canOpen(const char *URL) {
     __block bool canOpenURL = false;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_block_t block = ^{
         if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@(URL)]]) {
             canOpenURL = true;
         }
         dispatch_semaphore_signal(semaphore);
-    });
+    };
+    if ([[NSThread currentThread] isMainThread]) {
+        block();
+    } else {
+        dispatch_async(dispatch_get_main_queue(), block);
+    }
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
     return canOpenURL;
 }
@@ -1216,8 +1442,8 @@ out:
 }
 
 int waitForFile(const char *filename) {
-    auto rv = access(filename, F_OK);
-    for (auto i = 0; !(i >= 100 || rv == ERR_SUCCESS); i++) {
+    int rv = access(filename, F_OK);
+    for (int i = 0; !(i >= 100 || rv == ERR_SUCCESS); i++) {
         usleep(100000);
         rv = access(filename, F_OK);
     }
@@ -1229,56 +1455,92 @@ NSString *hexFromInt(NSInteger val) {
 }
 
 void waitFor(int seconds) {
-    for (auto i = 1; i <= seconds; i++) {
+    for (int i = 1; i <= seconds; i++) {
         LOG("Waiting (%d/%d)", i, seconds);
         sleep(1);
     }
 }
 
-void blockDomainWithName(const char *name) {
-    id hostsFile = nil;
-    id newLine = nil;
-    id newHostsFile = nil;
-    hostsFile = [NSString stringWithContentsOfFile:@"/etc/hosts" encoding:NSUTF8StringEncoding error:nil];
-    newHostsFile = hostsFile;
-    newLine = [NSString stringWithFormat:@"\n127.0.0.1 %s\n", name];
-    if (![hostsFile containsString:newLine]) {
-        newHostsFile = [newHostsFile stringByAppendingString:newLine];
+bool blockDomainWithName(const char *name) {
+    if (!unblockDomainWithName(name)) {
+        LOG("%s: Unable to clean hosts file", __FUNCTION__);
+        return false;
     }
-    newLine = [NSString stringWithFormat:@"\n::1 %s\n", name];
-    if (![hostsFile containsString:newLine]) {
-        newHostsFile = [newHostsFile stringByAppendingString:newLine];
+    NSString *domain = @(name);
+    NSString *hosts_file = @"/etc/hosts";
+    NSString *hosts = [NSString stringWithContentsOfFile:hosts_file encoding:NSUTF8StringEncoding error:nil];
+    if (hosts == nil) {
+        LOG("%s: Unable to read hosts file", __FUNCTION__);
+        return false;
     }
-    if (![newHostsFile isEqual:hostsFile]) {
-        [newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    NSArray *redirects = @[@"127.0.0.1", @"n::1"];
+    for (NSString *redirect in redirects) {
+        NSString *line = [NSString stringWithFormat:@"\n%@\t%@\n", redirect, domain];
+        hosts = [hosts stringByAppendingString:line];
     }
+    if (![hosts writeToFile:hosts_file atomically:YES encoding:NSUTF8StringEncoding error:nil]) {
+        LOG("%s: Unable to update hosts file", __FUNCTION__);
+        return false;
+    }
+    return true;
 }
 
-void unblockDomainWithName(const char *name) {
-    id hostsFile = nil;
-    id newLine = nil;
-    id newHostsFile = nil;
-    hostsFile = [NSString stringWithContentsOfFile:@"/etc/hosts" encoding:NSUTF8StringEncoding error:nil];
-    newHostsFile = hostsFile;
-    newLine = [NSString stringWithFormat:@"\n127.0.0.1 %s\n", name];
-    if ([hostsFile containsString:newLine]) {
-        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
+bool unblockDomainWithName(const char *name) {
+    NSString *domain = @(name);
+    NSString *hosts_file = @"/etc/hosts";
+    NSString *hosts = [NSString stringWithContentsOfFile:hosts_file encoding:NSUTF8StringEncoding error:nil];
+    if (hosts == nil) {
+        LOG("%s: Unable to read hosts file", __FUNCTION__);
+        return false;
     }
-    newLine = [NSString stringWithFormat:@"\n0.0.0.0 %s\n", name];
-    if ([hostsFile containsString:newLine]) {
-        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
+    for (NSString *line in [hosts componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
+        for (NSString *string in [line componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]) {
+            if ([string isEqualToString:domain]) {
+                hosts = [hosts stringByReplacingOccurrencesOfString:line withString:@""];
+            }
+        }
     }
-    newLine = [NSString stringWithFormat:@"\n0.0.0.0    %s\n", name];
-    if ([hostsFile containsString:newLine]) {
-        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
+    if (![hosts writeToFile:hosts_file atomically:YES encoding:NSUTF8StringEncoding error:nil]) {
+        LOG("%s: Unable to update hosts file", __FUNCTION__);
+        return false;
     }
-    newLine = [NSString stringWithFormat:@"\n::1 %s\n", name];
-    if ([hostsFile containsString:newLine]) {
-        newHostsFile = [hostsFile stringByReplacingOccurrencesOfString:newLine withString:@""];
+    return true;
+}
+
+bool cydiaIsInstalled() {
+    if (access("/Applications/Cydia.app", F_OK) != ERR_SUCCESS) {
+        return false;
     }
-    if (![newHostsFile isEqual:hostsFile]) {
-        [newHostsFile writeToFile:@"/etc/hosts" atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    if (!canOpen("cydia://")) {
+        return false;
     }
+    return true;
+}
+
+NSString *localize(NSString *str, ...) {
+    va_list ap;
+    va_start(ap, str);
+    NSString *str_to_localize = [[NSString alloc] initWithFormat:str arguments:ap];
+    va_end(ap);
+    return NSLocalizedString(str_to_localize, @"");
+}
+
+exploit_info_t *get_exploit_info(exploit_t exploit) {
+    for (size_t i = 0; exploit_infos[i]; ++i) {
+        if (exploit_infos[i]->exploit == exploit) {
+            return exploit_infos[i];
+        }
+    }
+    return NULL;
+}
+
+substitutor_info_t *get_substitutor_info(substitutor_t substitutor) {
+    for (size_t i = 0; substitutor_infos[i]; ++i) {
+        if (substitutor_infos[i]->substitutor == substitutor) {
+            return substitutor_infos[i];
+        }
+    }
+    return NULL;
 }
 
 __attribute__((constructor))

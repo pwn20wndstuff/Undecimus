@@ -324,7 +324,7 @@ NSArray *resolveDepsForPkg(NSString *pkg, BOOL preDeps) {
     return resolveDepsForPkgWithQueue(pkg, nil, preDeps);
 }
 
-BOOL extractDebsForPkg(NSString *pkg, NSMutableArray *installed, BOOL preDeps) {
+BOOL extractDebsForPkg(NSString *pkg, NSMutableArray *installed, BOOL preDeps, bool doInject) {
     NSArray *pkgsForPkg = resolveDepsForPkg(pkg, preDeps);
     if (pkgsForPkg == nil || pkgsForPkg.count < 1) {
         LOG("Found no pkgs to install for \"%@\"", pkg);
@@ -342,7 +342,7 @@ BOOL extractDebsForPkg(NSString *pkg, NSMutableArray *installed, BOOL preDeps) {
         // Already installed all these
         return YES;
     }
-    if (!extractDebs(debsForPkg)) {
+    if (!extractDebs(debsForPkg, doInject)) {
         LOG("Failed to extract debs for \"%@\"", pkg);
         return NO;
     }

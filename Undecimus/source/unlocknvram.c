@@ -41,7 +41,7 @@ uint64_t get_iodtnvram_obj(void) {
             LOG("Failed to get IODTNVRAM service");
             return 0;
         }
-        uint64_t nvram_up = get_address_of_port(getpid(), IODTNVRAMSrv);
+        uint64_t nvram_up = get_address_of_port(proc_struct_addr(), IODTNVRAMSrv);
         IODTNVRAMObj = ReadKernel64(nvram_up + koffset(KSTRUCT_OFFSET_IPC_PORT_IP_KOBJECT));
 
         LOG("IODTNVRAM obj at 0x%llx", IODTNVRAMObj);
@@ -72,7 +72,7 @@ int unlocknvram(void) {
         kernel_xpaci(buf[searchNVRAMProperty / sizeof(uint64_t)]);
 
     // allocate buffer in kernel
-    fake_vtable_xpac = kmem_alloc_wired(kernel_buffer_size);
+    fake_vtable_xpac = IOMalloc(kernel_buffer_size);
     
     // Forge the pacia pointers to the virtual methods.
     size_t count = 0;
@@ -119,7 +119,7 @@ int locknvram(void) {
     }
     
     WriteKernel64(obj, orig_vtable);
-    kmem_free(fake_vtable_xpac, kernel_buffer_size);
+    SafeIOFreeNULL(fake_vtable_xpac, kernel_buffer_size);
 
     LOG("Locked nvram");
     return 0;

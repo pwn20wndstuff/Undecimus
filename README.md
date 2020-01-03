@@ -2,9 +2,9 @@
 ### The most advanced jailbreak tool
 ![unc0ver logo](https://github.com/pwn20wndstuff/Undecimus/raw/master/Undecimus/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png)
 
-unc0ver jailbreak for iOS 11.0 - 12.1.2<br/>
+unc0ver jailbreak for iOS 11.0 - 12.2<br/>
 by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
-UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](https://reddit.com/u/Samg_is_a_Ninja)<br/>
+UI by [@iOS_App_Dev](https://twitter.com/iOS_App_Dev) & [@HiMyNameIsUbik](https://twitter.com/HiMyNameIsUbik)<br/>
 
 ## The most outstanding changes over the other jailbreaks
 * One app to jailbreak all firmwares
@@ -58,15 +58,14 @@ UI by [@DennisBednarz](https://twitter.com/DennisBednarz) & [Samg_is_a_Ninja](ht
 * [@i41nbeer](https://twitter.com/i41nbeer) for mach_portal, triple_fetch, async_wake, empty_list, multi_path and deja_xnu
 * [@bazad](https://twitter.com/bazad) for voucher_swap and PAC bypass
 * [@Morpheus______](https://twitter.com/Morpheus______) for the QiLin Toolkit (No longer used)
-* [@xerub](https://twitter.com/xerub) for libjb and the original patchfinder64
-* [@iBSparkes](https://twitter.com/iBSparkes) for the original amfid_payload (No longer used), jailbreakd (No longer used), pspawn_hook (No longer used), machswap and machswap2
+* [@xerub](https://twitter.com/xerub) for the original patchfinder64
+* [@iBSparkes](https://twitter.com/iBSparkes) for the machswap and machswap2
 * [@stek29](https://twitter.com/stek29) for the patchfinder64 additions, unlocknvram, host_get_special_port(4) patch and shenanigans bypass
 * [@theninjaprawn](https://twitter.com/theninjaprawn) for the patchfinder64 additions
 * [@saurik](https://twitter.com/saurik) for Cydia and Substrate
 * [@FCE365](https://twitter.com/FCE365) for the empty_list reliability improvements
-* [@tihmstar](https://twitter.com/tihmstar) for libgrabkernel (No longer used), liboffsetfinder64 (No longer used), v1ntex (No longer used) and v3ntex (No longer used)
-* Credits for [Undecimus-Resources](https://github.com/pwn20wndstuff/Undecimus-Resources)
-* [@coolstarorg](https://twitter.com/coolstarorg) for originally testing the snapshot rename idea on corellium
+* [Samg_is_a_ninja](https://reddit.com/u/Samg_is_a_Ninja) for original UI development
+* [@DennisBednarz](https://twitter.com/DennisBednarz) for original UI design
 * [@Cryptiiiic](https://twitter.com/Cryptiiiic) for testing
 * [@xanDesign_](https://twitter.com/xanDesign_) for testing
 * [@AppleDry05](https://twitter.com/AppleDry05) for testing

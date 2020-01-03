@@ -79,6 +79,7 @@ enum kernel_offset {
     KSTRUCT_OFFSET_HOST_SPECIAL,
     
     /* struct ucred */
+    KSTRUCT_OFFSET_UCRED_CR_REF,
     KSTRUCT_OFFSET_UCRED_CR_UID,
     KSTRUCT_OFFSET_UCRED_CR_RUID,
     KSTRUCT_OFFSET_UCRED_CR_SVUID,
@@ -97,6 +98,9 @@ enum kernel_offset {
     /* struct ipc_entry */
     KSTRUCT_SIZE_IPC_ENTRY,
     KSTRUCT_OFFSET_IPC_ENTRY_IE_BITS,
+    
+    /* struct vnode */
+    KSTRUCT_OFFSET_VNODE_V_FLAG,
     
     /* vtable OSDictionary */
     KVTABLE_OFFSET_OSDICTIONARY_SETOBJECTWITHCHARP,
