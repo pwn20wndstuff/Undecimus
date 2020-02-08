@@ -13,6 +13,8 @@ typedef io_object_t	io_connect_t;
 typedef io_object_t	io_iterator_t;
 typedef io_object_t	io_service_t;
 
+#define IO_OBJECT_NULL    MACH_PORT_NULL
+
 extern const mach_port_t kIOMasterPortDefault;
 
 kern_return_t
@@ -60,6 +62,23 @@ IOConnectCallMethod(
 AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER;
 
 kern_return_t
+IOConnectCallAsyncMethod(
+    mach_port_t     connection,        // In
+    uint32_t     selector,        // In
+    mach_port_t     wake_port,        // In
+    uint64_t    *reference,        // In
+    uint32_t     referenceCnt,        // In
+    const uint64_t    *input,            // In
+    uint32_t     inputCnt,        // In
+    const void    *inputStruct,        // In
+    size_t         inputStructCnt,    // In
+    uint64_t    *output,        // Out
+    uint32_t    *outputCnt,        // In/Out
+    void        *outputStruct,        // Out
+    size_t        *outputStructCnt)    // In/Out
+AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER;
+
+kern_return_t
 IOConnectTrap6(io_connect_t	connect,
 	       uint32_t		index,
 	       uintptr_t	p1,
@@ -68,6 +87,11 @@ IOConnectTrap6(io_connect_t	connect,
 	       uintptr_t	p4,
 	       uintptr_t	p5,
 	       uintptr_t	p6);
+
+kern_return_t
+IOConnectAddClient(
+   io_connect_t    connect,
+   io_connect_t    client );
 
 CFMutableDictionaryRef
 IOServiceMatching(

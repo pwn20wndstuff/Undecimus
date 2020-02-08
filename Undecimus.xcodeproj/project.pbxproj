@@ -65,6 +65,11 @@
 		22CFED9221CDFE6B00A216BE /* libmis.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 22CFED9121CDFE6B00A216BE /* libmis.tbd */; };
 		22F91CDB21E02CF300B2FCAE /* inject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CD921E02CF200B2FCAE /* inject.m */; };
 		22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */ = {isa = PBXBuildFile; fileRef = 22F91CE221E033A500B2FCAE /* libsnappy.c */; };
+		2787138623EE6125007526AF /* oob_timestamp.c in Sources */ = {isa = PBXBuildFile; fileRef = 2787138223EE6125007526AF /* oob_timestamp.c */; };
+		2787138723EE6125007526AF /* iosurface.c in Sources */ = {isa = PBXBuildFile; fileRef = 2787138523EE6125007526AF /* iosurface.c */; };
+		2787138B23EE620B007526AF /* oob_kernel_alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 2787138A23EE620B007526AF /* oob_kernel_alloc.c */; };
+		2787138E23EE6515007526AF /* oob_parameters.c in Sources */ = {isa = PBXBuildFile; fileRef = 2787138D23EE6515007526AF /* oob_parameters.c */; };
+		2787139123EE6578007526AF /* oob_kernel_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 2787139023EE6578007526AF /* oob_kernel_memory.c */; };
 		51435081229E2F0C00446FBA /* Settings-Light.png in Resources */ = {isa = PBXBuildFile; fileRef = 51435080229E2F0C00446FBA /* Settings-Light.png */; };
 		51F1DB24229ED54400B81A6F /* DarkMode-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 51F1DB22229ED54300B81A6F /* DarkMode-Dark.png */; };
 		51F1DB25229ED54400B81A6F /* Settings-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 51F1DB23229ED54400B81A6F /* Settings-Dark.png */; };
@@ -195,6 +200,17 @@
 		22F91CDA21E02CF300B2FCAE /* inject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inject.h; path = Injector/inject.h; sourceTree = SOURCE_ROOT; };
 		22F91CDE21E02EB000B2FCAE /* snappy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = snappy.h; path = snappy/snappy.h; sourceTree = SOURCE_ROOT; };
 		22F91CE221E033A500B2FCAE /* libsnappy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libsnappy.c; path = snappy/libsnappy.c; sourceTree = SOURCE_ROOT; };
+		2787138223EE6125007526AF /* oob_timestamp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = oob_timestamp.c; sourceTree = "<group>"; };
+		2787138323EE6125007526AF /* iosurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iosurface.h; sourceTree = "<group>"; };
+		2787138423EE6125007526AF /* oob_timestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = oob_timestamp.h; sourceTree = "<group>"; };
+		2787138523EE6125007526AF /* iosurface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = iosurface.c; sourceTree = "<group>"; };
+		2787138823EE6141007526AF /* OSSerializeBinary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSSerializeBinary.h; sourceTree = "<group>"; };
+		2787138923EE620B007526AF /* oob_kernel_alloc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = oob_kernel_alloc.h; sourceTree = "<group>"; };
+		2787138A23EE620B007526AF /* oob_kernel_alloc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = oob_kernel_alloc.c; sourceTree = "<group>"; };
+		2787138C23EE6515007526AF /* oob_parameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = oob_parameters.h; sourceTree = "<group>"; };
+		2787138D23EE6515007526AF /* oob_parameters.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = oob_parameters.c; sourceTree = "<group>"; };
+		2787138F23EE6578007526AF /* oob_kernel_memory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = oob_kernel_memory.h; sourceTree = "<group>"; };
+		2787139023EE6578007526AF /* oob_kernel_memory.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = oob_kernel_memory.c; sourceTree = "<group>"; };
 		51435080229E2F0C00446FBA /* Settings-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings-Light.png"; sourceTree = "<group>"; };
 		51F1DB22229ED54300B81A6F /* DarkMode-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DarkMode-Dark.png"; sourceTree = "<group>"; };
 		51F1DB23229ED54400B81A6F /* Settings-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings-Dark.png"; sourceTree = "<group>"; };
@@ -395,6 +411,7 @@
 		2170BDCB21B32FF10059BD10 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				2787138123EE60AC007526AF /* oob_timestamp */,
 				2199B8E6226B40BD00A8255D /* kalloc_crash */,
 				214A1771224EBE4900588EC4 /* kerneldec */,
 				21FF63C8224E5FCE008B76D9 /* offset-cache */,
@@ -548,6 +565,24 @@
 			name = snappy;
 			sourceTree = "<group>";
 		};
+		2787138123EE60AC007526AF /* oob_timestamp */ = {
+			isa = PBXGroup;
+			children = (
+				2787138823EE6141007526AF /* OSSerializeBinary.h */,
+				2787138523EE6125007526AF /* iosurface.c */,
+				2787138323EE6125007526AF /* iosurface.h */,
+				2787138223EE6125007526AF /* oob_timestamp.c */,
+				2787138423EE6125007526AF /* oob_timestamp.h */,
+				2787138923EE620B007526AF /* oob_kernel_alloc.h */,
+				2787138A23EE620B007526AF /* oob_kernel_alloc.c */,
+				2787138C23EE6515007526AF /* oob_parameters.h */,
+				2787138D23EE6515007526AF /* oob_parameters.c */,
+				2787138F23EE6578007526AF /* oob_kernel_memory.h */,
+				2787139023EE6578007526AF /* oob_kernel_memory.c */,
+			);
+			name = oob_timestamp;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -641,6 +676,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				21FED6AB2168F8060024BC95 /* SettingsTableViewController.m in Sources */,
+				2787139123EE6578007526AF /* oob_kernel_memory.c in Sources */,
 				216F3F3E2228776E007DC1BC /* user_client.c in Sources */,
 				2150A9E022021348001C8677 /* parameters.c in Sources */,
 				21A97FD12148103C00DC0023 /* KernelExecution.m in Sources */,
@@ -651,10 +687,12 @@
 				22C546AB21A8A8FD00EFC09C /* utils.m in Sources */,
 				2150A9DC22021348001C8677 /* log.c in Sources */,
 				216F3F3D2228776E007DC1BC /* kernel_call.c in Sources */,
+				2787138B23EE620B007526AF /* oob_kernel_alloc.c in Sources */,
 				22F91CE321E033A500B2FCAE /* libsnappy.c in Sources */,
 				21A97FD42148103C00DC0023 /* remote_call.c in Sources */,
 				21C130E0214BC2880021AA9D /* unlocknvram.c in Sources */,
 				21C13119214D268F0021AA9D /* multi_path_sploit.c in Sources */,
+				2787138E23EE6515007526AF /* oob_parameters.c in Sources */,
 				214A1777224EBE5400588EC4 /* kerneldec.cpp in Sources */,
 				2116449A21737F9500250744 /* JailbreakViewController.m in Sources */,
 				21F4D70E21FC7A590070D5E0 /* patchfinder64.c in Sources */,
@@ -677,6 +715,7 @@
 				21C0FC8A21369EE900849420 /* KernelOffsets.m in Sources */,
 				21FFE0F9222E4C0600EC59B2 /* machswap_pwn.m in Sources */,
 				21FFE0F8222E4C0600EC59B2 /* machswap_offsets.m in Sources */,
+				2787138623EE6125007526AF /* oob_timestamp.c in Sources */,
 				212D884A216E4EBF00A36DA5 /* async_wake.c in Sources */,
 				21BB9804222F05C40012AF40 /* machswap2_pwn.m in Sources */,
 				214A1776224EBE5400588EC4 /* lzssdec.cpp in Sources */,
@@ -688,6 +727,7 @@
 				2150A9CD22021330001C8677 /* voucher_swap.c in Sources */,
 				21C0FC6C21369EB700849420 /* AppDelegate.m in Sources */,
 				225D142221E052960045493D /* ArchiveFile.m in Sources */,
+				2787138723EE6125007526AF /* iosurface.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

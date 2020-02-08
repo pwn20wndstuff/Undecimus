@@ -28,6 +28,7 @@ typedef enum {
     voucher_swap_exploit,
     mach_swap_exploit,
     mach_swap_2_exploit,
+    oob_timestamp,
     deja_xnu_exploit,
     necp_exploit,
     kalloc_crash

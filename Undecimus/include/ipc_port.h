@@ -32,6 +32,7 @@ union waitq_flags {
 
 #define	IKOT_NONE				0
 #define	IKOT_TASK				2
+#define IKOT_HOST_PRIV          4
 
 // ---- osfmk/ipc/ipc_object.h --------------------------------------------------------------------
 

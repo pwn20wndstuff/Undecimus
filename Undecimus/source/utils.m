@@ -111,6 +111,16 @@ exploit_info_t *exploit_infos[] = {
     },
     &(exploit_info_t)
     {
+        .exploit = oob_timestamp,
+        .name = "oob_timestamp",
+        .exploit_capability = jailbreak_capability,
+        .exploit_reliability = highest_exploit_reliability,
+        .device_support_info.min_kernel_version = "6153.60.66~39",
+        .device_support_info.max_kernel_version = "6153.60.66~39",
+        .device_support_info.handler = NULL,
+    },
+    &(exploit_info_t)
+    {
         .exploit = deja_xnu_exploit,
         .name = "Deja XNU",
         .exploit_capability = respring_capability,
@@ -159,7 +169,7 @@ substitutor_info_t *substitutor_infos[] = {
         .bootstrap_tools = "/usr/lib/substrate",
         .substitutor_stability = highest_substitutor_stability,
         .device_support_info.min_kernel_version = "4397.0.0.2.4~1",
-        .device_support_info.max_kernel_version = "4903.240.8~8",
+        .device_support_info.max_kernel_version = "6153.60.66~39",
         .device_support_info.handler = ^bool (void) {
             if (machineNameContains("iPhone11,") || machineNameContains("iPad8,"))
                 return false;

@@ -58,6 +58,7 @@
 #include "machswap_offsets.h"
 #include "machswap_pwn.h"
 #include "machswap2_pwn.h"
+#include "oob_timestamp.h"
 #include "prefs.h"
 
 int stage = __COUNTER__;
@@ -220,6 +221,14 @@ void jailbreak()
                     if (machswap_offsets != NULL &&
                         machswap2_exploit(machswap_offsets) == ERR_SUCCESS &&
                         MACH_PORT_VALID(tfp0) &&
+                        KERN_POINTER_VALID(kernel_base)) {
+                        exploit_success = YES;
+                    }
+                    break;
+                }
+                case oob_timestamp: {
+                    oob_timestamp_pwn(&kernel_base);
+                    if (MACH_PORT_VALID(tfp0) &&
                         KERN_POINTER_VALID(kernel_base)) {
                         exploit_success = YES;
                     }
