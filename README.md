@@ -15,6 +15,11 @@ Unc0ver Jailbreak for iOS 11.0 - 13.5<br/> by
     <a href="https://twitter.com/HiMyNameIsUbik">@HiMyNameIsUbik</a><br/>
 </p>
 
+<p align="center">
+<img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/pwn20wndstuff/Undecimus/total">
+<img alt="GitHub" src="https://img.shields.io/github/license/pwn20wndstuff/Undecimus?label=Pwn20wnd%20-%20License%20MIT">
+</p>
+
 ## The most outstanding changes over the other jailbreaks
 * One app to jailbreak all firmwares
 * Full-fledged Cydia and Substrate support for ARM64 devices
