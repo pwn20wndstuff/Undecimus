@@ -5,10 +5,15 @@
         height="100">
 </p>
 
-<p class="center">
-Unc0ver Jailbreak for iOS 11.0 - 13.5<br/>
-by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
-UI by [@iOS_App_Dev](https://twitter.com/iOS_App_Dev) & [@HiMyNameIsUbik](https://twitter.com/HiMyNameIsUbik)<br/>
+<p align="center">
+Unc0ver Jailbreak for iOS 11.0 - 13.5<br/> by
+<a href="https://twitter.com/Pwn20wnd">
+    @pwn20wnd</a>&
+<a href="https://twitter.com/sbingner">
+    @sbingner</a><br/> UI by
+<a href="https://twitter.com/iOS_App_Dev">
+    @iOS_App_Dev</a> &
+    <a href="https://twitter.com/HiMyNameIsUbik">@HiMyNameIsUbik</a><br/>
 </p>
 
 ## The most outstanding changes over the other jailbreaks
