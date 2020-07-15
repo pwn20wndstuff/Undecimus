@@ -5,7 +5,7 @@
         height="100">
 </p>
 
-<p align="center">
+<p class="center">
 Unc0ver Jailbreak for iOS 11.0 - 13.5<br/>
 by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
 UI by [@iOS_App_Dev](https://twitter.com/iOS_App_Dev) & [@HiMyNameIsUbik](https://twitter.com/HiMyNameIsUbik)<br/>
