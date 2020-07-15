@@ -69,7 +69,7 @@ Unc0ver Jailbreak for iOS 11.0 - 13.5<br/> by
 
 ## Screenshots
 <p align="center">
-<img src="https://github.com/iTPr0/Undecimus/blob/master/Resources/Screenshot.png?raw=true" width="281.25" height="609" /></p>
+<img src="https://github.com/iTPr0/Undecimus/blob/master/Resources/Screenshot.png?raw=true" width="281.25" height="100" /></p>
 
 ## Changelog
 * Releases are available at https://github.com/pwn20wndstuff/Undecimus/releases (Note: rc1-v1.1.4 releases are no longer available)
