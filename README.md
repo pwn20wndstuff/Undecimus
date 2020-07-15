@@ -9,7 +9,7 @@ Unc0ver Jailbreak for iOS 11.0 - 13.5<br/> by
 <a href="https://twitter.com/Pwn20wnd">
     <img alt="Twitter URL" src="https://img.shields.io/twitter/url?label=Pwn20wnd&style=social&url=https%3A%2F%2Ftwitter.com%2FPwn20wnd"></a>  &
 <a href="https://twitter.com/sbingner">
-    @sbingner</a><br/> UI by
+    <img alt="Twitter URL" src="https://img.shields.io/twitter/url?label=Sam%20Bingner&url=https%3A%2F%2Ftwitter.com%2Fsbingner"></a><br/> UI by
 <a href="https://twitter.com/iOS_App_Dev">
     @iOS_App_Dev</a>  &
     <a href="https://twitter.com/HiMyNameIsUbik">@HiMyNameIsUbik</a><br/>
