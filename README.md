@@ -18,11 +18,11 @@ Unc0ver Jailbreak for iOS 11.0 - 13.5<br/> by
 
 <p align="center">
 <a href="https://github.com/pwn20wndstuff/Undecimus/watchers">
-<img alt="GitHub watchers" src="https://img.shields.io/github/watchers/pwn20wndstuff/Undecimus?label=Watchers%20-%20Pwn20wnd&style=social"></a>
+    <img alt="GitHub watchers" src="https://img.shields.io/github/watchers/pwn20wndstuff/Undecimus?label=Watchers%20-%20Pwn20wnd&style=social"></a>
 <a href="https://github.com/pwn20wndstuff/Undecimus/releases">  
-<img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/pwn20wndstuff/Undecimus/total"></a>
+    <img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/pwn20wndstuff/Undecimus/total?label=Downloads%20-%20Pwn20wnd"></a>
 <a href="https://github.com/pwn20wndstuff/Undecimus/blob/master/LICENSE">
-<img alt="GitHub" src="https://img.shields.io/github/license/pwn20wndstuff/Undecimus?label=Pwn20wnd%20-%20License%20MIT"></a>
+    <img alt="GitHub" src="https://img.shields.io/github/license/pwn20wndstuff/Undecimus?label=Pwn20wnd%20-%20License%20MIT"></a>
 </p>
 
 ## The most outstanding changes over the other jailbreaks
