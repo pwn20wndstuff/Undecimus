@@ -17,6 +17,10 @@ Unc0ver Jailbreak for iOS 11.0 - 13.5<br/> by
 </p>
 
 <p align="center">
+<a href="https://www.patreon.com/Pwn20wnd">
+    <img alt="Support me on Patreon" src="https://user-images.githubusercontent.com/6497827/53698102-4af3f400-3dfe-11e9-9749-4104ceb6ea3c.png"></a>
+<a href="https://www.paypal.me/pwn20wnd">
+    <img alt="Support me on Patreon" src="https://user-images.githubusercontent.com/6497827/53698092-42032280-3dfe-11e9-8054-1597c62d344e.png"></a>
 <a href="https://github.com/pwn20wndstuff/Undecimus/watchers">
     <img alt="GitHub watchers" src="https://img.shields.io/github/watchers/pwn20wndstuff/Undecimus?label=Watchers%20-%20Pwn20wnd&style=social"></a>
 <a href="https://github.com/pwn20wndstuff/Undecimus/releases">  
