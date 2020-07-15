@@ -17,6 +17,8 @@ Unc0ver Jailbreak for iOS 11.0 - 13.5<br/> by
 </p>
 
 <p align="center">
+<a href="https://github.com/pwn20wndstuff/Undecimus/watchers">
+<img alt="GitHub watchers" src="https://img.shields.io/github/watchers/pwn20wndstuff/Undecimus?label=Watchers%20-%20Pwn20wnd&style=social"></a>
 <a href="https://github.com/pwn20wndstuff/Undecimus/releases">  
 <img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/pwn20wndstuff/Undecimus/total"></a>
 <a href="https://github.com/pwn20wndstuff/Undecimus/blob/master/LICENSE">
