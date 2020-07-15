@@ -8,11 +8,11 @@
 <p align="center">
 Unc0ver Jailbreak for iOS 11.0 - 13.5<br/> by
 <a href="https://twitter.com/Pwn20wnd">
-    @pwn20wnd</a>&
+    @pwn20wnd</a>  &
 <a href="https://twitter.com/sbingner">
     @sbingner</a><br/> UI by
 <a href="https://twitter.com/iOS_App_Dev">
-    @iOS_App_Dev</a> &
+    @iOS_App_Dev</a>  &
     <a href="https://twitter.com/HiMyNameIsUbik">@HiMyNameIsUbik</a><br/>
 </p>
 
