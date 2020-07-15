@@ -1,10 +1,15 @@
 # unc0ver
 ### The most advanced jailbreak tool
-![unc0ver logo](https://github.com/pwn20wndstuff/Undecimus/raw/master/Undecimus/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png)
+<p align="center">
+    <img src="https://github.com/pwn20wndstuff/Undecimus/raw/master/Undecimus/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png"
+        height="100">
+</p>
 
+<p align="center">
 Unc0ver Jailbreak for iOS 11.0 - 13.5<br/>
 by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
 UI by [@iOS_App_Dev](https://twitter.com/iOS_App_Dev) & [@HiMyNameIsUbik](https://twitter.com/HiMyNameIsUbik)<br/>
+</p>
 
 ## The most outstanding changes over the other jailbreaks
 * One app to jailbreak all firmwares
