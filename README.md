@@ -13,9 +13,7 @@ Unc0ver Jailbreak for iOS 11.0 - 13.5<br/> by
 <a href="https://twitter.com/iOS_App_Dev">
     <img alt="Twitter URL" src="https://img.shields.io/twitter/url?label=exDeveloper&url=https%3A%2F%2Ftwitter.com%2FiOS_App_Dev"></a>  &
 <a href="https://twitter.com/HiMyNameIsUbik">
-    <img alt="Twitter URL" src="https://img.shields.io/twitter/url?label=UBIK%20%E2%80%93%20Get%20Kalm%20on%20Chariz%21&url=https%3A%2F%2Ftwitter.com%2FHiMyNameIsUbik"></a>
-<a href"https://unc0ver.dev/">
-    <img alt="Website" src="https://img.shields.io/website?label=https&up_message=Unc0ver.dev&url=https%3A%2F%2Func0ver.dev%2F"></a><br/>
+    <img alt="Twitter URL" src="https://img.shields.io/twitter/url?label=UBIK%20%E2%80%93%20Get%20Kalm%20on%20Chariz%21&url=https%3A%2F%2Ftwitter.com%2FHiMyNameIsUbik"></a><br/>
 </p>
 
 <p align="center">
@@ -25,6 +23,8 @@ Unc0ver Jailbreak for iOS 11.0 - 13.5<br/> by
     <img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/pwn20wndstuff/Undecimus/total?label=v5.2.0%20Release%20-%20Pwn20wnd"></a>
 <a href="https://github.com/pwn20wndstuff/Undecimus/blob/master/LICENSE">
     <img alt="GitHub" src="https://img.shields.io/github/license/pwn20wndstuff/Undecimus?label=Pwn20wnd%20-%20License%20MIT"></a>
+<a href"https://unc0ver.dev/">
+    <img alt="Website" src="https://img.shields.io/website?label=https&up_message=Unc0ver.dev&url=https%3A%2F%2Func0ver.dev%2F"></a>
 </p>
 
 ## The most outstanding changes over the other jailbreaks
