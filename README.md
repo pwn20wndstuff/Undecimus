@@ -1,7 +1,7 @@
 # unc0ver
 ### The most advanced jailbreak tool
 <p align="center">
-    <img src="https://github.com/pwn20wndstuff/Undecimus/raw/master/Undecimus/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png"
+    <img src="https://github.com/iTPr0/Undecimus/blob/master/Undecimus/Assets.xcassets/AppIcon.appiconset/unc0ver.png?raw=true"
         height="100">
 </p>
 
