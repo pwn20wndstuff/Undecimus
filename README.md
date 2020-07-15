@@ -1,10 +1,33 @@
-# unc0ver
 ### The most advanced jailbreak tool
-![unc0ver logo](https://github.com/pwn20wndstuff/Undecimus/raw/master/Undecimus/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png)
+<p align="center">
+    <img src="https://github.com/iTPr0/Undecimus/blob/master/Undecimus/Assets.xcassets/AppIcon.appiconset/unc0ver.png?raw=true"
+        height="300">
+</p>
 
-unc0ver jailbreak for iOS 11.0 - 12.2<br/>
-by [@pwn20wnd](https://twitter.com/Pwn20wnd) & [@sbingner](https://twitter.com/sbingner)<br/>
-UI by [@iOS_App_Dev](https://twitter.com/iOS_App_Dev) & [@HiMyNameIsUbik](https://twitter.com/HiMyNameIsUbik)<br/>
+<p align="center">
+Unc0ver Jailbreak for iOS 11.0 - 13.5<br/> by
+<a href="https://twitter.com/Pwn20wnd">
+    <img alt="Twitter URL" src="https://img.shields.io/twitter/url?label=Pwn20wnd&style=social&url=https%3A%2F%2Ftwitter.com%2FPwn20wnd"></a>  &
+<a href="https://twitter.com/sbingner">
+    <img alt="Twitter URL" src="https://img.shields.io/twitter/url?label=Sam%20Bingner&url=https%3A%2F%2Ftwitter.com%2Fsbingner"></a><br/> UI by
+<a href="https://twitter.com/iOS_App_Dev">
+    <img alt="Twitter URL" src="https://img.shields.io/twitter/url?label=exDeveloper&url=https%3A%2F%2Ftwitter.com%2FiOS_App_Dev"></a>  &
+<a href="https://twitter.com/HiMyNameIsUbik">
+    <img alt="Twitter URL" src="https://img.shields.io/twitter/url?label=UBIK%20%E2%80%93%20Get%20Kalm%20on%20Chariz%21&url=https%3A%2F%2Ftwitter.com%2FHiMyNameIsUbik"></a><br/>
+</p>
+
+<p align="center">
+<a href="https://www.patreon.com/Pwn20wnd">
+    <img alt="Support me on Patreon" src="https://user-images.githubusercontent.com/6497827/53698102-4af3f400-3dfe-11e9-9749-4104ceb6ea3c.png"></a>
+<a href="https://www.paypal.me/pwn20wnd">
+    <img alt="Support me on Patreon" src="https://user-images.githubusercontent.com/6497827/53698092-42032280-3dfe-11e9-8054-1597c62d344e.png"></a>
+<a href="https://github.com/pwn20wndstuff/Undecimus/watchers">
+    <img alt="GitHub watchers" src="https://img.shields.io/github/watchers/pwn20wndstuff/Undecimus?label=Watchers%20-%20Pwn20wnd&style=social"></a>
+<a href="https://github.com/pwn20wndstuff/Undecimus/releases">  
+    <img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/pwn20wndstuff/Undecimus/total?label=v5.2.0%20Release%20-%20Pwn20wnd"></a>
+<a href="https://github.com/pwn20wndstuff/Undecimus/blob/master/LICENSE">
+    <img alt="GitHub" src="https://img.shields.io/github/license/pwn20wndstuff/Undecimus?label=Pwn20wnd%20-%20License%20MIT"></a>
+</p>
 
 ## The most outstanding changes over the other jailbreaks
 * One app to jailbreak all firmwares
@@ -49,7 +72,8 @@ UI by [@iOS_App_Dev](https://twitter.com/iOS_App_Dev) & [@HiMyNameIsUbik](https:
 * <a href="https://youtu.be/TqHYjLHO0zs">https://youtu.be/TqHYjLHO0zs</a>
 
 ## Screenshots
-<img src="https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Screenshot-1.PNG" width="281.25" height="609" /> <img src="https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Screenshot-2.PNG" width="281.25" height="609" /> <img src="https://github.com/pwn20wndstuff/Undecimus/raw/master/Resources/Screenshot-3.PNG" width="281.25" height="609" />
+<p align="center">
+<img src="https://github.com/iTPr0/Undecimus/blob/master/Resources/Screenshot.png?raw=true" height="500" /></p>
 
 ## Changelog
 * Releases are available at https://github.com/pwn20wndstuff/Undecimus/releases (Note: rc1-v1.1.4 releases are no longer available)
